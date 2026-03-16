@@ -1,0 +1,116 @@
+Italy-paper style specification build-up for Australia
+Run time: 2026-03-16 21:29:49
+Sample start: 1988-09-01
+Sample end: 2021-12-01
+
+Sequence
+--------
+Step 1: textbook-style model with log net worth to income.
+Step 2: add short-run change in credit conditions.
+Step 3: replace log net worth ratio with level net worth ratio.
+Step 4: split housing wealth from net financial wealth and add housing affordability.
+Step 5: split financial wealth into liquid assets, illiquid financial assets and debt.
+Step 6: allow a post-2008Q3 shift in the permanent-vs-current income weight.
+
+Model Comparison
+----------------
+# A tibble: 6 × 16
+  specification     step_order n_obs   aic   bic adj_r2  sigma adf_stat adf_1pct
+  <chr>                  <int> <int> <dbl> <dbl>  <dbl>  <dbl>    <dbl>    <dbl>
+1 step1_textbook_l…          1   134 -451. -439.  0.587 0.0441    -1.58    -3.46
+2 step2_add_short_…          2   134 -451. -439.  0.587 0.0441    -1.58    -3.46
+3 step3_level_net_…          3   134 -456. -444.  0.601 0.0434    -1.82    -3.46
+4 step4_split_hous…          4   134 -496. -479.  0.710 0.0370    -1.25    -3.46
+5 step5_split_liqu…          5   134 -662. -639.  0.917 0.0198    -3.13    -3.46
+6 step6_post_gfc_s…          6   134 -675. -649.  0.925 0.0188    -3.50    -3.46
+# ℹ 7 more variables: adf_5pct <dbl>, adf_10pct <dbl>, adf_reject_5pct <lgl>,
+#   ecm_n_obs <int>, ecm_adj_r2 <dbl>, ecm_sigma <dbl>,
+#   speed_of_adjustment <dbl>
+
+Final Long-run Fit
+------------------
+
+Call:
+lm(formula = formula, data = sample)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.139067 -0.008115  0.000307  0.009894  0.040078 
+
+Coefficients:
+                                      Estimate Std. Error t value
+(Intercept)                            3.75087    0.67043   5.595
+log_disposable_permanent_income_ratio  0.05330    0.11898   0.448
+gfc_income_shift_interaction          -0.80276    0.21410  -3.750
+housing_wealth_income_ratio            0.06930    0.01397   4.959
+house_price_income_log_ratio          -0.26811    0.04971  -5.394
+liquid_assets_income_ratio            -0.71791    0.03428 -20.943
+illiquid_financial_income_ratio       -0.07581    0.01699  -4.462
+debt_income_ratio                      0.31082    0.02844  10.930
+                                                  Pr(>|t|)    
+(Intercept)                                    0.000000131 ***
+log_disposable_permanent_income_ratio             0.654954    
+gfc_income_shift_interaction                      0.000269 ***
+housing_wealth_income_ratio                    0.000002236 ***
+house_price_income_log_ratio                   0.000000329 ***
+liquid_assets_income_ratio            < 0.0000000000000002 ***
+illiquid_financial_income_ratio                0.000017756 ***
+debt_income_ratio                     < 0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.01883 on 126 degrees of freedom
+Multiple R-squared:  0.9288,	Adjusted R-squared:  0.9249 
+F-statistic: 234.9 on 7 and 126 DF,  p-value: < 0.00000000000000022
+
+
+Final Short-run ECM
+-------------------
+
+Call:
+lm(formula = ecm_formula_local, data = ecm_data_local)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.065210 -0.004419 -0.000081  0.006211  0.025751 
+
+Coefficients:
+                                 Estimate Std. Error t value        Pr(>|t|)
+(Intercept)                     0.0008779  0.0031058   0.283        0.777931
+ecm_lag                        -0.2311639  0.0759294  -3.044        0.002880
+d_lgdi                         -0.4969817  0.6646553  -0.748        0.456124
+d_lgdi_lag                      0.1584252  0.0825565   1.919        0.057421
+d_lcons_lag                    -0.2158016  0.0776696  -2.778        0.006364
+d_log_y_yp                      0.1310966  0.6551463   0.200        0.841748
+d_gfc_income_shift_interaction -0.5957365  0.1618414  -3.681        0.000353
+d_hw_ratio                      0.0279687  0.0176045   1.589        0.114823
+d_house_price_income_log_ratio -0.3274549  0.2739619  -1.195        0.234404
+d_liquid_assets_ratio          -0.0967461  0.1144123  -0.846        0.399507
+d_ifw_ratio                    -0.0221024  0.0172323  -1.283        0.202162
+d_debt_ratio                   -4.6393994  1.6293959  -2.847        0.005209
+d_cci                           2.1938032  0.7546694   2.907        0.004367
+d_u                            -0.0237275  0.0031886  -7.441 0.0000000000183
+d_house_prices                  0.2329738  0.2650169   0.879        0.381154
+                                  
+(Intercept)                       
+ecm_lag                        ** 
+d_lgdi                            
+d_lgdi_lag                     .  
+d_lcons_lag                    ** 
+d_log_y_yp                        
+d_gfc_income_shift_interaction ***
+d_hw_ratio                        
+d_house_price_income_log_ratio    
+d_liquid_assets_ratio             
+d_ifw_ratio                       
+d_debt_ratio                   ** 
+d_cci                          ** 
+d_u                            ***
+d_house_prices                    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.01142 on 117 degrees of freedom
+Multiple R-squared:  0.5912,	Adjusted R-squared:  0.5423 
+F-statistic: 12.09 on 14 and 117 DF,  p-value: < 0.00000000000000022
+

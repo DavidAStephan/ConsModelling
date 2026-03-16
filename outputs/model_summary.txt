@@ -1,0 +1,112 @@
+Australian household consumption model summary
+Run time: 2026-03-16 21:29:49
+Sample start: 1988-09-01
+Sample end: 2021-12-01
+
+Specification
+-------------
+House prices are spliced from houseprice_old.csv into the ABS series; resulting house-price sample starts: 1986-06-01
+Real consumption and income are scaled by civilian population aged 15 years and over.
+Permanent income is constructed with a one-sided adaptive filter on log real disposable income per working-age person.
+Preferred long-run specification: net_liquid_assets
+Long-run RHS variables: log_disposable_permanent_income_ratio, housing_wealth_income_ratio, illiquid_financial_income_ratio, net_liquid_assets_income_ratio, unemployment_rate, credit_conditions_index
+Short-run equation: error-correction model for quarterly log real consumption growth using the differenced terms implied by the selected long-run specification.
+
+Long-run model comparison
+-------------------------
+# A tibble: 4 × 11
+  specification       n_obs   aic   bic adj_r2  sigma adf_stat adf_1pct adf_5pct
+  <chr>               <int> <dbl> <dbl>  <dbl>  <dbl>    <dbl>    <dbl>    <dbl>
+1 net_liquid_assets     134 -643. -620.  0.904 0.0213    -2.94    -3.46    -2.88
+2 separate_liquid_de…   134 -643. -620.  0.904 0.0213    -2.93    -3.46    -2.88
+3 separate_liquid_de…   134 -642. -619.  0.904 0.0213    -2.99    -3.46    -2.88
+4 separate_liquid_de…   134 -641. -615.  0.904 0.0213    -2.98    -3.46    -2.88
+# ℹ 2 more variables: adf_10pct <dbl>, adf_reject_5pct <lgl>
+
+Long-run fit
+------------
+
+Call:
+lm(formula = formula, data = sample)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.145186 -0.008773  0.000134  0.011664  0.045375 
+
+Coefficients:
+                                       Estimate Std. Error t value
+(Intercept)                           -0.413201   0.045899  -9.002
+log_disposable_permanent_income_ratio -0.106367   0.092279  -1.153
+housing_wealth_income_ratio           -0.003670   0.008258  -0.444
+illiquid_financial_income_ratio       -0.005384   0.013959  -0.386
+net_liquid_assets_income_ratio        -0.678527   0.033713 -20.127
+unemployment_rate                     -0.002185   0.002071  -1.055
+credit_conditions_index               -0.185486   0.012923 -14.353
+                                                  Pr(>|t|)    
+(Intercept)                            0.00000000000000274 ***
+log_disposable_permanent_income_ratio                0.251    
+housing_wealth_income_ratio                          0.658    
+illiquid_financial_income_ratio                      0.700    
+net_liquid_assets_income_ratio        < 0.0000000000000002 ***
+unemployment_rate                                    0.293    
+credit_conditions_index               < 0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.02125 on 127 degrees of freedom
+Multiple R-squared:  0.9086,	Adjusted R-squared:  0.9042 
+F-statistic: 210.3 on 6 and 127 DF,  p-value: < 0.00000000000000022
+
+
+ADF test on error-correction residual
+-------------------------------------
+
+############################################################### 
+# Augmented Dickey-Fuller Test Unit Root / Cointegration Test # 
+############################################################### 
+
+The value of the test statistic is: -2.9416 4.4754 
+
+
+Short-run ECM
+-------------
+
+Call:
+lm(formula = ecm_formula, data = ecm_data)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.074925 -0.004626  0.000410  0.005834  0.021147 
+
+Coefficients:
+                Estimate Std. Error t value           Pr(>|t|)    
+(Intercept)     0.003764   0.002633   1.429            0.15552    
+ecm_lag        -0.225720   0.067197  -3.359            0.00105 ** 
+d_lgdi         -0.037851   0.670512  -0.056            0.95508    
+d_lgdi_lag      0.064723   0.077771   0.832            0.40693    
+d_lcons_lag    -0.161632   0.079140  -2.042            0.04331 *  
+d_log_y_yp     -0.026654   0.684255  -0.039            0.96899    
+d_hw_ratio      0.023255   0.017960   1.295            0.19787    
+d_ifw_ratio    -0.008223   0.017673  -0.465            0.64256    
+d_nla_ratio    -0.112175   0.116666  -0.962            0.33823    
+d_u            -0.027848   0.003264  -8.533 0.0000000000000513 ***
+d_cci           0.017913   0.068320   0.262            0.79362    
+d_house_prices -0.103029   0.086712  -1.188            0.23711    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.01205 on 120 degrees of freedom
+Multiple R-squared:  0.5325,	Adjusted R-squared:  0.4897 
+F-statistic: 12.43 on 11 and 120 DF,  p-value: 0.000000000000002251
+
+
+Headline diagnostics
+--------------------
+Long-run R-squared: 0.9086
+Short-run R-squared: 0.5325
+Speed of adjustment (ECM coefficient): -0.2257
+Short-run income elasticity term on dlog income: -0.0379
+Approximate housing wealth MPC (dollars per dollar): -0.7921
+Approximate illiquid financial wealth MPC (dollars per dollar): -1.1622
+Approximate liquid assets MPC (dollars per dollar): NA
+Approximate debt MPC (dollars per dollar): NA
