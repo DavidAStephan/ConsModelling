@@ -139,6 +139,17 @@ safe_log <- function(x) {
 }
 
 
+rescale_to_millions <- function(x, unit) {
+  unit_clean <- str_to_lower(str_squish(unit))
+
+  dplyr::case_when(
+    unit_clean %in% c("$ billions", "billions") ~ x * 1000,
+    unit_clean %in% c("$ millions", "millions") ~ x,
+    TRUE ~ x
+  )
+}
+
+
 parse_quarter_label_date <- function(x) {
   x <- str_trim(x)
   month_map <- c(
@@ -220,14 +231,26 @@ splice_house_price_series <- function(current_series, legacy_series) {
 
 
 run_adf_drift <- function(x, lags = 4L) {
-  fit <- ur.df(x, type = "drift", lags = lags)
-  tau_name <- grep("^tau", colnames(fit@teststat), value = TRUE)[1]
+  tryCatch(
+    {
+      fit <- ur.df(x, type = "drift", lags = lags)
+      tau_name <- grep("^tau", colnames(fit@teststat), value = TRUE)[1]
 
-  tibble(
-    adf_stat = unname(fit@teststat[1, tau_name]),
-    adf_1pct = unname(fit@cval[tau_name, "1pct"]),
-    adf_5pct = unname(fit@cval[tau_name, "5pct"]),
-    adf_10pct = unname(fit@cval[tau_name, "10pct"])
+      tibble(
+        adf_stat = unname(fit@teststat[1, tau_name]),
+        adf_1pct = unname(fit@cval[tau_name, "1pct"]),
+        adf_5pct = unname(fit@cval[tau_name, "5pct"]),
+        adf_10pct = unname(fit@cval[tau_name, "10pct"])
+      )
+    },
+    error = function(e) {
+      tibble(
+        adf_stat = NA_real_,
+        adf_1pct = NA_real_,
+        adf_5pct = NA_real_,
+        adf_10pct = NA_real_
+      )
+    }
   )
 }
 
@@ -293,6 +316,151 @@ build_local_trend_ssm <- function(y, log_h, log_q_level, log_q_slope) {
     ),
     H = matrix(exp(log_h))
   )
+}
+
+
+read_rba_xlsx_table <- function(path, sheet = "Data") {
+  raw <- read_excel(path, sheet = sheet, col_names = FALSE, .name_repair = "minimal")
+
+  if (ncol(raw) < 2L) {
+    stop("RBA workbook ", basename(path), " appears to have no data columns.")
+  }
+
+  meta_rows <- list(
+    title = 2L,
+    description = 3L,
+    frequency = 4L,
+    series_type = 5L,
+    unit = 6L,
+    source = 9L,
+    publication_date = 10L,
+    series_id = 11L
+  )
+
+  data_block <- raw[-seq_len(11L), , drop = FALSE]
+  names(data_block) <- paste0("col_", seq_len(ncol(data_block)))
+
+  out <- vector("list", length = ncol(data_block) - 1L)
+
+  for (j in 2:ncol(raw)) {
+    title <- as.character(raw[[j]][meta_rows$title])
+    if (is.na(title) || !nzchar(title)) {
+      next
+    }
+
+    tmp <- tibble(
+      date_serial = suppressWarnings(as.numeric(data_block[[1]])),
+      value = suppressWarnings(as.numeric(data_block[[j]]))
+    ) %>%
+      mutate(
+        date = as.Date(date_serial, origin = "1899-12-30"),
+        series_name = str_squish(title),
+        description = str_squish(as.character(raw[[j]][meta_rows$description])),
+        frequency = str_squish(as.character(raw[[j]][meta_rows$frequency])),
+        series_type = str_squish(as.character(raw[[j]][meta_rows$series_type])),
+        unit = str_squish(as.character(raw[[j]][meta_rows$unit])),
+        source = str_squish(as.character(raw[[j]][meta_rows$source])),
+        publication_date = as.character(raw[[j]][meta_rows$publication_date]),
+        series_id = str_squish(as.character(raw[[j]][meta_rows$series_id]))
+      ) %>%
+      select(date, value, series_name, description, frequency, series_type, unit, source, publication_date, series_id) %>%
+      filter(!is.na(date))
+
+    out[[j - 1L]] <- tmp
+  }
+
+  bind_rows(out) %>%
+    filter(!is.na(value))
+}
+
+
+read_rba_csv_table <- function(path) {
+  raw <- read.csv(path, skip = 1L, header = FALSE, fill = TRUE, check.names = FALSE, stringsAsFactors = FALSE)
+
+  if (ncol(raw) < 2L || nrow(raw) < 9L) {
+    stop("RBA CSV ", basename(path), " appears to have no data columns.")
+  }
+
+  meta_rows <- list(
+    title = 1L,
+    description = 2L,
+    frequency = 3L,
+    series_type = 4L,
+    unit = 5L,
+    source = 6L,
+    publication_date = 7L,
+    series_id = 8L
+  )
+
+  out <- vector("list", length = ncol(raw) - 1L)
+
+  for (j in 2:ncol(raw)) {
+    title <- raw[[j]][meta_rows$title]
+    if (is.na(title) || !nzchar(title)) {
+      next
+    }
+
+    tmp <- tibble(
+      date = as.Date(raw[-seq_len(8L), 1], format = "%d-%b-%Y"),
+      value = suppressWarnings(as.numeric(raw[-seq_len(8L), j])),
+      series_name = str_squish(title),
+      description = str_squish(raw[[j]][meta_rows$description]),
+      frequency = str_squish(raw[[j]][meta_rows$frequency]),
+      series_type = str_squish(raw[[j]][meta_rows$series_type]),
+      unit = str_squish(raw[[j]][meta_rows$unit]),
+      source = str_squish(raw[[j]][meta_rows$source]),
+      publication_date = raw[[j]][meta_rows$publication_date],
+      series_id = str_squish(raw[[j]][meta_rows$series_id])
+    ) %>%
+      filter(!is.na(date), !is.na(value))
+
+    out[[j - 1L]] <- tmp
+  }
+
+  bind_rows(out)
+}
+
+
+to_quarter_start_date <- function(x) {
+  as.Date(sprintf("%d-%02d-01", lubridate::year(x), lubridate::quarter(x) * 3L))
+}
+
+
+interpolate_annual_to_quarterly <- function(annual_data, quarter_dates, value_col) {
+  annual_dates <- sort(unique(annual_data$date))
+  quarter_frame <- tibble(date = sort(unique(as.Date(quarter_dates))))
+
+  merged <- quarter_frame %>%
+    left_join(
+      annual_data %>% select(date, value = all_of(value_col)),
+      by = "date"
+    ) %>%
+    arrange(date)
+
+  merged %>%
+    mutate(value = zoo::na.approx(value, x = date, na.rm = FALSE, rule = 2L)) %>%
+    rename(!!value_col := value)
+}
+
+
+build_spline_credit_index <- function(indicator_data, indicator_cols, spline_df = 6L) {
+  smooth_components <- lapply(indicator_cols, function(col_name) {
+    valid <- which(!is.na(indicator_data[[col_name]]))
+    out <- rep(NA_real_, nrow(indicator_data))
+
+    if (length(valid) < 8L) {
+      return(out)
+    }
+
+    df_use <- max(3L, min(spline_df, length(valid) - 1L))
+    time_index <- seq_along(valid)
+    fit <- lm(indicator_data[[col_name]][valid] ~ splines::ns(time_index, df = df_use))
+    out[valid] <- fitted(fit)
+    out
+  })
+
+  component_matrix <- do.call(cbind, smooth_components)
+  standardise(rowMeans(component_matrix, na.rm = TRUE))
 }
 
 
