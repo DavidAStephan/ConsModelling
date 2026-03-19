@@ -156,6 +156,55 @@ mortgage_interest_paid <- pick_preferred_series(
 ) %>%
   transmute(date, mortgage_interest_paid = value)
 
+compensation_employees <- pick_preferred_series(
+  hh_income_account_raw,
+  "^Compensation of employees ;$",
+  preferred_types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend", "Original")
+) %>%
+  transmute(date, compensation_employees = value)
+
+gross_mixed_income <- pick_preferred_series(
+  hh_income_account_raw,
+  "^Gross mixed income ;$",
+  preferred_types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend", "Original")
+) %>%
+  transmute(date, gross_mixed_income = value)
+
+gross_operating_surplus_dwellings <- pick_preferred_series(
+  hh_income_account_raw,
+  "^Gross operating surplus ; Dwellings owned by persons ;$",
+  preferred_types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend", "Original")
+) %>%
+  transmute(date, gross_operating_surplus_dwellings = value)
+
+total_primary_income_receivable <- pick_preferred_series(
+  hh_income_account_raw,
+  "^Total primary income receivable ;$",
+  preferred_types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend", "Original")
+) %>%
+  transmute(date, total_primary_income_receivable = value)
+
+total_primary_income_payable <- pick_preferred_series(
+  hh_income_account_raw,
+  "^Total primary income payable ;$",
+  preferred_types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend", "Original")
+) %>%
+  transmute(date, total_primary_income_payable = value)
+
+total_secondary_income_receivable <- pick_preferred_series(
+  hh_income_account_raw,
+  "^Total secondary income receivable ;$",
+  preferred_types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend", "Original")
+) %>%
+  transmute(date, total_secondary_income_receivable = value)
+
+total_secondary_income_payable <- pick_preferred_series(
+  hh_income_account_raw,
+  "^Total secondary income payable ;$",
+  preferred_types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend", "Original")
+) %>%
+  transmute(date, total_secondary_income_payable = value)
+
 closing_net_worth <- pick_preferred_series(
   hh_inc_raw,
   "^Closing net worth ;$"
@@ -288,6 +337,13 @@ model_data <- consumption_real %>%
   inner_join(gross_disposable_income, by = "date") %>%
   inner_join(final_consumption_hh, by = "date") %>%
   inner_join(mortgage_interest_paid, by = "date") %>%
+  inner_join(compensation_employees, by = "date") %>%
+  inner_join(gross_mixed_income, by = "date") %>%
+  inner_join(gross_operating_surplus_dwellings, by = "date") %>%
+  inner_join(total_primary_income_receivable, by = "date") %>%
+  inner_join(total_primary_income_payable, by = "date") %>%
+  inner_join(total_secondary_income_receivable, by = "date") %>%
+  inner_join(total_secondary_income_payable, by = "date") %>%
   inner_join(closing_net_worth, by = "date") %>%
   inner_join(currency_deposits, by = "date") %>%
   inner_join(equities, by = "date") %>%
@@ -307,27 +363,33 @@ model_data <- consumption_real %>%
     liquid_assets = currency_deposits,
     net_liquid_assets = currency_deposits - household_debt,
     final_consumption_hh_sa = final_consumption_hh,
+    property_income_receivable = total_primary_income_receivable - compensation_employees - gross_mixed_income - gross_operating_surplus_dwellings,
+    non_property_disposable_income = gross_disposable_income - property_income_receivable + total_primary_income_payable,
     annualised_income = gross_disposable_income * 4,
+    annualised_nonproperty_income = non_property_disposable_income * 4,
     # The ABS household balance sheet is current price. Deflating by the
     # household consumption deflator is an approximation, but it keeps the
     # balance-sheet variables on a household spending price basis.
     real_gdi = gross_disposable_income / consumption_deflator * 100,
+    real_nonproperty_income = non_property_disposable_income / consumption_deflator * 100,
     real_consumption_per_working_age = consumption_real / working_age_population,
     real_gdi_per_working_age = real_gdi / working_age_population,
+    real_nonproperty_income_per_working_age = real_nonproperty_income / working_age_population,
     real_housing_wealth = housing_wealth / consumption_deflator * 100,
     real_illiquid_financial_wealth = illiquid_financial_wealth / consumption_deflator * 100,
     real_household_debt = household_debt / consumption_deflator * 100,
-    nominal_consumption_income_ratio = final_consumption_hh_sa / annualised_income,
-    housing_wealth_income_ratio = housing_wealth / annualised_income,
-    illiquid_financial_income_ratio = illiquid_financial_wealth / annualised_income,
-    liquid_assets_income_ratio = liquid_assets / annualised_income,
-    net_liquid_assets_income_ratio = net_liquid_assets / annualised_income,
-    debt_income_ratio = household_debt / annualised_income,
-    mortgage_interest_income_ratio = mortgage_interest_paid / annualised_income,
+    nominal_consumption_income_ratio = final_consumption_hh_sa / annualised_nonproperty_income,
+    housing_wealth_income_ratio = housing_wealth / annualised_nonproperty_income,
+    illiquid_financial_income_ratio = illiquid_financial_wealth / annualised_nonproperty_income,
+    liquid_assets_income_ratio = liquid_assets / annualised_nonproperty_income,
+    net_liquid_assets_income_ratio = net_liquid_assets / annualised_nonproperty_income,
+    debt_income_ratio = household_debt / annualised_nonproperty_income,
+    mortgage_interest_income_ratio = mortgage_interest_paid / annualised_nonproperty_income,
     mortgage_rate_nominal = 400 * mortgage_interest_paid / lag(household_debt, 1L),
+    mortgage_cashflow_pressure = lead_lag_diff(mortgage_rate_nominal, 4L) * lag(debt_income_ratio, 1L),
     first_home_buyer_share = first_home_buyer_loans / (first_home_buyer_loans + non_first_home_buyer_loans),
     lcons = safe_log(real_consumption_per_working_age),
-    lgdi = safe_log(real_gdi_per_working_age)
+    lgdi = safe_log(real_nonproperty_income_per_working_age)
   )
 
 permanent_log_income <- adaptive_permanent_income_log(model_data$lgdi, lambda = 0.97)
@@ -350,44 +412,130 @@ model_data <- model_data %>%
 
 # In the Muellbauer tradition, measured borrowing conditions are not fully
 # observed. We therefore summarise several indicators into a single latent
-# factor. Signs are chosen so that a higher index means easier credit:
-# - more loan commitments -> easier credit
-# - faster house prices -> easier credit / more collateral
-# - lower debt-income ratio -> easier credit, after leverage has built up
-credit_panel <- model_data %>%
+# factor. We explore multiple long-history state-space specifications and use
+# the benchmark paper-style consumption equation to choose among them.
+credit_indicator_panel <- model_data %>%
   transmute(
     date,
-    loan_flow_z = standardise(safe_log(housing_loan_flow)),
     house_price_growth_z = standardise(lead_lag_diff(safe_log(house_price_index), 4L)),
-    leverage_z = standardise(-debt_income_ratio)
+    leverage_z = standardise(-debt_income_ratio),
+    mortgage_rate_headwind_z = standardise(-real_mortgage_rate),
+    mortgage_burden_headwind_z = standardise(-mortgage_interest_income_ratio),
+    loan_flow_z = standardise(safe_log(housing_loan_flow)),
+    first_home_buyer_share_z = standardise(first_home_buyer_share),
+    mortgage_cashflow_headwind_z = standardise(-mortgage_cashflow_pressure)
   )
 
-y_matrix <- as.matrix(credit_panel %>% select(loan_flow_z, house_price_growth_z, leverage_z))
+credit_variant_specs <- list(
+  rw_core = list(
+    model_type = "rw",
+    indicators = c("house_price_growth_z", "leverage_z", "mortgage_rate_headwind_z", "mortgage_burden_headwind_z")
+  ),
+  rw_augmented = list(
+    model_type = "rw",
+    indicators = c("house_price_growth_z", "leverage_z", "mortgage_rate_headwind_z", "mortgage_burden_headwind_z", "loan_flow_z", "first_home_buyer_share_z")
+  ),
+  rw_cashflow = list(
+    model_type = "rw",
+    indicators = c("house_price_growth_z", "leverage_z", "mortgage_rate_headwind_z", "mortgage_cashflow_headwind_z", "loan_flow_z")
+  ),
+  trend_core = list(
+    model_type = "trend",
+    indicators = c("house_price_growth_z", "leverage_z", "mortgage_rate_headwind_z", "mortgage_burden_headwind_z")
+  ),
+  trend_augmented = list(
+    model_type = "trend",
+    indicators = c("house_price_growth_z", "leverage_z", "mortgage_rate_headwind_z", "mortgage_burden_headwind_z", "loan_flow_z", "first_home_buyer_share_z")
+  )
+)
 
-credit_fit <- fitSSM(
-  inits = c(rep(log(0.25), 3L), log(0.10), 0.5, 0.5),
-  model = build_credit_ssm(y_matrix, log_h = rep(log(0.25), 3L), log_q = log(0.10), lambda_2 = 0.5, lambda_3 = 0.5),
-  updatefn = function(pars, model) {
-    build_credit_ssm(
+fit_credit_variant <- function(panel, spec) {
+  y_matrix <- as.matrix(panel %>% select(all_of(spec$indicators)))
+  n_series <- ncol(y_matrix)
+  initial_loadings <- rep(0.5, n_series - 1L)
+
+  fit_obj <- tryCatch(
+    {
+      if (identical(spec$model_type, "rw")) {
+        fitSSM(
+          inits = c(rep(log(0.25), n_series), log(0.10), initial_loadings),
+          model = build_credit_ssm_factor(
+            y_matrix = y_matrix,
+            log_h = rep(log(0.25), n_series),
+            log_q = log(0.10),
+            loadings = c(1, initial_loadings)
+          ),
+          updatefn = function(pars, model) {
+            build_credit_ssm_factor(
+              y_matrix = y_matrix,
+              log_h = pars[seq_len(n_series)],
+              log_q = pars[n_series + 1L],
+              loadings = c(1, pars[(n_series + 2L):length(pars)])
+            )
+          },
+          method = "BFGS"
+        )
+      } else {
+        fitSSM(
+          inits = c(rep(log(0.25), n_series), log(0.05), log(0.01), initial_loadings),
+          model = build_credit_ssm_local_trend(
+            y_matrix = y_matrix,
+            log_h = rep(log(0.25), n_series),
+            log_q_level = log(0.05),
+            log_q_slope = log(0.01),
+            loadings = c(1, initial_loadings)
+          ),
+          updatefn = function(pars, model) {
+            build_credit_ssm_local_trend(
+              y_matrix = y_matrix,
+              log_h = pars[seq_len(n_series)],
+              log_q_level = pars[n_series + 1L],
+              log_q_slope = pars[n_series + 2L],
+              loadings = c(1, pars[(n_series + 3L):length(pars)])
+            )
+          },
+          method = "BFGS"
+        )
+      }
+    },
+    error = function(e) NULL
+  )
+
+  if (is.null(fit_obj)) {
+    return(NULL)
+  }
+
+  model_obj <- if (identical(spec$model_type, "rw")) {
+    build_credit_ssm_factor(
       y_matrix = y_matrix,
-      log_h = pars[1:3],
-      log_q = pars[4],
-      lambda_2 = pars[5],
-      lambda_3 = pars[6]
+      log_h = fit_obj$optim.out$par[seq_len(n_series)],
+      log_q = fit_obj$optim.out$par[n_series + 1L],
+      loadings = c(1, fit_obj$optim.out$par[(n_series + 2L):length(fit_obj$optim.out$par)])
     )
-  },
-  method = "BFGS"
-)
+  } else {
+    build_credit_ssm_local_trend(
+      y_matrix = y_matrix,
+      log_h = fit_obj$optim.out$par[seq_len(n_series)],
+      log_q_level = fit_obj$optim.out$par[n_series + 1L],
+      log_q_slope = fit_obj$optim.out$par[n_series + 2L],
+      loadings = c(1, fit_obj$optim.out$par[(n_series + 3L):length(fit_obj$optim.out$par)])
+    )
+  }
 
-credit_model <- build_credit_ssm(
-  y_matrix = y_matrix,
-  log_h = credit_fit$optim.out$par[1:3],
-  log_q = credit_fit$optim.out$par[4],
-  lambda_2 = credit_fit$optim.out$par[5],
-  lambda_3 = credit_fit$optim.out$par[6]
-)
+  tibble(
+    date = panel$date,
+    credit_conditions_variant = standardise(extract_state(fit_obj, model_obj))
+  )
+}
 
-credit_panel$credit_conditions_index <- standardise(extract_state(credit_fit, credit_model))
+credit_variant_series <- lapply(names(credit_variant_specs), function(variant_name) {
+  out <- fit_credit_variant(credit_indicator_panel, credit_variant_specs[[variant_name]])
+  if (is.null(out)) {
+    return(NULL)
+  }
+  out %>% rename(!!paste0("cci_", variant_name) := credit_conditions_variant)
+})
+names(credit_variant_series) <- names(credit_variant_specs)
 
 spline_credit_panel <- model_data %>%
   transmute(
@@ -412,15 +560,121 @@ spline_credit_panel$credit_conditions_spline <- build_spline_credit_index(
 )
 
 model_data <- model_data %>%
-  left_join(credit_panel %>% select(date, credit_conditions_index), by = "date") %>%
-  left_join(spline_credit_panel %>% select(date, credit_conditions_spline), by = "date") %>%
+  left_join(spline_credit_panel %>% select(date, credit_conditions_spline), by = "date")
+
+for (variant_name in names(credit_variant_series)) {
+  variant_df <- credit_variant_series[[variant_name]]
+  if (!is.null(variant_df)) {
+    model_data <- model_data %>% left_join(variant_df, by = "date")
+  }
+}
+
+evaluate_credit_variant <- function(data, variant_name) {
+  cci_col <- paste0("cci_", variant_name)
+  work <- data %>%
+    mutate(
+      credit_conditions_index = .data[[cci_col]]
+    )
+
+  if (all(is.na(work$credit_conditions_index))) {
+    return(NULL)
+  }
+
+  means <- work %>%
+    filter(!is.na(credit_conditions_index)) %>%
+    summarise(
+      mean_log_disposable_permanent_income_ratio = mean(log_disposable_permanent_income_ratio, na.rm = TRUE),
+      mean_housing_wealth_income_ratio = mean(housing_wealth_income_ratio, na.rm = TRUE),
+      mean_real_mortgage_rate = mean(real_mortgage_rate, na.rm = TRUE)
+    )
+
+  work <- work %>%
+    mutate(
+      centred_log_disposable_permanent_income_ratio = log_disposable_permanent_income_ratio - means$mean_log_disposable_permanent_income_ratio,
+      centred_housing_wealth_income_ratio = housing_wealth_income_ratio - means$mean_housing_wealth_income_ratio,
+      centred_real_mortgage_rate = real_mortgage_rate - means$mean_real_mortgage_rate,
+      cci_x_log_disposable_permanent_income_ratio = credit_conditions_index * centred_log_disposable_permanent_income_ratio,
+      cci_x_housing_wealth_income_ratio = credit_conditions_index * centred_housing_wealth_income_ratio,
+      cci_x_real_mortgage_rate = credit_conditions_index * centred_real_mortgage_rate
+    )
+
+  rhs_vars <- c(
+    "log_disposable_permanent_income_ratio",
+    "housing_wealth_income_ratio",
+    "illiquid_financial_income_ratio",
+    "net_liquid_assets_income_ratio",
+    "mortgage_interest_income_ratio",
+    "prime_working_age_share",
+    "first_home_buyer_share",
+    "unemployment_rate",
+    "credit_conditions_index"
+  )
+
+  baseline_fit <- fit_long_run_spec(
+    work,
+    spec_name = variant_name,
+    rhs_vars = rhs_vars,
+    response_var = "lcons_perm_income_ratio"
+  )
+
+  coefs <- coef(baseline_fit$fit)
+  sign_score <- sum(
+    c(
+      coefs[["housing_wealth_income_ratio"]] > 0,
+      coefs[["illiquid_financial_income_ratio"]] > 0,
+      coefs[["net_liquid_assets_income_ratio"]] > 0,
+      coefs[["mortgage_interest_income_ratio"]] < 0,
+      coefs[["unemployment_rate"]] < 0,
+      coefs[["credit_conditions_index"]] > 0
+    ),
+    na.rm = TRUE
+  )
+
+  baseline_fit$diagnostics %>%
+    mutate(
+      cci_variant = variant_name,
+      cci_start = min(work$date[!is.na(work$credit_conditions_index)], na.rm = TRUE),
+      cci_end = max(work$date[!is.na(work$credit_conditions_index)], na.rm = TRUE),
+      sign_score = sign_score,
+      corr_loan_flow = suppressWarnings(cor(work$credit_conditions_index, work$housing_loan_flow, use = "pairwise.complete.obs")),
+      corr_house_prices = suppressWarnings(cor(work$credit_conditions_index, work$house_price_index, use = "pairwise.complete.obs")),
+      corr_real_mortgage_rate = suppressWarnings(cor(work$credit_conditions_index, work$real_mortgage_rate, use = "pairwise.complete.obs"))
+    )
+}
+
+credit_variant_comparison <- bind_rows(
+  lapply(names(credit_variant_specs), function(variant_name) evaluate_credit_variant(model_data, variant_name))
+) %>%
+  arrange(desc(sign_score), bic, aic)
+
+selected_cci_variant <- credit_variant_comparison %>%
+  slice(1L) %>%
+  pull(cci_variant)
+
+model_data <- model_data %>%
   mutate(
-    cci_x_log_disposable_permanent_income_ratio = credit_conditions_index * log_disposable_permanent_income_ratio,
-    cci_x_housing_wealth_income_ratio = credit_conditions_index * housing_wealth_income_ratio,
-    cci_x_unemployment_rate = credit_conditions_index * unemployment_rate,
-    cci_spline_x_log_disposable_permanent_income_ratio = credit_conditions_spline * log_disposable_permanent_income_ratio,
-    cci_spline_x_housing_wealth_income_ratio = credit_conditions_spline * housing_wealth_income_ratio,
-    cci_spline_x_unemployment_rate = credit_conditions_spline * unemployment_rate
+    credit_conditions_index = .data[[paste0("cci_", selected_cci_variant)]]
+  )
+
+cci_means <- model_data %>%
+  filter(!is.na(credit_conditions_index)) %>%
+  summarise(
+    mean_log_disposable_permanent_income_ratio = mean(log_disposable_permanent_income_ratio, na.rm = TRUE),
+    mean_housing_wealth_income_ratio = mean(housing_wealth_income_ratio, na.rm = TRUE),
+    mean_real_mortgage_rate = mean(real_mortgage_rate, na.rm = TRUE)
+  )
+
+model_data <- model_data %>%
+  mutate(
+    centred_log_disposable_permanent_income_ratio = log_disposable_permanent_income_ratio - cci_means$mean_log_disposable_permanent_income_ratio,
+    centred_housing_wealth_income_ratio = housing_wealth_income_ratio - cci_means$mean_housing_wealth_income_ratio,
+    centred_real_mortgage_rate = real_mortgage_rate - cci_means$mean_real_mortgage_rate,
+    cci_x_log_disposable_permanent_income_ratio = credit_conditions_index * centred_log_disposable_permanent_income_ratio,
+    cci_x_housing_wealth_income_ratio = credit_conditions_index * centred_housing_wealth_income_ratio,
+    cci_x_real_mortgage_rate = credit_conditions_index * centred_real_mortgage_rate,
+    cci_spline_x_log_disposable_permanent_income_ratio = credit_conditions_spline * centred_log_disposable_permanent_income_ratio,
+    cci_spline_x_housing_wealth_income_ratio = credit_conditions_spline * centred_housing_wealth_income_ratio,
+    cci_spline_x_real_mortgage_rate = credit_conditions_spline * centred_real_mortgage_rate
   )
 
 
@@ -428,79 +682,65 @@ model_data <- model_data %>%
 # Long-run consumption equation
 # ------------------------------------------------------------------------------
 
-# Candidate Muellbauer-style long-run specifications. The benchmark preserves
-# the original net-liquid-assets treatment, while the alternatives separate
-# liquid assets and debt explicitly.
+# Candidate Muellbauer-style long-run specifications centred on the paper's
+# net-liquid-assets and latent-credit structure.
 long_run_specs <- list(
-  net_liquid_assets = c(
+  paper_baseline = c(
     "log_disposable_permanent_income_ratio",
     "housing_wealth_income_ratio",
     "illiquid_financial_income_ratio",
     "net_liquid_assets_income_ratio",
+    "mortgage_interest_income_ratio",
+    "prime_working_age_share",
+    "first_home_buyer_share",
     "unemployment_rate",
     "credit_conditions_index"
   ),
-  separate_liquid_debt = c(
+  paper_interactive = c(
     "log_disposable_permanent_income_ratio",
     "housing_wealth_income_ratio",
     "illiquid_financial_income_ratio",
-    "liquid_assets_income_ratio",
-    "debt_income_ratio",
-    "unemployment_rate",
-    "credit_conditions_index"
-  ),
-  separate_liquid_debt_no_credit = c(
-    "log_disposable_permanent_income_ratio",
-    "housing_wealth_income_ratio",
-    "illiquid_financial_income_ratio",
-    "liquid_assets_income_ratio",
-    "debt_income_ratio",
-    "unemployment_rate"
-  ),
-  separate_liquid_debt_no_uncertainty = c(
-    "log_disposable_permanent_income_ratio",
-    "housing_wealth_income_ratio",
-    "illiquid_financial_income_ratio",
-    "liquid_assets_income_ratio",
-    "debt_income_ratio",
-    "credit_conditions_index"
-  ),
-  interactive_credit = c(
-    "log_disposable_permanent_income_ratio",
-    "housing_wealth_income_ratio",
-    "illiquid_financial_income_ratio",
-    "liquid_assets_income_ratio",
-    "debt_income_ratio",
+    "net_liquid_assets_income_ratio",
+    "mortgage_interest_income_ratio",
+    "prime_working_age_share",
+    "first_home_buyer_share",
     "unemployment_rate",
     "credit_conditions_index",
     "cci_x_log_disposable_permanent_income_ratio",
-    "cci_x_housing_wealth_income_ratio",
-    "cci_x_unemployment_rate"
+    "cci_x_housing_wealth_income_ratio"
   ),
-  interactive_credit_spline = c(
+  paper_interactive_no_demo = c(
     "log_disposable_permanent_income_ratio",
     "housing_wealth_income_ratio",
     "illiquid_financial_income_ratio",
-    "liquid_assets_income_ratio",
-    "debt_income_ratio",
+    "net_liquid_assets_income_ratio",
+    "mortgage_interest_income_ratio",
+    "unemployment_rate",
+    "credit_conditions_index",
+    "cci_x_log_disposable_permanent_income_ratio",
+    "cci_x_housing_wealth_income_ratio"
+  ),
+  paper_cashflow = c(
+    "log_disposable_permanent_income_ratio",
+    "housing_wealth_income_ratio",
+    "illiquid_financial_income_ratio",
+    "net_liquid_assets_income_ratio",
+    "real_mortgage_rate",
+    "mortgage_interest_income_ratio",
+    "unemployment_rate",
+    "credit_conditions_index"
+  ),
+  diagnostic_spline = c(
+    "log_disposable_permanent_income_ratio",
+    "housing_wealth_income_ratio",
+    "illiquid_financial_income_ratio",
+    "net_liquid_assets_income_ratio",
+    "real_mortgage_rate",
     "unemployment_rate",
     "credit_conditions_spline",
     "cci_spline_x_log_disposable_permanent_income_ratio",
     "cci_spline_x_housing_wealth_income_ratio",
-    "cci_spline_x_unemployment_rate"
-  ),
-  augmented_muellbauer = c(
-    "log_disposable_permanent_income_ratio",
-    "housing_wealth_income_ratio",
-    "illiquid_financial_income_ratio",
-    "liquid_assets_income_ratio",
-    "debt_income_ratio",
-    "mortgage_interest_income_ratio",
-    "real_mortgage_rate",
-    "prime_working_age_share",
-    "first_home_buyer_share",
-    "unemployment_rate",
-    "credit_conditions_spline"
+    "cci_spline_x_real_mortgage_rate"
   )
 )
 
@@ -514,13 +754,46 @@ long_run_candidates <- lapply(names(long_run_specs), function(spec_name) {
 })
 names(long_run_candidates) <- names(long_run_specs)
 
+long_run_sign_scores <- tibble(
+  specification = names(long_run_candidates),
+  sign_score = vapply(long_run_candidates, function(obj) {
+    coefs <- coef(obj$fit)
+    score <- sum(
+      c(
+        ("log_disposable_permanent_income_ratio" %in% names(coefs)) && coefs[["log_disposable_permanent_income_ratio"]] > 0,
+        ("housing_wealth_income_ratio" %in% names(coefs)) && coefs[["housing_wealth_income_ratio"]] > 0,
+        ("illiquid_financial_income_ratio" %in% names(coefs)) && coefs[["illiquid_financial_income_ratio"]] > 0,
+        ("net_liquid_assets_income_ratio" %in% names(coefs)) && coefs[["net_liquid_assets_income_ratio"]] > 0,
+        (!("mortgage_interest_income_ratio" %in% names(coefs))) || coefs[["mortgage_interest_income_ratio"]] < 0,
+        (!("real_mortgage_rate" %in% names(coefs))) || coefs[["real_mortgage_rate"]] < 0,
+        ("unemployment_rate" %in% names(coefs)) && coefs[["unemployment_rate"]] < 0
+      ),
+      na.rm = TRUE
+    )
+
+    interaction_bonus <- sum(
+      c(
+        (!("cci_x_housing_wealth_income_ratio" %in% names(coefs))) || coefs[["cci_x_housing_wealth_income_ratio"]] > 0,
+        (!("cci_x_log_disposable_permanent_income_ratio" %in% names(coefs))) || coefs[["cci_x_log_disposable_permanent_income_ratio"]] > 0
+      ),
+      na.rm = TRUE
+    )
+
+    score + interaction_bonus
+  }, numeric(1L))
+)
+
 long_run_comparison <- bind_rows(lapply(long_run_candidates, `[[`, "diagnostics")) %>%
+  left_join(long_run_sign_scores, by = "specification") %>%
   arrange(bic, aic)
 
-best_long_run_name <- long_run_comparison %>%
+benchmark_long_run_name <- long_run_comparison %>%
+  filter(str_detect(specification, "^paper_")) %>%
+  arrange(desc(sign_score), bic, aic) %>%
   slice(1L) %>%
   pull(specification)
 
+best_long_run_name <- benchmark_long_run_name
 best_long_run <- long_run_candidates[[best_long_run_name]]
 long_run_fit <- best_long_run$fit
 long_run_rhs_vars <- best_long_run$rhs_vars
@@ -556,10 +829,10 @@ ecm_data <- long_run_sample %>%
     d_cci_spline = lead_lag_diff(credit_conditions_spline, 1L),
     d_cci_x_log_y_yp = lead_lag_diff(cci_x_log_disposable_permanent_income_ratio, 1L),
     d_cci_x_hw_ratio = lead_lag_diff(cci_x_housing_wealth_income_ratio, 1L),
-    d_cci_x_u = lead_lag_diff(cci_x_unemployment_rate, 1L),
+    d_cci_x_real_rate = lead_lag_diff(cci_x_real_mortgage_rate, 1L),
     d_cci_spline_x_log_y_yp = lead_lag_diff(cci_spline_x_log_disposable_permanent_income_ratio, 1L),
     d_cci_spline_x_hw_ratio = lead_lag_diff(cci_spline_x_housing_wealth_income_ratio, 1L),
-    d_cci_spline_x_u = lead_lag_diff(cci_spline_x_unemployment_rate, 1L),
+    d_cci_spline_x_real_rate = lead_lag_diff(cci_spline_x_real_mortgage_rate, 1L),
     d_house_prices = lead_lag_diff(safe_log(house_price_index), 1L),
     ecm_lag = lag(ecm_residual, 1L),
     d_lcons_lag = lag(d_lcons, 1L),
@@ -571,8 +844,8 @@ ecm_data <- long_run_sample %>%
       d_liquid_assets_ratio, d_debt_ratio, d_nla_ratio,
       d_mortgage_cashflow, d_real_mortgage_rate, d_prime_working_age_share,
       d_first_home_buyer_share, d_u, d_cci, d_cci_spline, d_cci_x_log_y_yp,
-      d_cci_x_hw_ratio, d_cci_x_u, d_cci_spline_x_log_y_yp, d_cci_spline_x_hw_ratio,
-      d_cci_spline_x_u, d_house_prices,
+      d_cci_x_hw_ratio, d_cci_x_real_rate, d_cci_spline_x_log_y_yp, d_cci_spline_x_hw_ratio,
+      d_cci_spline_x_real_rate, d_house_prices,
       ecm_lag, d_lcons_lag, d_lgdi_lag
     )
   )
@@ -593,10 +866,10 @@ ecm_term_map <- c(
   credit_conditions_spline = "d_cci_spline",
   cci_x_log_disposable_permanent_income_ratio = "d_cci_x_log_y_yp",
   cci_x_housing_wealth_income_ratio = "d_cci_x_hw_ratio",
-  cci_x_unemployment_rate = "d_cci_x_u",
+  cci_x_real_mortgage_rate = "d_cci_x_real_rate",
   cci_spline_x_log_disposable_permanent_income_ratio = "d_cci_spline_x_log_y_yp",
   cci_spline_x_housing_wealth_income_ratio = "d_cci_spline_x_hw_ratio",
-  cci_spline_x_unemployment_rate = "d_cci_spline_x_u"
+  cci_spline_x_real_mortgage_rate = "d_cci_spline_x_real_rate"
 )
 
 selected_ecm_terms <- unname(ecm_term_map[long_run_rhs_vars])
@@ -635,11 +908,13 @@ long_run_r2 <- summary(long_run_fit)$r.squared
 ecm_r2 <- summary(ecm_fit)$r.squared
 speed_of_adjustment <- coef(ecm_fit)[["ecm_lag"]]
 income_short_run <- coef(ecm_fit)[["d_lgdi"]]
-average_consumption_to_annual_income <- mean(model_data$final_consumption_hh / model_data$annualised_income, na.rm = TRUE)
+average_consumption_to_annual_income <- mean(model_data$final_consumption_hh / model_data$annualised_nonproperty_income, na.rm = TRUE)
 housing_mpc_approx <- coef(long_run_fit)[["housing_wealth_income_ratio"]] * average_consumption_to_annual_income
 illiquid_financial_mpc_approx <- coef(long_run_fit)[["illiquid_financial_income_ratio"]] * average_consumption_to_annual_income
 liquid_assets_mpc_approx <- if ("liquid_assets_income_ratio" %in% names(coef(long_run_fit))) {
   coef(long_run_fit)[["liquid_assets_income_ratio"]] * average_consumption_to_annual_income
+} else if ("net_liquid_assets_income_ratio" %in% names(coef(long_run_fit))) {
+  coef(long_run_fit)[["net_liquid_assets_income_ratio"]] * average_consumption_to_annual_income
 } else {
   NA_real_
 }
@@ -658,6 +933,7 @@ write.csv(model_data, file.path(output_dir, "model_dataset.csv"), row.names = FA
 write.csv(tidy(long_run_fit), file.path(output_dir, "long_run_coefficients.csv"), row.names = FALSE)
 write.csv(tidy(ecm_fit), file.path(output_dir, "ecm_coefficients.csv"), row.names = FALSE)
 write.csv(long_run_comparison, file.path(output_dir, "long_run_model_comparison.csv"), row.names = FALSE)
+write.csv(credit_variant_comparison, file.path(output_dir, "credit_conditions_variant_comparison.csv"), row.names = FALSE)
 
 
 # ------------------------------------------------------------------------------
@@ -751,16 +1027,24 @@ writeLines(
   c(
     paste("House prices are chained from houseprice_old.csv through the legacy ABS RPPI workbook into the ABS Total Value of Dwellings mean-price series; resulting house-price sample starts:", min(spliced_house_prices$date, na.rm = TRUE)),
     "Real consumption and income are scaled by civilian population aged 15 years and over.",
-    "Permanent income is constructed with a one-sided adaptive filter on log real disposable income per working-age person.",
+    "The income concept for the benchmark model is real non-property disposable income per working-age person, constructed by stripping net property income out of household gross disposable income.",
+    "Permanent income is constructed with a one-sided adaptive filter on log real non-property disposable income per working-age person.",
     "The augmented system adds a mortgage cash-flow burden term from ABS household interest payable on dwellings and an implicit real mortgage rate constructed from household interest payments, debt stocks and annual consumption inflation.",
     "Demographic and access terms include a prime working-age population share interpolated from annual ERP ages 25 to 44 and an owner-occupier first-home-buyer loan share from ABS lending indicators.",
-    "A transparent spline-based credit index is estimated alongside the latent state-space factor and is available for long-run specification selection.",
-    paste("Preferred long-run specification:", best_long_run_name),
+    paste("Selected state-space CCI variant:", selected_cci_variant),
+    paste("Selected state-space CCI sample start:", credit_variant_comparison %>% filter(cci_variant == selected_cci_variant) %>% slice(1L) %>% pull(cci_start)),
+    "The benchmark CCI is chosen by comparing multiple state-space variants on paper-style long-run coefficient signs and information criteria.",
+    "A spline-based credit index is retained only as a diagnostic comparator and is excluded from benchmark model selection.",
+    "Within the paper-aligned state-space family, benchmark specification choice prioritises economically plausible signs first and information criteria second.",
+    paste("Preferred long-run specification within the paper-aligned state-space family:", best_long_run_name),
     paste("Long-run RHS variables:", paste(long_run_rhs_vars, collapse = ", ")),
     "Short-run equation: error-correction model for quarterly log real consumption growth using the differenced terms implied by the selected long-run specification."
   ),
   con = con
 )
+
+write_section(con, "Credit index variants")
+writeLines(capture.output(print(credit_variant_comparison)), con = con)
 
 write_section(con, "Long-run model comparison")
 writeLines(capture.output(print(long_run_comparison)), con = con)
@@ -806,6 +1090,7 @@ cat(" - ", file.path(output_dir, "model_dataset.csv"), "\n", sep = "")
 cat(" - ", file.path(output_dir, "long_run_coefficients.csv"), "\n", sep = "")
 cat(" - ", file.path(output_dir, "ecm_coefficients.csv"), "\n", sep = "")
 cat(" - ", file.path(output_dir, "long_run_model_comparison.csv"), "\n", sep = "")
+cat(" - ", file.path(output_dir, "credit_conditions_variant_comparison.csv"), "\n", sep = "")
 cat(" - ", file.path(output_dir, "model_summary.txt"), "\n", sep = "")
 cat(" - ", file.path(output_dir, "credit_conditions_index.png"), "\n", sep = "")
 cat(" - ", file.path(output_dir, "credit_conditions_comparison.png"), "\n", sep = "")

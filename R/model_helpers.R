@@ -308,6 +308,61 @@ build_credit_ssm <- function(y_matrix, log_h, log_q, lambda_2, lambda_3) {
 }
 
 
+build_credit_ssm_factor <- function(y_matrix, log_h, log_q, loadings) {
+  n_series <- ncol(y_matrix)
+
+  if (length(log_h) != n_series) {
+    stop("log_h length must match number of indicator series.")
+  }
+
+  if (length(loadings) != n_series) {
+    stop("loadings length must match number of indicator series.")
+  }
+
+  SSModel(
+    y_matrix ~ -1 +
+      SSMcustom(
+        Z = matrix(loadings, nrow = n_series, ncol = 1L),
+        T = matrix(1),
+        R = matrix(1),
+        Q = matrix(exp(log_q), nrow = 1L, ncol = 1L),
+        a1 = matrix(0),
+        P1 = matrix(10)
+      ),
+    H = diag(exp(log_h), nrow = n_series)
+  )
+}
+
+
+build_credit_ssm_local_trend <- function(y_matrix, log_h, log_q_level, log_q_slope, loadings) {
+  n_series <- ncol(y_matrix)
+
+  if (length(log_h) != n_series) {
+    stop("log_h length must match number of indicator series.")
+  }
+
+  if (length(loadings) != n_series) {
+    stop("loadings length must match number of indicator series.")
+  }
+
+  z_array <- array(0, dim = c(n_series, 2L, 1L))
+  z_array[, 1L, 1L] <- loadings
+
+  SSModel(
+    y_matrix ~ -1 +
+      SSMcustom(
+        Z = z_array,
+        T = array(matrix(c(1, 1, 0, 1), nrow = 2L, byrow = TRUE), dim = c(2L, 2L, 1L)),
+        R = array(diag(2L), dim = c(2L, 2L, 1L)),
+        Q = array(diag(c(exp(log_q_level), exp(log_q_slope))), dim = c(2L, 2L, 1L)),
+        a1 = matrix(c(0, 0), ncol = 1L),
+        P1 = diag(c(10, 1), nrow = 2L)
+      ),
+    H = diag(exp(log_h), nrow = n_series)
+  )
+}
+
+
 build_local_trend_ssm <- function(y, log_h, log_q_level, log_q_slope) {
   SSModel(
     y ~ SSMtrend(
