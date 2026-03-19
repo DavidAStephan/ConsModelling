@@ -1,11 +1,11 @@
 Australian household consumption model summary
-Run time: 2026-03-19 21:07:24
+Run time: 2026-03-19 21:34:31
 Sample start: 1989-09-01
-Sample end: 2021-12-01
+Sample end: 2025-09-01
 
 Specification
 -------------
-House prices are spliced from houseprice_old.csv into the ABS series; resulting house-price sample starts: 1986-06-01
+House prices are chained from houseprice_old.csv through the legacy ABS RPPI workbook into the ABS Total Value of Dwellings mean-price series; resulting house-price sample starts: 1986-06-01
 Real consumption and income are scaled by civilian population aged 15 years and over.
 Permanent income is constructed with a one-sided adaptive filter on log real disposable income per working-age person.
 The augmented system adds a mortgage cash-flow burden term from ABS household interest payable on dwellings and an implicit real mortgage rate constructed from household interest payments, debt stocks and annual consumption inflation.
@@ -20,13 +20,13 @@ Long-run model comparison
 # A tibble: 7 × 11
   specification       n_obs   aic   bic adj_r2  sigma adf_stat adf_1pct adf_5pct
   <chr>               <int> <dbl> <dbl>  <dbl>  <dbl>    <dbl>    <dbl>    <dbl>
-1 interactive_credit…   130 -673. -639.  0.957 0.0173    -4.03    -3.46    -2.88
-2 separate_liquid_de…   130 -612. -587.  0.930 0.0221    -2.95    -3.46    -2.88
-3 separate_liquid_de…   130 -603. -581.  0.924 0.0230    -3.20    -3.46    -2.88
-4 interactive_credit    130 -614. -580.  0.932 0.0217    -2.64    -3.46    -2.88
-5 separate_liquid_de…   130 -599. -576.  0.921 0.0234    -2.76    -3.46    -2.88
-6 net_liquid_assets     130 -443. -421.  0.740 0.0425    -2.58    -3.46    -2.88
-7 augmented_muellbau…    78 -430. -399.  0.978 0.0142    -2.62    -3.51    -2.89
+1 interactive_credit…   145 -703. -668.  0.951 0.0205    -3.77    -3.46    -2.88
+2 interactive_credit    145 -682. -646.  0.943 0.0221    -3.65    -3.46    -2.88
+3 separate_liquid_de…   145 -656. -632.  0.930 0.0245    -3.13    -3.46    -2.88
+4 separate_liquid_de…   145 -656. -629.  0.931 0.0243    -3.16    -3.46    -2.88
+5 separate_liquid_de…   145 -641. -617.  0.923 0.0257    -3.08    -3.46    -2.88
+6 augmented_muellbau…    93 -536. -504.  0.986 0.0126    -4.33    -3.51    -2.89
+7 net_liquid_assets     145 -508. -484.  0.807 0.0407    -3.22    -3.46    -2.88
 # ℹ 2 more variables: adf_10pct <dbl>, adf_reject_5pct <lgl>
 
 Long-run fit
@@ -37,51 +37,51 @@ lm(formula = formula, data = sample)
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--0.080598 -0.010980  0.000455  0.010760  0.040479 
+-0.097831 -0.009959  0.001016  0.012861  0.041663 
 
 Coefficients:
                                                      Estimate Std. Error
-(Intercept)                                         2.7756975  0.0352075
-log_disposable_permanent_income_ratio               0.3782114  0.0829594
-housing_wealth_income_ratio                         0.0033074  0.0008992
-illiquid_financial_income_ratio                    -0.0021404  0.0014979
-liquid_assets_income_ratio                         -0.0962894  0.0042080
-debt_income_ratio                                   0.0002384  0.0046491
-unemployment_rate                                  -0.0233947  0.0028898
-credit_conditions_spline                            0.0212592  0.0242200
-cci_spline_x_log_disposable_permanent_income_ratio  0.0851310  0.0465394
-cci_spline_x_housing_wealth_income_ratio           -0.0003585  0.0004318
-cci_spline_x_unemployment_rate                     -0.0065575  0.0022437
+(Intercept)                                         2.7538265  0.0386479
+log_disposable_permanent_income_ratio              -0.0753452  0.0805254
+housing_wealth_income_ratio                         0.0018356  0.0009056
+illiquid_financial_income_ratio                    -0.0030250  0.0018782
+liquid_assets_income_ratio                         -0.1048075  0.0047434
+debt_income_ratio                                   0.0150055  0.0047656
+unemployment_rate                                  -0.0192071  0.0032044
+credit_conditions_spline                            0.0166547  0.0324311
+cci_spline_x_log_disposable_permanent_income_ratio -0.0899669  0.0569618
+cci_spline_x_housing_wealth_income_ratio            0.0005224  0.0005465
+cci_spline_x_unemployment_rate                     -0.0085438  0.0034314
                                                    t value             Pr(>|t|)
-(Intercept)                                         78.838 < 0.0000000000000002
-log_disposable_permanent_income_ratio                4.559    0.000012554051537
-housing_wealth_income_ratio                          3.678             0.000354
-illiquid_financial_income_ratio                     -1.429             0.155653
-liquid_assets_income_ratio                         -22.883 < 0.0000000000000002
-debt_income_ratio                                    0.051             0.959181
-unemployment_rate                                   -8.096    0.000000000000555
-credit_conditions_spline                             0.878             0.381846
-cci_spline_x_log_disposable_permanent_income_ratio   1.829             0.069870
-cci_spline_x_housing_wealth_income_ratio            -0.830             0.408011
-cci_spline_x_unemployment_rate                      -2.923             0.004156
+(Intercept)                                         71.254 < 0.0000000000000002
+log_disposable_permanent_income_ratio               -0.936              0.35113
+housing_wealth_income_ratio                          2.027              0.04464
+illiquid_financial_income_ratio                     -1.611              0.10962
+liquid_assets_income_ratio                         -22.095 < 0.0000000000000002
+debt_income_ratio                                    3.149              0.00202
+unemployment_rate                                   -5.994         0.0000000179
+credit_conditions_spline                             0.514              0.60842
+cci_spline_x_log_disposable_permanent_income_ratio  -1.579              0.11660
+cci_spline_x_housing_wealth_income_ratio             0.956              0.34076
+cci_spline_x_unemployment_rate                      -2.490              0.01400
                                                       
 (Intercept)                                        ***
-log_disposable_permanent_income_ratio              ***
-housing_wealth_income_ratio                        ***
+log_disposable_permanent_income_ratio                 
+housing_wealth_income_ratio                        *  
 illiquid_financial_income_ratio                       
 liquid_assets_income_ratio                         ***
-debt_income_ratio                                     
+debt_income_ratio                                  ** 
 unemployment_rate                                  ***
 credit_conditions_spline                              
-cci_spline_x_log_disposable_permanent_income_ratio .  
+cci_spline_x_log_disposable_permanent_income_ratio    
 cci_spline_x_housing_wealth_income_ratio              
-cci_spline_x_unemployment_rate                     ** 
+cci_spline_x_unemployment_rate                     *  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.01729 on 119 degrees of freedom
-Multiple R-squared:  0.9602,	Adjusted R-squared:  0.9569 
-F-statistic: 287.2 on 10 and 119 DF,  p-value: < 0.00000000000000022
+Residual standard error: 0.0205 on 134 degrees of freedom
+Multiple R-squared:  0.9546,	Adjusted R-squared:  0.9512 
+F-statistic: 281.5 on 10 and 134 DF,  p-value: < 0.00000000000000022
 
 
 ADF test on error-correction residual
@@ -91,7 +91,7 @@ ADF test on error-correction residual
 # Augmented Dickey-Fuller Test Unit Root / Cointegration Test # 
 ############################################################### 
 
-The value of the test statistic is: -4.0297 8.2019 
+The value of the test statistic is: -3.7695 7.1054 
 
 
 Short-run ECM
@@ -102,41 +102,41 @@ lm(formula = ecm_formula, data = ecm_data)
 
 Residuals:
       Min        1Q    Median        3Q       Max 
--0.030650 -0.005655 -0.000214  0.004949  0.050928 
+-0.046427 -0.005264 -0.000599  0.004971  0.040351 
 
 Coefficients:
-                         Estimate Std. Error t value    Pr(>|t|)    
-(Intercept)              0.008658   0.011703   0.740     0.46225    
-ecm_lag                 -0.358529   0.119851  -2.991     0.00400 ** 
-d_lgdi                  -0.797576   1.860532  -0.429     0.66966    
-d_lgdi_lag               0.551386   0.329049   1.676     0.09892 .  
-d_lcons_lag             -0.194669   0.089488  -2.175     0.03349 *  
-d_log_y_yp               1.029529   1.763160   0.584     0.56143    
-d_hw_ratio               0.004059   0.002849   1.425     0.15924    
-d_ifw_ratio              0.003528   0.002314   1.525     0.13244    
-d_liquid_assets_ratio   -0.020190   0.016351  -1.235     0.22165    
-d_debt_ratio            -0.011046   0.015068  -0.733     0.46629    
-d_u                     -0.032345   0.004943  -6.544 0.000000014 ***
-d_cci_spline             0.420545   0.163443   2.573     0.01253 *  
-d_cci_spline_x_log_y_yp -0.206874   0.401337  -0.515     0.60809    
-d_cci_spline_x_hw_ratio -0.005381   0.001830  -2.940     0.00463 ** 
-d_cci_spline_x_u        -0.037327   0.006331  -5.896 0.000000174 ***
-d_house_prices          -0.220161   0.117006  -1.882     0.06466 .  
+                         Estimate Std. Error t value            Pr(>|t|)    
+(Intercept)             -0.003303   0.008114  -0.407             0.68510    
+ecm_lag                 -0.258309   0.089246  -2.894             0.00496 ** 
+d_lgdi                   1.296668   1.295203   1.001             0.31994    
+d_lgdi_lag              -0.140201   0.271824  -0.516             0.60751    
+d_lcons_lag             -0.142704   0.080753  -1.767             0.08121 .  
+d_log_y_yp              -1.068959   1.245270  -0.858             0.39336    
+d_hw_ratio              -0.001257   0.002763  -0.455             0.65045    
+d_ifw_ratio              0.003322   0.002175   1.527             0.13082    
+d_liquid_assets_ratio   -0.030804   0.014280  -2.157             0.03416 *  
+d_debt_ratio            -0.001907   0.010562  -0.181             0.85720    
+d_u                     -0.042224   0.004206 -10.038 0.00000000000000141 ***
+d_cci_spline             0.327578   0.109633   2.988             0.00378 ** 
+d_cci_spline_x_log_y_yp -0.393817   0.223321  -1.763             0.08184 .  
+d_cci_spline_x_hw_ratio -0.003148   0.001497  -2.103             0.03878 *  
+d_cci_spline_x_u        -0.029601   0.006358  -4.656 0.00001342235144689 ***
+d_house_prices          -0.014443   0.126178  -0.114             0.90917    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 0.01114 on 61 degrees of freedom
-Multiple R-squared:  0.7854,	Adjusted R-squared:  0.7327 
-F-statistic: 14.89 on 15 and 61 DF,  p-value: 0.000000000000004517
+Residual standard error: 0.01188 on 76 degrees of freedom
+Multiple R-squared:  0.702,	Adjusted R-squared:  0.6432 
+F-statistic: 11.94 on 15 and 76 DF,  p-value: 0.00000000000002043
 
 
 Headline diagnostics
 --------------------
-Long-run R-squared: 0.9602
-Short-run R-squared: 0.7854
-Speed of adjustment (ECM coefficient): -0.3585
-Short-run income elasticity term on dlog income: -0.7976
-Approximate housing wealth MPC (dollars per dollar): 0.0008
-Approximate illiquid financial wealth MPC (dollars per dollar): -0.0005
-Approximate liquid assets MPC (dollars per dollar): -0.0241
-Approximate debt MPC (dollars per dollar): 0.0001
+Long-run R-squared: 0.9546
+Short-run R-squared: 0.702
+Speed of adjustment (ECM coefficient): -0.2583
+Short-run income elasticity term on dlog income: 1.2967
+Approximate housing wealth MPC (dollars per dollar): 0.0005
+Approximate illiquid financial wealth MPC (dollars per dollar): -0.0008
+Approximate liquid assets MPC (dollars per dollar): -0.0262
+Approximate debt MPC (dollars per dollar): 0.0038

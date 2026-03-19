@@ -56,7 +56,7 @@ workbooks <- tribble(
   "australian-national-accounts-finance-and-wealth", "5232035.xlsx", "hh_balance_sheet",
   "australian-national-accounts-finance-and-wealth", "5232036.xlsx", "hh_income_wealth",
   "lending-indicators", "560101.xlsx", "housing_credit_flow",
-  "residential-property-price-indexes-eight-capital-cities", "641601.xlsx", "house_prices",
+  "residential-property-price-indexes-eight-capital-cities", "641601.xlsx", "house_prices_bridge",
   "labour-force-australia", "6202001.xlsx", "labour_force"
 )
 
@@ -74,6 +74,11 @@ population_age_path <- download_file_if_missing(
   target_path = file.path(raw_dir, "3101059.xlsx")
 )
 
+total_value_dwellings_path <- download_file_if_missing(
+  url = "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/total-value-dwellings/dec-quarter-2025/643201.xlsx",
+  target_path = file.path(raw_dir, "643201.xlsx")
+)
+
 
 # ------------------------------------------------------------------------------
 # Read and prepare raw time-series data
@@ -83,10 +88,11 @@ hfce_raw <- read_abs_ts_workbook(file.path(raw_dir, "5206008_Household_Final_Con
 hh_bs_raw <- read_abs_ts_workbook(file.path(raw_dir, "5232035.xlsx"))
 hh_inc_raw <- read_abs_ts_workbook(file.path(raw_dir, "5232036.xlsx"))
 credit_raw <- read_abs_ts_workbook(file.path(raw_dir, "560101.xlsx"))
-house_prices_raw <- read_abs_ts_workbook(file.path(raw_dir, "641601.xlsx"))
+house_prices_bridge_raw <- read_abs_ts_workbook(file.path(raw_dir, "641601.xlsx"))
 labour_raw <- read_abs_ts_workbook(file.path(raw_dir, "6202001.xlsx"))
 hh_income_account_raw <- read_abs_ts_workbook(hh_income_account_path)
 population_age_raw <- read_abs_ts_workbook(population_age_path)
+total_value_dwellings_raw <- read_abs_ts_workbook(total_value_dwellings_path)
 legacy_house_prices_raw <- read_legacy_house_price_series(file.path(raw_dir, "houseprice_old.csv"))
 
 # Consumption volume and nominal consumption from the same workbook allow us to
@@ -206,16 +212,29 @@ non_first_home_buyer_loans <- pick_preferred_series(
 ) %>%
   transmute(date, non_first_home_buyer_loans = value)
 
-national_house_prices <- pick_preferred_series(
-  house_prices_raw,
+bridge_house_prices <- pick_preferred_series(
+  house_prices_bridge_raw,
   "^Residential Property Price Index ; Weighted average of eight capital cities ;$",
   preferred_types = c("Original")
 ) %>%
   transmute(date, house_price_index = value)
 
-spliced_house_prices <- splice_house_price_series(
-  current_series = national_house_prices,
+legacy_with_bridge_prices <- splice_house_price_series(
+  current_series = bridge_house_prices,
   legacy_series = legacy_house_prices_raw
+) %>%
+  rename(house_price_old = house_price_spliced)
+
+current_house_prices <- pick_preferred_series(
+  total_value_dwellings_raw,
+  "^Mean price of residential dwellings ; Australia ;$",
+  preferred_types = c("Original")
+) %>%
+  transmute(date, house_price_index = value)
+
+spliced_house_prices <- splice_house_price_series(
+  current_series = current_house_prices,
+  legacy_series = legacy_with_bridge_prices
 ) %>%
   rename(house_price_index = house_price_spliced)
 
@@ -730,7 +749,7 @@ writeLines(paste("Sample end:", max(model_data$date, na.rm = TRUE)), con = con)
 write_section(con, "Specification")
 writeLines(
   c(
-    paste("House prices are spliced from houseprice_old.csv into the ABS series; resulting house-price sample starts:", min(spliced_house_prices$date, na.rm = TRUE)),
+    paste("House prices are chained from houseprice_old.csv through the legacy ABS RPPI workbook into the ABS Total Value of Dwellings mean-price series; resulting house-price sample starts:", min(spliced_house_prices$date, na.rm = TRUE)),
     "Real consumption and income are scaled by civilian population aged 15 years and over.",
     "Permanent income is constructed with a one-sided adaptive filter on log real disposable income per working-age person.",
     "The augmented system adds a mortgage cash-flow burden term from ABS household interest payable on dwellings and an implicit real mortgage rate constructed from household interest payments, debt stocks and annual consumption inflation.",

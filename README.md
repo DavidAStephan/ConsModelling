@@ -11,7 +11,7 @@ What the script does:
 - Downloads an ABS population-by-age workbook used to construct interpolated cohort shares.
 - Parses ABS time-series workbooks with a custom reader to avoid current Windows path issues in `readabs::read_abs_local()`.
 - Normalises ABS units so stock variables reported in `$ Billions` are rescaled onto the same `$ Millions` basis as the national-accounts income flow series before wealth-to-income ratios are constructed.
-- Splices `data_raw/houseprice_old.csv` onto the ABS residential property price index to extend the house-price history back before the ABS series begins.
+- Chains `data_raw/houseprice_old.csv` through the legacy ABS eight-capital-city residential property price index and into the current ABS `Total Value of Dwellings` mean-price series, so the live end of the house-price series comes from the current ABS release.
 - Builds household income, consumption, housing wealth, illiquid financial wealth, liquid assets, debt, house prices, lending, unemployment, and a working-age-population proxy series.
 - Scales real consumption and real disposable income by civilian population aged 15 years and over and constructs a permanent-income proxy from an adaptive filter on real income per person.
 - Estimates a latent credit conditions index in a state-space model using `KFAS`.
