@@ -14,10 +14,10 @@ What the script does:
 - Chains `data_raw/houseprice_old.csv` through the legacy ABS eight-capital-city residential property price index and into the current ABS `Total Value of Dwellings` mean-price series, so the live end of the house-price series comes from the current ABS release.
 - Builds household income, consumption, housing wealth, illiquid financial wealth, liquid assets, debt, house prices, lending, unemployment, and a working-age-population proxy series.
 - Scales real consumption and real disposable income by civilian population aged 15 years and over and constructs a permanent-income proxy from an adaptive filter on real income per person.
-- Estimates a latent credit conditions index in a state-space model using `KFAS`.
+- Builds an institutional-style credit conditions index that combines dated liberalisation regimes with observed lending and housing indicators.
 - Adds Muellbauer-style mortgage and cohort terms, including a mortgage cash-flow burden, an implicit real mortgage rate, a prime working-age population share, and a first-home-buyer loan share.
-- Builds a transparent spline-based credit conditions composite alongside the state-space factor and allows model selection to choose between them.
-- Estimates and compares several Muellbauer-style long-run consumption equations, including interaction-rich specifications where credit conditions tilt the housing-collateral, expected-income, and uncertainty channels, then fits a short-run error-correction model using the selected long-run specification.
+- Builds a transparent spline-based credit conditions composite as a diagnostic comparator to the benchmark institutional CCI.
+- Estimates and compares Muellbauer-style long-run consumption equations, admitting only specifications that satisfy residual-stationarity and theory-sign screens before fitting a parsimonious short-run error-correction model.
 - Writes cleaned data, coefficient tables, charts, and a text summary to `outputs/`.
 
 Run from PowerShell:
@@ -41,6 +41,6 @@ Main outputs:
 Current limitations:
 
 - The working sample now starts in 1989Q3, which is the binding start date from the balance-sheet data rather than the house-price series.
-- The preferred specification currently comes from a model-comparison exercise rather than a tightly imposed theory restriction, so coefficient stability and sign restrictions should still be reviewed before using the equation for policy work.
+- The repo is still a single-equation consumption model rather than the full multi-equation LIVES system used in Muellbauer and Williams, so it remains an approximation to the paper rather than a strict replication.
 - The household balance-sheet tables are current price stocks, so the script deflates them using a household consumption deflator constructed from ABS HFCE current-price and chain-volume series.
 - The cohort-share term is interpolated from annual ERP age data, which is useful for slow-moving demographics but not a substitute for true quarterly age-structure estimates.

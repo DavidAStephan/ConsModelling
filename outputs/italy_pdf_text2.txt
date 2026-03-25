@@ -1,0 +1,2751 @@
+Installing package into 'C:/Users/david/AppData/Local/R/win-library/4.2'
+(as 'lib' is unspecified)
+
+  There is a binary version available (and will be installed) but the
+  source version is later:
+         binary source
+pdftools  3.4.0  3.7.0
+
+also installing the dependency 'qpdf'
+
+trying URL 'https://cloud.r-project.org/bin/windows/contrib/4.2/qpdf_1.3.3.zip'
+Content type 'application/zip' length 1015245 bytes (991 KB)
+==================================================
+downloaded 991 KB
+
+trying URL 'https://cloud.r-project.org/bin/windows/contrib/4.2/pdftools_3.4.0.zip'
+Content type 'application/zip' length 7792693 bytes (7.4 MB)
+==================================================
+downloaded 7.4 MB
+
+package 'qpdf' successfully unpacked and MD5 sums checked
+package 'pdftools' successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\david\AppData\Local\Temp\RtmpOSV4Xz\downloaded_packages
+Using poppler version 22.04.0
+TOTAL_PAGES: 59 
+
+===PAGE 1 ===
+             Why net worth is the wrong concept for
+           explaining consumption: evidence from Italy∗
+                              Riccardo De Bonis†, Danilo Liberati‡, John
+                            Muellbauer§and Concetta Rondinelli¶
+                                                8 August 2025
+
+
+                                                        Abstract
+Most econometric policy models at central banks use a ‘representative agent’ aggregate consumption
+function in which net worth (summing all household assets less debt) proxies for balance sheet effects
+and borrowing and liquidity constraints are absent. This conventional formulation is inconsistent with
+heterogeneous agent behaviour under uncertainty in incomplete markets. Using aggregate quarterly
+Italian data from 1980-2019, our more general model rejects the above formulation. We instead find
+different marginal propensities to consume out of liquid and less liquid wealth components.
+Moreover, rising housing prices have a dual effect on consumption, increasing housing wealth for
+owners, and worsening housing affordability.
+
+         JEL Classification: E21, E32, E44, E51
+
+         Keywords: central bank models, consumption function, financial wealth, liquid and illiquid
+         assets, permanent income, housing wealth.
+
+∗ We are very grateful for comments from the referee and editor and wish to thank G. Albareto, A. Brandolini, G.
+
+Bulligan, F. Busetti, A. Cristini, F. Lilla, G. Marinelli, S. Neri, A. Silvestrini, R. Zizza and F. Zollino for discussions
+and/or access to data, and above all to Janine Aron for her extensive comments and insights. We are grateful to the
+participants who attended the Workshop “Household Consumption, The Role of Heterogeneity and Policies” held
+at Bergamo University, 3 June 2019, and those who attended the Italian Economic Association 60th Annual
+Scientific Conference held at Palermo University, 24-26 October 2019, for their useful comments. The views
+expressed herein are solely those of the authors and do not necessarily reflect the views of the Bank of Italy.
+† Bank of Italy, Consumer Protection and Financial Education Directorate.
+‡
+  Bank of Italy, Economics, Statistics and Research Directorate.
+§ Nuffield College and Institute for New Economic Thinking, Oxford Martin School, University of Oxford.
+¶ Bank of Italy, Economics, Statistics and Research Directorate.
+
+
+
+
+                                                            0
+
+===PAGE 2 ===
+1. Introduction
+
+Most central banks now include ‘semi-structural’ econometric policy models, with scope to learn
+from data, in their policy modelling platforms. Consumption typically accounts for 60 percent or
+more of GDP in advanced economies, and hence the aggregate consumption function should have a
+crucial role in these models. However, even for central banks with ‘semi-structural’ models, most
+retain a specification of the consumption function based on the simple textbook form for a representative
+agent. This consumption function assumes that the relevant concept of wealth for households is net
+worth, which treats liquid and illiquid financial assets and housing as if they each have the same
+expenditure implications. 1 These consumption models also assume that households face no borrowing
+or liquidity constraints (especially relevant when there is income uncertainty).
+
+A more general approach is needed which can relax these incredible assumptions. The probability is
+small that any household’s asset holdings approximates the ‘average’ portfolio of all households, given
+transactions costs and differences in risks and returns. For example, heavily indebted households
+typically have very different asset holdings from those with low debt to income ratios. Many households
+have no direct stock market participation, and substantial proportions of households are renters rather
+than owner-occupiers. Hence when aggregate data on household portfolios is split into different asset
+types this reveals considerable distributional information. These different types of households are likely
+to have different consumption behaviours, amalgamated in aggregate consumption.
+
+A more general formulation for the consumption function was proposed in Aron et al. (2012) and Duca
+and Muellbauer (2014), also see Muellbauer (2020). The textbook permanent income model was
+generalized by setting out a ‘credit-augmented consumption function’, with four important features.
+First, the credit channel, typically absent, is explicitly incorporated by the inclusion of ‘credit conditions
+indices’ for both unsecured credit and mortgage credit. This is because, for given levels and distributions
+of income and portfolios, easier lending conditions (more relaxed loan standards) will tend to raise
+aggregate consumer spending.2 Second, rather than using the net worth concept, household balance
+sheets are split into liquid assets and debt, illiquid financial assets and housing wealth, with an additional
+control included for housing affordability (relevant for renting households). This allows a more realistic
+measurement of the different propensities to consume from the components of wealth. This formulation
+is supported by micro-evidence from Fagereng et al. (2021) and Crawley and Kuchler (2023), that the
+marginal propensity to consume out of income varies according to the structure of household portfolios.
+
+A third feature is that rather than ignoring income expectations as in some central bank models, these
+have a role through permanent income. Income expectations are captured in a permanent income
+construct using an innovative econometric model that also adjusts for the structural breaks in the income
+
+1
+  The Federal Reserve’s FRBUS, ECB BASE, the Bank of Canada’s LENS and the Reserve Bank of Australia’s MARTIN
+models are among the ‘semi-structural’ econometric models (SEMs) relying on net worth; the policy models at the Bank
+of Italy and the Bundesbank instead use ‘net financial wealth’, which excludes housing wealth.
+2
+  Easier credit also affects household portfolios, especially raising debt levels, and may raise asset prices and thus feed
+into future spending decisions.
+
+===PAGE 3 ===
+process, such as were caused by the Global Financial Crisis and the subsequent European debt crisis.
+Since households could not have anticipated these shifts, the model takes account of over-optimism
+before the crises and posits a subsequent learning process in which expectations adjust to new realities.
+A far higher discount rate than in the standard textbook model is applied to the expected future income
+streams (high discount rates are also used by those central bank models which include income
+expectations - though they do not address structural breaks - FRBUS, ECB BASE and Canada’s LENS
+model). Adopting a higher discount rate is consistent with the view of Friedman (1963), that in aggregate
+empirical applications, permanent income should be based on far shorter horizons. This approach does
+not claim that all households discount cash-flows identically, but it argues that it is better to control for
+an average effect rather than to ignore such effects altogether.
+
+A final feature addresses a short-term role for income insecurity, proxied by the change in the
+unemployment rate and different measures of income volatility, and potential cash-flow effects on
+indebted households facing floating interest rates are captured by changes in nominal interest rates.
+
+This paper applies the above generalized consumption function approach (that encompasses the
+conventional formulation), using quarterly data for Italy from 1980 to 2019. The model controls for
+permanent income, includes the effective interest rate on household loans, and tests for the relevance of
+an index of credit conditions. The model splits net worth into liquid, semi-liquid and illiquid financial
+assets and debt, controlling separately for housing affordability (measured by the house price to income
+ratio) and for housing wealth. The conventional form of the consumption function implies a set of linear
+restrictions on this credit-augmented consumption function. We relax these restrictions in a series of
+regressions, beginning with the conventional net worth formulation. Striking improvements in statistical
+fit and coherence are demonstrated with the sequential disaggregation of net worth, clearly rejecting the
+conventional formulation.
+
+This generalized consumption function approach is also supported by qualitative insights for modelling
+aggregate consumption from the buffer-stock saving and heterogeneous agent literatures. Buffer-stock
+saving theory explains how rational behaviour under income uncertainty and liquidity constraints
+radically undermines the simple textbook permanent income model of consumption (Deaton, 1991;
+Carroll, 1992). Indeed, after the Global Financial Crisis, research has burgeoned on the behaviour of
+heterogeneous households operating in an incomplete market setting with asymmetric information. For
+example, new theory and evidence on heterogeneity comes from models of wealthy ‘hand-to-mouth’
+consumption, presented by Kaplan and Violante (2014) and Kaplan et al. (2014), and generalized into a
+general equilibrium model in Kaplan et al. (2018) - with an otherwise conventional New Keynesian
+production and pricing side of the economy. These models describe the short-horizon consumption
+behaviour of income-constrained, though asset-rich, consumers, facing credit constraints and trading
+costs in an illiquid asset. Monetary policy conclusions are radically transformed in the ‘heterogeneous
+agent New Keynesian’ (HANK) model version of Kaplan et al. (2018)3 as compared to the standard
+representative agent rational expectations life-cycle/permanent income version of the New Keynesian
+
+3 See Kaplan and Violante (2018) for a non-technical overview.
+
+                                                           2
+
+===PAGE 4 ===
+model.4 A comprehensive overview in Pascal (2024) shows how theoretical developments in the
+heterogeneous agent literature have altered thinking about monetary transmission, since the earlier view
+summarized by Gertler et al. (1999). For transmission via households, the new view puts far more weight
+on the transmission of interest rate changes through general equilibrium effects on current income than
+on intertemporal substitution by households.
+
+Heterogeneous agent theory suggests that, in principle, long time-series of micro-data on households are
+needed to analyse fluctuations in aggregate consumption. However, once the above generalized
+approach is adopted, many policy-relevant insights from the theory can be obtained from a consumption
+function using aggregate data with the household balance sheets separated by portfolio composition.
+
+There is widespread disagreement about the size and nature of the influence of housing and financial
+wealth on household consumption. One of the contributions of this paper is to provide new evidence on
+these questions and the associated channels of monetary transmission, though for an economy with a
+very different credit market architecture than the US and many other major OECD economies. Boone
+and Girouard (2002) find large differences from both housing and financial wealth on consumption
+across OECD countries. Case et al. (2005) argue that in the US, the wealth effect for housing exceeds
+that of the stock market. Cooper and Dynan (2016) point to the distinction between the collateral and
+wealth effects for housing for several countries and acknowledge the mixed and heterogeneous nature
+of the evidence. There is also no consensus about housing wealth effects on consumption in Italy.
+These are positive and rather small according to Catte et al. (2004) and Guiso et al. (2006), and
+sometimes even negative (Boone and Girouard, 2002; Slacalek, 2009). Financial wealth effects
+appear to be stronger and more statistically significant than housing effects (Bassanetti and Zollino,
+2010). While the ratio of Italian household financial wealth to GDP has increased in the last 40 years,
+housing wealth remains the main asset for Italian households, as in other advanced economies (see
+Caprara, De Bonis, and Infante, 2020).
+
+The paper is structured as follows. Section 2 explains the theoretical and empirical frameworks and
+Section 3 describes the data (together with detailed online appendices). The role of the different assets
+in explaining households’ consumption dynamics is reported in Section 4, with strong robustness checks.
+The results reported begin with the fully restricted standard net worth formulation. In a series of
+regressions, with progressive relaxation of the restrictions, striking improvements are demonstrated.
+Section 5 concludes. Online appendices provide information on ancillary modelling, as well as
+describing data transformations.
+
+
+
+
+4
+  The version of HANK Kaplan et al. (2018) does not incorporate endogenous asset prices, e.g. of equities and real
+estate, through which monetary policy also operates. See Garrida and Hedlund (2020) for a micro-founded extension of
+this model, in which balance sheets also matter.
+
+                                                         3
+
+===PAGE 5 ===
+2. Consumption models
+
+The cornerstone of the standard aggregate consumption model is the classical Ando-Modigliani-
+Brumberg-Friedman consumption function based on the optimizing behaviour of a representative
+household. This has the following form:
+
+                                              𝑐𝑡 = (𝛾 ∗ 𝐴𝑡−1 + 𝑦𝑡𝑝 )                                               (2.1)
+
+Aggregate consumption (𝑐) depends on household real net worth (𝐴) at the end of the previous period
+and permanent non-property household disposable income (𝑦 𝑝 ). The marginal propensities to
+consume out of these are, respectively, 𝛾 ∗ and one. Non-property disposable income (𝑦) refers to
+labour income plus net transfers, both after tax. In the basic version of the theory, 𝛾 ∗ is the return on
+net worth (embodying property income such as dividends, rent and interest). Then it is appropriate
+to exclude property income from the measure of household income used in the consumption function
+(Blinder and Deaton, 1985). All variables are real per capita levels.
+
+With some manipulation, see Aron et al. (2012), a log approximation of equation (3.1) becomes:
+
+                            ln 𝑐𝑡 /𝑦𝑡 ≈ 𝛼0 + 𝛾𝐴𝑡−1 /𝑦𝑡 + 𝜑𝐸𝑡 ln (𝑦𝑡𝑝 /𝑦𝑡 )                                        (2.2)
+
+where the log consumption to income ratio, ln 𝑐𝑡 /𝑦𝑡 is driven by three elements. First, there is (time-
+invariant) autonomous consumption, 𝛼0 . Second, there is the ratio of household net worth (at end of
+period t-1) to income, 𝐴𝑡−1 /𝑦𝑡 , scaled by the marginal propensity to consume out of assets (𝛾 ≈ 𝛾 ∗ ).
+Third, there is the log ratio of permanent to current non-property income, 𝐸𝑡 ln (𝑦𝑡𝑝 /𝑦𝑡 ), scaled by
+(𝜑) to allow for a generalisation of the strict permanent income hypothesis under which 𝜑 = 1.
+ln (𝑦𝑡𝑝 /𝑦𝑡 ) can be approximated by equation (2.3) where 𝑘 is the time horizon and δ is the rate at
+which households discount future income5:
+
+                            ln (𝑦𝑡𝑝 /𝑦𝑡 ) = (∑ks=0 𝛿 s ln yt+s )/ ∑ks=0 𝛿 𝑠 ) − ln 𝑦𝑡                              (2.3)
+
+With partial adjustment,6 the dynamic version of equation (2.2) is:
+
+                    ∆ ln 𝑐𝑡 ≈ 𝜆(𝛼0 + 𝛾𝐴𝑡−1 /𝑦𝑡 +𝜑 𝐸𝑡 ln (𝑦𝑡𝑝 /𝑦𝑡 ) + ln 𝑦𝑡 ⁄𝑐𝑡−1 )                                 (2.4)
+
+where 𝜆 is the speed of adjustment to a target defined by the right-hand side of equation (2.2). Note
+that equations (2.2) and (2.4) are homogenous of degree one, so that doubling income and assets
+doubles consumption. Equation (2.4) assumes constant real interest rates, no distributional effects,
+homogeneous net assets so that 𝛾 is the same for all asset types including liquid and illiquid financial
+
+
+
+
+3
+    Campbell (1987) shows that this is equivalent to a weighted moving average of forward-looking income growth rates.
+6 Partial adjustment can be rationalised through costs of adjustment, habit formation or sticky information, Reis (2006).
+
+                                                            4
+
+===PAGE 6 ===
+wealth and housing wealth; and that there are no credit constraints.7
+
+To introduce controls for time-varying credit access and the real interest rate and to generalise the
+role of liquid, semi-liquid and illiquid assets, debt and housing wealth and affordability, we augment
+equation (2.4) as follows:
+
+∆ ln 𝑐𝑡 = 𝜆(𝛼0 + 𝛼𝑐 𝐶𝐶𝐼𝑡 + 𝛼1 𝑟𝑡 + 𝛾1 𝐿𝐴𝑡−1 /𝑦𝑡 + 𝛾2 𝐿𝑂𝐴𝑁𝑆𝑡−1 /𝑦𝑡 + 𝛾3 𝑆𝐿𝐹𝐴𝑡−1 /𝑦𝑡 + 𝛾4 𝐼𝐿𝐹𝐴𝑡−1 /
+𝑦𝑡 + 𝛾5 𝐻𝐴𝑡−1 /𝑦𝑡 + 𝛾6 ln ℎ𝑝𝑡−1 /𝑦𝑡 + 𝜑 𝐸𝑡 ln (𝑦𝑡𝑝 /𝑦𝑡 ) + ln 𝑦𝑡 ⁄𝑐𝑡−1 ) + 𝑜𝑡ℎ𝑒𝑟 𝑓𝑎𝑐𝑡𝑜𝑟𝑠    (2.5)
+
+Here, 𝐶𝐶𝐼 is an index of non-price credit conditions index, or loan standards8; 𝑟 is the effective real
+household borrowing rate; 𝐿𝐴𝑡−1 /𝑦𝑡 is the ratio to income of the most liquid assets, always including
+bank and saving deposits; 𝐿𝑂𝐴𝑁𝑆𝑡−1 /𝑦𝑡 is the ratio to income of debt; 𝑆𝐿𝐹𝐴𝑡−1 /𝑦𝑡 is the ratio to
+income of semi-liquid financial assets; 𝐼𝐿𝐹𝐴𝑡−1/𝑦𝑡 is the ratio to income of illiquid financial assets;
+𝐻𝐴𝑡−1 /𝑦𝑡 is the ratio to income of gross housing assets; and ln ℎ𝑝𝑡−1 /𝑦𝑡 is the log ratio of real house
+prices to income. In most specifications, after testing, we constrain liquid assets and debt to appear
+in a net liquid assets form, with equal and opposite signed coefficients, i.e. assuming 𝛾2 = −𝛾1. This
+reflects evidence also from France (Chauvin and Muellbauer, 2018), the UK and the US (Aron et al.,
+2012) and South Africa (Aron and Muellbauer, 2025a), which support this constraint. As it turned
+out, for Italy, unlike France, the UK, the US, South Africa and Germany, no long-term effect could
+be found for our indicator of credit conditions, which was found to be relevant only for short-term
+dynamics.9
+
+The other long-term factors, discussed further below, include a shift in seasonality in 1990 and a
+2012 shift dummy to control for the Fornero pension reforms.
+
+We now explain equation (2.5) in more detail. Whereas equation (2.1), (2.2) and (2.4) assumed
+homogenous assets, equation (3.5) adopts a five-part disaggregation of household net worth10
+whereby the marginal propensity to consume (MPC) out of assets depends on the liquidity of
+financial assets (see Otsuka 2004 for an optimizing model with trading costs) and is different for
+housing (see Berger et al. 2018 for an optimizing model of the housing collateral effect in the
+presence of credit constraints).
+
+An important feature of this formulation of the long-run drivers of consumption is consistency with
+
+7
+  In an ad hoc extension of the model, one can add a term ∆ln 𝑦𝑡 to represent a fraction of households who just spend
+income perhaps because they are credit constrained. However, as Deaton (1991) makes clear, there is no micro-
+foundation for such an interpretation of credit-constrained behaviour.
+8
+  Where loan standards have evolved differently for mortgage and non-mortgage credit, an index for each is needed.
+9 The 𝐶𝐶𝐼 term controls for fluctuations in long run ln 𝑐/𝑦 due to shifts in household credit access, particularly mortgage
+
+credit access. Due to asymmetric information, lenders tend to rely on non-price constraints such as down-payments (‘skin
+in the game’), debt servicing capabilities and other screening technologies, that in many countries have evolved through
+time, to mitigate default risk. These non-price constraints can vary with the capital position of the lenders, with regulatory
+constraints they face, with competitive pressure from other lenders and with their risk appetite.
+10
+   This is a more refined disaggregation than adopted in Aron et al. (2012) and in Chauvin and Muellbauer (2018), where
+semi-liquid assets were combined with illiquid financial assets.
+                                                              5
+
+===PAGE 7 ===
+micro-evidence and buffer-stock theory that the marginal propensity to consume out of current
+income varies according to the asset position of households. As Crawley and Kuchler (2023) show,
+the MPC out of current income is highest for asset-poor households, intermediate for those holding
+illiquid but not liquid assets, and lowest for the doubly asset-rich. That is consistent with equation
+(2.5) which implies the following expression for the MPC out of current income of an individual
+household:
+
+        𝜕𝑐𝑡
+              = (𝑐𝑡 /𝑦𝑡 )[1 − 𝜑 − 𝛾1 𝐿𝐴𝑡−1 /𝑦𝑡 − 𝛾2 𝐿𝑂𝐴𝑁𝑆𝑡−1 /𝑦𝑡 − 𝛾3 𝑆𝐿𝐹𝐴𝑡−1 /𝑦𝑡
+        𝜕𝑦𝑡
+                 −𝛾4 𝐼𝐿𝐹𝐴𝑡−1 /𝑦𝑡 − 𝛾5 𝐻𝐴𝑡−1 /𝑦𝑡 − 𝛾6 ln ℎ𝑝𝑡−1 /𝑦𝑡 ]                               (2.6)
+
+For a given value of 𝜑 which captures how forward-looking is a household, one without financial
+assets or housing wealth but with debt, will have the highest MPC as 𝛾2 is negative. This is reinforced
+by the fact that such resource-poor households will tend to have a high average propensity to
+consume, 𝑐/𝑦. A household with no debt but with both financial assets and housing wealth will have
+low MPCs, reinforced by the fact that such households will tend to have lower values of 𝑐/𝑦.
+Moreover, as 𝛾1, the MPC for liquid assets, exceeds the MPCs for less liquid assets and housing,
+where the fraction of the portfolio in liquid assets is high, the MPC will be especially low.
+
+Credit availability potentially also has an influence on the MPC. Since easy access to credit should
+make households more forward-looking as they can more easily borrow in advance of higher
+expected income, the MPC out of current relative to permanent income would be expected to be
+lower when credit access is easy or where households have the means to meet down-payment
+constraints on access to a mortgage. However, this could be somewhat offset by a tendency of such
+households to have higher values of the average propensity to consume, 𝑐/𝑦.
+
+Differences in MPCs with respect to wealth between different asset types, i.e. the 𝛾𝑖 , can also reflect
+the different characteristics of households dominating ownership of the different assets. Indeed, as
+noted earlier, there is a good deal of distributional information buried in the aggregate data on the
+different types of assets. It is likely that many households with mortgage debt have relatively low
+holdings of deposits and other financial assets. This would make their reaction to higher debt levels
+more negative than implied by the net worth formulation. As it is likely that the MPC for illiquid
+financial assets such as stock market wealth is lower for very wealthy households, the fact that such
+wealth is very unequally held is likely to be a factor affecting the estimated magnitude of 𝛾4 on
+aggregate data, in addition to its illiquidity characteristics such as trading costs or riskiness.
+
+Even without liquidity issues and credit constraints, intertemporal optimisation shows that, because
+housing is a consumption good as well as an asset, the response of consumption to an increase in
+house prices is different from the response of consumption to, for example, the share price index (see
+Aron et al. (2012), Buiter (2010) and Calomiris et al. (2009)). This is one motivation for including in
+the consumption function the log ratio of house price to income as well as the housing wealth to
+income ratio. The other reason arises because of mortgage credit constraints, particularly salient in
+                                                   6
+
+===PAGE 8 ===
+Italy, and because owner-occupiers and renters are likely to have different reactions to housing
+market developments. For a given loan standard, higher house prices relative to incomes increase the
+need to save for a deposit to enter the mortgage market. Moreover, renters are likely to see an increase
+in house prices relative to incomes as sign that future rents will rise and therefore be more cautious
+in their spending.
+
+It is possible that some of the coefficients in the model could interact with non-price credit conditions.
+For example, Aron et al. (2012) and Duca and Muellbauer (2014) find that in the US and UK, where
+home equity withdrawal is common, the MPC for housing wealth increases with easier non-price
+credit conditions. This finding is corroborated for South Africa where home equity withdrawal is also
+widespread, see Aron and Muellbauer (2025a). But this is not the case in France and Germany where
+equity withdrawal has scarcely existed, see Chauvin and Muellbauer (2018) and Geiger et al. (2016).
+In this respect, Italy should be like France and Germany, as mortgage equity withdrawal is also
+absent. It is possible that if lenders ease the down-payment requirement, the negative effect of higher
+house prices relative to incomes could moderate. If access to credit in general increases, households
+should be able to engage in more intertemporal substitution, which would increase the weight 𝜑 on
+permanent income. These are testable propositions.
+
+An important advantage of the general formulation of the consumption function in (2.5) is that it
+nests conventional models. With 𝛼𝑐 = 0, and 𝛾𝑖 = 𝛾, for i=1, 5, and 𝛾6 = 0, equation (2.5) reduces
+to equation (2.4).
+
+
+3. Data background
+
+3.1 Consumption and income
+
+The Italian ratio of total consumer spending to household disposable income has experienced a
+significant evolution. Before about 1993 it was rarely above 80 percent, implying a household saving
+ratio of over 20 percent, well above the saving ratios for most OECD countries (Ando et al., 1994
+and De Bonis and Marinucci, 2023). In the later 1990s, the ratio rose to levels nearer 90 percent, and
+saving ratios moved closer to those in OECD countries after Italy joined the Eurozone in 1999. The
+ratio remained fairly constant until the Covid-19 pandemic, when it declined dramatically, due to a
+huge drop in Italian private consumption – the sharpest in the euro area together with Spain. The
+contraction in disposable income was somewhat smaller as it was sustained by a generous stimulus
+package implemented by the government (Guglielminetti and Rondinelli, 2023).
+
+Textbook consumer theory suggests that non-property income rather than overall disposable income
+is the appropriate income concept for explaining consumption, with net worth capturing permanent
+property income. We define a measure of scaled income, which averages labour income plus transfer
+income, and overall disposable income (including property income), as our preferred income measure
+to approximate non-property income (see the Appendix A.1 for details on data sources and
+                                                    7
+
+===PAGE 9 ===
+definitions). Rather than give labour and transfer income a weight of 1, with property income
+replaced by a fixed rate of return multiplied by net worth, we overweight labour and transfer income,
+giving property income as measured in the national accounts a reduced weight in explaining
+consumption. Several reasons underly this compromise. First, the text-book assumption that property
+income is a fixed proportion of net worth is quite unrealistic, as rates of return vary by property type
+and are far from constant. Second, in a context where many households are credit or liquidity
+constrained, the cash-flow from property income matters to them, rather than a real rate of return
+applied to the underlying asset. In the national accounts, many types of property income are recorded
+as cash flows, which are then deflated by the consumption deflator to convert to real terms. Many
+economists regard that as mismeasurement (especially in the context of price inflation) in contrast to
+a measure of real property income defined as the real rate of return (the nominal return on the asset
+minus the expected rate of inflation) multiplied by a constant price measure of the asset value, e.g.
+Jump (1980). However, our view is that for many households, the standard national accounts cash-
+flow treatment is more relevant. The third argument for our compromise is that some types of income,
+e.g. those of small business owners, contain a difficult-to-separate mix of labour and property
+income, and moreover, national accounts data do not permit separate tax adjustments for different
+types of income.
+
+ Figure 1 shows the log ratios of consumption to disposable and scaled income, taken as deviations
+from their values in 1996Q1.11 The figure shows that they moved closely together from the late 1970s
+to the mid-2000s but then diverged as interest rates fell and property income as measured in the
+national accounts declined relative to labour and transfer income.
+
+
+
+                Log ratio of consumption to scaled income
+                Log ratio of consumption to total disposable income
+ 0.15
+
+
+
+
+ 0.10
+
+
+
+
+ 0.05
+
+
+
+
+ 0.00
+
+
+
+
+-0.05
+
+
+
+         1980       1985      1990      1995       2000      2005         2010   2015   2020
+
+Figure 1: The log ratios of consumption to disposable and to scaled income, relative to 1996Q1.
+
+
+11
+     This reference date of 1996Q1 reflects when it became clear that Italy qualified for and would adopt the euro.
+                                                                      8
+
+===PAGE 10 ===
+Source: National Accounts, ISTAT, and authors’ weighting of raw data.
+
+
+
+3.2 Household balance sheet data
+
+From 1995, quarterly financial balance sheets from the Bank of Italy give a detailed breakdown of
+household portfolios. Before 1995, annual balance sheets from Bonci and Coletta (2008) give a
+cruder breakdown in which short (‘bills’) and medium and long-term debt securities (‘bonds’) are
+aggregated. The split of total debt securities into bills and bonds before 1995 is based on information
+collected by the Bank of Italy. After quarterly interpolation of the data (see details in Appendix A.2)
+and adjusting for data breaks12, we obtain continuous quarterly household balance sheets for eight
+categories of financial assets and debt. These are deposits plus cash, bills, bonds, quoted equities,
+mutual funds, unquoted shares, life insurance reserves and pensions, and household debt in the form
+of loans.
+
+For empirical modelling on time series data, it is desirable to group the nine elements of the portfolio
+into broader groups to avoid overfitting. In our preferred empirical formulation, as explained below,
+we group these eight categories into three groups: net liquid assets (defined as deposits including
+cash, plus bills plus mutual funds, minus debt); semi-liquid assets (defined as bonds); and illiquid
+assets (defined as quoted shares plus pension and life-insurance assets). Figure 2 displays ratios of
+the market values of these three asset groups, measured at the end of the previous quarter, and divided
+by annualised scaled income.
+
+
+
+
+12
+  Several structural breaks were adjusted for, see the Appendix A.2 for details. First, the 1995 European System of
+Accounts (ESA95) introduced methodological innovations which affected the continuity of the time series of national
+accounts. Second, corrections had to be made for a break in the pensions data in 1984 and in the loans data in 1989.
+                                                         9
+
+===PAGE 11 ===
+ 1.50
+
+
+
+ 1.25
+
+
+
+ 1.00
+
+
+
+ 0.75
+
+
+
+ 0.50
+
+
+
+ 0.25                                                 Ratio of net liquid assets to scaled income
+                                                      Ratio of bonds to scaled income
+                                                      Ratio of illiquid fin. assets to scaled income
+
+        1980        1985        1990        1995        2000       2005        2010        2015        2020
+
+Figure 2: Ratios to income of net liquid assets, semi-liquid assets and illiquid assets.
+Source: National Accounts and quarterly household balance sheets, ISTAT. Before 1995, balance sheet data linked
+with break-adjusted annual data are from Bonci and Coletta (2008) and internal Bank of Italy data. Net liquid assets are
+defined as deposits plus mutual funds plus bills minus loans; semi-liquid assets are defined as bonds; and illiquid
+financial assets are defined as quoted shares plus pension and life insurance funds. Unquoted shares are excluded.
+
+
+The rationale behind grouping the eight portfolio elements into the three groups shown in Figure 2,
+is influenced by the liquidity characteristics of Italy’s different assets. A priori, it is plausible that
+unquoted shares and pension wealth should be the least liquid wealth components, followed by
+quoted shares. Bills, bonds and mutual funds could be an intermediate semi-liquid category, with
+deposits the most liquid of all. However, in Italy mutual funds are mainly bank-managed funds,
+containing a mix of money market instruments as well as less liquid securities (Albareto et al.2020).
+These come in a variety of forms, including some partially invested in quoted equities. With low
+withdrawal restrictions, they have a high degree of effective liquidity making them a candidate for
+inclusion in the liquid category. Short-term treasury bills carry little capital risk and have very low
+transactions costs, which also makes them suitable for inclusion in the liquid category. Bonds make
+up the semi-liquid category, and quoted shares plus pensions and life insurance reserves comprise
+the illiquid financial asset category. We also consider an alternative grouping in which deposits
+define liquid assets, the semi-liquid category consists of bills plus mutual funds, and the illiquid
+group contains bonds, quoted shares and pension wealth, while unquoted shares drop out altogether.
+In all plausible groupings, unquoted shares have a negative coefficient, suggesting serious problems
+in valuation, and are therefore omitted. Liquid assets minus loans can be combined into ‘net liquid
+                                                          10
+
+===PAGE 12 ===
+assets’ in both of the plausible groupings.
+
+Figures 3 to 5 show ratios to annualised scaled income for the full available disaggregation of nine
+categories of balance sheet data. We summarise the main factors driving variations in these ratios.
+Notable features of the data include the surge relative to income in holdings of bonds and mutual
+funds after 1995, while holdings of bills –short-term securities- as well as of bank deposits, declined
+as certainty increased regarding Italy’s membership of the currency union and price inflation fell (see
+Caprara, De Bonis and Infante 2020). Holdings of mutual funds decreased after the collapse of the
+dotcom stock market boom in 2001, which also sharply lowered the value of quoted shares, and
+bottomed out in the financial crisis of 2008-9, but rose again with the low interest rates and stock
+market recovery that followed. For net liquid assets, as defined above, the rise in the value of mutual
+funds in the 1995 to 2000 period was offset by the relative decline in deposits and bills and the rise
+in household debt. The decline in the ratio of net liquid assets to income from 2001 to about 2012 is
+substantially due to the relative decline in mutual funds after the dotcom bust, to a decline in holdings
+of short-term bills, and to a degree, to the rise in debt relative to deposits. Subsequently, the rise in
+the ratio of net liquid assets to income is due to the recovery of mutual funds and the rise in deposits
+relative to debt.
+
+Turning to semi-liquid assets, i.e. bonds, there was a striking rise after 1995 with lower inflation,
+lower interest rates and increasing confidence that Italy would join the euro, broadly sustained in the
+relatively low interest rate period until the sovereign debt crisis, after which the value of holdings of
+Italian long bonds fell sharply. For the composite of illiquid financial assets, the gradual upward trend
+of holdings of pensions and life-insurance funds looks relatively unrelated to economic events and
+dominates the much more volatile value of holdings of directly-held quoted shares. That showed a
+strong rise in the late 1990s boom, with a temporary hiccup in the financial crisis affecting emerging
+markets and Russia in 1998-9, followed by a sharp decline in the dotcom bust, broadly sustained in
+the subsequent years.
+
+
+
+
+                                                   11
+
+===PAGE 13 ===
+                Ratio of deposits to scaled income
+                Ratio of loans to scaled income
+  1.50
+
+
+
+  1.25
+
+
+
+  1.00
+
+
+
+  0.75
+
+
+
+  0.50
+
+
+
+  0.25
+
+
+         1980       1985      1990       1995        2000   2005          2010     2015   2020
+
+Figure 3: Ratios to scaled income of household deposits and loans.
+Source: National Accounts and quarterly household balance sheets, ISTAT. Before 1995, balance sheet data linked with
+break-adjusted annual data are from Bonci and Coletta (2008) and internal Bank of Italy data.
+
+
+
+
+                  Ratio of bills to scaled income
+                  Ratio of bonds to scaled income
+   0.9            Ratio of mutual funds to scaled income
+                  Ratio of quoted shares to scaled income
+   0.8
+
+
+   0.7
+
+
+   0.6
+
+
+   0.5
+
+
+   0.4
+
+
+   0.3
+
+
+   0.2
+
+
+   0.1
+
+
+          1980             1985       1990           1995          2000          2005     2010   2015   2020
+
+Figure 4: Ratios to scaled income of bills, bonds, mutual funds and quoted shares.
+Source: National Accounts and quarterly household balance sheets, ISTAT. Before 1995, balance sheet data linked with
+                                                                     12
+
+===PAGE 14 ===
+break-adjusted annual data are from Bonci and Coletta (2008) and internal Bank of Italy data.
+
+
+The estimates of housing wealth including land are obtained from Istat from 2001 and are linked with
+estimates by Cannari et al. (2017). Figure 5 plots the ratios to scaled income of housing wealth,
+unquoted shares and pension wealth, showing the dramatic scale of housing wealth relative to other
+wealth components.
+    7
+               Ratio of housing wealth to scaled income
+               Ratio of unquoted shares to scaled income
+    6          Ratio of pensions to scaled income
+
+
+    5
+
+
+
+    4
+
+
+
+    3
+
+
+
+    2
+
+
+
+    1
+
+
+
+        1980       1985      1990      1995      2000      2005   2010   2015   2020
+
+
+Figure 5: Ratios to scaled income of housing wealth, unquoted shares and life insurance and pension
+wealth.
+Source: National Accounts and quarterly household balance sheets, ISTAT. Before 1995, balance sheet data linked with
+break-adjusted annual data are from Bonci and Coletta (2008) and internal Bank of Italy data.
+
+
+House prices affect not only housing wealth but also housing affordability which we measure by the
+ratio of house price to per capita income, see Figure 6. Unsurprisingly, the ratio has a cyclical pattern
+like that of the housing wealth to income ratio but does not show the upward trend of the latter (which
+reflects the cumulative effect of real residential investment). A comparison of Figure 5 with the index
+of credit conditions discussed below, see Appendix 4, Figure A3, suggests that shifts in credit
+conditions help to explain the cyclical pattern of the house price to income ratio. As in a number of
+European countries, house prices rose relative to income in the late 1980s and declined in the early
+1990s, with the ERM crisis. Interestingly, house prices did not join the boom in prices of financial
+assets in the late 1990s, but rose strongly after Italy joined the euro. With the GFC and the sovereign
+debt crisis, the Italian house price to income ratio fell sharply, and failed to join the post-crises
+recovery in house prices experienced in most other European countries.
+
+
+
+
+                                                                   13
+
+===PAGE 15 ===
+     0.25          Log ratio of house prices to per capita scaled income
+
+     0.20
+
+     0.15
+
+     0.10
+
+     0.05
+
+     0.00
+
+ -0.05
+
+ -0.10
+
+ -0.15
+
+ -0.20
+
+            1980       1985      1990       1995       2000       2005     2010   2015   2020
+
+Figure 6: The log ratio of house prices to income, relative to 1996Q1.
+Source: National Accounts, ISTAT and the house price index from Bank of Italy.
+
+
+
+While major evolutions in aggregate balance sheets have occurred, it is important to recognize the
+heterogeneity of ownership of these assets. In Italy, financial wealth is very concentrated, with almost
+80 per cent of financial wealth belonging to the upper 40 per cent of the income distribution. As
+shown in the Appendix A.3, higher income households are far more likely to be holders of the
+different categories of wealth. Indeed, the proportion of households who own no wealth in a particular
+asset class varies strikingly by income quantile. Unsurprisingly, deposits are the most universally
+held type of asset, though even for this category, poorer households have far lower holdings than
+higher income households. As noted earlier, the MPC measures depend not only on liquidity
+characteristics of the different assets but also on the behaviour patterns of the dominant owners.
+
+3.3 Estimates of permanent income
+
+Permanent income is prominent in the classic texts and important in our generalized consumption
+function. We define the log of permanent income as the discounted stream of log income over the
+next 40 quarters, using a quarterly discount factor of 0.95, implying an annual discount rate of a little
+over 20 percent. Following Chauvin and Muellbauer (2018) and Geiger et al. (2016), we use a
+reduced form forecasting equation for log permanent income.13 One independent variable is the log
+ratio of the working age population measured relative to the total population, since our consumption
+and income data are per capita: a higher proportion in the working age group implies higher per capita
+
+13
+  The forecasting method used is a type of ‘local projection’, Jordà (2005). Instead of forecasting quarterly log income
+separately at each horizon t+h, where h runs from 1 to 40 quarters, we forecast the weighted average of quarterly log
+income over a horizon of 40 quarters (see further details in Appendix A.6).
+                                                                 14
+
+===PAGE 16 ===
+incomes. Other drivers in levels are a measure of international competitiveness, the unemployment
+rate, the log of real oil prices, logs of current and recent income. and the log of the real stock market
+index. For the dynamics, changes are included in the unemployment rate, in log real oil prices and in
+a credit conditions indicator (see Appendix A.6). In the long run, real per capita incomes trend
+upwards with improvements in technology and working practices, and hence a time trend is also
+included.
+
+Our forecasting model for the permanent income construct requires adjustment for unexpected
+structural breaks through learning-adjustment. The Global Financial Crisis (GFC) of 2008-2009 put
+a serious and unforecastable dent into the long-run performance of income. This is manifested as a
+mix of a one-off step down in income and a lower level of trend growth. Households could not have
+foreseen the GFC, and to address this, the fitted values of the forecasted log permanent income are
+adjusted beginning 40 quarters earlier to remove the unanticipated break in the income process. We
+aim to replicate what a forecaster would likely have predicted prior to the GFC. According to our
+estimates, without any adjustments, the permanent income assessments just before the crisis would
+have been around 3.5 percent too optimistic. We thus build in a mix of quick and gradual learning
+from 2008Q3. We assume that, given the severe shock of the financial crisis, half of the learning
+adjustment was instantaneous. As the European sovereign debt crisis followed the GFC with some
+delay, we then assume there are two phases of a gradual learning process, with equal weights: the
+first running from 2008Q3 to 2010Q2 and the second from 2010Q3 to 2012Q2. From 2012Q2, the
+learning-adjusted forecasts are fully based on the model incorporating the structural break, see Figure
+7. The learning-adjusted version demonstrates the over-optimism before the GFC and the relatively
+rapid downward adjustment thereafter. By contrast, the rational expectations approach, which ignores
+the large forecast error everyone made just before the crisis, would not have been a good proxy for
+realistic income expectations.
+
+The forecast method uses actual data on future income for 40 quarters ahead, where available. As the
+estimation period ends in 2019Q4, this means that from 2020Q1 we need forecasts of income from
+some external source to fill in the missing values. We take these from income growth forecasts for
+the following 40 quarters from vintage forecasts made at the end of 2019 by Oxfordeconomics.com.
+These forecasts correctly do not take account of the imminent unforecastable pandemic. Robustness
+is checked by comparing the results where these forecast growth rates are reduced by 50 percent.
+
+
+
+
+                                                   15
+
+===PAGE 17 ===
+0.050
+
+0.025
+
+0.000
+
+-0.025
+                                       Learning-adjusted fitted log permanent income
+-0.050                                 Fitted log permanent income
+                                       Log permanent income
+-0.075
+
+-0.100
+
+-0.125
+
+-0.150
+
+-0.175
+
+
+         1980    1985     1990       1995       2000       2005       2010        2015    2020
+
+Figure 7: Estimates of log permanent income: actual values, fitted values from an econometric model,
+and learning-adjusted fitted values, relative to fitted value in 1996Q1.
+Source: National Accounts, ISTAT and learning-adjusted permanent income estimates described in the text.
+
+
+
+3.4 Interest rates
+
+Further data relevant for the consumption function’s long-run solution are interest rates. Textbook
+theory suggests a negative coefficient for a real interest rate in the consumption function, interpreted
+in terms of intertemporal substitution. However, there are conditions under which a positive
+coefficient can occur, see Aron et al. (2012). To define the nominal effective interest rate, we adapt
+the Bank for International Settlements (BIS) approach to the measurement of the household debt
+service ratio, where Drehmann (2017), defines the relevant interest rate for an amortising mortgage
+with a remaining life of 18 years as follows:
+
+            𝑎𝑑𝑗𝑅 = 𝑅/(1 − (1 + 𝑅)−18 )                                                                     (3.1)
+
+where R is the annual percentage mortgage rate/100. We instead take 12 years as a better
+approximation to the average maturity of Italian household debt. In the equation, 𝑎𝑑𝑗𝑅 is the interest
+rate for which the stream of payments on debt service and repayment would be constant over time.
+We define the real interest rate by subtracting the 4-quarter change in the log of the consumer
+expenditure deflator. Figure 8 shows that the real rate remained positive even during the high inflation
+period in the 1980s, turning briefly negative only in the inflation surge following Russia’s attack on
+Ukraine.
+
+                                                         16
+
+===PAGE 18 ===
+               Effective real interest rate for borrowing
+0.150
+
+
+
+0.125
+
+
+
+0.100
+
+
+
+0.075
+
+
+
+0.050
+
+
+
+0.025
+
+
+
+0.000
+        1980       1985       1990       1995        2000   2005    2010   2015   2020
+
+Figure 8: The real interest rate on housing loans.
+Source: The interest rate is for housing loans, from Bank of Italy; the BIS definition is used for the effective rate on a
+loan but with 12 years remaining duration, see text; the real rate is the nominal effective rate minus the 4-quarter change
+in the log consumer expenditure deflator.
+
+
+
+3.5 Credit conditions
+
+As shown in Figure 3, the ratio of household loans to income has drifted up since the 1980s, and
+especially from the late 1990s to the onset of the GFC. As the introduction and the model set-up in
+Section 2 have emphasised, controlling for variations in non-price credit conditions (credit standards)
+is important for modelling consumption, especially in countries where liberalization of credit
+conditions occurred through financial deregulation, and through shifts in financial technology and
+industry structure. The ratio of household debt to income in Italy has risen over time, but it is not
+clear to what extent credit liberalization played a role as opposed to rising income and house prices,
+and lower interest rates. Unfortunately, data on the composition of household debt (mortgage versus
+non-mortgage debt) only begin in 1999. We therefore resort to a measure of overall credit conditions
+for the economy rather than one specific to households. Our measure is based on data on credit lines
+available to the private sector relative to a moving average of GDP, see Appendix A.4 for details.
+
+
+
+3.6 Seasonality, structural breaks and short-term dynamics
+
+While the consumption and income data are meant to be seasonally adjusted, there is a pronounced
+shift in seasonality in the recorded consumption data before 1990, especially in the third quarters.
+                                                                   17
+
+===PAGE 19 ===
+We control for this with a third quarter seasonal dummy which is zero from 1990Q1.
+
+Finally, there are structural breaks controlled for by dummies. The long run solution for the
+consumption to income ratio is likely to be affected by pension reform. While the 1992 Amato and
+1995 Dini reforms, see Hamann (1997), appear to have had few detectable long-run effects on
+aggregate data, this is not so for the Fornero reforms passed in 2011, which reduced the generosity
+of pension benefits (Fornero, 2020). These reforms succeeded the sovereign debt crisis, which had
+deeply affected Italy. The reforms came into effect in 2012 and appear to have lowered the
+consumption to income ratio, see Lepinteur et al. (2022).14 We therefore introduce a shift dummy in
+2012, but allow gradual phasing in of its full effects over two years. A softening of the Fornero
+reforms was anticipated from 2017 with the election of a new government seen to be likely and
+eventually realised in May 2018. Checking for consumption effects of a softening of the pension
+reforms uses a 2017 shift dummy, also phased in over two years (though this proved to be
+insignificant).
+
+Four dummies capture outliers in the consumption function. These are negative impulse dummies for
+1983Q1, 1993Q1 and 2013Q1, and a dummy, which is 1 for the two years: 1992-93. In 1983Q1 the
+spread between the Italian and German T-bill rates reached a record. Consumer confidence was
+probably affected by political uncertainty with the forthcoming election. The years 1992-93 saw an
+exchange rate crisis resulting in Italy’s temporary departure in 1992Q3 from the Exchange Rate
+Mechanism (ERM), accompanied by a record jump in the T-bill spread. Measures of consumer
+confidence available since 1985 show the most pessimistic view of economic conditions and of
+employment prospects in 1993Q1, except for the sovereign debt crisis in 2012.15 The 2013 impulse
+dummy reflects the large tax rises of that year including the temporary re-introduction of a property
+tax.
+
+Controls for short-term dynamics are discussed in the Appendix A.4 and A.5. These include the
+growth rate of an indicator of credit conditions, the acceleration of income growth, a measure of
+income volatility, changes in the unemployment rate and in the log of per capita constant price public
+consumption – a partial substitute for private consumption.
+
+
+4. Empirical findings.
+
+4.1 Main regressions
+
+
+
+14
+   Lepinteur et al. (2022) use a difference-in-differences framework based on a firm-size discontinuity, with individual
+data coming from the Italian Survey on Household Income and Wealth, to examine the consequences of the 2012 reforms.
+Their evidence suggests that the resulting greater income insecurity reduced consumption and increased savings.
+15
+   It is also possible to incorporate such expectations effects into the model for permanent income. However, this is quite
+complex, given a downward shift in the underlying trend in 1992, and an upward shift in 1994, and corresponding learning
+mechanisms. As the 1992 crisis was temporary, introducing a 1992-3 dummy into the consumption function was the
+simpler alternative.
+                                                            18
+
+===PAGE 20 ===
+Tables 1 and 2 give the main findings for our estimation of a more generalized consumption function
+for Italy, that encompasses the conventional textbook version. In Table 1, we follow a step-by-step
+approach, progressively splitting the conventional measure of net worth into its liquid and illiquid
+asset components and introducing debt.
+
+The first regression (in column 1) captures the simple textbook version of the consumption function,
+where every asset that households own is summarised by one variable: the log of net worth to income
+ratio. There is no distinction between financial and physical assets in the long run and in the short-
+term dynamics. Without most of these controls, there is almost no relationship to be found, suggesting
+quite erroneously that consumption might well follow a martingale process. Column 1 shows a poor
+fit of the model with high levels of residual autocorrelation, as shown in the Durbin-Watson statistic
+and tests of autocorrelation up to 4 quarters, and poor parameter stability revealed in the Chow test.16
+The speed of adjustment is very low at 0.05 (a typical sign of misspecification).17 The log of net
+worth is only just significant, and one could accept the hypothesis of a unit coefficient on permanent
+income (as implied by the textbook model). Column 2 adds the lagged change in the log of credit
+conditions to the short-term controls. Though outside the framework of the standard model, it is
+significant, raises the speed of adjustment a little and improves the fit and the significance of log net
+worth. However, parameter stability remains very poor and residual autocorrelation very high.
+Column 3 demonstrates that replacing the log of net worth simply by net worth causes a deterioration
+in the already poor results. All three specifications so far suggest a positive sign on the real effective
+interest rate on borrowing, contrary to conventional wisdom.
+
+It is crucial to disaggregate net worth. Column 4 shows a radical improvement when housing wealth
+is separated from net financial assets. The speed of adjustment rises to 0.10 and is strongly significant.
+The relative weight of permanent income is now estimated to be 0.7, well below the unity coefficient
+implied by the (textbook) permanent income model. The effect of the real effective interest rate on
+borrowing is now negative, though insignificant. The long-run MPC out of net financial assets is
+estimated at 0.06 with a t-ratio of 7.7. The housing wealth to income ratio and the log of the house
+price to income ratio are insignificant, both with negative effects. One could conclude from these
+findings that housing wealth has, if anything, a small negative effect on consumption in Italy, as
+found by Boone and Girouard (2002) and Slacalek (2009). However, this model still fails the
+parameter stability test and the residual autocorrelation remains very high.
+
+A dramatic improvement comes with a further disaggregation of the household balance sheet, shown
+in column 5. We now split net financial assets into three components: net liquid assets (defined as
+liquid assets - deposits plus mutual funds plus bills minus debt); semi-liquid assets (defined as
+
+16 In addition to the Durbin-Watson statistic, the tests include Lagrange-Multiplier (LM) tests for residual autocorrelation
+
+for both the moving average and for the autoregressive form for lags up to 4 quarters, see Godfrey (1988). The RESET2
+test, or Ramsey Regression Equation Specification Error Test, is a test of potential misspecification in a linear regression
+model. It checks for issues related to the functional form of the model, such as omitted non-linear terms.
+17 As suggested by the review of central bank econometric policy models in Muellbauer (2022), low speeds of adjustment
+
+are a symptom of specification problems, especially of omitted variables (see also Hendry et al. (1984) and Hendry (1995,
+ch.7)).
+                                                            19
+
+===PAGE 21 ===
+bonds); and illiquid financial assets (defined as quoted shares plus pension wealth).18 The equation
+standard error falls from 0.0043 to 0.0032, and the speed of adjustment jumps from 0.10 to 0.29.
+Moreover, parameter stability according to the Chow test is excellent and tests for residual
+autocorrelation are at last satisfactory. The relative weight of permanent to current income is
+estimated at 0.57; this is strongly against the extreme textbook view which bases all the weight on
+permanent income. The marginal propensities to consume are estimated with a relatively high degree
+of accuracy. The MPC of liquid assets minus debt is estimated at 0.14 (with a t-ratio of 14.8), the
+MPC of semi-liquid assets (bonds) is 0.054 (with a t-ratio of 6.7), and on the MPC of illiquid financial
+assets is 0.0.037 (with a t-ratio of 2.2). These results are broadly in line with other countries
+(discussed below) except for the relatively high MPC on illiquid financial assets. There is a strongly
+significant positive housing wealth effect but it is substantially offset by the negative affordability of
+higher house prices relative to income. Hence, high house prices have different consumption
+consequences for home-owners versus renters, and the net outcome for Italy is that the weight of the
+owners somewhat exceeds that of renters. Overall, this evidence strongly contradicts the conventional
+net worth restriction.19 The real effective interest rate effect is now negative and strongly significant.
+However, the negative estimated effect of the Fornero reforms on the long-run consumption to
+income ratio is implausibly large at over 6 percent.
+
+The GFC and the subsequent European sovereign debt crisis had severe domestic consequences for
+fiscal policy, likely to have raised income insecurity among Italian households. Probably households
+became less forward looking and more focused on current income A simple way of testing this within
+the model is to permit a shift in the relative weights of permanent and current income from the GFC
+onwards. We interact the 2008Q3 shift dummy with the log-ratio of permanent to current income
+(with this ratio defined relative to its value in 2008Q2). The interaction effect is significant at the 10
+percent level and reduces the relative weight on permanent income from a point estimate of 0.57 pre-
+GFC, to 0.21 post-GFC, see column 6. The speed of adjustment is 0.30 and the estimated long-run
+effect of the Fornero reforms becomes a more plausible 0.035 reduction in the consumption to income
+ratio (compared with a 0.061 reduction, when omitting the post-GFC shift in the weight of permanent
+income in column 5).
+
+
+
+
+18
+   Note that unquoted shares are excluded from our preferred specifications, as the estimated implied MPC would have
+been negative in all specifications. This is related to mismeasurement of unquoted shares, see discussion in Section 3.2
+19
+   For comparison, the Bank of Italy’s consumption equation in BIQM uses net financial wealth (excluding housing
+wealth) and includes a negative real interest rate effect. The speed of adjustment is only around 0.07 in contrast with ours
+of 0.30, and the MPC out of net financial wealth is round 0.08, not far from ours of 0.06, though the results are not strictly
+comparable, since the wealth coverage is for the whole private sector (including businesses) rather than just households,
+and the definition of consumption includes the imputed service flow of durable goods instead of expenditure on durables.
+                                                             20
+
+===PAGE 22 ===
+                         Table 1. Italian Consumption Function Estimates, 1980-2019
+
+         ∆ 𝐥𝐧 𝒄𝒕        Symbol        (1)        (2)         (3)          (4)            (5)         (6)
+                                               Long-run effects
+                                     0.0531     0.0632      0.0398        0.103         0.289       0.298
+Speed of adjustment        𝜆        (0.0219)   (0.0216)    (0.0184)     (0.0263)      (0.0276)    (0.0273)
+                                     [2.43]     [2.92]      [2.16]       [3.92]        [10.46]     [10.91]
+   ln 𝑦𝑡 − ln 𝑐𝑡−1          -        1.00        1.00        1.00         1.00          1.00        1.00
+                                     -0.293     -0.299     -0.00999      0.151          0.369       0.298
+      Constant             𝛼0       (0.180)    (0.146)     (0.0155)     (0.416)       (0.1254)    (0.1225)
+                                    [-1.63]    [-2.04]     [-0.0643]    [0.364]        [2.94]      [2.43]
+                                     0.105      0.0854      0.139         0.060         0.024       0.023
+1990 seasonal pattern
+                          𝛼0𝑆       (0.0568)   (0.0414)    (0.0816)     (0.0223)      (0.00477)   (0.00451)
+      dummy
+                                     [1.85]     [2.06]      [1.70]       [2.69]         [5.11]      [5.19]
+                                     0.769      0.667        0.982      -0.0308        -0.361      -0.350
+    Adjusted 𝑟𝑡            𝛼1       (0.569)    (0.448)      (0.765)     (0.272)       (0.0769)    (0.0733)
+                                     [1.35]     [1.49]       [1.28]     [-0.113]       [-4.70]     [-4.78]
+                                      1.48       1.28         1.43       0.704          0.574       0.615
+          𝑝
+     ln (𝑦𝑡 /𝑦𝑡 )          𝛼2       (0.473)    (0.352)      (0.596)     (0.197)       (0.0544)    (0.0548)
+                                     [3.13]     [3.63]       [2.41]      [3.56]        [10.55]     [11.22]
+
+2008q3 GFC dummy                                                                                   -0.406
+           𝑝             𝛼2,𝑖𝑛𝑡                                                                   (0.1583)
+    x ln (𝑦𝑡 /𝑦𝑡 )                                                                                 [-2.57]
+                                    -0.0425    -0.0322      -0.0385     -0.02399       -0.0363     -0.0345
+1992 Exchange rate
+                         𝜏1992      (0.0400)   (0.0325)    (0.0528)     (0.0200)      (0.00644)   (0.00612)
+   crisis dummy
+                                     [-1.06]   [-0.994]    [-0.729]      [-1.19]        [-5.63]     [-5.64]
+                                    -0.0525    -0.0308     -0.00545      -0.0151       -0.0614     -0.0346
+2012 Fornero reform
+                         𝜏2012      (0.0290)   (0.0261)    (0.0462)     (0.0216)      (0.00794)   (0.0129)
+      dummy
+                                     [-1.81]    [-1.18]     [-0.118]    [-0.702]        [-7.73]     [-2.68]
+                                     0.172      0.173
+     ln 𝐴𝑡−1 /𝑦𝑡           𝛾        (0.0819)   (0.0668)
+                                     [2.10]     [2.60]
+                                                           0.00766
+      𝐴𝑡−1 /𝑦𝑡           𝛾𝑁𝐸𝑇𝑊                             (0.0176)
+                                                            [0.436]
+                                                                        0.0594
+    𝑁𝐹𝐴𝑡−1 /𝑦𝑡           𝛾1,𝑁𝐹𝐴                                        (0.00768)
+                                                                         [7.74]
+                                                                                        0.137       0.137
+     𝑁𝐿𝐴𝑡−1 /𝑦𝑡          𝛾1,𝑁𝐿𝐴                                                       (0.00926)   (0.00878)
+                                                                                       [14.84]     [15.57]
+                                                                                       0.0540      0.0623
+   𝐵𝑂𝑁𝐷𝑆𝑡−1 /𝑦𝑡         𝛾1,𝑆𝑀𝐿𝐵                                                       (0.00808)   (0.00817)
+                                                                                        [6.68]      [7.63]
+                                                                                       0.0365      0.0301
+    𝐼𝐿𝐹𝐴𝑡−1 /𝑦𝑡         𝛾1,𝐼𝐿𝐴𝑃𝐸𝑁                                                     (0.0169)    (0.0165)
+                                                                                       [2.15]      [1.83]
+
+                                                 21
+
+===PAGE 23 ===
+                                                                                                    -0.00716           0.0411            0.0392
+           𝐻𝐴𝑡−1 /𝑦𝑡                 𝛾2                                                             (0.0142)          (0.00559)         (0.00533)
+                                                                                                     [-0.505]           [7.35]            [7.36]
+                                                                                                      -0.0305           -0.109            -0.0962
+         ln 𝐻𝑃𝑡−1 /𝑦𝑡−1             𝛾3                                                               (0.0760)          (0.0230)          (0.0224)
+                                                                                                     [-0.402]           [-4.74]            [-4.29]
+                                                                 Short-run effects
+                                                                  0.0379            0.0365            0.0114            0.0295            0.0315
+          ∆2 ln 𝐶𝐶𝐼𝑡−2               𝛽0                          (0.0129)          (0.0130)          (0.0153)          (0.0112)          (0.0111)
+                                                                  [2.94]            [2.82]            [0.750]           [2.62]            [2.85]
+                                                 -0.0230          -0.0237          -0.0229           -0.0294           -0.0173           -0.0166
+            ∆2 ln 𝑐𝑡𝑃                𝛽1         (0.00875)        (0.00853)        (0.00859)         (0.00847)         (0.00656)         (0.00644)
+                                                  [-2.63]          [-2.78]         [-2.67]           [-3.48]            [-2.63]           [-2.57]
+                                                 0.0858           0.0879            0.0891            0.0848            0.0803            0.0769
+            ∆∆4 ln 𝑦𝑡                𝛽2         (0.0232)         (0.0227)          (0.0228)          (0.0221)          (0.0168)          (0.0166)
+                                                 [3.69]           [3.88]            [3.91]            [3.84]            [4.77]            [4.64]
+                                                 -0.477           -0.412             -0.367           -0.155            -0.297            -0.304
+            ∆2 ln 𝑢𝑟𝑡                𝛽3         (0.0993)         (0.0992)           (0.101)          (0.113)           (0.0855)          (0.0839)
+                                                 [-4.80]          [-4.15]           [-3.64]          [-1.37]            [-3.48]           [-3.62]
+                                                -0.0579          -0.0437            -0.0463           -0.0551           -0.169            -0.159
+              |𝜀̂𝑡−1 |               𝛽4         (0.0530)         (0.0518)          (0.0524)          (0.0505)          (0.0406)          (0.0400)
+                                                 [-1.09]         [-0.843]          [-0.883]           [-1.09]           [-4.15]           [-3.97]
+                                                 -0.0193          -0.0190          -0.0185           -0.0182           -0.0214           -0.0216
+             𝑑1983:𝑞1                𝛽5         (0.00471)        (0.00459)        (0.00461)         (0.00447)         (0.00340)         (0.00334)
+                                                  [-4.11]          [-4.13]         [-4.01]           [-4.08]            [-6.28]           [-6.48]
+                                                 -0.01692         -0.0166          -0.0166           -0.0154           -0.0148           -0.0144
+             𝑑1993:𝑞1                𝛽6         (0.00501)         (0.488)         (0.00492)         (0.00475)         (0.00360)         (0.00353)
+                                                  [-3.37]          [-3.40]         [-3.37]           [-3.23]            [-4.13]           [-4.09]
+                                                 -0.0137          -0.0131          -0.0133            -.0134           -0.0125           -0.0116
+            𝑑2013:𝑞1                 𝛽7         (0.00479)        (0.00467)        (0.00470)         (0.00454)         (0.00346)         (0.00341)
+                                                  [-2.87]          [-2.80]         [-2.83]           [-2.96]            [-3.62]           [-3.41]
+                                                                    Diagnostics
+     Standard error x 100                         0.454            0.442             0.445            0.429             0.325             0.319
+                  2
+     Adjusted R                                   0.510            0.535             0.528            0.562             0.749             0.758
+     LM Het. test (p-value)                       0.474            0.822             0.891            0.701             0.182             0.162
+     Durbin-Watson                                 1.53             1.53             1.56              1.60              2.11              2.19
+     AR1/MA1 (p-value)                            0.002            0.002             0.004            0.012             0.509             0.236
+     AR4/MA4(p-value)                             0.001            0.000             0.000            0.000             0.450             0.401
+     Chow test (p-value)                          0.005            0.001             0.000            0.000             0.962             0.960
+     RESET2 test (p-value)                         0.04            0.139             0.088            0.816             0.841             0.480
+     Schwarz Criterion                            -606.1           -608.2           -607.1            -609.1            -649.6            -650.7
+     Log likelihood                               644.2            648.8             647.7            654.7             700.3             704.0
+Notes: standard errors in parenthesis; t-stats in square brackets. An ogive dummy based on 8 quarters starting from 2017:q1 is not significant.
+A 2-quarter moving average transformation is applied to the 1992 exchange rate crisis dummy. Acronyms are as follows: A is net worth including
+housing wealth; NFA is net financial assets, defined as total financial assets minus loans; NLA is net liquid assets defined as deposits plus mutual
+funds plus bills minus loans; BONDS is bonds; ILFA is illiquid assets defined as pensions plus quoted shares, HA is housing wealth, HP is the
+                                                                    22
+
+===PAGE 24 ===
+real house price index, CCI is the credit conditions index, cp is public consumption , ur is the unemployment rate, 𝜀̂𝑡−1 is lagged income
+volatility.
+
+
+
+
+                                                                23
+
+===PAGE 25 ===
+                     Table 2. Italian Consumption Function Estimates on different sample periods.
+
+         ∆ 𝐥𝐧 𝒄𝒕          Symbol      1980-1999   1980-2007    1980-2010     1985-2019    1980-2019       ̂
+                                                                                                          𝒚
+                                         (1)          (2)          (3)          (4)           (5)        (6)
+                                                   Long-run effects
+                                         0.324       0.297        0.326         0.305         0.298      0.296
+Speed of adjustment           𝜆        (0.0505)     (0.0362)     (0.0353)     (0.0302)      (0.0273)   (0.0279)
+                                        [6.41]       [8.22]       [9.23]       [10.10]       [10.91]    [10.59]
+   ln 𝑦𝑡 − ln 𝑐𝑡−1            -         1.00         1.00          1.00         1.00          1.00      1.00
+                                         0.501       0.231        0.184        0.578         0.298       0.293
+      Constant               𝛼0        (0.3630)     (0.1873)     (0.1512)     (0.2077)      (0.1225)   (0.1274)
+                                        [1.38]       [1.23]       [1.22]       [2.78]        [2.43]     [2.30]
+                                         0.020       0.023        0.021        0.025         0.023       0.024
+1990 seasonal pattern
+                             𝛼0𝑆       (0.0056)     (0.0051)     (0.0046)     (0.0060)     (0.00451)   (0.0046)
+      dummy
+                                        [3.63]       [4.56]       [4.60]       [4.14]        [5.19]     [5.16]
+                                        -0.219       -0.294       -0.292       -0.371        -0.350     -0.344
+    Adjusted 𝑟𝑡              𝛼1        (0.1074)     (0.0881)     (0.0793)     (0.1011)      (0.0733)   (0.0790)
+                                        [-2.04]      [-3.33]      [-3.68]      [-3.67]       [-4.78]    [-4.35]
+                                         0.601        0.634        0.633       0.564          0.615      0.623
+          𝑝
+     ln (𝑦𝑡 /𝑦𝑡 )            𝛼2        (0.0820)     (0.0612)     (0.0563)     (0.0616)      (0.0548)   (0.0747)
+                                        [7.32]       [10.37]      [11.23]      [9.15]        [11.22]    [8.34]
+
+2008: q3 GFC dummy                                                -0.422       -0.294        -0.406     -0.384
+           𝑝                𝛼2,𝑖𝑛𝑡                               (0.3954)     (0.1674)      (0.1583)   (0.1927)
+    x ln (𝑦𝑡 /𝑦𝑡 )                                                [-1.07]      [-1.76]       [-2.57]    [-1.99]
+                                        -0.042       -0.036       -0.032       -0.031        -0.035     -0.035
+ 1992 Exchange rate
+                            𝜏1992      (0.0110)     (0.0076)     (0.0064)     (0.0061)     (0.00612)   (0.0063)
+    crisis dummy
+                                        [-3.77]      [-4.76]      [-4.95]      [-5.11]       [-5.64]    [-5.51]
+                                                                              -0.0452        -0.035     -0.037
+2012 Fornero reforms                                                                        (0.0129)   (0.0153)
+                            𝜏2012                                             (0.0140)
+      dummy                                                                                  [-2.68]    [-2.41]
+                                                                               [-3.22]
+                                         0.126        0.137        0.134        0.140        0.137       0.137
+    𝑁𝐿𝐴𝑡−1 /𝑦𝑡             𝛾1,𝑁𝐿𝐴      (0.0230)     (0.0100)     (0.0090)     (0.0093)     (0.00878)   (0.0096)
+                                        [5.47]       [13.65]      [14.88]      [15.05]      [15.57]     [14.32]
+                                         0.065       0.066        0.069        0.066         0.062       0.061
+   𝐵𝑂𝑁𝐷𝑆𝑡−1 /𝑦𝑡            𝛾1,𝑆𝑀𝐿𝐵     (0.0192)     (0.0119)     (0.0107)     (0.0082)     (0.00817)   (0.0089)
+                                        [3.38]       [5.60]       [6.43]       [8.11]        [7.63]     [6.87]
+                                        -0.012       0.020        0.023        0.027         0.030       0.031
+    𝐼𝐿𝐹𝐴𝑡−1 /𝑦𝑡           𝛾1,𝐼𝐿𝐴𝑃𝐸𝑁    (0.0466)     (0.0254)     (0.0224)     (0.0182)      (0.0165)   (0.0167)
+                                        [-0.26]      [0.81]       [1.04]       [1.46]        [1.83]     [1.85]
+                                         0.060       0.040        0.038        0.045         0.039       0.040
+     𝐻𝐴𝑡−1 /𝑦𝑡               𝛾2        (0.0249)     (0.0995)     (0.0073)     (0.0067)     (0.00533)   (0.0058)
+                                        [2.43]       [4.02]       [5.11]       [6.74]        [7.36]     [6.77]
+                                        -0.143       -0.086       -0.076       -0.149        -0.096     -0.096
+   ln 𝐻𝑃𝑡−1 /𝑦𝑡−1            𝛾3        (0.0750)     (0.0363)     (0.0285)     (0.0388)      (0.0224)   (0.0230)
+                                        [-1.91]      [-2.37]      [-2.68]      [-3.83]       [-4.29]    [-4.17]
+                                                   Short-run effects
+                                                   24
+
+===PAGE 26 ===
+                                                 0.049           0.041             0.044            0.027              0.032              0.031
+        ∆2 ln 𝐶𝐶𝐼𝑡−2              𝛽0           (0.0183)         (0.0145)          (0.0141)         (0.0125)           (0.0111)          (0.0111)
+                                                [2.68]           [2.85]            [3.08]           [2.11]             [2.85]            [2.83]
+                                                -0.020           -0.016            -0.014           -0.021             -0.017            -0.017
+          ∆2 ln 𝑐𝑡𝑃               𝛽1           (0.0099)         (0.0073)          (0.0073)         (0.0089)          (0.00644)          (0.0065)
+                                                [-2.04]          [-2.20]           [-1.89]          [-2.34]            [-2.57]           [-2.55]
+                                                 0.099           0.081             0.075            0.084              0.077              0.074
+          ∆∆4 ln 𝑦𝑡               𝛽2           (0.0247)         (0.0192)          (0.0192)         (0.0181)           (0.0166)          (0.0213)
+                                                [3.98]           [4.22]            [3.92]           [4.67]             [4.64]            [3.49]
+                                                -0.338           -0.311            -0.415           -0.306             -0.304            -0.308
+          ∆2 ln 𝑢𝑟𝑡               𝛽3           (0.1803)         (0.1314)          (0.1244)         (0.0929)           (0.0839)          (0.0902)
+                                                [-1.87]          [-2.36]           [-3.34]          [-3.29]            [-3.62]           [-3.42]
+                                                -0.168           -0.143            -0.171           -0.163             -0.159            -0.159
+            |𝜀̂𝑡−1 |              𝛽4           (0.0594)         (0.0468)          (0.0465)         (0.0412)           (0.0400)          (0.0402)
+                                                [-2.83]          [-3.06]           [-3.66]          [-3.95]            [-3.97]           [-3.97]
+                                                -0.022           -0.022            -0.022                              -0.022            -0.022
+          𝑑1983:𝑞1                𝛽5           (0.0040)         (0.0036)          (0.0036)                           (0.00334)          (0.0033)
+                                                [-5.50]          [-6.07]           [-6.08]                             [-6.48]           [-6.45]
+                                                -0.017           -0.015            -0.015           -0.015             -0.014            -0.014
+          𝑑1993:𝑞1                𝛽6           (0.0043)         (0.0038)          (0.0039)         (0.0036)          (0.00353)          (0.0036)
+                                                [-3.82]          [-3.89]           [-3.94]          [-4.18]            [-4.09]           [-4.04]
+                                                                                                    -0.012             -0.012            -0.012
+          𝑑2013:𝑞1                𝛽7                                                               (0.0034)          (0.00341)          (0.0034)
+                                                                                                    [-3.44]            [-3.41]           [-3.37]
+                                                                   Diagnostics
+  Standard error x 100                          0.376             0.340            0.346             0.315             0.319              0.319
+               2
+  Adjusted R                                    0.675             0.695            0.705             0.754             0.758              0.758
+  LM Het. test (p-value)                        0.303             0.088            0.148             0.334             0.162               NA
+  Durbin-Watson                                  2.40              2.46             2.16             2.13               2.19              2.19
+  AR1/MA1 (p-value)                             0.072             0.019            0.355             0.418             0.236              0.222
+  AR4/MA4(p-value)                              0.241             0.035            0.316             0.262             0.401              0.353
+  Chow test (p-value)                           0.932             0.988            0.992             0.980             0.960              0.925
+  RESET2 test (p-value)                         0.948             0.496            0.871             0.372             0.480               NA
+  Schwarz Criterion                             -305.8            -446.9           -492.4           -569.8             -650.7            -701.4
+  Log likelihood                                345.2             489.4            538.2             619.3             704.0              704.0
+
+ Notes: standard errors in parenthesis; t-stats in square brackets. An ogive dummy based on 8 quarters starting from 2017: q1 is not significant. A
+ 2-quarter moving average transformation is applied to the 1992 exchange rate crisis dummy. See Table 1 for acronyms.
+
+
+
+The preferred model is estimated over various samples to test for parameter stability. In Table 2,
+columns 1 to 4 contrast the results for the periods 1980-1999, 1980-2007, 1980-2010, and 1985-
+2019, respectively, with that of the final model of Table 1, repeated in column 5 of Table 2, for 1980-
+2019. The Chow test confirms that the model is stable, and all the parameter estimates lie within one
+standard error of the full sample estimates in column 5 of Table 2. As current household income is
+
+                                                                25
+
+===PAGE 27 ===
+potentially endogenous, as strongly argued by Hall (1978), it is helpful to compare results of
+instrumental variable estimates where current income is instrumented by its fitted value from an
+equation using lagged data. Column 6 of Table 2 shows these estimates. The results are very close to
+the OLS estimates, suggesting that income endogeneity is not an issue.
+
+To help interpret the quantitative relevance of the long-run solution implied by the preferred
+specification shown in Table 1, column 6, we examine the fitted contributions to the log consumption
+to income ratio in Figures 9 and 10. Figure 9 shows the fitted contribution of the effective real interest
+rate on borrowing, the log ratio of permanent to current income, the 1992-3 step dummy and the
+Fornero reform dummy. Figure 10 shows the fitted contributions of the key portfolio ingredients.
+These are the ratios to income of net liquid assets, semi-liquid assets, illiquid financial assets and the
+combined positive effect of the ratio to income of housing wealth and the negative offset of housing
+affordability, measured by the log house price to income ratio.
+
+                 Fitted contributions
+                Log ratio of consumption to scaled income
+                Real interest rate
+ 0.100          Learning-adjusted log yperm/y
+                ERM crisis dummy
+                Fornero reform dummy
+ 0.075
+
+
+ 0.050
+
+
+ 0.025
+
+
+ 0.000
+
+
+-0.025
+
+
+-0.050
+
+
+-0.075
+
+
+         1980        1985       1990       1995       2000        2005      2010       2015        2020
+
+Figure 9: Fitted long-run contributions to log ratio of consumption to scaled income, part 1.
+Notes: Fitted contributions are for the effective real interest rate, the deviation of log permanent income from current
+income, the 1992-3 step dummy and the Fornero reform dummy.
+
+
+
+
+                                                             26
+
+===PAGE 28 ===
+                    Fitted contributions
+                Ratio of bills to scaled income
+                Ratio of bonds to scaled income
+   0.9          Ratio of mutual funds to scaled income
+                Ratio of quoted shares to scaled income
+
+   0.8
+
+
+   0.7
+
+
+   0.6
+
+
+   0.5
+
+
+   0.4
+
+
+   0.3
+
+
+   0.2
+
+
+   0.1
+
+
+         1980        1985       1990        1995        2000        2005        2010        2015        2020
+Figure 10: Fitted long-run contributions to log ratio of consumption to scaled income, part 2.
+Notes: The fitted contributions are for the ratios to income of net liquid assets, semi-liquid assets (bonds), illiquid
+financial assets and the combined effect of the ratio to income of housing wealth and the log house price to income ratio.
+
+The two graphics together suggest that the fall in the early 1990s in the consumption to income ratio
+was mainly driven by the fall in income relative to permanent income, together with the 1992-3 step
+dummy (see the discussion of the ERM crisis in Section 3.6). The rise in the ratio that followed was
+partly due to the ending of the ERM crisis, and partly due to the rising contributions of net liquid
+assets (especially by the mutual funds component), bonds, and illiquid financial assets in the boom
+period prior to joining the Euro. However, after the early 2000s, a faster rise of household debt than
+household deposits, and the decline in mutual funds, caused the ratio of net liquid assets to income
+to decline, offsetting some of the upwards drivers of other parts of the portfolio. Thus, following a
+peak in the consumption to income ratio in early 2001, the ratio stabilised at a lower level.
+
+After 2011, one would have expected consumption to rise relative to income, given some recovery
+in the ratios of permanent income to income, and especially in net liquid assets to income. The fact
+that it failed to do so and instead fell moderately, our model attributes to the Fornero reforms of 2011,
+see Section 3.6.
+
+Some of the fluctuations in the log of the ratio of consumption to income are sharper than can be
+accounted for by the long-run drivers pictured here. This is partly because of dynamic adjustment to
+shifts in these drivers, and partly because short-run factors, such as changes in the unemployment
+                                                           27
+
+===PAGE 29 ===
+rate, the acceleration of income and income volatility, also play a role, most often at turning points
+in the consumption to income ratio.
+
+4.2 A range of robustness checks
+
+An initial round of robustness tests on the model are performed in Table 3. The first column examines
+the effect of omitting the change in the credit conditions index. With one exception, the results are
+very similar to those shown in Tables 1 and 2: however, the estimated coefficient on illiquid financial
+assets rises from 0.030 to 0.048. This is probably because the easing of credit constraints was
+associated with higher asset prices. Regarding other short-term controls, an interesting feature of the
+Table 1 results is that, even with the poorly specified formulations in columns 1 to 4, the short-term
+controls, including dummies for three outliers, have the same signs as in the favoured specification,
+and are mostly significant. This finding is evidence for the robustness of the short-term effects and
+the dummies selected. Reinforcing this, when all eight short term controls (including the dummies
+for the outliers) are omitted in column 2 of Table 3, the fit deteriorates, but the estimated speed of
+adjustment, and most of the long-run coefficients, are little changed. The one exception is the
+coefficient on illiquid financial assets, which rises to 0.066. One interpretation is that the stock market
+reacts to short-run shocks, changes in credit conditions and indicators of income insecurity, so that
+when their direct effects on consumption are omitted, there is an upward bias in the estimated wealth
+effect for illiquid assets.
+
+In column 3, the net liquid assets restriction is relaxed, with separate coefficients on liquid assets and
+household debt. The results suggest that the restriction, of equal and opposite signed coefficients, is
+easily accepted. The final column shows results for the alternative grouping of semi-liquid and
+illiquid financial assets discussed in Section 2. Here liquid assets are restricted to deposits, semi-
+liquid assets are defined as bills plus mutual funds, and illiquid financial assets are bonds plus quoted
+shares plus pensions and insurance company reserves. The fit and parameter stability are slightly
+worse, though the speed of adjustment is much the same. The MPC out of net liquid assets is a little
+higher at 0.15, that on semi-liquid assets is 0.125 and on illiquid financial assets is 0.059. The
+estimated increase in the saving rate due to the Fornero reforms is higher at 0.049. The housing
+effects are quite similar to those for the preferred split of semi-liquid and illiquid financial assets.
+The post-GFC shift in the relative weights of permanent and current income is confirmed.
+Fundamentally, the key findings of the paper regarding the importance of separate estimation of the
+MPC for different groupings of assets, and the need to control for housing affordability when
+estimating housing wealth effects, are upheld.
+
+A different robustness check is to compare the results for the conventionally defined real interest rate
+on borrowing with those for the effective real interest rate as defined by the BIS. The estimates and
+the goodness of fit are very similar, but parameter stability is slightly superior for the effective real
+rate. We also checked for the relevance of a real long bond yield as used in the Bank of Italy’s
+quarterly policy model. For the period, 1991 to 2019 for which we have consistent 10-year yield data,
+the real long bond yield is not significant while either of our real short rates remains highly
+                                                    28
+
+===PAGE 30 ===
+significant. While adjustable-rate debt dominates in Italy, as historically has been the case in the UK,
+Sweden and Finland, the absence of a negative (aggregate) cash-flow effect in Italy by comparison
+with say the UK, is noteworthy. While in the UK, the change in the nominal interest rate has a
+significant negative effect on consumer spending (Aron and Muellbauer, 2012 and Cloyne et al. 2016,
+as originally posited by Jackman and Sutton, 1982), this is not so in Italy. This is almost certainly
+because household debt is low compared to household liquid assets, in contrast to the higher debt
+countries mentioned above. When interest rates rise, the cash-flow of borrowers declines while that
+of liquid asset holders improves. Borrowers tend to respond more strongly to cash-flow than owners
+of liquid assets (depositors). However, in Italy (unlike in the UK), the far greater size of liquid
+deposits in the balance sheets by comparison to household debt means that the net cash flow effect
+is not negative.
+
+
+
+
+                                                  29
+
+===PAGE 31 ===
+                     Table 3. Italian Consumption Function Estimates, 1980-2019: robustness checks.
+
+                                     Excluding    No short-     Liquid      Different
+         ∆ 𝐥𝐧 𝒄𝒕         Symbol       change        run        assets vs      asset
+                                       CCI        controls       loans      grouping
+                                        (1)          (2)          (3)           (4)
+                                          Long-run effects
+                                        0.307       0.294        0.312         0.289
+Speed of adjustment          𝜆        (0.0278)     (0.0365)    (0.0307)      (0.0292)
+                                       [11.04]      [8.08]      [10.14]       [9.88]
+   ln 𝑦𝑡 − ln 𝑐𝑡−1           -         1.00         1.00         1.00          1.00
+                                        0.350       0.373        0.148         0.235
+      Constant              𝛼0        (0.1205)     (0.1638)    (0.1921)       (0.119)
+                                       [2.90]       [2.28]      [0.77]         [1.97]
+                                        0.023       0.029        0.023         0.024
+1990 seasonal pattern
+                            𝛼0𝑆       (0.0045)     (0.0065)    (0.0044)      (0.00486)
+      dummy
+                                       [5.16]       [4.45]      [5.21]         [4.98]
+                                       -0.360       -0.371      -0.331        -0.313
+    Adjusted 𝑟𝑡             𝛼1        (0.0728)     (0.0991)    (0.0729)      (0.0713)
+                                       [-4.94]      [-3.75]     [-4.54]       [-4.40]
+                                        0.606       0.530        0.660         0.643
+          𝑝
+     ln (𝑦𝑡 /𝑦𝑡 )           𝛼2        (0.0543)     (0.0724)    (0.0703)      (0.0574)
+                                       [11.17]      [7.32]      [9.38]        [11.2]
+
+2008: q3 GFC dummy                     -0.363       -0.542      -0.449        -0.302
+           𝑝               𝛼2,𝑖𝑛𝑡     (0.1564)     (0.2173)    (0.1581)      (0.1585)
+    x ln (𝑦𝑡 /𝑦𝑡 )                     [-2.32]      [-2.49]     [-2.84]       [-1.92]
+                                       -0.033       -0.035      -0.032         -0.035
+ 1992 Exchange rate
+                           𝜏1992      (0.0060)     (0.0082)    (0.0062)      (0.00637)
+    crisis dummy
+                                       [-5.44]      [-4.30]     [-5.17]       [-5.47]
+                                       -0.042       -0.019      -0.034        -0.049
+2012 Fornero reforms
+                           𝜏2012      (0.0125)     (0.0170)    (0.0124)      (0.0111)
+      dummy
+                                       [-3.39]      [-1.12]     [-2.71]       [-4.36]
+                                        0.132        0.123                     0.147
+    𝑁𝐿𝐴𝑡−1 /𝑦𝑡             𝛾1,𝑁𝐿𝐴     (0.0084)     (0.0105)                  (0.0164)
+                                       [15.72]      [11.79]                   [9.00]
+                                                                 0.137
+                                                               (0.0084)
+     𝐿𝐴𝑡−1 /𝑦𝑡             𝛾1,𝐷𝐸𝑃
+                                                                [16.25]
+
+
+                                                                -0.092
+   𝐿𝑂𝐴𝑁𝑆𝑡−1 /𝑦𝑡           𝛾1,𝐿𝑂𝐴𝑁𝑆                             (0.0463)
+                                                                [-1.98]
+                                        0.064       0.079        0.060
+   𝐵𝑂𝑁𝐷𝑆𝑡−1 /𝑦𝑡           𝛾1,𝑆𝑀𝐿𝐵     (0.0081)     (0.0107)    (0.0081)
+                                       [7.85]       [7.38]      [7.49]
+
+
+                                                    30
+
+===PAGE 32 ===
+                                       0.048     0.066        0.024      0.059
+     𝐼𝐿𝐹𝐴𝑡−1 /𝑦𝑡         𝛾1,𝐼𝐿𝐴𝑃𝐸𝑁   (0.0148)   (0.0184)    (0.0172)   (0.00846)
+                                      [3.23]     [3.57]      [1.38]      [6.97]
+                                                                         0.125
+     𝑆𝐿𝐹𝐴𝑡−1 /𝑦𝑡         𝛾1,𝑆𝐸𝑀𝐼𝐿𝐴                                     (0.0131)
+                                                                        [9.56]
+                                       0.036     0.025        0.030      0.035
+      𝐻𝐴𝑡−1 /𝑦𝑡             𝛾2       (0.0051)   (0.0062)    (0.0110)   (0.00509)
+                                      [6.99]     [4.03]      [2.68]      [6.95]
+                                      -0.103     -0.100      -0.066     -0.086
+    ln 𝐻𝑃𝑡−1 /𝑦𝑡−1         𝛾3        (0.0222)   (0.0298)    (0.0374)   (0.0220)
+                                      [-4.64]    [-3.37]     [-1.77]    [-3.90]
+                                                Short-run effects
+                                                              0.029      0.0296
+     ∆2 ln 𝐶𝐶𝐼𝑡−2           𝛽0                              (0.0115)    (0.0112)
+                                                             [2.48]    [2.65021]
+                                      -0.018                 -0.016     -0.0172
+       ∆2 ln 𝑐𝑡𝑃            𝛽1       (0.0066)               (0.0065)   (0.00653)
+                                      [-2.81]                [-2.45]     [-2.64]
+                                       0.076                  0.074    0.0794
+      ∆∆4 ln 𝑦𝑡             𝛽2       (0.0170)               (0.0169)   (0.0167
+                                      [4.47]                 [4.38]     [4.76]
+                                      -0.290                 -0.306     -0.284
+      ∆2 ln 𝑢𝑟𝑡             𝛽3       (0.0858)               (0.0840)   (0.0830)
+                                      [-3.37]                [-3.65]    [-3.42]
+                                      -0.165                 -0.158     -0.163
+        |𝜀̂𝑡−1 |            𝛽4       (0.0410)               (0.0401)   (0.0403)
+                                      [-4.03]                [-3.94]    [-4.05]
+                                      -0.021                 -0.022      -0.022
+       𝑑1983:𝑞1             𝛽5       (0.0034)               (0.0033)   (0.00336)
+                                      [-6.25]                [-6.46]    [-6.43]
+                                      -0.014                 -0.014      -0.015
+       𝑑1993:𝑞1             𝛽6       (0.0036)               (0.0035)   (0.00356)
+                                      [-3.99]                [-4.05]    [-4.11]
+                                      -0.012                 -0.012      -0.011
+       𝑑2013:𝑞1             𝛽7       (0.0035)               (0.0034)   (0.00343)
+                                      [-3.36]                [-3.47]    [-3.24]
+                                                  Diagnostics
+Standard error x 100                  0.327      0.435       0.319      0.321
+Adjusted R2                           0.746      0.549       0.758      0.755
+LM Het. test (p-value)                0.097      0.136       0.182      0.152
+Durbin-Watson                         2.164      1.973       2.190      2.194
+AR1/MA1 (p-value)                     0.290      0.925       0.231      0.214
+AR4/MA4(p-value)                      0.419      0.158       0.397      0.469
+Chow test (p-value)                   0.998      0.725       0.828      0.956
+RESET2 test (p-value)                 0.863      0.104       0.431      0.604
+                                                 31
+
+===PAGE 33 ===
+ Schwarz Criterion                             -648.7           -616.7           -648.7            -649.8
+ Log likelihood                                699.5            649.7            704.5              703.1
+Notes: standard errors in parenthesis; t-stats in square brackets. An ogive dummy based on 8 quarters starting from 2017:q1 is not significant. Moving
+average transformations apply to the 1992 exchange rate crises dummy (MA2). See notes to table 1 for portfolio acronyms for columns 1 to 3. In
+column 4, net liquid assets NlA is defined as deposits minus loans; semi-liquid assets SLFA is defined as bills plus mutual funds; illiquid financial
+assets ILFA is defined as bonds plus quoted shares plus pension wealth.
+
+
+
+
+A further robustness test is to estimate the consumption function and the permanent income equation
+as a two-equation system. Then, instead of using the fitted value of the log permanent income, the
+log permanent income function is substituted into the jointly estimated consumption equation. The
+latter fits slightly less well, as the consumption parameters are influenced by the need to satisfy the
+cross-equation restrictions, but the parameter estimates and even the estimated standard errors are
+only a whisker away. It is encouraging that joint estimation gives similar estimates to the single
+equation estimates for the coefficients of the permanent income equation. It suggests that the selected
+model is capturing reasonably well the average income outlook of households.
+
+A final robustness issue concerns the impact of the income growth projections made in 2019Q4 on
+the estimates. As consumer confidence data in 2019 show some deterioration relative to 2018, one
+might wonder whether the Oxfordeconomics.com income projections are over-optimistic relative to
+the actual expectations of Italian households. As a check, the growth rate of the projections was
+halved, otherwise retaining the cyclical pattern. This has remarkably little impact on the estimates,
+including of the permanent income equation. The fit of the consumption equation actually improves
+very slightly, though the change in the log likelihood is only 0.2, and the estimated coefficients are
+almost the same.20 Previously reported estimates for the reduction in the consumption to income ratio
+following the Fornero reforms are reduced slightly, e.g. from 0.035 to 0.033 for our preferred model.
+
+Though the outperformance in fit and parameter stability of the favoured specification (shown in
+Table 1 (column 6) and repeated in Table 2 (column 5) is only small, there are two, more important,
+reasons for preferring it to that shown in Table 3, column 4. One is that the estimate of the effect of
+the Fornero pension reforms of 0.035 is more plausible and consistent with micro-evidence than the
+estimate of 0.049 in the Table 3, column 4 alternative. Even more important is the fact that the
+estimate of the MPC out of illiquid financial assets of 0.03 (t=1.8) in the favoured specification is
+much more in line with estimates for other countries where illiquid financial assets also include
+directly-held stock market wealth and pension and long-term life insurance assets. The Table 3,
+column 4 alternative includes bonds in the illiquid asset definition, a far larger item in Italian
+household portfolios than is the case in other countries, with an MPC of 0.059 (t=7.0). In contrast,
+
+20
+  While we could have chosen results tables for this variant, it seemed preferable simply to take the more standard
+projection as the basis for end-of period permanent income estimates. In regular updating of the model estimates, one
+would typically be using the most recently available income growth projections, whether from the Oxford source or the
+5-year ahead forecasts from the IMF. Alternatively, if this consumption equation were incorporated in a revised version
+of the Bank of Italy’s BIQM, the income forecasts from the full model would produce an approximation of ‘model
+consistent expectations’.
+                                                                 32
+
+===PAGE 34 ===
+the favoured specification treats bonds as a semi-liquid asset, intermediate between liquid and illiquid
+assets, with an MPC of 0.062 (t=7.6). As can be deduced from Figures 4 and 5, when bonds are
+included in illiquid assets, the bond time-profile tends to dominate variations in the time-profile of
+illiquid assets, and this pushes up the estimated MPC in column 4 on illiquid assets (which includes
+bonds).
+
+4.3 Comparisons with other countries: MPCs and credit conditions
+
+In principle, it would be highly desirable to extend this study to many countries beyond Italy.
+However, there is an important reason why this is beyond our current research capacity. The
+exposition in Section 2 of the credit-augmented generalized consumption function emphasized the
+role of credit conditions. Throughout our study for Italy, tests for the relevance of generalized credit
+conditions, covering private sector firms as well as households, as part of the long-run solution
+showed an insignificant effect, in contrast to the important role played by variations in household
+credit conditions in France (Chauvin and Muellbauer, 2018), the UK (Aron et al. 2012), the US (Duca
+and Muellbauer, 2013), South Africa (Aron and Muellbauer, 2025a) and even Germany (Geiger et
+al. 2016), where credit liberalization went less far. It is noteworthy that household debt relative to
+income has grown only slowly in Italy and Italy still has one of the lowest ratios of household debt
+to income among OECD countries. This suggests little change in credit conditions relevant in the
+long-run for households in Italy, by comparison with many other economies. While the level of credit
+conditions is not relevant in the Italian consumption function, the rate of change of credit conditions
+does play a role in our models, helping to forecast income growth in the permanent income equation
+and directly significant in the consumption equation. However, parameter estimates for the long-run
+coefficients are robust, as we have seen, to the exclusion of the rate of change of credit conditions.
+
+For most other countries the exclusion of controls for changing credit conditions would seriously
+contaminate any attempt to estimate the consumption function parameters. One illustration of the
+importance of credit conditions is that in three countries where home equity withdrawal is easily
+available - the UK, the US and South Africa - housing wealth appears only in interaction with
+mortgage credit conditions, and with high levels of significance. This suggests that in those countries
+housing wealth has more of a collateral effect than a conventional wealth effect. However, credit
+conditions are hard to observe directly, which is why the above studies use a latent interactive
+equation system (LIVES) to deduce shifts in credit conditions for mortgages and non-mortgage debt.
+Typically, this involves estimating an equation system also including mortgage and non-mortgage
+debt, house prices, and liquid assets drawing on country by country institutional information to guide
+empirical identification.21 While extending such research beyond the countries mentioned above
+would be desirable, the effort required would be substantial, not least because assembling the
+necessary quarterly balance sheet estimates for many countries would encounter similar challenges
+to those surmounted in this paper for Italy.
+21
+   For the UK, the estimates of mortgage credit conditions were taken from a separate latent variable equation system,
+using distributional data on high loan to value and loan to income mortgages, as well as data on the aggregate mortgage
+stock, see Fernandez-Corugedo and Muellbauer (2006).
+                                                         33
+
+===PAGE 35 ===
+For the five countries, where broadly comparable estimates are available, Table 4 summarises
+estimates of the parameters for net liquid assets and for illiquid financial assets, where the latter
+include the assets of pension and long-term life insurance funds.
+
+Table 4: Estimates of MPCs for net liquid and illiquid financial assets for 6 countries
+
+ MPC out of assets                     Net liquid assetst-1 / y t          Illiquid financial assetst-1 / yt
+
+
+                                Coefficient,  1           t-ratio    Coefficient,  2            t-ratio
+                1980:1 to
+ Italy                               0.14                    15.6           0.03                    1.8
+                 2019:4
+
+                1981:2 to
+ France                              0.14                    4.4           0.022                    3.3
+                 2016:4
+
+ South          1992:1 to
+                                     0.14                     4            0.018                    3.1
+ Africa          2020:1
+
+                1981:3 to
+ Germany                             0.09                    4.1           0.016                    2.5
+                 2012:4
+
+                1967:1 to
+ UK                                  0.11                     8            0.022                     8
+                 2005:4
+                1971:4 to
+ US                                   0.1                    7.6           0.017                    8.6
+                 2011:1
+Sources: For Italy: this paper, Table 1, column 6. For France: Chauvin and Muellbauer (2018). For South Africa: Aron
+and Muellbauer (2025a). For the UK: Aron et al. (2012). For Germany: Geiger et al. (2016). For the US: Duca and
+Muellbauer (2013).
+
+
+
+Although the institutions and the composition of household balance sheets differ amongst the six
+countries, the parameter estimates are broadly similar. The Italian estimates for  1 of 0.14 (t=15.6)
+and for  2 of 0.03 (t=1.8) fit well into the range of estimates for the other five countries, especially
+of  2 , the MPC for illiquid financial assets, of 0.017 to 0.022. This is an important reason for
+preferring the chosen grouping of Italian assets into the different asset categories, compared with the
+alternative asset grouping in Table 3, column 4, though the latter fits almost as well.
+
+
+5. Conclusions
+
+In recent years, central banks have evolved away from New Keynesian DSGE models, or early
+vintages of these models, through the redesign of the main policy model, or in the weights given to
+different models within a suite of models. Previous vintages of New Keynesian DSGE models were
+founded on the optimizing behaviour of representative agents facing linear intertemporal budget
+constraints, and typically omitted household balance sheets, asset prices and credit flows, and
+                                                            34
+
+===PAGE 36 ===
+imposed strong restrictions on the data being modelled. Most central banks now include semi-
+structural econometric models in their policy modelling platforms, allowing the data to ‘speak’ under
+less strict prior restrictions.22
+
+Central to the semi-structural econometric policy models is the formulation of the aggregate
+consumption function, with consumption being by far the largest component of GDP. Yet many of
+these formulations are still based on the text-book model of a representative consumer following the
+life-cycle permanent income hypothesis. In the text-book model, complex household portfolios are
+summarized in a single net worth measure, treating liquid and illiquid financial assets and housing
+as if the same marginal propensity to consume applied to each component. Credit constraints or
+variations in loan standards, and uncertainty, are largely disregarded. That the extreme restrictions of
+the text-book model should be challenged and tested is also supported by an evolution in the micro
+foundations of macroeconomics. The modern view of heterogeneous agent behaviour under
+uncertainty in incomplete markets has monetary policy transmission implications for the household
+sector that are radically different from the text-book model. For example, rather than operating
+primarily through intertemporal substitution, monetary transmission via households is now seen to
+operate more through general equilibrium effects on income and through the implications of changes
+in interest rates for asset prices and for balance sheets (Pascal, 2024).
+
+This paper has challenged the restrictions embodied in the conventional formulation for an aggregate
+consumption function for Italy, using quarterly data from 1980 to 2019. Our model disaggregates net
+worth into sub-components with different liquidity characteristics and housing wealth, it controls for
+income expectations through modelling a permanent income construct with adjustment for structural
+breaks through learning, and it controls for a real interest effect. In the short run, the model controls
+for income uncertainty and the effects of changing credit conditions.
+
+The fully restricted standard net worth formulation is strongly rejected. Progressive relaxation of the
+restrictions reveals striking improvements in statistical fit and model coherence. It is difficult even
+to find a significant net worth effect. An alternative formulation where net worth is replaced by net
+financial wealth, as in the Bank of Italy’s semi-structural model BIQM (Bank of Italy Quarterly
+Model), does a little less badly, but it is still strongly rejected against our preferred specification
+where net worth is disaggregated into liquid, semi-liquid and illiquid assets and debt, controlling
+separately for housing affordability and housing wealth.
+
+With heterogeneity such an important issue, and with these consumption models estimated on
+aggregate data, an element of caution needs to be exercised in their policy application. The most
+obvious example is if there were to be large shifts in the distribution of assets over different
+households (e.g. as might have occurred in the pandemic). In this case, the parameters estimated on
+
+22
+  These central banks include the US Federal Reserve, the ECB, the Bank of Canada, the Reserve Bank of Australia, and
+many central banks in Europe, including those of Germany, France, Italy, Spain, the Netherlands and Ireland. These
+banks are currently being joined by the Bank of England, and the Czech National Bank, where such models are under
+development (see Frait (2025) and Aron and Muellbauer (2025b) for the background to the CNB’s decision).
+                                                         35
+
+===PAGE 37 ===
+macro-data may be subject to instability or may shift. In the pandemic, by the end of 2020, there was
+a surge ‘excess savings’, see Colabella et al. (2023). Some of this saving would have been seen in
+increases in total holdings of deposits and other liquid assets. However, data from the Surveys of
+Household Income and Wealth suggest little change from end-2016 to end-2020 in the distributional
+pattern by income quintile (see our Appendix A.3). There is, therefore, little prima facie evidence for
+notable changes in Italy’s MPCs for aggregate holdings of deposits and other liquid assets, pre versus.
+post-pandemic.
+
+Expectations of future income play a crucial role in our empirical model. The omission of the
+permanent income variable in the regression results in a halving of the estimated speed of adjustment,
+an implausible negative illiquid asset wealth effect, a substantially worse equation fit, parameter
+instability, and serially correlated residuals. With the higher discount rate applied to future income
+flows motivated in the paper, our results suggest weights of 43 percent on current household income
+and 57 percent on permanent income, before the European sovereign debt crisis. This supports the
+view that current income is important for consumption, and contrasts with the simple life cycle model
+which puts all weight on permanent income. Since the debt crisis, we find evidence for the weight
+shifting even further to current income, as households became more uncertain about long-run income
+prospects. In contrast to the text-book view, our findings imply a substantial fiscal policy multiplier,
+important for evaluating the effectiveness of fiscal policy
+
+Our results for Italy find that the marginal propensity to consume out of liquid assets (comprising
+deposits, Treasury bills and bank-managed funds) is around 0.14, the MPC for bonds, more widely-
+held by households in Italy than in most other countries, is around 0.06, and the MPC for illiquid
+financial assets (consisting of directly-held quoted shares and pension and long-term life-insurance
+assets) is around 0.03. To contrast these findings with the Bank of Italy’s BIQM, that model reports
+only the long-run MPC for net financial worth (excluding housing), which is around 0.08. This
+exaggerates the MPC for quoted shares and pension and life-insurance assets but understates that for
+liquid assets. In our model, a significant positive effect from housing wealth is partly but not
+completely offset by the negative effect of housing affordability (measured by the house price to
+income ratio). Thus, in contrast to the BIQM, which does not include housing, our model has a net
+positive effect from higher house prices on consumption.
+
+A full comparison of model properties for monetary transmission needs the incorporation of our
+consumption model in a complete econometric model. Nevertheless, several differences stand out as
+between our model and the BIQM which consider a consumption function for the entire non-financial
+private sector and is mainly used to produce projections and forecasts of the main macro variables.
+First, concerning a long-run effect of cuts in the short-term policy rate, our consumption equation
+shows a significant direct short-term interest rate effect, while BIQM uses the real yield on long-term
+Italian sovereign debt, which historically (and in BIQM) has been quite detached from the short-term
+policy rate. Second, our model implies pass-through channels from a cut in the short-term policy rate
+to the mutual funds and short-term bills component of liquid assets, and to net housing wealth. Third,
+our model also implies a channel to permanent income through equity prices. BIQM does not include
+                                                  36
+
+===PAGE 38 ===
+a role for permanent income and therefore omits this channel. Fourth, in the other direction, our
+model suggests that the rise in debt caused by a lower policy rate, will, in due course, have negative
+consumption effects. Both models share a long-run general equilibrium transmission through current
+income. Finally, the speed of adjustment of our consumption model at around 0.3 is higher than that
+of the BIQM consumption equation, resulting in a faster and more complete adjustment to shocks
+and transmission of monetary impulses.
+
+Our higher speed of transmission is consistent with recent evidence from Buda et al (2025). Using
+daily data on consumption and investment from bank transactions, they find large, short-run effects
+of monetary policy, by contrast with conventional wisdom that such lags are ‘long and variable’. It
+is not surprising that mis-specified models find lags which are both long and variable. They will be
+long because misspecification tends to show up in downward biases in the adjustment speed. They
+will be variable because, for example, as the portfolio composition alters, the weights on the different
+transmission channels shift in a way that the net worth or financial net worth restriction cannot
+capture.
+
+While some of our findings are specific to Italy, the comparisons with estimated MPCs for assets in
+other countries, in Section 4, suggests some reassuring similarities, with broadly similar MPCs for
+different categories of financial assets. Another important similarity, shared with models for
+Germany, France and South Africa, is that interest rate cuts inducing higher house prices have the
+opposite effect on the consumption of owners (housing is more valuable) from that of renters (who
+need to save a bigger deposit and caution with rents more likely to rise). This suggests a serious
+distributional effect from interest rate changes of which policy-makers should be aware.
+
+However, Italy’s credit market architecture is different from that of most OECD countries: for
+instance, mortgage equity withdrawal does not exist and this contributed to far slower growth in
+household indebtedness. Any attempt to estimate a similar specification of the consumption function
+for other countries must include controls for shifts in credit conditions, especially for countries where
+home equity withdrawal is significant. The full implications for monetary transmission via
+households need to be explored in a comprehensive model that, inter alia, endogenises interest rates
+on borrowing, household mortgage and non-mortgage debt, liquid assets, house prices and housing
+investment with separate models for these variables, incorporating controls for credit conditions (see
+Muellbauer (2022) for the six main housing-related channels). This paper’s focus on a well-specified
+consumption function goes a long way toward improving the understanding of monetary policy
+transmission via more clearly articulated channels.
+
+
+
+
+                                                   37
+
+===PAGE 39 ===
+References
+
+Albareto, G., A. Cardillo, A. Hamaui, and G. Marinelli. 2020. “Mutual funds' performance: the role of distribution
+networks and bank affiliation,” Bank of Italy Economic working papers, n. 1272.
+
+Ando, A., L. Guiso and I. Visco. 1994. “Saving and the Accumulation of Wealth: Essays on Italian Household and
+Government Saving Behavior”, MIT Press.
+
+Aron, J., J. V. Duca, J. Muellbauer, A. Murphy, and K. Murata. 2012. “Credit, Housing Collateral and Consumption,
+Evidence from the U.K., Japan and the U.S.” Review of Income and Wealth 58 (3):397–423.
+
+Aron, J. and J. Muellbauer. 2025a “New models for South African consumption, house prices, and mortgage and non-
+mortgage debt: Insights for financial stability and monetary transmission”, WIDER Working Paper, UNU-WIDER.
+
+Aron, J. and J. Muellbauer. 2025b “Summary of the external review of the CNB’s modelling framework” in Proceedings
+of the Czech National Bank Workshop on Monetary Policy: Inflation Targeting Frameworks Under Review, ed. E.
+Zamrazilová and J. Frait, p.63-72.
+
+Bank of Italy. 2018. “Annual Report for 2017.” May 2018.
+
+Bassanetti, A. and F. Zollino. 2010. Housing Markets in Europe, chap. “The Effects of Housing and Financial Wealth
+on Personal Consumption: Aggregate Evidence for Italian Households”. Springer.
+
+Battistini, N., V. Di Nino and J. Gareis (2023) “The consumption impulse from pandemic savings ‒ does the
+composition matter?”, ECB Economic Bulletin, Issue 4/2023.
+
+Berger, D., V. Guerrieri, G. Lorenzoni and J. Vavra, (2018), “House Prices and Consumer Spending”, Review of
+Economic Studies, 85 (3): 1502-42.
+
+Blinder, A. S. and A. Deaton. 1985. “The Time Series Consumption Function Revisited.” Brookings Papers on
+Economic Activity 16 (2):465–521.
+
+Bonci, R. and M. Coletta. 2008. “Italy’s financial accounts since 1950”, in Financial Accounts: History, Methods, the
+Case of Italy and International Comparisons, Proceedings of the papers presented at the Bank of Italy conference
+held in Perugia, 1-2 December 2005.
+
+Boone, L. and N. Girouard. 2002. “The stock market, the housing market and consumer behaviour.” OECD Economic
+Studies 35, OECD.
+
+Bruno, G. 2008. “Obtaining quarterly series from the annual financial accounts”, in Financial Accounts: History,
+Methods, the Case of Italy and International Comparisons, Proceedings of the papers presented at the Bank of Italy conference
+held in Perugia, 1-2 December 2005.
+
+Buda, G. , V. M. Carvalho, G. Corsetti, J.B. Duarte, S. Hansen, A.S. Moura, A. Ortiz, T. Rodrigo, J.V. Rodriguez
+Mora, A. Ortiz, and G.A. da Silva. 2025. "The Short Lags of Monetary Policy," Working Papers w202501, Banco de
+Portugal, Economics and Research Department.
+
+Buiter, W. H. 2010. “Housing Wealth Isn’t Wealth.” Economics - The Open-Access, Open-Assessment E-Journal 4:1–
+29.
+
+Bulligan, G., F. Busetti, M. Caivano, P. Cova, D. Fantino, A. Locarno, and L. Rodano. 2017. “The Bank of Italy
+econometric model: an update of the main equations and model elasticities.” Temi di discussione (Economic working
+papers) 1130, Bank of Italy, Economic Research and International Relations Area.                            URL
+https://ideas.repec.org/p/bdi/wptemi/td_1130_17.html.
+
+
+                                                            38
+
+===PAGE 40 ===
+Calomiris, C., S. D. Longhofer and W. Miles. 2009. "The (Mythical?) Housing Wealth Effect," NBER Working
+Paper 15075.
+
+Campbell, J. Y. 1987. “Does Saving Anticipate Declining Labor Income? An Alternative Test of the Permanent
+Income Hypothesis.” Econometrica 55 (6):1249–1273.
+
+Cannari, L., G. D’Alessio, and G. Vecchi. 2017. “Wealth”, in G. Vecchi (edited by), Measuring Wellbeing. A History
+of Italian Living Standards. Oxford University Press.
+
+Caprara, D., R. De Bonis, and L. Infante. 2020. “What do we know on household wealth?” Rivista di Storia Economica,
+April, 43-85.
+
+Carroll, C. D. 1992. “The Buffer-Stock Theory of Saving: Some Macroeconomic Evidence.” Brookings Papers on
+Economic Activity 23 (2):61–156. URL https://ideas. repec.org/a/bin/bpeajo/v23y1992i1992-2p61-156.html.
+
+Case, K. E., J. M. Quigley, and R. J. Shiller. 2005. “Comparing Wealth Effects: The Stock Market versus the Housing
+Market.” Advances in Macroeconomics 5 (1):1–32.
+
+Catte, P., N. Girouard, R. Price and C. André. 2004. “Housing markets, wealth, and the business cycle.” OECD
+Economics Department Working Paper 394, OECD.
+
+Chauvin, V. and J. Muellbauer. 2018. “Consumption, household portfolios and the housing market in France.”,
+Economics and Statistics, vol. 58. 157–178.
+
+Cloyne, J., C. Ferreira and P. Surico. 2016. “Monetary Policy when Households have Debt: New Evidence on the
+Transmission Mechanism”, Bank of England Staff Working Paper No. 589.
+
+Colabella, A., E. Guglielminetti and C. Rondinelli. 2023. “The distribution and use of Italian households' savings after
+the pandemic” Questioni di Economia e Finanza (Occasional Papers) 797, Bank of Italy, Economic Research and
+International Relations Area..
+
+Cooper, D. and K. Dynan. 2016. “Wealth Effects and Macroeconomic Dynamics.” Journal of Economic Surveys 30
+(1):34–55.
+
+Crawley, E., and A. Kuchler. 2023. “Consumption Heterogeneity: Micro Drivers and Macro Implications”, American
+Economic Journal: Macroeconomics, 15 (1): 314-41.
+
+De Bonis, R. and M. Marinucci. 2023. “A Short Note on Interest Rates and Household Wealth”. Italian Economic
+Journal, July, 617-635.
+
+De Bonis, R. and A. Silvestrini. 2012. “The effects of financial and real wealth on consumption: new evidence from
+OECD countries.” Applied Financial Economics, 22 (5):409–425.
+
+Deaton, A. 1991. “Saving and Liquidity Constraints.” Econometrica 59 (5):1221–1248.
+
+Duca, J. V. and J. Muellbauer. 2014. A Flow-of-Funds Perspective on the Financial Crisis, chap. “Tobin LIVES:
+Integrating Evolving Credit Market Architecture into Flow-of-Funds Based Macro-Models”. Palgrave Studies in
+Economics and Banking. Palgrave Macmillan, London.
+
+Fagereng, A., M. B. Holm and G. J. Natvik. 2021. "MPC Heterogeneity and Household Balance Sheets," American
+Economic Journal: Macroeconomics, 13(4), 1-54.
+
+Fernandez-Corugedo, E. and J. Muellbauer, 2006. "Consumer credit conditions in the United Kingdom," Bank of
+England working paper 314.
+
+
+                                                          39
+
+===PAGE 41 ===
+Fornero, E. 2020. “Italy’s pension reform: the twists and turns of an obstacle course”, Revue de l'OFCE, 120 (6) 59-
+84.
+
+Frait, J. 2025. “Monetary policy in the era of “Great Macrofinancial Volatility” in Proceedings of the Czech National
+Bank Workshop on Monetary Policy: Inflation Targeting Frameworks Under Review, ed. E. Zamrazilová and J. Frait,
+p.53-62.
+
+Friedman, M. 1957. A Theory of the Consumption Function. Princeton University Press. Princeton, NJ.
+
+———. 1963. Measurement in Economics, chap. Windfalls, the ‘Horizon’ and Related Concepts in the Permanent
+Income Hypothesis. Stanford University Press, Palo Alto, CA.
+
+Garrida, C. and A. Hedlund. 2020. “Mortgage Debt, Consumption, and Illiquid Housing Markets in the Great
+Recession.” American Economic Review 110 (6):1603–1634.
+
+Geiger, F., J. Muellbauer and M. Rupprecht. 2016. "The housing market, household portfolios and the German
+consumer," Working Paper Series 1904, European Central Bank.
+
+Gertler, M., J. Gali, and R. Clarida. 1999. “The Science of Monetary Policy: A New Keynesian Perspective.” Journal
+of Economic Literature 37 (4):1661–1707.
+
+Godfrey, L. G. (1978). "Testing Against General Autoregressive and Moving Average Error Models when the
+Regressors Include Lagged Dependent Variables". Econometrica. 46 (6): 1293–1301.
+
+Guiso, L., M. Paiella, and I. Visco. 2006. “Do Capital Gains Affect Consumption? Estimates of Wealth Effects from
+Italian Households’ Behavior.” In Long-run Growth and Short-run Stabilization, Chapters, chap. 3. Edward Elgar
+Publishing.
+
+Guglielminetti, E., and C. Rondinelli. 2024. “Macro and Micro Consumption Drivers in the Wake of the COVID-19
+Pandemic.” International Journal of Central Banking, 20(1), pages 181-237
+
+Hall, R. E. 1978. "Stochastic Implications of the Life Cycle-Permanent Income Hypothesis: Theory and
+Evidence," Journal of Political Economy, 86(
+
+Hamann, A. J. 1997. “The Reform of the Pension System in Italy.” IMF Working Papers 97/18, IMF.
+
+Hendry, D., A. Pagan and J.D. Sargan.1984. Dynamic specification, ch. 18, p. 1023-1100 in Z. Griliches and M.D.
+Intriligator, eds., Handbook of Econometrics, vol. 2, Elsevier
+
+Hendry, D. F. 1995. Dynamic Econometrics. Oxford: Oxford University Press.
+
+Jackman, R., and J. Sutton. 1982. ‘Imperfect Capital Markets and the Monetarist Black Box: Liquidity Constraints,
+Inflation and the Asymmetric Effects of Interest Rate Policy’, The Economic Journal, 92, 108–28.
+
+Jordà, Ò.2005. “Estimation and Inference of Impulse Responses by Local Projections.” American Economic
+Review, 95 (1): 161-182.
+
+Jump, G. V. “Interest Rates, Inflation Expectations, and Spurious Elements in Measured Real Income and
+Saving.” American Economic Review, 70 (5) (1980): 990–1004.
+
+Kaplan, G., and G. L. Violante. 2014. “A Model of the Consumption Response to Fiscal Stimulus Payments”,
+Econometrica, 82, 1199–239.
+
+Kaplan, G., and G. L. Violante. 2018. “Microeconomic Heterogeneity and Macroeconomic Shocks”, Journal of
+Economic Perspectives, 32(3), 167–94.
+                                                        40
+
+===PAGE 42 ===
+Kaplan, G., B. Moll and G. L. Violante. 2018. “Monetary Policy According to HANK”, American Economic Review,
+108(3), 697–743.
+
+Kaplan, G., G. L. Violante and J. Weidner. 2014. “The Wealthy Hand-to-Mouth”, Brookings Papers on Economic
+Activity, Spring.
+
+Lepinteur, A., A. Clark and C. D'Ambrosio. 2022. “Job insecurity, savings and consumption: an Italian experiment” ,
+paper prepared for the 37th IARIW General Conference.
+
+Muellbauer, J. 2020. “Implications of Household-level Evidence for Policy Models: the Case of Macrofinancial
+Linkages.” Oxford Review of Economic Policy 36 (3).
+
+Muellbauer, J. 2022. “Real estate booms and busts: implications for monetary and macroprudential policy in Europe”,
+in Challenges for monetary policy in a rapidly changing world, proceedings, ECB Forum on Central Banking, Sintra.
+https://www.ecb.europa.eu/pub/pdf/sintra/ecb.forumcentbank202206~a6bc0541ca.en.pdf
+
+Otsuka, M. (2004), ‘Essays on Household Portfolio and Current Account Dynamics’, PhD Thesis, Johns Hopkins
+University.
+
+Pascal, P. 2024. "Heterogeneity in macroeconomic models: A review of theory and computation," BCL working
+papers 185, Central Bank of Luxembourg.
+
+Reis, R. (2006), “Inattentive Consumers, Journal of Monetary Economics,53(8),1761-1800.
+
+Slacalek, J. 2009. “What drives personal consumption? The role of housing and financial wealth.” The B.E. Journal
+of Macroeconomics 9 (1).
+
+
+
+
+                                                        41
+
+===PAGE 43 ===
+Data Appendix
+
+A1. Consumption and income data.
+
+Constant price consumption data comes from the Bank of Italy Quarterly Model (Bulligan et al.,
+2017) based on National Accounts (ISTAT). Basically, it is the sum of constant price expenditure
+on non-durable goods and services and expenditure on durables. The ratio of the current price
+sum to the constant price sum defines the consumer expenditure deflator. Per capita data are
+defined by deflating by quarterly population.
+
+Total household disposable income also comes from the national accounts. Quarterly estimates
+of labour income based on payroll data plus transfer income data (mainly state pensions) are tax-
+adjusted using more detailed breakdowns of categories in the annual accounts. We implicitly
+assume the same tax rate for each form of income. The current price income data are deflated by
+the above consumer expenditure deflator and converted to a per capita basis.
+
+A2. Adjusting for breaks in the asset data
+
+As explained in Section 2, consistent quarterly portfolio data begin in 1995. Before then, annual
+data from Bonci and Coletta (2008) are quarternalised; most of the statistics are taken from the
+Italian financial accounts published by the Bank of Italy. Because of the move from the 1979
+System of National Accounts (ESA79) to the 1995 System of National Accounts (ESA95,
+implemented in 2000 with time series starting in 1995), there are breaks in some series. Two
+general principles are followed in break-adjustment, the first being to adjust earlier data to match
+later data. The second is to use the average of immediate pre and post break growth rates to
+estimate what the value for the last pre-break observation would have been if it had grown at that
+rate relative to the first post-break observation. That value is then used to splice to the pre-break
+data. For example, there is a break in the pension data in 1984, when the data jumped from 16.53
+at the end of 1983 to 47.56 in at the end of 1984 (Lire converted into Euros). The average of the
+pre and post break growth rates is 11.6%. Projecting back gives a revision of the end of 1983
+observation from 16.53 to 42.63, so that the earlier data are revised up by 42.63/16.53 to be
+continuous with the post-break data.
+
+Another break is in the loans data in 1989. As Bonci and Coletta (2008) point out, from 1989 to
+1994, due to the new standards of ESA95, the sector consisting of households and non-profit
+institutions serving households was extended to include sole proprietorships with at most 20
+workers. The increase in household loans from 93.426 to 202.975 from 1988 to 1989 is clearly
+not a genuine increase in household loans. The fact that NFC loans actually decrease in the same
+year against a strongly rising upward trend is a symptom of the reclassification. The average of
+the pre and post-break growth rates is 18.3% which suggests an upward revision of 78.150 to the
+end of 1988 loans data from 93.426 to 171.577. As a check, the same methods applied to NFC
+                                              42
+
+===PAGE 44 ===
+loans data would imply a closely consistent downward revision of 77.289.
+
+From 1995Q1, consistent quarterly balance sheet data have been published by ISTAT and the
+Bank of Italy. These data, for the first time, split debt securities into short term – ‘bills’ and long
+term – ‘bonds’, both mainly in the form of government debt. As bills carry very little revaluation
+risk, one would expect them to be more liquid than bonds, which with Italy’s volatile inflation
+and interest rate history, are far riskier. Internal data from the Bank of Italy on end of year levels
+of short-term and medium- and long-term securities before 1995 add to the information in Bonci
+and Coletta (2008).
+
+There are breaks in the quarterly balance sheet data relative to the pre-1995 data from Bonci and
+Coletta (2008). These were corrected using the principles outlined above. This resulted in upward
+adjustments of pre-1995 data on deposits, mutual funds and quoted shares and downward
+adjustments for bills, bonds, unquoted shares and pension assets.
+
+A3. Heterogeneity in asset ownership
+
+Based on the data of the Survey of Household Income and Wealth (Bank of Italy, 2018), at the
+end of 2016, almost 70 per cent of Italian households owned their main residence; this proportion
+remained fairly stable compared with 2006. A one percentage point drop, to 52 per cent, in the
+share of property owners among households headed by someone 45 years or younger was offset
+by the sharp decline in the percentage of these households out of the total, from 37 to 27 per cent,
+continuing the trend that began in the early 1990s.
+
+Regarding financial assets, the SHIW suggests that households belonging to the poorest quartile
+of the income distribution primarily have bank or post office deposits; the share of government
+securities, private sector bonds and managed investments (mainly investment funds) rises
+gradually across the income distribution; the richest 25 per cent of households are the ones most
+likely to directly own stocks and to entrust the management of a significant portion of their
+financial assets to investment professionals (Figure A1).
+
+
+
+
+                                                43
+
+===PAGE 45 ===
+ 100
+
+  90
+
+  80
+
+  70
+
+  60
+
+  50
+
+  40
+
+  30
+
+  20
+
+  10
+
+   0
+              1st quartile              2nd quartile             3rd quartile               4th quartile
+                 Deposits                                Government securities
+                 Private-sector bonds                    Equity shares and participating interests
+                 Managed investment schemes              Other
+
+Figure A1: Breakdown of financial assets by income quartile distribution in 2016
+Source: Authors’ calculation from Survey of Household Income and Wealth (Bank of Italy)
+
+
+
+Colabella et al. (2023) estimate that at the beginning of 2023 the amount of financial assets
+accumulated due to the pandemic exceeded 130 billion euros. While all households, including
+less affluent ones, managed to accumulate excess savings the majority of these funds (more than
+60%) is held by the higher-income households. Figure A2 plots the distribution of financial assets
+at the end of 2020 (figures are taken from the SHIW in 2020, last wave available; Bank of Italy,
+2022) by income quartile. It shows that for more affluent households, there was a substantial rise
+from end-2016 to end-2020 in the fraction of total financial wealth held in managed investment
+schemes. For the top income group, this displaced mainly government securities, private sector
+bonds and equity shares.
+
+For aggregate behaviour, an interesting question is whether, for each asset aggregated across
+households, there was a notable change in the distribution by income group. For example,
+suppose that the share of liquid asset holdings by the top income group had increased sharply in
+the pandemic. Given that the MPC out of liquid assets is almost certainly lower for the top income
+group than for lower incomes, this would imply a fall in the aggregate MPC for liquid assets.
+Table A1 provides information from the SHIW for the asset classes used in that survey comparing
+end-2016 with end-2020. It shows little change in the distribution across income quintiles in
+liquid deposit holdings. For managed investment schemes and for ‘equity shares and participating
+interests’, there were falls in the share of the top quintile compensated by increases in the shares
+of the 3rd and 4th income quintiles. If anything, this would point to slight increases in the aggregate
+                                                 44
+
+===PAGE 46 ===
+ 100
+
+  90
+
+  80
+
+  70
+
+  60
+
+  50
+
+  40
+
+  30
+
+  20
+
+  10
+
+   0
+               1st quartile              2nd quartile                3rd quartile               4th quartile
+                  Deposits                                   Government securities
+                  Private-sector bonds                       Equity shares and participating interests
+                  Managed investment schemes                 Other
+
+Figure A2: Breakdown of financial assets by income quartile distribution in 2020
+Source: Author’s calculation from Survey of Household Income and Wealth (Bank of Italy)
+
+
+MPCs associated with these less liquid assets. It does suggest that there are no reasons to suppose
+that aggregate MPCs out of all financial assets have fallen as a result of the large changes in the
+structure of asset holdings due to the pandemic. However, evidence from the SHIW needs to be
+interpreted cautiously given the differences between balance sheet totals implied by the micro
+data and the national balance sheets. For example, for liquid deposits in 2016 and 2020, under 40
+percent of the national balance sheet totals can be accounted for by the survey totals.23 Shifts in
+the representativeness of the SHIW in the pandemic could have affected conclusions about
+changes in the distributional pattern of asset holdings.
+
+Battistini et al. (2023) investigate potential composition effects on aggregate spending from the
+savings accumulated during the pandemic, comparing the US and Euro area. In the US, data
+suggest that the surge in savings was mostly accumulated in liquid assets, while in the Euro area
+the accumulation in illiquid financial assets was greater than in liquid assets. This would imply,
+other things being equal, a smaller post-pandemic consumption response in the Euro area than in
+the US. Battistini et al. (2023) combine aggregate balance sheet and distributional survey data to
+simulate potential compositional and distributional effects on aggregate consumption. They
+divide assets into two: deposits and illiquid financial assets minus debt. Our evidence from Italy
+
+
+23 Though some of the difference is likely to be due to the inclusion of non-profit institutions serving households in
+
+the national balance sheets.                            45
+
+===PAGE 47 ===
+is that grouping of semi-liquid assets and debt with illiquid financial assets would likely have
+distorted the conclusions of such a study in the case of Italy.
+
+
+Table A1: Comparing 2016 and 2020 shares of each asset held by different income quintiles
+                                                                  Equity shares and      Managed
+                                  Government     Private-sector
+                   Deposits                                         participating       investment         Other
+                                   securities        bonds
+                                                                      interests           schemes
+     WAVE IBF   2016     2020    2016    2020    2016     2020     2016       2020    2016      2020   2016    2020
+1st quintile    3.94     3.22    0.52    1.73    0.03     2.99     0.24       0.03    1.91      0.26   0.38    0.53
+2nd quintile    7.81     7.12    4.14    5.83    1.09      0.9     0.62       1.13    1.18      2.06   0.07    4.43
+3rd quintile    13.99    13.68   8.82    12.17   2.86     4.65     0.51       5.14    3.88      5.99   5.49    11.28
+4th quintile    22.07    22.44   21.02   20.27   20.94    15.07    6.21      15.82    11.65    17.57   7.42    9.61
+5th quintile    52.19    53.54   65.5    59.99   75.08    76.4     92.41     77.88    81.39    74.12   86.63   74.15
+                 100      100     100     100     100      100      100        100     100       100    100     100
+Source: Author’s calculation from Survey of Household Income and Wealth (Bank of Italy)
+
+
+
+A4. Measuring credit conditions
+
+We have quarterly data on the ratio of granted to used credit lines for the whole period but regard
+the ratio of granted credit lines to a moving average of GDP as a better indicator of credit
+availability. From 1996, we have data on used credit lines, which we fit to data on the stock of
+bank credit advanced to the private sector at t and the change relative to t-4 indicating a mix of
+level and change effects. The adjusted R-squared is 0.983. We estimate granted credit lines before
+1996 by multiplying the ratio of granted to used credit lines by the fitted value of used credit
+lines. Our credit indicator is estimated by credit lines divided by the lagged 8-quarter moving
+average of GDP in current prices. As granted credit lines is more of a stock affected by past
+economic conditions than a flow, this avoids temporary fluctuations in GDP distorting the
+measure. Figure A3 compares the ratios of granted credit lines respectively to used credit lines
+and to a moving average of GDP.
+
+
+
+
+                                                     46
+
+===PAGE 48 ===
+                                              Ratio of granted to used credit lines
+  1.8                                         Ratio of granted credit lines to moving average of GDP
+
+
+
+  1.6
+
+
+
+  1.4
+
+
+
+  1.2
+
+
+
+  1.0
+
+
+
+  0.8
+
+            1980       1985      1990       1995      2000       2005          2010   2015    2020
+
+Figure A3: The ratios of granted credit lines to used credit lines and to a moving average of GDP.
+Source: Credit register, Bank of Italy and national accounts data from ISTAT
+
+The empirical evidence is that the lagged rate of change in the latter measure helps explain short-
+term fluctuations in consumption.
+
+A5. Other short-term controls.
+
+Turning to controls for the short-term dynamics, these include the 2-quarter change in the log of
+the credit conditions measure, in the log of the per capita measure of public consumption – a
+partial substitute for private consumption, and in the unemployment rate, see Figure A4.
+
+
+
+
+                                                     47
+
+===PAGE 49 ===
+                             Two-quarter change in log credit conditions
+ 0.20
+                             Two quarter change in log per capita public consumption
+                             Two quarter change in unemployment rate
+
+
+ 0.15
+
+
+
+ 0.10
+
+
+
+ 0.05
+
+
+
+ 0.00
+
+
+
+-0.05
+
+
+
+        1980      1985      1990      1995      2000       2005      2010      2015    2020
+
+Figure A4: Two-quarter changes in the log of credit conditions, the log of per capita public
+consumption, and in the unemployment rate.
+Source: See Figure A3, and ISTAT.
+
+
+Other short-term controls include the change in the annual growth rate of income and a measure
+of income volatility (Figure A5). Income volatility is defined as the absolute value of the residual
+of the change in log income from an AR2 autoregressive process.
+
+
+
+
+                                                 48
+
+===PAGE 50 ===
+                Income volatility
+0.075
+                The change in the 4-quarter change in log scaled income
+
+
+0.050
+
+
+
+0.025
+
+
+
+0.000
+
+
+
+-0.025
+
+
+
+-0.050
+
+
+         1980       1985      1990       1995       2000       2005       2010       2015       2020
+
+Figure A5: Income volatility and the change in the 4-quarter growth rate of income.
+Sources: National Accounts data from ISTAT; income volatility is the absolute value of the residual from an AR8
+process for log scaled income.
+
+A6. The model for permanent income
+
+The definition of log permanent income was given in equation 3.3 with the horizon k=40 quarters
+and the discount factor δ=0.95. A summary of the findings was given in Section 2. The following
+equation was estimated:
+
+                               2008:𝑞3
+  ln 𝑦𝑡𝑝 = 𝑎𝑦0 + 𝑎𝑦𝑡 𝑡 + 𝑎𝑦08 𝑡𝑝𝑒𝑟𝑚              2008:𝑞3
+                                       + 𝑎𝑦𝑑08 𝑑𝑡𝑝𝑒𝑟𝑚    + 𝑎𝑦 ln 𝑦𝑡,𝑚𝑎
+                                  𝑙𝑎𝑏𝑜𝑢𝑟𝑡−1
+                 + (1 − 𝑎𝑦 )ln (            ) + 𝑎𝑦𝑀𝐼𝐵 ln 𝑀𝐼𝐵𝑡−1 + 𝑎𝑦𝐶𝑂𝑀𝑃 𝐶𝑂𝑀𝑃𝑡−4,𝑚𝑎
+                                    𝑝𝑜𝑝𝑡−1 𝑚𝑎
+                 + 𝑎𝑦𝑂𝐼𝐿 ln 𝑂𝐼𝐿𝑡−4,𝑚𝑎 + 𝑎𝑦𝑈𝑅 𝑈𝑅𝑡−1 + 𝑎𝑦𝐶𝐶𝐼4 ∆4 ln 𝐶𝐶𝐼𝑡−1 + 𝑎𝑦𝑈𝑅4 ∆4 𝑈𝑅𝑡−1
+                 + 𝑎𝑦𝑂𝐼𝐿4 ∆4 ln 𝑂𝐼𝐿𝑡
+
+The dependent variable is the log of permanent income. In order, the regressors include a time
+trend, the present discounted values of a trend shift in 2008Q3 and of a step change in the mean
+of the long-run solution in 2008Q3, both with significant negative coefficients. Next come the 4-
+quarter moving averages of log real per capita scaled income and of the log ratio of the labour
+force to the population. The latter coefficient is restricted so that the long-run effect of the latter
+on log income – combining permanent with current- is unity. This makes economic sense as our
+                                               49
+
+===PAGE 51 ===
+income variable is per capita relative to the population but the capacity to produce of the economy
+is constrained by the labour force, not population. The latter explains a good deal of the slow-
+down of permanent income growth in the early 1990s, as the figures below will show. The next
+regressor is the log of the real stock market index, followed by the moving average of a measure
+of competitiveness of the Italian firms, strongly related to the real exchange rate. It enters at a lag
+of 4 quarters, implying a slow response of future real household incomes to this factor. The log
+of real oil prices enters with a similar lag structure. High real oil prices damage the terms of trade
+of the economy for an oil importing economy and therefore affect living standards. The final
+term in the long-run solution is the level of the unemployment rate. This has a positive coefficient,
+which is at first sight surprising as one might have expected workers to have weaker bargaining
+power when unemployment is high and therefore have a lower wage share in GDP. However,
+GDP is not one of the controls in the equation. What the term suggests is that when the
+unemployment rate is high, there is a tendency for policies to be enacted that eventually stimulate
+growth in order to bring unemployment down. Similarly, when the unemployment rate is very
+low, policies tend to reverse to stabilise the business cycle.24
+
+However, in the short-term dynamics, the lagged 4-quarter change in the unemployment rate has
+a significant negative effect probably because in the short run it results in lower wage growth,
+which, other things being equal lowers the growth rate of household income in the near future.
+The other terms in the short-term dynamics are the lagged 4-quarter change in the log of the credit
+conditions indicator and the 4-quarter change in the log of real oil prices. As large energy price
+shocks feed into the inflation rate faced by households and there tends to be nominal inertia in
+wages, near term real household incomes are negatively affected.
+
+
+
+
+24 It is also possible that endogenous mechanisms such as wage and price dynamics are affected by the
+                                                    50rate of real incomes.
+unemployment rate and eventually feed into the growth
+
+===PAGE 52 ===
+                          Table A2 Model for permanent income, 1980-2019
+       Parameter                   Estimate               Standard Error         t-statistic
+           𝑎𝑦0                     1.479                       0.060                24.59
+           𝑎𝑦𝑡                     0.000                       0.000                12.00
+           𝑎𝑦08                    -0.000                      0.000                 -3.17
+          𝑎𝑦𝑑08                    -0.033                      0.004                 -7.63
+              𝑎𝑦                   0.206                       0.022                 9.33
+          𝑎𝑦𝑀𝐼𝐵                    0.011                       0.002                 6.48
+         𝑎𝑦𝐶𝑂𝑀𝑃                    0.026                       0.010                 2.77
+          𝑎𝑦𝑂𝐼𝐿                    -0.008                      0.002                 -3.94
+          𝑎𝑦𝑈𝑅                     0.383                       0.047                 8.14
+         𝑎𝑦𝐶𝐶𝐼4                    0.053                       0.011                 4.88
+          𝑎𝑦𝑈𝑅4                    -0.419                      0.070                 -5.98
+         𝑎𝑦𝑂𝐼𝐿4                    -0.005                      0.001                 -3.83
+                                            Diagnostics
+ Standard error x 100      0.433
+ Adjusted R 2
+                           0.995
+ LM Het. test (p-value)    0.11
+ Durbin-Watson             0.22
+
+
+
+In this formulation, it is assumed that the structural break in the income process that occurred in
+2008Q3, was fully anticipated and became more and more relevant in permanent income from
+1998Q3 as the global financial crisis approached. The estimated model benefits from post crisis
+hindsight as the structural break is then incorporated in the formulation. To capture what might
+have been more feasible beforehand, we need to remove the over-optimism represented by the
+fitted estimated present value of the structural break before 2008Q3 to simulate information of
+which a sophisticated household proxied by an econometrician might have been aware. However,
+we then need to posit a learning mechanism. The failure of Lehman Bros in September 2008 and
+the global financial turmoil that followed was a profound shock that must have made households
+far less optimistic about future income growth. However, it would have taken some time to arrive
+at a view of whether this was more of a step change or a change in the underlying growth rate.
+Both factors are in the equation. We assume that learning was split equally between an instant
+reaction and gradual learning over the following 16 quarters. In the first 8 quarters before the
+sovereign debt crisis became serious, learning follows an ogive or S-shaped curve, where
+learning is initially slow but speeds up near the mid-point of the period and then asymptotes
+                                                51
+
+===PAGE 53 ===
+towards completion towards the end. In response to the sovereign debt crisis, from 2010Q3, it
+follows a new sigmoid curve to 2012Q2. Thus, gradual learning takes into account the two phases
+of the crisis, the GFC followed by the debt crisis. Learning is implemented by attaching a time-
+varying weight w to the formulation of fitted permanent income from which the present value of
+the structural break has been removed, and a weight of 1-w to the ex-post formulation that
+includes the structural break. The weight is zero before 2008Q3 and 1 from 2012Q2 and looks
+like this:
+
+                            Table A3 Weights for learning adjustment
+        Quarter                  Weight                  Quarter                  Weight
+        2008:q2                 0.0000                   2010:q3                   0.7625
+        2008:q3                 0.5125                   2010:q4                   0.7875
+        2008:q4                 0.5375                   2011:q1                   0.8250
+        2009:q1                 0.5750                   2011:q2                   0.8750
+        2009:q2                 0.6250                   2011:q3                   0.9250
+        2009:q3                 0.6750                   2011:q4                   0.9625
+        2009:q4                 0.7125                   2012:q1                   0.9875
+        2010:q1                 0.7375                   2012:q2                   1.0000
+        2010:q2                 0.7500
+
+
+
+Thus, by 2012Q2, over-optimism has been eliminated and the model has fully incorporated the
+down-shift in the path of income. Instead of an equal weight on fast and slow learning, variations
+in the range 0.3 to 0.7 on the relative weight of the two have almost no impact on the estimated
+parameters of the consumption function and only a marginal effect on the goodness of fit.
+
+The contributions of the different regressors to the fitted, learning adjusted log permanent income
+are shown in Figures A6 to A8. Figure A6 shows that much of trend movement of log permanent
+income is accounted for by the time trend, the log of the labour force relative to the population
+and some by the movement of actual log current income. Much of the abrupt fall following
+2008Q3 is accounted for the learning adjusted split trend.
+
+
+
+
+                                              52
+
+===PAGE 54 ===
+0.050
+
+0.025
+
+0.000
+
+-0.025
+                                           Fitted learning-adjusted log permanent income
+-0.050                                     Learning-adjusted split trends
+                                           Log scaled income, moving average
+                                           Log ratio work force to population
+-0.075
+
+-0.100
+
+-0.125
+
+-0.150
+
+-0.175
+
+         1980   1985      1990      1995        2000        2005       2010       2015     2020
+
+Figure A6: The fitted contributions to log permanent income of shifting trends, log scaled income
+and the log ratio of work force to population.
+
+
+
+
+                                               53
+
+===PAGE 55 ===
+0.050
+
+0.025
+
+0.000
+
+-0.025
+                                       Fitted learning-adjusted log permanent income
+-0.050                                 Log real stock market index
+                                       Log competitiveness
+-0.075                                 Log real oil price
+                                       Rate of unemployment
+-0.100
+
+-0.125
+
+-0.150
+
+-0.175
+
+         1980   1985      1990      1995       2000       2005       2010       2015    2020
+
+Figure A7: The fitted contributions to log permanent income of the stock market index,
+competitiveness, the real oil price and the unemployment rate.
+
+
+Figure A8 shows the fitted contribution of the three short-term regressors: the rate of growth of
+credit conditions, the change in the unemployment rate and the rate of change of real oil prices.
+
+
+
+
+                                             54
+
+===PAGE 56 ===
+0.050
+
+0.025
+
+0.000
+
+-0.025
+                                    Log fitted learning-adjusted permanent income
+-0.050                              Four-quarter change in log credit conditions
+                                    Four-quarter change in rate of unemployment
+-0.075
+                                    Four-quarter change in log real oil price
+
+-0.100
+
+-0.125
+
+-0.150
+
+-0.175
+
+         1980   1985      1990      1995       2000       2005       2010           2015   2020
+
+Figure A8: The fitted contributions to log permanent income of three short-term regressors.
+
+
+A7. Instrumenting current income
+
+The log of current real per capita scaled income was instrumented using a regression on its lag,
+and lags of log consumption, the unemployment rate, the log of the labour force to population
+ratio, competitiveness and in the acceleration of inflation. When log current income is
+instrumented in the consumption function, it is instrumented by its fitted value. Where the level
+of current income appears, for example, in ratios of assets to income, current income is replaced
+by the exponential of fitted log income.
+
+                                                             𝑙𝑎𝑏𝑜𝑟𝑡−3
+ ln 𝑦𝑡 = 𝑎0 + 𝑎𝑦 ln 𝑦𝑡−1 + 𝑎𝑐 ln 𝑐𝑡−1 + 𝑎𝑈𝑅 𝑈𝑅𝑡−1 + 𝑎𝐿𝐴𝐵 ln (         ) + 𝑎𝐶𝑂𝑀𝑃 𝐶𝑂𝑀𝑃𝑡−6,𝑚𝑎
+                                                              𝑝𝑜𝑝𝑡−3
+               + 𝑎𝜋2 ∆𝜋𝑡−2 + 𝑎𝜋3 ∆𝜋𝑡−3
+
+
+
+
+                                             55
+
+===PAGE 57 ===
+                          Table A4 Model for instrumenting income, 1980-2019
+        Parameter                    Estimate               Standard Error     t-statistic
+              𝑎0                     0.418                       0.102             4.09
+              𝑎𝑦                     0.781                       0.039            20.03
+              𝑎𝑐                     0.102                       0.026             3.86
+            𝑎𝑈𝑅                      -0.205                      0.064            -3.20
+           𝑎𝐿𝐴𝐵                      0.344                       0.079             4.33
+          𝑎𝐶𝑂𝑀𝑃                      0.041                       0.011             3.78
+            𝑎𝜋2                      -0.226                      0.105            -2.15
+            𝑎𝜋3                      -0.314                      0.105            -3.00
+                                              Diagnostics
+ Standard error x 100       0.010
+ Adjusted R 2
+                            0.986
+ LM Het. test (p-value)     0.36
+ Durbin-Watson              2.27
+ AR1/MA1 (p-value)          0.054
+ AR4/MA4(p-value)           0.180
+ Chow test (p-value)        0.019
+ RESET2 test (p-value)      0.000
+ F test (p-value)           0.000
+ Schwarz Criterion          -493.3
+ Log likelihood             513.6
+
+
+
+A8. Descriptive statistics
+
+
+
+
+                                                    56
+
+===PAGE 58 ===
+                                          Table A5 Descriptive statistics 1980-2019
+                Variable                       Mean               Std. Dev.        Minimum       Maximum
+                              Raw data before transformations (current prices, billions)
+Consumption                                      170.9               76.2              30.5        272.4
+Disposable income                                199.0               79.4              39.1        297.4
+Labour and transfer income                       103.7               47.4              19.0        179.4
+Deposits                                         741.3              398.3             107.6       1448.2
+Loans                                            343.2              267.0              18.5        737.8
+Mutual funds                                     272.1              218.8                  0.5     677.3
+Bonds                                            346.8              262.0                  5.5     755.8
+Bills                                             66.8               52.1                  1.8     182.2
+Pensions and life insurance                      404.5              330.3              25.2       1119.4
+Quoted shares                                     84.5               39.1                  7.6     208.8
+Unquoted shares                                  506.9              343.2              20.4       1242.4
+
+                                                Data for consumption equations
+Log per capita consumption                       1.388              0.130             1.092        1.529
+Log per capita scaled income                     1.291              0.084             1.054        1.393
+Change in log per capita consumption            0.0026             0.0065           -0.0158       0.0211
+Change in log per capita scaled income          0.0018             0.0114           -0.0337       0.0448
+Real effective borrowing rate                    0.094              0.017             0.028        0.150
+Log learning-adjusted permanent income           1.316              0.061             1.144        1.378
+Net liquid assets/scaled income                  1.175              0.217             0.791        1.595
+Bonds/scaled income                              0.473              0.305             0.040        0.932
+Illiquid financial assets/scaled income          0.683              0.294             0.276        1.297
+Housing assets/scaled income                     5.030              1.055             3.431        6.962
+Log ratio of house prices to income              5.923              0.121             5.645        6.116
+Net worth/scaled income                          8.080              1.835             5.219       10.585
+Net financial assets/scaled income               3.051              0.929             1.326        4.361
+
+                                              Data for short term controls
+Two-quarter change in log credit conditions     0.0011             0.0311           -0.0889       0.1170
+Two-quarter change in log per capita public
+consumption                                     0.0121             0.0460           -0.0746       0.2381
+Change in 4-quarter change in log scaled
+income                                          0.0002             0.0163           -0.0551       0.0549
+Two-quarter change in unemployment rate         0.0003             0.0044           -0.0084       0.0152
+Income volatility                               0.0080             0.0074            0.0000       0.0414
+
+                                          Data for permanent income equation
+Log permanent income                              1.31               0.06              1.14         1.38
+Log scaled income (4-quarter MA)                  1.29               0.09              1.05         1.39
+Log labour force/population (4-Quarter MA)        -0.88              0.03             -0.96        -0.84
+Log real stock market index                       9.83               0.39              8.82        10.64
+Competitiveness (4-quarter MA)                    1.10               0.14              0.91         1.39
+Log real oil price index (4-quarter MA)           3.75               0.52              2.71         4.54
+                                                             57
+
+===PAGE 59 ===
+Unemployment rate                            0.10         0.02    0.06     0.13
+4-quarter change in log credit conditions    0.00         0.05    -0.09    0.15
+4-quarter change in unemployment rate       0.001        0.008   -0.012   0.025
+4-quarter change in log real oil prices     -0.01         0.30    -1.12    0.96
+
+
+
+
+                                                    58
+Warning message:
+package 'pdftools' was built under R version 4.2.3 

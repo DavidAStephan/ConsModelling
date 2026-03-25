@@ -1,0 +1,4 @@
+"specification","n_obs","aic","bic","adj_r2","sigma","adf_stat","adf_1pct","adf_5pct","adf_10pct","adf_reject_5pct","sign_score","admissible"
+"mortgage_credit_core",93,-223.323191207578,-208.127594248658,0.970944615337859,0.0701944773537371,-3.47779553405757,-3.51,-2.89,-2.58,TRUE,4,TRUE
+"mortgage_credit_full",93,-240.393028593441,-220.132232648215,0.976296186283075,0.0634013846589899,-2.4195620929715,-3.51,-2.89,-2.58,FALSE,5,FALSE
+"mortgage_credit_housing_interaction",93,-241.502857714512,-223.774661262439,0.976343288500773,0.0633383603944628,-2.3794013751738,-3.51,-2.89,-2.58,FALSE,4,FALSE

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -lah C:/Users/david/Documents/ConsModelling/data_raw/*.xlsx)",
+      "Bash(pdftotext \"/c/Users/david/Documents/ConsModelling/References/Aust system paper - revised.pdf\" -)",
+      "Bash(pdftotext \"/c/Users/david/Documents/ConsModelling/References/Duca_Muellbauer_Tobin LIVES DP July 2013r.pdf\" -)",
+      "Bash(pdftotext \"/c/Users/david/Documents/ConsModelling/References/500-501-502_Chauvin-Muellbauer_complement \\(1\\).pdf\" -)",
+      "Bash(pdftotext \"/c/Users/david/Documents/ConsModelling/References/bispap64p 2012.pdf\" -)",
+      "Bash(pdftotext \"/c/Users/david/Documents/ConsModelling/References/8 August 2025 revised paper Italy final.pdf\" -)",
+      "Bash(dir /ad \"c:\\\\Users\\\\david\\\\Documents\\\\ConsModelling\")",
+      "Bash(Rscript --vanilla R/consumption_model_australia.R)",
+      "Bash(Rscript R/consumption_model_australia.R)",
+      "Bash(Rscript -e \"install.packages\\(''''sandwich'''', repos=''''https://cloud.r-project.org''''\\)\")",
+      "Bash(Rscript -e \":*)",
+      "Bash(Rscript --vanilla -e \":*)",
+      "Bash(grep -A 30 \"^Short-run ECM$\" outputs/model_summary.txt)"
+    ]
+  }
+}

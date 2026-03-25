@@ -1,0 +1,376 @@
+variable,symbol,section,stat,column,value
+Speed of adjustment,lambda,long_run,coef,1,0.0531
+Speed of adjustment,lambda,long_run,se,1,0.0219
+Speed of adjustment,lambda,long_run,t,1,2.43
+Speed of adjustment,lambda,long_run,coef,2,0.0632
+Speed of adjustment,lambda,long_run,se,2,0.0216
+Speed of adjustment,lambda,long_run,t,2,2.92
+Speed of adjustment,lambda,long_run,coef,3,0.0398
+Speed of adjustment,lambda,long_run,se,3,0.0184
+Speed of adjustment,lambda,long_run,t,3,2.16
+Speed of adjustment,lambda,long_run,coef,4,0.103
+Speed of adjustment,lambda,long_run,se,4,0.0263
+Speed of adjustment,lambda,long_run,t,4,3.92
+Speed of adjustment,lambda,long_run,coef,5,0.289
+Speed of adjustment,lambda,long_run,se,5,0.0276
+Speed of adjustment,lambda,long_run,t,5,10.46
+Speed of adjustment,lambda,long_run,coef,6,0.298
+Speed of adjustment,lambda,long_run,se,6,0.0273
+Speed of adjustment,lambda,long_run,t,6,10.91
+Constant,alpha0,long_run,coef,1,-0.293
+Constant,alpha0,long_run,se,1,0.18
+Constant,alpha0,long_run,t,1,-1.63
+Constant,alpha0,long_run,coef,2,-0.299
+Constant,alpha0,long_run,se,2,0.146
+Constant,alpha0,long_run,t,2,-2.04
+Constant,alpha0,long_run,coef,3,-0.00999
+Constant,alpha0,long_run,se,3,0.0155
+Constant,alpha0,long_run,t,3,-0.0643
+Constant,alpha0,long_run,coef,4,0.151
+Constant,alpha0,long_run,se,4,0.416
+Constant,alpha0,long_run,t,4,0.364
+Constant,alpha0,long_run,coef,5,0.369
+Constant,alpha0,long_run,se,5,0.1254
+Constant,alpha0,long_run,t,5,2.94
+Constant,alpha0,long_run,coef,6,0.298
+Constant,alpha0,long_run,se,6,0.1225
+Constant,alpha0,long_run,t,6,2.43
+Seasonal dummy 1990,alpha_s,long_run,coef,1,0.105
+Seasonal dummy 1990,alpha_s,long_run,se,1,0.0568
+Seasonal dummy 1990,alpha_s,long_run,t,1,1.85
+Seasonal dummy 1990,alpha_s,long_run,coef,2,0.0854
+Seasonal dummy 1990,alpha_s,long_run,se,2,0.0414
+Seasonal dummy 1990,alpha_s,long_run,t,2,2.06
+Seasonal dummy 1990,alpha_s,long_run,coef,3,0.139
+Seasonal dummy 1990,alpha_s,long_run,se,3,0.0816
+Seasonal dummy 1990,alpha_s,long_run,t,3,1.7
+Seasonal dummy 1990,alpha_s,long_run,coef,4,0.06
+Seasonal dummy 1990,alpha_s,long_run,se,4,0.0223
+Seasonal dummy 1990,alpha_s,long_run,t,4,2.69
+Seasonal dummy 1990,alpha_s,long_run,coef,5,0.024
+Seasonal dummy 1990,alpha_s,long_run,se,5,0.00477
+Seasonal dummy 1990,alpha_s,long_run,t,5,5.11
+Seasonal dummy 1990,alpha_s,long_run,coef,6,0.023
+Seasonal dummy 1990,alpha_s,long_run,se,6,0.00451
+Seasonal dummy 1990,alpha_s,long_run,t,6,5.19
+Adjusted r_t,alpha1,long_run,coef,1,0.769
+Adjusted r_t,alpha1,long_run,se,1,0.569
+Adjusted r_t,alpha1,long_run,t,1,1.35
+Adjusted r_t,alpha1,long_run,coef,2,0.667
+Adjusted r_t,alpha1,long_run,se,2,0.448
+Adjusted r_t,alpha1,long_run,t,2,1.49
+Adjusted r_t,alpha1,long_run,coef,3,0.982
+Adjusted r_t,alpha1,long_run,se,3,0.765
+Adjusted r_t,alpha1,long_run,t,3,1.28
+Adjusted r_t,alpha1,long_run,coef,4,-0.0308
+Adjusted r_t,alpha1,long_run,se,4,0.272
+Adjusted r_t,alpha1,long_run,t,4,-0.113
+Adjusted r_t,alpha1,long_run,coef,5,-0.361
+Adjusted r_t,alpha1,long_run,se,5,0.0769
+Adjusted r_t,alpha1,long_run,t,5,-4.7
+Adjusted r_t,alpha1,long_run,coef,6,-0.35
+Adjusted r_t,alpha1,long_run,se,6,0.0733
+Adjusted r_t,alpha1,long_run,t,6,-4.78
+ln(y_p/y),alpha2,long_run,coef,1,1.48
+ln(y_p/y),alpha2,long_run,se,1,0.473
+ln(y_p/y),alpha2,long_run,t,1,3.13
+ln(y_p/y),alpha2,long_run,coef,2,1.28
+ln(y_p/y),alpha2,long_run,se,2,0.352
+ln(y_p/y),alpha2,long_run,t,2,3.63
+ln(y_p/y),alpha2,long_run,coef,3,1.43
+ln(y_p/y),alpha2,long_run,se,3,0.596
+ln(y_p/y),alpha2,long_run,t,3,2.41
+ln(y_p/y),alpha2,long_run,coef,4,0.704
+ln(y_p/y),alpha2,long_run,se,4,0.197
+ln(y_p/y),alpha2,long_run,t,4,3.56
+ln(y_p/y),alpha2,long_run,coef,5,0.574
+ln(y_p/y),alpha2,long_run,se,5,0.0544
+ln(y_p/y),alpha2,long_run,t,5,10.55
+ln(y_p/y),alpha2,long_run,coef,6,0.615
+ln(y_p/y),alpha2,long_run,se,6,0.0548
+ln(y_p/y),alpha2,long_run,t,6,11.22
+Exchange rate crisis 1992,tau_1992,long_run,coef,1,-0.0425
+Exchange rate crisis 1992,tau_1992,long_run,se,1,0.04
+Exchange rate crisis 1992,tau_1992,long_run,t,1,-1.06
+Exchange rate crisis 1992,tau_1992,long_run,coef,2,-0.0322
+Exchange rate crisis 1992,tau_1992,long_run,se,2,0.0325
+Exchange rate crisis 1992,tau_1992,long_run,t,2,-0.994
+Exchange rate crisis 1992,tau_1992,long_run,coef,3,-0.0385
+Exchange rate crisis 1992,tau_1992,long_run,se,3,0.0528
+Exchange rate crisis 1992,tau_1992,long_run,t,3,-0.729
+Exchange rate crisis 1992,tau_1992,long_run,coef,4,-0.02399
+Exchange rate crisis 1992,tau_1992,long_run,se,4,0.02
+Exchange rate crisis 1992,tau_1992,long_run,t,4,-1.19
+Exchange rate crisis 1992,tau_1992,long_run,coef,5,-0.0363
+Exchange rate crisis 1992,tau_1992,long_run,se,5,0.00644
+Exchange rate crisis 1992,tau_1992,long_run,t,5,-5.63
+Exchange rate crisis 1992,tau_1992,long_run,coef,6,-0.0345
+Exchange rate crisis 1992,tau_1992,long_run,se,6,0.00612
+Exchange rate crisis 1992,tau_1992,long_run,t,6,-5.64
+Fornero reform 2012,tau_2012,long_run,coef,1,-0.0525
+Fornero reform 2012,tau_2012,long_run,se,1,0.029
+Fornero reform 2012,tau_2012,long_run,t,1,-1.81
+Fornero reform 2012,tau_2012,long_run,coef,2,-0.0308
+Fornero reform 2012,tau_2012,long_run,se,2,0.0261
+Fornero reform 2012,tau_2012,long_run,t,2,-1.18
+Fornero reform 2012,tau_2012,long_run,coef,3,-0.00545
+Fornero reform 2012,tau_2012,long_run,se,3,0.0462
+Fornero reform 2012,tau_2012,long_run,t,3,-0.118
+Fornero reform 2012,tau_2012,long_run,coef,4,-0.0151
+Fornero reform 2012,tau_2012,long_run,se,4,0.0216
+Fornero reform 2012,tau_2012,long_run,t,4,-0.702
+Fornero reform 2012,tau_2012,long_run,coef,5,-0.0614
+Fornero reform 2012,tau_2012,long_run,se,5,0.00794
+Fornero reform 2012,tau_2012,long_run,t,5,-7.73
+Fornero reform 2012,tau_2012,long_run,coef,6,-0.0346
+Fornero reform 2012,tau_2012,long_run,se,6,0.0129
+Fornero reform 2012,tau_2012,long_run,t,6,-2.68
+ln(A_{t-1}/y_t),gamma,long_run,coef,1,0.172
+ln(A_{t-1}/y_t),gamma,long_run,se,1,0.0819
+ln(A_{t-1}/y_t),gamma,long_run,t,1,2.1
+ln(A_{t-1}/y_t),gamma,long_run,coef,2,0.173
+ln(A_{t-1}/y_t),gamma,long_run,se,2,0.0668
+ln(A_{t-1}/y_t),gamma,long_run,t,2,2.6
+A_{t-1}/y_t,gamma_netw,long_run,coef,3,0.00766
+A_{t-1}/y_t,gamma_netw,long_run,se,3,0.0176
+A_{t-1}/y_t,gamma_netw,long_run,t,3,0.436
+NFA_{t-1}/y_t,gamma_1_nfa,long_run,coef,4,0.0594
+NFA_{t-1}/y_t,gamma_1_nfa,long_run,se,4,0.00768
+NFA_{t-1}/y_t,gamma_1_nfa,long_run,t,4,7.74
+NLA_{t-1}/y_t,gamma_1_nla,long_run,coef,5,0.137
+NLA_{t-1}/y_t,gamma_1_nla,long_run,se,5,0.00926
+NLA_{t-1}/y_t,gamma_1_nla,long_run,t,5,14.84
+NLA_{t-1}/y_t,gamma_1_nla,long_run,coef,6,0.137
+NLA_{t-1}/y_t,gamma_1_nla,long_run,se,6,0.00878
+NLA_{t-1}/y_t,gamma_1_nla,long_run,t,6,15.57
+BONDS_{t-1}/y_t,gamma_1_smlb,long_run,coef,5,0.054
+BONDS_{t-1}/y_t,gamma_1_smlb,long_run,se,5,0.00808
+BONDS_{t-1}/y_t,gamma_1_smlb,long_run,t,5,6.68
+BONDS_{t-1}/y_t,gamma_1_smlb,long_run,coef,6,0.0623
+BONDS_{t-1}/y_t,gamma_1_smlb,long_run,se,6,0.00817
+BONDS_{t-1}/y_t,gamma_1_smlb,long_run,t,6,7.63
+ILFA_{t-1}/y_t,gamma_1_ilapen,long_run,coef,5,0.0365
+ILFA_{t-1}/y_t,gamma_1_ilapen,long_run,se,5,0.0169
+ILFA_{t-1}/y_t,gamma_1_ilapen,long_run,t,5,2.15
+ILFA_{t-1}/y_t,gamma_1_ilapen,long_run,coef,6,0.0301
+ILFA_{t-1}/y_t,gamma_1_ilapen,long_run,se,6,0.0165
+ILFA_{t-1}/y_t,gamma_1_ilapen,long_run,t,6,1.83
+HA_{t-1}/y_t,gamma2,long_run,coef,4,-0.00716
+HA_{t-1}/y_t,gamma2,long_run,se,4,0.0142
+HA_{t-1}/y_t,gamma2,long_run,t,4,-0.505
+HA_{t-1}/y_t,gamma2,long_run,coef,5,0.0411
+HA_{t-1}/y_t,gamma2,long_run,se,5,0.00559
+HA_{t-1}/y_t,gamma2,long_run,t,5,7.35
+HA_{t-1}/y_t,gamma2,long_run,coef,6,0.0392
+HA_{t-1}/y_t,gamma2,long_run,se,6,0.00533
+HA_{t-1}/y_t,gamma2,long_run,t,6,7.36
+ln HP_{t-1}/y_{t-1},gamma3,long_run,coef,4,-0.0305
+ln HP_{t-1}/y_{t-1},gamma3,long_run,se,4,0.076
+ln HP_{t-1}/y_{t-1},gamma3,long_run,t,4,-0.402
+ln HP_{t-1}/y_{t-1},gamma3,long_run,coef,5,-0.109
+ln HP_{t-1}/y_{t-1},gamma3,long_run,se,5,0.023
+ln HP_{t-1}/y_{t-1},gamma3,long_run,t,5,-4.74
+ln HP_{t-1}/y_{t-1},gamma3,long_run,coef,6,-0.0962
+ln HP_{t-1}/y_{t-1},gamma3,long_run,se,6,0.0224
+ln HP_{t-1}/y_{t-1},gamma3,long_run,t,6,-4.29
+Δ2 ln CC_{t-2},beta0,short_run,coef,2,0.0379
+Δ2 ln CC_{t-2},beta0,short_run,se,2,0.0129
+Δ2 ln CC_{t-2},beta0,short_run,t,2,2.94
+Δ2 ln CC_{t-2},beta0,short_run,coef,3,0.0365
+Δ2 ln CC_{t-2},beta0,short_run,se,3,0.013
+Δ2 ln CC_{t-2},beta0,short_run,t,3,2.82
+Δ2 ln CC_{t-2},beta0,short_run,coef,4,0.0114
+Δ2 ln CC_{t-2},beta0,short_run,se,4,0.0153
+Δ2 ln CC_{t-2},beta0,short_run,t,4,0.75
+Δ2 ln CC_{t-2},beta0,short_run,coef,5,0.0295
+Δ2 ln CC_{t-2},beta0,short_run,se,5,0.0112
+Δ2 ln CC_{t-2},beta0,short_run,t,5,2.62
+Δ2 ln CC_{t-2},beta0,short_run,coef,6,0.0315
+Δ2 ln CC_{t-2},beta0,short_run,se,6,0.0111
+Δ2 ln CC_{t-2},beta0,short_run,t,6,2.85
+Δ2 ln c_t^P,beta1,short_run,coef,1,-0.023
+Δ2 ln c_t^P,beta1,short_run,se,1,0.00875
+Δ2 ln c_t^P,beta1,short_run,t,1,-2.63
+Δ2 ln c_t^P,beta1,short_run,coef,2,-0.0237
+Δ2 ln c_t^P,beta1,short_run,se,2,0.00853
+Δ2 ln c_t^P,beta1,short_run,t,2,-2.78
+Δ2 ln c_t^P,beta1,short_run,coef,3,-0.0229
+Δ2 ln c_t^P,beta1,short_run,se,3,0.00859
+Δ2 ln c_t^P,beta1,short_run,t,3,-2.67
+Δ2 ln c_t^P,beta1,short_run,coef,4,-0.0294
+Δ2 ln c_t^P,beta1,short_run,se,4,0.00847
+Δ2 ln c_t^P,beta1,short_run,t,4,-3.48
+Δ2 ln c_t^P,beta1,short_run,coef,5,-0.0173
+Δ2 ln c_t^P,beta1,short_run,se,5,0.00656
+Δ2 ln c_t^P,beta1,short_run,t,5,-2.63
+Δ2 ln c_t^P,beta1,short_run,coef,6,-0.0166
+Δ2 ln c_t^P,beta1,short_run,se,6,0.00644
+Δ2 ln c_t^P,beta1,short_run,t,6,-2.57
+ΔΔ4 ln y_t,beta2,short_run,coef,1,0.0858
+ΔΔ4 ln y_t,beta2,short_run,se,1,0.0232
+ΔΔ4 ln y_t,beta2,short_run,t,1,3.69
+ΔΔ4 ln y_t,beta2,short_run,coef,2,0.0879
+ΔΔ4 ln y_t,beta2,short_run,se,2,0.0227
+ΔΔ4 ln y_t,beta2,short_run,t,2,3.88
+ΔΔ4 ln y_t,beta2,short_run,coef,3,0.0891
+ΔΔ4 ln y_t,beta2,short_run,se,3,0.0228
+ΔΔ4 ln y_t,beta2,short_run,t,3,3.91
+ΔΔ4 ln y_t,beta2,short_run,coef,4,0.0848
+ΔΔ4 ln y_t,beta2,short_run,se,4,0.0221
+ΔΔ4 ln y_t,beta2,short_run,t,4,3.84
+ΔΔ4 ln y_t,beta2,short_run,coef,5,0.0803
+ΔΔ4 ln y_t,beta2,short_run,se,5,0.0168
+ΔΔ4 ln y_t,beta2,short_run,t,5,4.77
+ΔΔ4 ln y_t,beta2,short_run,coef,6,0.0769
+ΔΔ4 ln y_t,beta2,short_run,se,6,0.0166
+ΔΔ4 ln y_t,beta2,short_run,t,6,4.64
+Δ2 ln ur_t,beta3,short_run,coef,1,-0.477
+Δ2 ln ur_t,beta3,short_run,se,1,0.0993
+Δ2 ln ur_t,beta3,short_run,t,1,-4.8
+Δ2 ln ur_t,beta3,short_run,coef,2,-0.412
+Δ2 ln ur_t,beta3,short_run,se,2,0.0992
+Δ2 ln ur_t,beta3,short_run,t,2,-4.15
+Δ2 ln ur_t,beta3,short_run,coef,3,-0.367
+Δ2 ln ur_t,beta3,short_run,se,3,0.101
+Δ2 ln ur_t,beta3,short_run,t,3,-3.64
+Δ2 ln ur_t,beta3,short_run,coef,4,-0.155
+Δ2 ln ur_t,beta3,short_run,se,4,0.113
+Δ2 ln ur_t,beta3,short_run,t,4,-1.37
+Δ2 ln ur_t,beta3,short_run,coef,5,-0.297
+Δ2 ln ur_t,beta3,short_run,se,5,0.0855
+Δ2 ln ur_t,beta3,short_run,t,5,-3.48
+Δ2 ln ur_t,beta3,short_run,coef,6,-0.304
+Δ2 ln ur_t,beta3,short_run,se,6,0.0839
+Δ2 ln ur_t,beta3,short_run,t,6,-3.62
+|ê_{t-1}|,beta4,short_run,coef,1,-0.0579
+|ê_{t-1}|,beta4,short_run,se,1,0.053
+|ê_{t-1}|,beta4,short_run,t,1,-1.09
+|ê_{t-1}|,beta4,short_run,coef,2,-0.0437
+|ê_{t-1}|,beta4,short_run,se,2,0.0518
+|ê_{t-1}|,beta4,short_run,t,2,-0.843
+|ê_{t-1}|,beta4,short_run,coef,3,-0.0463
+|ê_{t-1}|,beta4,short_run,se,3,0.0524
+|ê_{t-1}|,beta4,short_run,t,3,-0.883
+|ê_{t-1}|,beta4,short_run,coef,4,-0.0551
+|ê_{t-1}|,beta4,short_run,se,4,0.0505
+|ê_{t-1}|,beta4,short_run,t,4,-1.09
+|ê_{t-1}|,beta4,short_run,coef,5,-0.169
+|ê_{t-1}|,beta4,short_run,se,5,0.0406
+|ê_{t-1}|,beta4,short_run,t,5,-4.15
+|ê_{t-1}|,beta4,short_run,coef,6,-0.159
+|ê_{t-1}|,beta4,short_run,se,6,0.04
+|ê_{t-1}|,beta4,short_run,t,6,-3.97
+d_1983q1,beta5,short_run,coef,1,-0.0193
+d_1983q1,beta5,short_run,se,1,0.00471
+d_1983q1,beta5,short_run,t,1,-4.11
+d_1983q1,beta5,short_run,coef,2,-0.019
+d_1983q1,beta5,short_run,se,2,0.00459
+d_1983q1,beta5,short_run,t,2,-4.13
+d_1983q1,beta5,short_run,coef,3,-0.0185
+d_1983q1,beta5,short_run,se,3,0.00461
+d_1983q1,beta5,short_run,t,3,-4.01
+d_1983q1,beta5,short_run,coef,4,-0.0182
+d_1983q1,beta5,short_run,se,4,0.00447
+d_1983q1,beta5,short_run,t,4,-4.08
+d_1983q1,beta5,short_run,coef,5,-0.0214
+d_1983q1,beta5,short_run,se,5,0.0034
+d_1983q1,beta5,short_run,t,5,-6.28
+d_1983q1,beta5,short_run,coef,6,-0.0216
+d_1983q1,beta5,short_run,se,6,0.00334
+d_1983q1,beta5,short_run,t,6,-6.48
+d_1993q1,beta6,short_run,coef,1,-0.01692
+d_1993q1,beta6,short_run,se,1,0.00501
+d_1993q1,beta6,short_run,t,1,-3.37
+d_1993q1,beta6,short_run,coef,2,-0.0166
+d_1993q1,beta6,short_run,se,2,0.00488
+d_1993q1,beta6,short_run,t,2,-3.4
+d_1993q1,beta6,short_run,coef,3,-0.0166
+d_1993q1,beta6,short_run,se,3,0.00492
+d_1993q1,beta6,short_run,t,3,-3.37
+d_1993q1,beta6,short_run,coef,4,-0.0154
+d_1993q1,beta6,short_run,se,4,0.00475
+d_1993q1,beta6,short_run,t,4,-3.23
+d_1993q1,beta6,short_run,coef,5,-0.0148
+d_1993q1,beta6,short_run,se,5,0.0036
+d_1993q1,beta6,short_run,t,5,-4.13
+d_1993q1,beta6,short_run,coef,6,-0.0144
+d_1993q1,beta6,short_run,se,6,0.00353
+d_1993q1,beta6,short_run,t,6,-4.09
+d_2013q1,beta7,short_run,coef,1,-0.0137
+d_2013q1,beta7,short_run,se,1,0.00479
+d_2013q1,beta7,short_run,t,1,-2.87
+d_2013q1,beta7,short_run,coef,2,-0.0131
+d_2013q1,beta7,short_run,se,2,0.00467
+d_2013q1,beta7,short_run,t,2,-2.8
+d_2013q1,beta7,short_run,coef,3,-0.0133
+d_2013q1,beta7,short_run,se,3,0.0047
+d_2013q1,beta7,short_run,t,3,-2.83
+d_2013q1,beta7,short_run,coef,4,-0.0134
+d_2013q1,beta7,short_run,se,4,0.00454
+d_2013q1,beta7,short_run,t,4,-2.96
+d_2013q1,beta7,short_run,coef,5,-0.0125
+d_2013q1,beta7,short_run,se,5,0.00346
+d_2013q1,beta7,short_run,t,5,-3.62
+d_2013q1,beta7,short_run,coef,6,-0.0116
+d_2013q1,beta7,short_run,se,6,0.00341
+d_2013q1,beta7,short_run,t,6,-3.41
+Standard error x100,,diagnostics,value,1,0.454
+Standard error x100,,diagnostics,value,2,0.442
+Standard error x100,,diagnostics,value,3,0.445
+Standard error x100,,diagnostics,value,4,0.429
+Standard error x100,,diagnostics,value,5,0.325
+Standard error x100,,diagnostics,value,6,0.319
+Adjusted R2,,diagnostics,value,1,0.51
+Adjusted R2,,diagnostics,value,2,0.535
+Adjusted R2,,diagnostics,value,3,0.528
+Adjusted R2,,diagnostics,value,4,0.562
+Adjusted R2,,diagnostics,value,5,0.749
+Adjusted R2,,diagnostics,value,6,0.758
+LM Het p-value,,diagnostics,value,1,0.474
+LM Het p-value,,diagnostics,value,2,0.822
+LM Het p-value,,diagnostics,value,3,0.891
+LM Het p-value,,diagnostics,value,4,0.701
+LM Het p-value,,diagnostics,value,5,0.182
+LM Het p-value,,diagnostics,value,6,0.162
+Durbin-Watson,,diagnostics,value,1,1.53
+Durbin-Watson,,diagnostics,value,2,1.53
+Durbin-Watson,,diagnostics,value,3,1.56
+Durbin-Watson,,diagnostics,value,4,1.6
+Durbin-Watson,,diagnostics,value,5,2.11
+Durbin-Watson,,diagnostics,value,6,2.19
+AR1/MA1 p-value,,diagnostics,value,1,0.002
+AR1/MA1 p-value,,diagnostics,value,2,0.002
+AR1/MA1 p-value,,diagnostics,value,3,0.004
+AR1/MA1 p-value,,diagnostics,value,4,0.012
+AR1/MA1 p-value,,diagnostics,value,5,0.509
+AR1/MA1 p-value,,diagnostics,value,6,0.236
+AR4/MA4 p-value,,diagnostics,value,1,0.001
+AR4/MA4 p-value,,diagnostics,value,2,0
+AR4/MA4 p-value,,diagnostics,value,3,0
+AR4/MA4 p-value,,diagnostics,value,4,0
+AR4/MA4 p-value,,diagnostics,value,5,0.45
+AR4/MA4 p-value,,diagnostics,value,6,0.401
+Chow p-value,,diagnostics,value,1,0.005
+Chow p-value,,diagnostics,value,2,0.001
+Chow p-value,,diagnostics,value,3,0
+Chow p-value,,diagnostics,value,4,0
+Chow p-value,,diagnostics,value,5,0.962
+Chow p-value,,diagnostics,value,6,0.96
+RESET2 p-value,,diagnostics,value,1,0.04
+RESET2 p-value,,diagnostics,value,2,0.139
+RESET2 p-value,,diagnostics,value,3,0.088
+RESET2 p-value,,diagnostics,value,4,0.816
+RESET2 p-value,,diagnostics,value,5,0.841
+RESET2 p-value,,diagnostics,value,6,0.48
+Schwarz Criterion,,diagnostics,value,1,-606.1
+Schwarz Criterion,,diagnostics,value,2,-608.2
+Schwarz Criterion,,diagnostics,value,3,-607.1
+Schwarz Criterion,,diagnostics,value,4,-609.1
+Schwarz Criterion,,diagnostics,value,5,-649.6
+Schwarz Criterion,,diagnostics,value,6,-650.7
+Log likelihood,,diagnostics,value,1,644.2
+Log likelihood,,diagnostics,value,2,648.8
+Log likelihood,,diagnostics,value,3,647.7
+Log likelihood,,diagnostics,value,4,654.7
+Log likelihood,,diagnostics,value,5,700.3
+Log likelihood,,diagnostics,value,6,704
