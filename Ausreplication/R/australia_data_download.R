@@ -391,40 +391,31 @@ for (nm in c("fin_deposits", "fin_equities", "fin_super", "fin_loans",
 
 ## 2.9  Mortgage interest rate
 message("2.9 Mortgage interest rate")
-# Primary: RBA f05hist — series FILRHLBVS (standard variable owner-occupier rate).
-# Download f05hist.xlsx from https://www.rba.gov.au/statistics/tables/ and place in data_raw/.
+# Primary: RBA series FILRHLBVS (standard variable owner-occupier rate) via readrba.
 # Fallback: implicit rate from ABS mortgage interest paid / lagged debt stock.
 mort_rate_q <- NULL
 
-rba_f05_path <- file.path(raw_dir, "f05hist.xlsx")
-if (file.exists(rba_f05_path)) {
+if (requireNamespace("readrba", quietly = TRUE)) {
   tryCatch({
-    suppressMessages(
-      rba_all <- read_excel(rba_f05_path, sheet = 1, col_names = FALSE)
-    )
-    # RBA workbooks: series IDs are in the row that contains strings starting with "F"
-    id_row <- which(apply(rba_all, 1, function(r)
-      any(str_detect(as.character(r), "^FILR"), na.rm = TRUE)))[1L]
-    if (is.na(id_row)) id_row <- 11L
-    series_ids <- as.character(unlist(rba_all[id_row, ]))
-    svr_col    <- which(series_ids == "FILRHLBVS")
-    if (length(svr_col) > 0L) {
-      data_start <- id_row + 1L
-      dates_raw  <- as.numeric(unlist(rba_all[data_start:nrow(rba_all), 1]))
-      rates_raw  <- suppressWarnings(as.numeric(unlist(rba_all[data_start:nrow(rba_all), svr_col[1]])))
-      mort_rate_m <- tibble(
-        date  = as.Date(dates_raw, origin = "1899-12-30"),
-        value = rates_raw
-      ) %>% filter(!is.na(date), !is.na(value), date >= as.Date("1970-01-01"))
-      mort_rate_q <- monthly_to_quarterly(mort_rate_m) %>% rename(mortgage_rate = value)
-      message(sprintf("  mortgage_rate (RBA f05, FILRHLBVS): %d obs, %s to %s",
+    message("  Fetching FILRHLBVS via readrba...")
+    rba_series <- readrba::read_rba_seriesid("FILRHLBVS")
+    if (!is.null(rba_series) && nrow(rba_series) > 0L) {
+      mort_rate_m <- rba_series %>%
+        select(date, value) %>%
+        filter(!is.na(value), date >= as.Date("1970-01-01")) %>%
+        arrange(date)
+      mort_rate_q <- monthly_to_quarterly(mort_rate_m) %>%
+        rename(mortgage_rate = value)
+      message(sprintf("  mortgage_rate (RBA FILRHLBVS): %d obs, %s to %s",
         nrow(mort_rate_q),
         format(min(mort_rate_q$date), "%Y-%m-%d"),
         format(max(mort_rate_q$date), "%Y-%m-%d")))
     } else {
-      message("  FILRHLBVS not found in f05hist.xlsx column headers — using fallback")
+      message("  FILRHLBVS returned no data from readrba")
     }
-  }, error = function(e) message("  RBA f05hist parse error: ", e$message))
+  }, error = function(e) message("  readrba fetch failed: ", e$message))
+} else {
+  message("  readrba not installed — install with install.packages('readrba')")
 }
 
 # Fallback: implicit rate from ABS mortgage interest / lagged debt stock
@@ -438,11 +429,42 @@ if (is.null(mort_rate_q) || nrow(mort_rate_q) == 0L) {
       mutate(mortgage_rate = 400 * mort_int_paid / lag(fin_loans, 1L)) %>%
       filter(!is.na(mortgage_rate)) %>%
       select(date, mortgage_rate)
-    message(sprintf("  mortgage_rate (implicit): %d obs", nrow(mort_rate_q)))
+    message(sprintf("  mortgage_rate (implicit fallback): %d obs", nrow(mort_rate_q)))
   } else {
     mort_rate_q <- tibble(date = as.Date(character()), mortgage_rate = numeric())
     message("  mortgage_rate: insufficient data for implicit rate")
   }
+}
+
+## 2.9b RBA Cash Rate (for CCI back-extension to 1980s)
+message("2.9b RBA Cash Rate")
+cash_rate_q <- NULL
+
+if (requireNamespace("readrba", quietly = TRUE)) {
+  # Try daily target cash rate (FIRMMCRTD), fall back to overnight rate (FOOIRATCR)
+  for (sid in c("FIRMMCRTD", "FOOIRATCR")) {
+    tryCatch({
+      message(sprintf("  Fetching %s via readrba...", sid))
+      rba_cash <- readrba::read_rba_seriesid(sid)
+      if (!is.null(rba_cash) && nrow(rba_cash) > 0L) {
+        cash_rate_q <- rba_cash %>%
+          select(date, value) %>%
+          filter(!is.na(value), date >= as.Date("1970-01-01")) %>%
+          arrange(date) %>%
+          mutate(qdate = lubridate::floor_date(date, "quarter")) %>%
+          group_by(date = qdate) %>%
+          summarise(cash_rate = mean(value, na.rm = TRUE), .groups = "drop") %>%
+          arrange(date)
+        message(sprintf("  cash_rate (%s): %d quarterly obs, %s to %s",
+          sid, nrow(cash_rate_q),
+          format(min(cash_rate_q$date), "%Y-%m-%d"),
+          format(max(cash_rate_q$date), "%Y-%m-%d")))
+        break
+      }
+    }, error = function(e) message(sprintf("  %s fetch failed: %s", sid, e$message)))
+  }
+} else {
+  message("  readrba not installed — CCI will use housing loan flow only (from 2002)")
 }
 
 ## 2.10  House price index
@@ -670,6 +692,43 @@ master <- master %>%
     ydi_ann_8qma = zoo::rollmean(ydi_ann_nom, 8L, fill = NA, align = "right"),
     cci_ratio    = log(housing_loan_flow / ydi_ann_8qma)
   )
+
+# Extend CCI backwards using mortgage-to-cash-rate spread
+# The spread captures credit tightness pre-2002 when housing flow data is absent.
+# Normalised in the 2002-2024 overlap so scale is consistent with cci_ratio.
+if (!is.null(cash_rate_q) && nrow(cash_rate_q) > 0L) {
+  master <- master %>%
+    left_join(cash_rate_q, by = "date") %>%
+    mutate(mort_spread = mortgage_rate - cash_rate)
+
+  overlap <- master %>% filter(!is.na(cci_ratio), !is.na(mort_spread))
+  n_pre   <- sum(is.na(master$cci_ratio) & !is.na(master$mort_spread))
+  message(sprintf("  CCI overlap period: %d obs; pre-2002 to backfill: %d obs",
+                  nrow(overlap), n_pre))
+
+  if (nrow(overlap) >= 20L && n_pre > 0L) {
+    s_mn <- mean(overlap$mort_spread, na.rm = TRUE)
+    s_sd <- sd(overlap$mort_spread,   na.rm = TRUE)
+    c_mn <- mean(overlap$cci_ratio,   na.rm = TRUE)
+    c_sd <- sd(overlap$cci_ratio,     na.rm = TRUE)
+
+    master <- master %>%
+      mutate(
+        cci_spread_norm = c_sd * ((mort_spread - s_mn) / s_sd) + c_mn,
+        cci_ratio = ifelse(!is.na(cci_ratio), cci_ratio, cci_spread_norm)
+      ) %>%
+      select(-cci_spread_norm, -mort_spread, -cash_rate)
+
+    message(sprintf("  CCI extended: %d total obs (housing-flow 2002+, spread proxy pre-2002)",
+                    sum(!is.na(master$cci_ratio))))
+  } else {
+    master <- master %>% select(-mort_spread, -cash_rate)
+    if (n_pre == 0L)
+      message("  CCI: no pre-2002 gap to fill — keeping housing-flow series only")
+    else
+      message("  CCI extension: insufficient overlap — keeping housing-flow only")
+  }
+}
 
 # FHB share
 master <- master %>%

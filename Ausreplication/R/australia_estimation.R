@@ -62,8 +62,11 @@ cat(rep("=", 70), "\n\n", sep = "")
 # ==============================================================================
 # SECTION A: Permanent Income Construction
 # ==============================================================================
-# Identical algorithm to Italy script: rolling out-of-sample AR(8) + trend
-# forecast with discounted sum.
+# Rolling out-of-sample AR(8) + trend forecast in log income LEVELS, with
+# discounted sum of deviations from current income.  Australia exhibits a
+# negative α₂ (permanent income relative to current income does not raise c/y),
+# likely reflecting precautionary saving and wealth-channel dominance rather
+# than forward-looking Euler-equation smoothing as in Italy.
 #
 # For Australia, unemp_rate starts 1978 → used as optional predictor.
 # GFC learning adjustment kept: Australia avoided recession but confidence
@@ -333,6 +336,18 @@ add_model_variables <- function(model_data) {
     mutate(
       d2_log_unemp = c(NA_real_, NA_real_, diff(diff(log(unemp_rate))))
     )
+
+  # ---- Lagged quarterly consumption growth (lag 4) ---------------------------
+  # Captures habit formation / AR4 persistence. Analogous to the Δ² ln c^P
+  # persistence term in Italy. Added to sr_vars of dynamic specs.
+  dat <- dat %>%
+    mutate(dlcons_lag4 = lag(dlcons, 4L))
+
+  # ---- Pre-Superannuation Guarantee dummy ------------------------------------
+  # SG became mandatory July 1992. super_y data before this is unreliable
+  # (voluntary contributions only). Flag the 15 pre-SG quarters.
+  dat <- dat %>%
+    mutate(d_pre_sg = as.integer(date < as.Date("1992-07-01")))
 
   dat
 }

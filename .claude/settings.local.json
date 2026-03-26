@@ -13,7 +13,10 @@
       "Bash(Rscript -e \"install.packages\\(''''sandwich'''', repos=''''https://cloud.r-project.org''''\\)\")",
       "Bash(Rscript -e \":*)",
       "Bash(Rscript --vanilla -e \":*)",
-      "Bash(grep -A 30 \"^Short-run ECM$\" outputs/model_summary.txt)"
+      "Bash(grep -A 30 \"^Short-run ECM$\" outputs/model_summary.txt)",
+      "Bash(powershell -Command \":*)",
+      "Bash(powershell -Command \"Rscript ''Ausreplication/R/run_estimation_from_rds.R''\")",
+      "Bash(powershell -Command \"Rscript ''Ausreplication/R/australia_consumption_model.R''\")"
     ]
   }
 }
