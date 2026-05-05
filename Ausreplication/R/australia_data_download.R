@@ -622,12 +622,16 @@ housing_loan_flow_q <- monthly_to_quarterly(housing_loan_flow_m,
                                              value_col = "housing_loan_flow") %>%
   rename(housing_loan_flow = value)
 
+# Anchor "First Home Buyers" with a leading "; " so it doesn't also match
+# "; Non-First Home Buyers ;" — pick_abs selects by frequency and would
+# otherwise resolve both regexes to the same (Non-FHB) series, leaving
+# fhb_share constant at 0.5.
 fhb_m <- pick_abs(credit_raw,
-  "First Home Buyers.*New loan commitments.*Number",
+  "; First Home Buyers ;.*New loan commitments.*Number",
   types = c("Seasonally Adjusted", "Seasonally adjusted", "Original")
 ) %>% rename(fhb_loans = value)
 non_fhb_m <- pick_abs(credit_raw,
-  "Non-First Home Buyers.*New loan commitments.*Number",
+  "; Non-First Home Buyers ;.*New loan commitments.*Number",
   types = c("Seasonally Adjusted", "Seasonally adjusted", "Original")
 ) %>% rename(non_fhb_loans = value)
 
@@ -776,32 +780,7 @@ message(sprintf("  cci_ratio (housing-flow): %d non-NA obs starting %s",
 message("  CCI specs (Spec 2 / Spec 5) effective sample now starts 2002Q3 ",
         "after lagging — pre-2002 spread backfill dropped (Option B default).")
 
-if (USE_INSTITUTIONAL_CCI) {
-  # Build the regime basis on the master spine, then alias master columns to
-  # the names expected by construct_institutional_cci(). The helper signature
-  # is fixed in model_helpers.R; we adapt the call site rather than touching it.
-  basis <- build_credit_regime_basis(master$date)
-  cci_input <- master %>%
-    transmute(
-      date,
-      housing_loan_flow,
-      house_price_index      = hpi,
-      debt_income_ratio      = debt_y,
-      first_home_buyer_share = fhb_share,
-      real_mortgage_rate     = real_rate
-    )
-  inst_cci <- construct_institutional_cci(cci_input, basis)
-  # Overlay where the housing-flow series is missing; preserves the post-2002
-  # series (which is anchored to actual ABS data) and only fills back-history.
-  master <- master %>%
-    left_join(inst_cci %>% select(date, cci_institutional_raw), by = "date") %>%
-    mutate(
-      cci_ratio = ifelse(is.na(cci_ratio), cci_institutional_raw, cci_ratio)
-    ) %>%
-    select(-cci_institutional_raw)
-  message("  Using institutional CCI (Muellbauer-style regime+indicator blend) ",
-          "to backfill pre-2002 cci_ratio.")
-}
+# Optional Option-A overlay is applied after fhb_share is built (further down).
 
 # FHB share. Available 2002Q3+ from ABS 560101. Now consumed by Spec 7 (cohort +
 # burden) in australia_estimation.R as a credit-access proxy for younger buyers.
@@ -817,6 +796,31 @@ master <- master %>%
   mutate(
     mortgage_burden = (fin_loans * mortgage_rate / 100) / ydi_ann_nom
   )
+
+# Option-A overlay: institutional CCI from regime indicators + standardised
+# credit-quality indicators. Backfills cci_ratio pre-2002 only (preserving
+# the housing-flow anchor for the post-2002 period).
+if (USE_INSTITUTIONAL_CCI) {
+  basis <- build_credit_regime_basis(master$date)
+  cci_input <- master %>%
+    transmute(
+      date,
+      housing_loan_flow,
+      house_price_index      = hpi,
+      debt_income_ratio      = debt_y,
+      first_home_buyer_share = fhb_share,
+      real_mortgage_rate     = real_rate
+    )
+  inst_cci <- construct_institutional_cci(cci_input, basis)
+  master <- master %>%
+    left_join(inst_cci %>% select(date, cci_institutional_raw), by = "date") %>%
+    mutate(
+      cci_ratio = ifelse(is.na(cci_ratio), cci_institutional_raw, cci_ratio)
+    ) %>%
+    select(-cci_institutional_raw)
+  message("  Using institutional CCI (Muellbauer-style regime+indicator blend) ",
+          "to backfill pre-2002 cci_ratio.")
+}
 
 # Print coverage
 message("\n--- Coverage summary ---")

@@ -525,8 +525,30 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     sample_end = sample_end
   )
 
+  # ------------------------------------------------------------------
+  # Spec 7: Cohort + mortgage-burden additions on top of Spec 6.
+  # Tests whether life-cycle (prime_age_share), credit-access (fhb_share),
+  # and cash-flow (mortgage_burden) terms restore lambda sign-stability
+  # across the full vs pre-COVID samples. mortgage_burden is limited to
+  # 1988Q3+ (balance-sheet), which is already the binding sample start
+  # for disaggregated specs.
+  # ------------------------------------------------------------------
+  spec7 <- fit_ecm_spec(
+    data       = model_data,
+    spec_name  = "Spec7_CohortBurden",
+    lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                   "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008",
+                   "prime_age_share", "fhb_share", "mortgage_burden",
+                   "ln_y_over_c"),
+    sr_vars    = c("d2_logcci_lag2", "dd4_income",
+                   "d2_log_unemp", "abs_income_resid"),
+    dummy_vars = base_dummies,
+    sample_end = sample_end
+  )
+
   list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
-       spec4 = spec4, spec5 = spec5, spec6 = spec6)
+       spec4 = spec4, spec5 = spec5, spec6 = spec6,
+       spec7 = spec7)
 }
 
 
