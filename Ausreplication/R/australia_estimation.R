@@ -46,6 +46,14 @@ output_dir <- normalizePath(
 )
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
+# Source model_helpers so Williams CCI functions are available regardless of
+# the entry point (australia_consumption_model.R, run_estimation_from_rds.R).
+.helpers_path <- file.path(dirname(.this_file), "model_helpers.R")
+if (file.exists(.helpers_path) &&
+    !exists("build_williams_cci_basis", inherits = TRUE)) {
+  source(.helpers_path, local = FALSE)
+}
+
 if (!exists("model_data")) {
   stop(
     "[australia_estimation.R] 'model_data' not found in environment.\n",
@@ -525,8 +533,122 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     sample_end = sample_end
   )
 
-  list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
-       spec4 = spec4, spec5 = spec5, spec6 = spec6)
+  # ------------------------------------------------------------------
+  # Spec 8: Williams CCI + interaction terms (eq 7 of Aust paper)
+  # Requires cci_williams to be present in model_data (built by the
+  # iterative Williams CCI fit step in MAIN). Returns NULL otherwise.
+  # ------------------------------------------------------------------
+  if ("cci_williams" %in% names(model_data) &&
+      any(!is.na(model_data$cci_williams))) {
+    md8 <- model_data %>%
+      mutate(
+        r_x_cci          = real_rate * cci_williams,
+        hp_x_1_minus_cci = ln_hp_over_y * (1 - 1.2 * cci_williams),
+        yp_x_cci         = ln_yp_over_y * cci_williams
+      )
+    spec8 <- fit_ecm_spec(
+      data       = md8,
+      spec_name  = "Spec8_CCI_Interactions",
+      lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y",
+                     "hp_x_1_minus_cci",
+                     "r_x_cci",
+                     "ln_yp_over_y",
+                     "yp_x_cci",
+                     "ln_y_over_c"),
+      sr_vars    = c("dd4_income", "d2_log_unemp", "abs_income_resid"),
+      dummy_vars = base_dummies,
+      sample_end = sample_end
+    )
+  } else {
+    spec8 <- NULL
+    message("Spec 8 skipped: cci_williams not present in model_data ",
+            "(USE_INSTITUTIONAL_CCI may be FALSE or Williams fit failed)")
+  }
+
+  specs <- list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
+                spec4 = spec4, spec5 = spec5, spec6 = spec6,
+                spec8 = spec8)
+  Filter(Negate(is.null), specs)
+}
+
+
+# ==============================================================================
+# SECTION F2: Williams (2010) reduced-form CCI fit
+# ==============================================================================
+#
+# Estimates the 4 spline coefficients of the Williams 4-knot SDMMA basis
+# inside the Spec-4 disaggregated long-run consumption equation. Sign priors
+# are enforced by general-to-specific drop-on-violation (Hendry/Krolzig 2005),
+# matching the Aust paper Section 3 (p.4-5). Surviving knots are then
+# combined into a normalised cci_williams series for use in Spec 8.
+# ==============================================================================
+
+fit_consumption_with_williams_cci <- function(model_data, lr_vars, sr_vars,
+                                               dummy_vars,
+                                               sample_end = as.Date("2024-10-01")) {
+  basis <- build_williams_cci_basis(model_data$date)
+  sign_priors <- attr(basis, "sign_priors")
+  cci_terms   <- colnames(basis)
+  for (j in seq_along(cci_terms)) {
+    model_data[[cci_terms[j]]] <- basis[, j]
+  }
+
+  full_lr <- c(lr_vars, cci_terms)
+  spec <- fit_ecm_spec(model_data, "Williams_CCI", full_lr, sr_vars,
+                       dummy_vars, sample_end = sample_end)
+
+  cf <- coef(spec$fit)
+  violators <- character(0)
+  for (j in seq_along(cci_terms)) {
+    nm <- cci_terms[j]
+    if (nm %in% names(cf) && !is.na(cf[nm]) && cf[nm] != 0) {
+      if (sign(cf[nm]) != sign_priors[j]) {
+        violators <- c(violators, nm)
+      }
+    }
+  }
+
+  if (length(violators) > 0L) {
+    message("Williams CCI: dropping sign-violators: ",
+            paste(violators, collapse = ", "))
+    full_lr <- setdiff(full_lr, violators)
+    if (length(intersect(cci_terms, full_lr)) > 0L) {
+      spec <- fit_ecm_spec(model_data, "Williams_CCI", full_lr, sr_vars,
+                           dummy_vars, sample_end = sample_end)
+    }
+  }
+
+  # A knot is "surviving" only if it (a) was not sign-violated and (b) was
+  # not dropped by lm() as collinear (NA coefficient — typically the 1979
+  # SDMMA, which is constant within the post-1980 estimation window).
+  cf2 <- coef(spec$fit)
+  candidate_surv <- intersect(cci_terms, full_lr)
+  aliased_surv <- candidate_surv[
+    !candidate_surv %in% names(cf2) | is.na(cf2[candidate_surv])
+  ]
+  surviving <- setdiff(candidate_surv, aliased_surv)
+
+  cci_fitted <- rep(NA_real_, nrow(model_data))
+  if (length(surviving) > 0L) {
+    X <- as.matrix(model_data[, surviving, drop = FALSE])
+    raw <- as.numeric(X %*% cf2[surviving])
+    mx <- max(raw, na.rm = TRUE)
+    if (is.finite(mx) && mx > 0) {
+      cci_fitted <- raw / mx
+    } else if (is.finite(mx) && mx < 0) {
+      cci_fitted <- raw / abs(mx)
+    } else {
+      cci_fitted <- raw
+    }
+  }
+  model_data$cci_williams <- cci_fitted
+
+  list(spec = spec, model_data = model_data,
+       surviving_knots = surviving,
+       dropped_knots = violators,
+       aliased_knots = aliased_surv,
+       sign_priors = sign_priors,
+       knot_names = cci_terms)
 }
 
 
@@ -836,6 +958,90 @@ n_pi <- sum(!is.na(model_data$ln_yp_over_y))
 message(sprintf("[construct_permanent_income] ln_yp_over_y: %d non-NA obs", n_pi))
 
 cat("[Step 4] Estimating specifications — two sample periods...\n")
+# Order-of-execution note (Williams CCI iteration):
+#   (i)   Specs 1-6 are independent of cci_williams; Spec 8 needs it.
+#   (ii)  Fit the Williams 4-knot SDMMA spline inside the Spec-4 disaggregated
+#         long-run on the FULL sample. Sign-prior reduction (Hendry/Krolzig
+#         2005) drops knots whose OLS coefficient violates its institutional
+#         sign prior; the surviving combination defines cci_williams (peak-
+#         normalised to 1 by convention).
+#   (iii) Attach cci_williams to model_data and re-run the spec loop, which
+#         now fits Spec 8 with (r_x_cci, hp_x_1_minus_cci, yp_x_cci).
+WILLIAMS_FALLBACK <- FALSE
+williams_fit_info <- NULL
+if (any(grepl("^sdmma_", names(model_data)))) {
+  cat("  [4a-i] Fitting Williams 4-knot CCI spline (Spec-4 long-run)\n")
+  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound")
+  williams_fit_info <- tryCatch(
+    fit_consumption_with_williams_cci(
+      model_data,
+      lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                     "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+      sr_vars    = character(0),
+      dummy_vars = base_dummies,
+      sample_end = as.Date("2024-10-01")
+    ),
+    error = function(e) {
+      message("[Williams CCI] fit failed: ", conditionMessage(e))
+      NULL
+    }
+  )
+
+  if (!is.null(williams_fit_info)) {
+    surv  <- williams_fit_info$surviving_knots
+    drop  <- williams_fit_info$dropped_knots
+    alias <- williams_fit_info$aliased_knots
+    cat(sprintf("  [4a-i] Surviving knots: %s\n",
+                if (length(surv) == 0L) "(none)" else paste(surv, collapse = ", ")))
+    cat(sprintf("  [4a-i] Dropped (sign-violators): %s\n",
+                if (length(drop) == 0L) "(none)" else paste(drop, collapse = ", ")))
+    cat(sprintf("  [4a-i] Aliased (collinear / constant in sample): %s\n",
+                if (length(alias) == 0L) "(none)" else paste(alias, collapse = ", ")))
+
+    knot_csv <- tibble::tibble(
+      knot         = williams_fit_info$knot_names,
+      sign_prior   = williams_fit_info$sign_priors,
+      survived     = williams_fit_info$knot_names %in% surv,
+      sign_violator = williams_fit_info$knot_names %in% drop,
+      aliased      = williams_fit_info$knot_names %in% alias,
+      ols_estimate = sapply(williams_fit_info$knot_names, function(nm) {
+        cf <- coef(williams_fit_info$spec$fit)
+        if (nm %in% names(cf)) unname(cf[nm]) else NA_real_
+      })
+    )
+    write.csv(knot_csv,
+              file.path(output_dir, "australia_williams_cci_knots.csv"),
+              row.names = FALSE)
+
+    if (length(surv) == 0L) {
+      WILLIAMS_FALLBACK <- TRUE
+      message("[Williams CCI] All knots dropped by sign-prior reduction; ",
+              "the reduced-form Williams CCI is not viable on the 1988Q4+ ",
+              "sample. Consider Item 9 (sample back-extension) as a ",
+              "prerequisite to recover the pre-1988 turning points.")
+    } else {
+      model_data$cci_williams <- williams_fit_info$model_data$cci_williams
+      # Also expose the basis columns at the model_data level (already there
+      # via master, but be explicit).
+      for (nm in williams_fit_info$knot_names) {
+        if (!nm %in% names(model_data)) {
+          model_data[[nm]] <- williams_fit_info$model_data[[nm]]
+        }
+      }
+      cat(sprintf("  [4a-i] cci_williams: %d non-NA obs (%s -> %s)\n",
+                  sum(!is.na(model_data$cci_williams)),
+                  as.character(min(model_data$date[!is.na(model_data$cci_williams)])),
+                  as.character(max(model_data$date[!is.na(model_data$cci_williams)]))))
+    }
+  } else {
+    WILLIAMS_FALLBACK <- TRUE
+  }
+} else {
+  message("[Williams CCI] No SDMMA basis columns on model_data — skipping ",
+          "(USE_INSTITUTIONAL_CCI may be FALSE)")
+  WILLIAMS_FALLBACK <- TRUE
+}
+
 cat("  [4a] Full sample (1988Q4–2024Q4)\n")
 specs_full     <- run_all_specifications(model_data, sample_end = as.Date("2024-10-01"))
 cat("  [4b] Pre-COVID sample (1988Q4–2019Q4)\n")
@@ -844,6 +1050,49 @@ specs_precovid <- run_all_specifications(model_data, sample_end = as.Date("2019-
 cat("[Step 5] Building results tables...\n")
 results_full     <- build_results_table(specs_full,     output_dir, period_label = "full")
 results_precovid <- build_results_table(specs_precovid, output_dir, period_label = "precovid")
+
+# ---- Spec 8 sign-prior verdict ---------------------------------------------
+# Compares the long-run interaction coefficients to their institutional sign
+# priors (Aust paper eq 7); reports PASS/FAIL and significance (p-value).
+if (!is.null(specs_full$spec8)) {
+  sp8 <- specs_full$spec8
+  cf  <- coef(sp8$fit)
+  se  <- sqrt(diag(sp8$nw_vcov))
+  pv  <- 2 * pt(-abs(cf / se[match(names(cf), names(se))]),
+                df = nobs(sp8$fit) - sum(!is.na(cf)))
+  prior_tbl <- tibble::tribble(
+    ~term,                ~prior,           ~prior_sign,
+    "r_x_cci",            "negative",        -1,
+    "hp_x_1_minus_cci",   "negative",        -1,
+    "yp_x_cci",           "positive",         1,
+    "ln_yp_over_y",       "small positive",   1
+  )
+  prior_tbl$ols_estimate <- vapply(prior_tbl$term,
+    function(nm) if (nm %in% names(cf)) unname(cf[nm]) else NA_real_,
+    numeric(1))
+  prior_tbl$p_value <- vapply(prior_tbl$term,
+    function(nm) if (nm %in% names(pv)) unname(pv[nm]) else NA_real_,
+    numeric(1))
+  prior_tbl$verdict <- ifelse(
+    is.na(prior_tbl$ols_estimate), "NA",
+    ifelse(sign(prior_tbl$ols_estimate) == prior_tbl$prior_sign, "PASS", "FAIL")
+  )
+
+  cat("\n--- Spec 8 sign-prior verdicts (full sample) ---\n")
+  cat(sprintf("  %-22s %-15s %12s %10s  %s\n",
+              "term", "prior", "ols_estimate", "p_value", "verdict"))
+  for (i in seq_len(nrow(prior_tbl))) {
+    r <- prior_tbl[i, ]
+    cat(sprintf("  %-22s %-15s %12.6f %10.3f  %s\n",
+                r$term, r$prior,
+                ifelse(is.na(r$ols_estimate), 0, r$ols_estimate),
+                ifelse(is.na(r$p_value), NA, r$p_value),
+                r$verdict))
+  }
+  write.csv(prior_tbl,
+            file.path(output_dir, "australia_spec8_sign_prior_verdicts.csv"),
+            row.names = FALSE)
+}
 
 # Combined file with both periods
 combined_coef <- bind_rows(results_full$coef_combined, results_precovid$coef_combined)
