@@ -9,11 +9,14 @@
 # ASSUMES: model_data tibble already exists in the environment (sourced by
 # australia_consumption_model.R after Part 1).
 #
-# Model:
-#   Δ ln c_t = λ[α_0 + α_c·CCI_t + α_1·r_t + Σγ_i·(A_i,t-1/y_t)
-#              + φ·ln(y^p_t/y_t) + ln(y_t/c_{t-1})] + short-run + ε_t
+# Model (canonical Engle-Granger negative-restoration convention):
+#   Δ ln c_t = λ·[ln(c_{t-1}/y_t) - α_0 - α_c·CCI_t - α_1·r_t
+#                 - Σγ_i·(A_i,t-1/y_t) - φ·ln(y^p_t/y_t)] + short-run + ε_t
+# where ecm_lag = ln(c_{t-1}) - ln(y_t) and λ < 0 for a stable, restoring ECM.
 #
-# Structural params = estimated OLS coef / λ
+# Structural params = -estimated OLS coef / λ (so structural sign = OLS sign,
+# because both numerator and denominator flip relative to the old positive
+# convention).
 # ==============================================================================
 
 suppressPackageStartupMessages({
@@ -430,7 +433,7 @@ fit_ecm_spec <- function(data, spec_name, lr_vars, sr_vars = character(0),
 # ==============================================================================
 #
 # Response:  dlcons = Δ ln(real per capita consumption)
-# ECM term:  ln_y_over_c = ln(income/lagged consumption)
+# ECM term:  ecm_lag = ln(c_{t-1}) - ln(y_t)  (negative-restoration convention)
 # Dummies:   GST 2000Q3, GFC 2008Q3, COVID 2020Q2, COVID rebound 2020Q3
 #
 # Wealth variables (Australian balance sheet decomposition):
@@ -452,7 +455,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec1 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec1_LogNetWorth",
-    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -464,7 +467,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec2 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec2_LogNetWorth_CCI",
-    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = "d2_logcci_lag2",
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -476,7 +479,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec3 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec3_LevelNetWorth",
-    lr_vars    = c("networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -490,7 +493,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     data       = model_data,
     spec_name  = "Spec4_Disagg_NoCCI",
     lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
-                   "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+                   "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -503,7 +506,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     data       = model_data,
     spec_name  = "Spec5_FullDisagg",
     lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
-                   "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+                   "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = c("d2_logcci_lag2", "dd4_income",
                    "d2_log_unemp", "abs_income_resid"),
     dummy_vars = base_dummies,
@@ -518,7 +521,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     spec_name  = "Spec6_Preferred",
     lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
                    "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008",
-                   "ln_y_over_c"),
+                   "ecm_lag"),
     sr_vars    = c("d2_logcci_lag2", "dd4_income",
                    "d2_log_unemp", "abs_income_resid"),
     dummy_vars = base_dummies,
@@ -533,6 +536,43 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
 # ==============================================================================
 # SECTION G: Results Table
 # ==============================================================================
+
+# A-priori expected signs for each long-run regressor (canonical negative-λ
+# convention). NA = no prior; "+/-" = ambiguous.
+EXPECTED_SIGNS <- c(
+  ha_y          = "+",
+  eq_y          = "+",
+  super_y       = "+",
+  nla_y         = "+",
+  ilfa_y        = "+",
+  networth_y    = "+",
+  ln_networth_y = "+",
+  ln_hp_over_y  = "+/-",
+  real_rate     = "-",
+  ln_yp_over_y  = "+/-",
+  ln_yp_over_y_post2008 = "+/-",
+  ecm_lag       = "-"
+)
+
+expected_sign_lookup <- function(terms) {
+  out <- unname(EXPECTED_SIGNS[terms])
+  out[is.na(out)] <- NA_character_
+  out
+}
+
+format_coef_label <- function(estimate, pval, sign_ok) {
+  vapply(seq_along(estimate), function(i) {
+    if (is.na(estimate[i])) return(NA_character_)
+    star <- if (is.na(pval[i])) ""
+            else if (pval[i] < 0.01) "***"
+            else if (pval[i] < 0.05) "**"
+            else if (pval[i] < 0.10) "*"
+            else ""
+    sign_str <- if (estimate[i] >= 0) "+" else "-"
+    base <- sprintf("%s%.4f%s", sign_str, abs(estimate[i]), star)
+    if (!is.na(sign_ok[i]) && !sign_ok[i]) paste0(base, " (wrong sign)") else base
+  }, character(1))
+}
 
 build_results_table <- function(specs, output_dir = "outputs", period_label = "full") {
 
@@ -551,7 +591,7 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
     tstat  <- cf / se
     pval   <- 2 * pt(-abs(tstat), df = nobs(fit) - sum(!is.na(cf)))
 
-    lambda <- cf["ln_y_over_c"]
+    lambda <- cf["ecm_lag"]
     if (is.na(lambda) || abs(lambda) < 1e-10) {
       warning(sprintf("[build_results_table] λ near zero for %s", sp_name))
       lambda <- NA_real_
@@ -575,12 +615,26 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
       t_stat           = unname(tstat),
       p_value          = unname(pval),
       lambda           = lambda,
-      structural_param = unname(cf) / lambda
+      # Negative convention: long-run params = -OLS / λ. Sign of structural
+      # parameters is the same as the OLD positive-convention pipeline because
+      # both numerator (regressor sign-flip) and denominator (λ sign-flip)
+      # cancel for the ECM term, while non-ECM regressors keep their OLS coef
+      # but pick up a leading minus from the new λ < 0 convention.
+      structural_param = -unname(cf) / lambda
     ) %>%
       mutate(
         in_long_run  = term %in% sp$lr_vars,
         in_short_run = term %in% sp$sr_vars,
-        is_dummy     = term %in% sp$dummy_vars
+        is_dummy     = term %in% sp$dummy_vars,
+        expected_sign = expected_sign_lookup(term),
+        sign_ok      = case_when(
+          expected_sign == "+" ~ sign(ols_estimate) > 0,
+          expected_sign == "-" ~ sign(ols_estimate) < 0,
+          TRUE ~ NA
+        ),
+        signif_5pct  = !is.na(p_value) & p_value < 0.05,
+        signif_1pct  = !is.na(p_value) & p_value < 0.01,
+        coef_label   = format_coef_label(ols_estimate, p_value, sign_ok)
       )
 
     all_rows[[sp_name]] <- list(coef_tbl = coef_tbl, diag = diag_row)
@@ -684,7 +738,7 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
 
   key_terms <- c("ha_y", "nla_y", "ilfa_y", "eq_y", "super_y",
                  "bonds_y", "ln_hp_over_y", "real_rate", "ln_yp_over_y",
-                 "ln_y_over_c")
+                 "ecm_lag")
 
   # Identify specification column — if absent assign a default
   spec_col <- intersect(c("specification", "spec", "model"), names(italy_coef))[1L]
@@ -699,7 +753,7 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
     select(country, specification, term, structural_param)
 
   aus_tbl <- aus_coef %>%
-    filter(term %in% key_terms, in_long_run | term == "ln_y_over_c",
+    filter(term %in% key_terms, in_long_run | term == "ecm_lag",
            period == "full") %>%
     mutate(country = "Australia") %>%
     select(country, specification, term, structural_param)
@@ -731,8 +785,8 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
 
   # ------------------------------------------------------------------
   # Speed-of-adjustment (lambda) comparison table
-  # Italy: ecm_lag coefficient from ecm_coefficients.csv (negative = restoring)
-  # Australia: coefficient on ln_y_over_c (positive convention; abs value comparable)
+  # Both Italy and Australia now use the canonical negative convention:
+  # λ < 0 = restoring force.
   # ------------------------------------------------------------------
   italy_ecm_path <- file.path(italy_dir, "ecm_coefficients.csv")
   italy_lambda <- tryCatch({
@@ -742,19 +796,31 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
   }, error = function(e) NA_real_)
 
   aus_lambda <- aus_coef %>%
-    filter(term == "ln_y_over_c") %>%
+    filter(term == "ecm_lag") %>%
     select(specification, period, lambda) %>%
     distinct()
 
   cat("\n--- Speed of adjustment (lambda) comparison ---\n")
-  cat(sprintf("  Italy (ecm_lag, full sample):  %8.4f  [abs = %.4f per quarter]\n",
-              italy_lambda, abs(italy_lambda)))
-  cat(sprintf("  %-8s  %-35s  %8s  %8s\n", "Period", "Australia specification", "lambda", "|lambda|"))
-  cat(sprintf("  %s\n", strrep("-", 65)))
+  cat(sprintf("  Italy (ecm_lag, full sample):  %8.4f\n", italy_lambda))
+  cat(sprintf("  %-8s  %-35s  %8s\n", "Period", "Australia specification", "lambda"))
+  cat(sprintf("  %s\n", strrep("-", 56)))
   for (i in seq_len(nrow(aus_lambda))) {
-    cat(sprintf("  %-8s  %-35s  %8.4f  %8.4f\n",
+    cat(sprintf("  %-8s  %-35s  %8.4f\n",
       aus_lambda$period[i], aus_lambda$specification[i],
-      aus_lambda$lambda[i],  abs(aus_lambda$lambda[i])))
+      aus_lambda$lambda[i]))
+  }
+
+  # Both countries should now use the canonical negative convention.
+  preferred_aus_lambda <- aus_lambda %>%
+    filter(grepl("Preferred|Spec6", specification), period == "full") %>%
+    pull(lambda)
+  if (length(preferred_aus_lambda) > 0L && !is.na(italy_lambda) &&
+      !is.na(preferred_aus_lambda[1L])) {
+    if (sign(italy_lambda) != sign(preferred_aus_lambda[1L])) {
+      warning(sprintf(
+        "[build_comparison_table] Italy λ (%.4f) and Australia preferred λ (%.4f) have different signs after convention alignment — both should be negative.",
+        italy_lambda, preferred_aus_lambda[1L]))
+    }
   }
 
   lambda_path <- file.path(output_dir, "italy_australia_lambda.csv")
@@ -826,8 +892,8 @@ model_data <- construct_permanent_income(model_data)
 # Add variables that depend on permanent income
 model_data <- model_data %>%
   mutate(
-    # Ensure ln_y_over_c uses lagged consumption
-    ln_y_over_c = lincome - lag(lcons, 1L),
+    # Re-assert canonical negative-restoration ECM term post-PI construction.
+    ecm_lag = lag(lcons, 1L) - lincome,
     # ln(HP/y): log real house price relative to real income per capita
     ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100))
   )
