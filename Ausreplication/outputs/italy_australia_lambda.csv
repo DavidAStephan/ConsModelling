@@ -1,16 +1,18 @@
-"country","specification","period","lambda"
-"Italy","Italy_Preferred (full)","full",-0.0099013492279689
-"Australia","Spec1_LogNetWorth","full",0.0393125109107874
-"Australia","Spec2_LogNetWorth_CCI","full",0.0389248735613458
-"Australia","Spec3_LevelNetWorth","full",0.04110212828619
-"Australia","Spec4_Disagg_NoCCI","full",0.125003654850086
-"Australia","Spec5_FullDisagg","full",0.141240659950248
-"Australia","Spec6_Preferred","full",0.139898254449268
-"Australia","Spec8_CCI_Interactions","full",0.1511665994645
-"Australia","Spec1_LogNetWorth","precovid",-0.0592375546139851
-"Australia","Spec2_LogNetWorth_CCI","precovid",-0.0593691463141327
-"Australia","Spec3_LevelNetWorth","precovid",-0.0587678984172875
-"Australia","Spec4_Disagg_NoCCI","precovid",0.055963723845239
-"Australia","Spec5_FullDisagg","precovid",0.0523476194436804
-"Australia","Spec6_Preferred","precovid",0.0403487488850463
-"Australia","Spec8_CCI_Interactions","precovid",0.0629905016905699
+"country","specification","period","lambda","lambda_source","note"
+"Italy","Italy_Preferred","full",0.519270269214832,"/Users/davidstephan/Documents/consmodelling/Ausreplication/outputs/italy_table1_results.csv","OLS coefficient on ln(y/c) in italy_table1_results.csv (preferred spec, full sample)"
+"Australia","Spec1_LogNetWorth","full",-0.0797173852739585,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec2_LogNetWorth_CCI","full",-0.0873217444135958,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec3_LevelNetWorth","full",-0.074813102710304,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec4_Disagg_NoCCI","full",-0.067593061766848,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec5_FullDisagg","full",-0.0832513001558934,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec6_Preferred","full",-0.0461836352335867,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec7_CohortBurden","full",-0.2263790060389,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec8_CCI_Interactions","full",-0.0938035641114536,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec1_LogNetWorth","precovid",-0.0372574209129744,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec2_LogNetWorth_CCI","precovid",-0.0662226748938462,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec3_LevelNetWorth","precovid",-0.0236712504611697,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec4_Disagg_NoCCI","precovid",-0.0364306747420556,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec5_FullDisagg","precovid",-0.144517134722061,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec6_Preferred","precovid",-0.106851404261741,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec7_CohortBurden","precovid",-0.215692480767814,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
+"Australia","Spec8_CCI_Interactions","precovid",-0.0605188460191933,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"

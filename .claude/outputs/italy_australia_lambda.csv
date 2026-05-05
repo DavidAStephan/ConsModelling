@@ -1,0 +1,14 @@
+"country","specification","period","lambda"
+"Italy","Italy_Preferred (full)","full",-0.0099013492279689
+"Australia","Spec1_LogNetWorth","full",-0.0393125109107874
+"Australia","Spec2_LogNetWorth_CCI","full",-0.0389248735613458
+"Australia","Spec3_LevelNetWorth","full",-0.04110212828619
+"Australia","Spec4_Disagg_NoCCI","full",-0.125003654850086
+"Australia","Spec5_FullDisagg","full",-0.141240659950248
+"Australia","Spec6_Preferred","full",-0.139898254449268
+"Australia","Spec1_LogNetWorth","precovid",0.0592375546139851
+"Australia","Spec2_LogNetWorth_CCI","precovid",0.0593691463141327
+"Australia","Spec3_LevelNetWorth","precovid",0.0587678984172875
+"Australia","Spec4_Disagg_NoCCI","precovid",-0.055963723845239
+"Australia","Spec5_FullDisagg","precovid",-0.0523476194436804
+"Australia","Spec6_Preferred","precovid",-0.0403487488850463

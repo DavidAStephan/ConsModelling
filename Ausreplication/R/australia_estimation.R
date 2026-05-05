@@ -836,6 +836,22 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
     sp <- specs[[sp_name]]
     lr_no_ecm <- setdiff(sp$lr_vars, "ecm_lag")
     req <- c("lcons", lr_no_ecm)
+    # Some specs (e.g. Spec 8) build interaction columns inside their own
+    # data scope rather than on model_data; skip cointegration if any
+    # required regressor is missing from model_data.
+    missing <- setdiff(req, names(model_data))
+    if (length(missing) > 0L) {
+      message(sprintf("[run_cointegration_battery] %s: skipping (missing %s)",
+                      sp$spec_name, paste(missing, collapse = ", ")))
+      rows[[sp_name]] <- tibble::tibble(
+        specification = sp$spec_name,
+        period = NA_character_, n_obs = NA_integer_,
+        coint_adf_stat = NA_real_, coint_adf_5pct_cv = NA_real_,
+        coint_adf_pass = NA, po_stat = NA_real_, po_pass = NA,
+        johansen_r1_pass = NA
+      )
+      next
+    }
 
     coint_data <- model_data %>%
       filter(date <= sample_end) %>%
@@ -2152,7 +2168,12 @@ plot_actual_vs_fitted <- function(spec, output_dir = "outputs") {
 # fall back to the last spec in the list otherwise.
 # ==============================================================================
 
-select_preferred_spec <- function(specs) {
+pick_preferred_spec_object <- function(specs, preferred_name = NULL) {
+  if (!is.null(preferred_name) && length(preferred_name) > 0L) {
+    matches <- vapply(specs, function(sp) identical(sp$spec_name, preferred_name),
+                      logical(1L))
+    if (any(matches)) return(specs[[which(matches)[1L]]])
+  }
   pref_keys <- intersect(c("spec6", "spec7"), names(specs))
   if (length(pref_keys) > 0L) return(specs[[tail(pref_keys, 1L)]])
   specs[[length(specs)]]
@@ -2582,16 +2603,18 @@ plot_longrun_decomposition <- function(preferred_spec, output_dir) {
   lr_vars   <- preferred_spec$lr_vars
   cf        <- coef(fit)
 
-  if (!"ln_y_over_c" %in% names(cf))
-    stop("[plot_longrun_decomposition] no ln_y_over_c term in preferred spec")
+  ecm_term <- if ("ecm_lag" %in% names(cf)) "ecm_lag" else
+              if ("ln_y_over_c" %in% names(cf)) "ln_y_over_c" else NA_character_
+  if (is.na(ecm_term))
+    stop("[plot_longrun_decomposition] no ECM term (ecm_lag or ln_y_over_c) in preferred spec")
 
-  lambda <- cf["ln_y_over_c"]
+  lambda <- cf[ecm_term]
   if (is.na(lambda) || abs(lambda) < 1e-10)
     stop("[plot_longrun_decomposition] lambda near zero — cannot rescale")
 
   # Long-run regressors EXCLUDING the ECM term (ln_y_over_c itself); contributions
   # are de-meaned and scaled by structural coef = OLS / lambda.
-  decomp_vars <- setdiff(lr_vars, "ln_y_over_c")
+  decomp_vars <- setdiff(lr_vars, c("ln_y_over_c", "ecm_lag"))
   decomp_vars <- intersect(decomp_vars, names(est_data))
   decomp_vars <- decomp_vars[!vapply(est_data[, decomp_vars, drop = FALSE],
                                      function(x) all(is.na(x)), logical(1))]
@@ -3011,7 +3034,11 @@ plot_actual_vs_fitted(preferred_spec, output_dir = output_dir)
 plot_actual_vs_fitted(specs_full$spec1, output_dir = output_dir)
 
 cat("[Step 8] Selecting preferred spec for downstream robustness work...\n")
-preferred_spec <- select_preferred_spec(specs_full)
+preferred_name_val <- if (exists("selection") && "is_preferred" %in% names(selection)) {
+  sel_row <- selection[isTRUE(selection$is_preferred) | selection$is_preferred, ]
+  if (nrow(sel_row) > 0L) sel_row$specification[1L] else NULL
+} else NULL
+preferred_spec <- pick_preferred_spec_object(specs_full, preferred_name_val)
 cat(sprintf("  Preferred spec: %s\n", preferred_spec$spec_name))
 
 cat("[Step 9] Italy-style robustness suite (4 blocks)...\n")
