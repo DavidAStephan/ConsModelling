@@ -356,6 +356,25 @@ message(sprintf("  unemp_rate: %d obs, %s to %s",
   format(min(unemp_q$date), "%Y-%m-%d"),
   format(max(unemp_q$date), "%Y-%m-%d")))
 
+# Labour force level (persons, thousands) — used by Italy-style PI as
+# log(labour_force / population) predictor. Same workbook (6202001) as
+# the unemployment rate.
+lf_m <- pick_abs(labour_raw,
+  "^Labour force.*Persons",
+  types = c("Seasonally Adjusted", "Seasonally adjusted", "Trend")
+) %>% rename(labour_force = value)
+if (nrow(lf_m) == 0L) {
+  message("  labour_force: not found in 6202001 — lf_share will be NA")
+  lf_q <- tibble(date = as.Date(character()), labour_force = NA_real_)
+} else {
+  lf_q <- monthly_to_quarterly(lf_m, value_col = "labour_force") %>%
+    rename(labour_force = value)
+  message(sprintf("  labour_force: %d obs, %s to %s",
+    nrow(lf_q),
+    format(min(lf_q$date), "%Y-%m-%d"),
+    format(max(lf_q$date), "%Y-%m-%d")))
+}
+
 ## 2.7  CPI / consumption deflator
 message("2.7 Consumption deflator (from 5206008 nominal / real)")
 deflator_q <- cons_real_q %>%
@@ -655,6 +674,7 @@ master <- master %>%
   left_join(deflator_q,        by = "date") %>%   # index, 2023=100
   left_join(gdi_q,             by = "date") %>%   # $m, current, quarterly
   left_join(unemp_q,           by = "date") %>%   # %
+  left_join(lf_q,              by = "date") %>%   # persons (thousands)
   left_join(pop_q %>% select(date, pop_millions), by = "date") %>%
   left_join(prime_age_share_q,                    by = "date") %>%   # prime working-age share (25-54)
   left_join(fin_deposits_q,    by = "date") %>%   # $m
@@ -761,6 +781,20 @@ master <- master %>%
     real_rate    = mortgage_rate - hicp_4q_ann
   )
 
+# Labour-force participation share. Both labour_force and the pop_millions
+# column are reported here in thousands of persons (the column name predates
+# the unit clarification), so lf_share is the dimensionless ratio. Used by
+# the Italy-style PI predictor when that path is enabled in estimation.
+master <- master %>%
+  mutate(lf_share = labour_force / pop_millions)
+lf_obs <- master$lf_share[!is.na(master$lf_share)]
+if (length(lf_obs) > 0L) {
+  message(sprintf(
+    "  lf_share: %d obs, range %.3f – %.3f (mean %.3f)",
+    length(lf_obs), min(lf_obs), max(lf_obs), mean(lf_obs)
+  ))
+}
+
 # ------------------------------------------------------------------------------
 # Credit Conditions Index (CCI)
 # ------------------------------------------------------------------------------
@@ -858,7 +892,8 @@ message("\n--- Coverage summary ---")
 for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",
             "real_rate", "hpi", "ha_y", "eq_y", "super_y",
             "nla_y", "nla_y_unrestricted", "debt_y", "networth_y",
-            "cci_ratio", "fhb_share", "prime_age_share", "mortgage_burden")) {
+            "cci_ratio", "fhb_share", "prime_age_share", "mortgage_burden",
+            "labour_force", "lf_share")) {
   report_series(master[[v]], v, master$date)
 }
 

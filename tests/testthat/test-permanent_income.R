@@ -42,20 +42,39 @@ test_that("compute_log_yp_over_y returns numeric(0) on empty expected_log_income
   expect_identical(out, numeric(0))
 })
 
-test_that("compute_log_yp_over_y SHOULD apply discount weights (EXPECTED behaviour)", {
-  skip("BUG: compute_log_yp_over_y ignores discount/horizon arguments and returns a raw difference; see model_helpers.R lines 840-849.")
-  # Aspirational specification: a discounted average of expected_log_income
-  # minus log_income. Wired up here so that when the bug is fixed, removing
-  # the skip() above will exercise this test.
+test_that("compute_log_yp_over_y applies discount weights to a matrix of horizon-step forecasts", {
   discount <- 0.05
   horizon  <- 4L
-  weights  <- (1 - discount) ^ (seq_len(horizon) - 1L)
-  log_income          <- c(1.0, 1.1)
-  expected_log_income <- c(1.5, 1.6)
-  expected <- (expected_log_income * sum(weights) / sum(weights)) - log_income
-  out <- compute_log_yp_over_y(log_income, expected_log_income,
+  log_income <- c(1.0, 1.1)
+  # 2 observations x 4-step-ahead forecast paths
+  forecast_mat <- rbind(
+    c(1.5, 1.6, 1.7, 1.8),
+    c(1.6, 1.7, 1.8, 1.9)
+  )
+  w <- (1 - discount) ^ (seq_len(horizon) - 1L)
+  w <- w / sum(w)
+  expected <- as.numeric(forecast_mat %*% w) - log_income
+  out <- compute_log_yp_over_y(log_income, forecast_mat,
                                discount = discount, horizon = horizon)
   expect_equal(out, expected)
+})
+
+test_that("compute_log_yp_over_y matrix branch honours an explicit weights vector", {
+  log_income <- c(2.0)
+  forecast_mat <- matrix(c(3.0, 3.5, 4.0), nrow = 1L)
+  w <- c(1, 1, 2)              # unnormalised; helper normalises internally
+  expected <- sum(forecast_mat[1L, ] * (w / sum(w))) - log_income
+  out <- compute_log_yp_over_y(log_income, forecast_mat, weights = w)
+  expect_equal(out, expected)
+})
+
+test_that("compute_log_yp_over_y matrix branch supports a custom denom", {
+  log_income <- c(1.0, 1.0)
+  denom_alt  <- c(0.5, 0.6)
+  forecast_mat <- rbind(c(2.0, 2.0), c(2.0, 2.0))
+  out <- compute_log_yp_over_y(log_income, forecast_mat,
+                               horizon = 2L, denom = denom_alt)
+  expect_equal(out, c(2.0 - 0.5, 2.0 - 0.6))
 })
 
 # ---- adaptive_permanent_income_log ------------------------------------------

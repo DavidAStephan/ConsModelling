@@ -871,23 +871,44 @@ compute_expected_log_income_path <- function(data, fit, horizon = 40L, income_co
 }
 
 
-compute_log_yp_over_y <- function(log_income, expected_log_income, discount = 0.05, horizon = 40L) {
-  weights <- (1 - discount) ^ (seq_len(horizon) - 1L)
-  denom <- sum(weights)
-
+compute_log_yp_over_y <- function(log_income, expected_log_income,
+                                   discount = 0.05, horizon = 40L,
+                                   weights = NULL, denom = NULL) {
   if (length(expected_log_income) == 0L) {
     return(numeric(0))
   }
 
-  # BUG: this function ignores its `discount`, `horizon`, `weights`, and
-  # `denom` arguments and simply returns the raw level gap. The intended
-  # behaviour is a discounted weighted sum of expected future deviations from
-  # current income (per the Australia paper). Flagged for human review; do NOT
-  # silently fix — downstream code in australia_estimation.R uses its own
-  # construct_permanent_income() which DOES apply discounting, so the only
-  # callers of this helper would be future Italy-style code. See model summary
-  # "Known issues" section.
-  expected_log_income - log_income
+  if (is.null(denom)) denom <- log_income
+
+  is_matrixlike <- is.matrix(expected_log_income) ||
+                   is.data.frame(expected_log_income)
+
+  if (is_matrixlike) {
+    M <- as.matrix(expected_log_income)
+    if (is.null(weights)) {
+      h <- if (!is.null(horizon)) as.integer(horizon) else ncol(M)
+      if (ncol(M) != h) {
+        stop(sprintf(
+          "[compute_log_yp_over_y] expected_log_income has %d columns but horizon = %d.",
+          ncol(M), h
+        ))
+      }
+      w <- (1 - discount) ^ (seq_len(h) - 1L)
+      w <- w / sum(w)
+    } else {
+      w <- weights
+      if (length(w) != ncol(M)) {
+        stop(sprintf(
+          "[compute_log_yp_over_y] weights length (%d) != expected_log_income ncol (%d).",
+          length(w), ncol(M)
+        ))
+      }
+      if (abs(sum(w) - 1) > 1e-8) w <- w / sum(w)
+    }
+    return(as.numeric(M %*% w) - denom)
+  }
+
+  expected_log_income - denom
 }
 
 
