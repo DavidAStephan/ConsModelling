@@ -292,16 +292,44 @@ model_diagnostics <- function(fit, data, break_date = "2008-07-01") {
 add_model_variables <- function(model_data) {
   dat <- model_data %>% arrange(date)
 
+  # Logistic ogive transition: smooth 0->1 transition centred at t0 (in
+  # quarter units after rescaling). half_width = 2.5 gives ~5-quarter ramp.
+  # Defined locally so this function works on any model_data input,
+  # including saved RDS where the function isn't part of the dataset.
+  ogive <- function(t, t0, half_width = 2.5) {
+    1 / (1 + exp(-(t - t0) / half_width))
+  }
+
+  # Backfill NLA cross-equation pieces if loaded from a pre-Task-1 RDS.
+  if (!"nla_y_unrestricted" %in% names(dat) &&
+      all(c("fin_deposits", "ydi_ann_nom") %in% names(dat))) {
+    dat <- dat %>% mutate(nla_y_unrestricted = fin_deposits / ydi_ann_nom)
+  }
+  if (!"debt_y" %in% names(dat) &&
+      all(c("fin_loans", "ydi_ann_nom") %in% names(dat))) {
+    dat <- dat %>% mutate(debt_y = fin_loans / ydi_ann_nom)
+  }
+
   # ---- Impulse dummies -------------------------------------------------------
   # GST: large one-off boost to nominal consumption July 2000 (Q3)
   # GFC: sharp drop Q3 2008; Q4 2008/Q1 2009 also affected
   # COVID: lockdown Q2 2020 (massive drop) + Q3 2020 rebound
+  # The five Australian-narrative dummies (negative gearing, 1991 recession,
+  # APRA macroprudential rounds, JobKeeper) are reconstructed here so they are
+  # present even when model_data was loaded from a pre-Task-3 RDS snapshot.
   dat <- dat %>%
     mutate(
       d2000_gst     = as.integer(date == as.Date("2000-07-01")),
       d2008_gfc     = as.integer(date == as.Date("2008-07-01")),
       d2020_covid   = as.integer(date == as.Date("2020-04-01")),
-      d2020_rebound = as.integer(date == as.Date("2020-07-01"))
+      d2020_rebound = as.integer(date == as.Date("2020-07-01")),
+      d_neg_gearing_8587 = as.integer(date >= as.Date("1985-07-01") &
+                                       date <= as.Date("1987-07-01")),
+      d_recession_1991   = as.integer(date == as.Date("1991-04-01")),
+      d_apra_2014 = ogive(as.numeric(date - as.Date("2014-10-01")) / 91.31, 0),
+      d_apra_2017 = ogive(as.numeric(date - as.Date("2017-04-01")) / 91.31, 0),
+      d_jobkeeper_2020   = as.integer(date >= as.Date("2020-04-01") &
+                                       date <= as.Date("2021-01-01"))
     )
 
   # ---- Log CCI (credit conditions proxy) ------------------------------------
@@ -359,7 +387,10 @@ add_model_variables <- function(model_data) {
 
 fit_ecm_spec <- function(data, spec_name, lr_vars, sr_vars = character(0),
                          dummy_vars = c("d2000_gst", "d2008_gfc",
-                                        "d2020_covid", "d2020_rebound"),
+                                        "d2020_covid", "d2020_rebound",
+                                        "d_neg_gearing_8587", "d_recession_1991",
+                                        "d_apra_2014", "d_apra_2017",
+                                        "d_jobkeeper_2020"),
                          response     = "dlcons",
                          sample_start = as.Date("1980-01-01"),
                          sample_end   = as.Date("2024-10-01")) {
@@ -444,15 +475,21 @@ fit_ecm_spec <- function(data, spec_name, lr_vars, sr_vars = character(0),
 
 run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01")) {
 
-  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound")
+  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
+                    "d_neg_gearing_8587", "d_recession_1991",
+                    "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
 
   # ------------------------------------------------------------------
   # Spec 1: Log net worth (conventional baseline)
   # ------------------------------------------------------------------
+  # ln_hp_over_y appears in EVERY long-run spec: Italy paper Section 2 p.7
+  # treats it as a load-bearing baseline regressor capturing the affordability /
+  # down-payment channel that partially offsets the housing wealth effect.
   spec1 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec1_LogNetWorth",
-    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("ln_networth_y", "ln_hp_over_y", "real_rate",
+                   "ln_yp_over_y", "ln_y_over_c"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -464,7 +501,8 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec2 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec2_LogNetWorth_CCI",
-    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("ln_networth_y", "ln_hp_over_y", "real_rate",
+                   "ln_yp_over_y", "ln_y_over_c"),
     sr_vars    = "d2_logcci_lag2",
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -476,7 +514,8 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec3 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec3_LevelNetWorth",
-    lr_vars    = c("networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("networth_y", "ln_hp_over_y", "real_rate",
+                   "ln_yp_over_y", "ln_y_over_c"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -641,6 +680,125 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
   }
 
   invisible(list(coef_combined = coef_combined, diag_combined = diag_combined))
+}
+
+
+# ==============================================================================
+# SECTION G2: Wald test of NLA cross-equation restriction
+# ==============================================================================
+# Italy paper Section 2 eq 2.5 / Table 3 col 3 imposes gamma_LA + gamma_LOANS = 0
+# (deposits and household debt enter with equal-and-opposite coefficients) and
+# accepts it. This helper refits each disaggregated spec with the unrestricted
+# decomposition (nla_y_unrestricted = deposits/y, debt_y = loans/y) and tests
+# whether the restriction is statistically defensible in Australian data.
+
+test_nla_restriction <- function(model_data,
+                                 sample_label = "full",
+                                 sample_end   = as.Date("2024-10-01")) {
+
+  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
+                    "d_neg_gearing_8587", "d_recession_1991",
+                    "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
+
+  # Spec families to test: 4 (no CCI), 5 (full disagg), 6 (preferred).
+  spec_defs <- list(
+    Spec4_Disagg_NoCCI = list(
+      sr = character(0),
+      lr_extra = c("eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                   "real_rate", "ln_yp_over_y", "ln_y_over_c")
+    ),
+    Spec5_FullDisagg = list(
+      sr = c("d2_logcci_lag2", "dd4_income", "d2_log_unemp", "abs_income_resid"),
+      lr_extra = c("eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                   "real_rate", "ln_yp_over_y", "ln_y_over_c")
+    ),
+    Spec6_Preferred = list(
+      sr = c("d2_logcci_lag2", "dd4_income", "d2_log_unemp", "abs_income_resid"),
+      lr_extra = c("eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                   "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008",
+                   "ln_y_over_c")
+    )
+  )
+
+  rows <- list()
+  for (sp in names(spec_defs)) {
+    cfg <- spec_defs[[sp]]
+    fit <- tryCatch(
+      fit_ecm_spec(
+        data       = model_data,
+        spec_name  = paste0(sp, "_unrestricted"),
+        lr_vars    = c("nla_y_unrestricted", "debt_y", cfg$lr_extra),
+        sr_vars    = cfg$sr,
+        dummy_vars = base_dummies,
+        sample_end = sample_end
+      ),
+      error = function(e) {
+        message(sprintf("[test_nla_restriction] %s failed: %s", sp, e$message))
+        NULL
+      }
+    )
+    if (is.null(fit)) next
+
+    cf   <- coef(fit$fit)
+    vcov <- fit$nw_vcov
+    if (!all(c("nla_y_unrestricted", "debt_y") %in% names(cf))) {
+      message(sprintf("[test_nla_restriction] %s: regressors dropped, skipping",
+                      sp))
+      next
+    }
+    b1 <- unname(cf["nla_y_unrestricted"])
+    b2 <- unname(cf["debt_y"])
+    v11 <- vcov["nla_y_unrestricted", "nla_y_unrestricted"]
+    v22 <- vcov["debt_y", "debt_y"]
+    v12 <- vcov["nla_y_unrestricted", "debt_y"]
+    sum_bs <- b1 + b2
+    se_sum <- sqrt(v11 + v22 + 2 * v12)
+
+    # Prefer car::linearHypothesis with NW vcov when available; otherwise the
+    # manual t-statistic (1 d.f.) is identical up to the chi-sq vs t framing.
+    have_car <- requireNamespace("car", quietly = TRUE)
+    if (have_car) {
+      lh <- tryCatch(
+        car::linearHypothesis(fit$fit,
+          "nla_y_unrestricted + debt_y = 0",
+          vcov. = vcov, test = "Chisq"),
+        error = function(e) NULL
+      )
+      if (!is.null(lh) && "Pr(>Chisq)" %in% names(lh)) {
+        chi_stat <- lh$Chisq[2L]
+        p_val    <- lh$`Pr(>Chisq)`[2L]
+        t_stat   <- sign(sum_bs) * sqrt(chi_stat)
+      } else {
+        t_stat <- sum_bs / se_sum
+        p_val  <- 2 * pt(-abs(t_stat),
+                         df = nobs(fit$fit) - length(cf))
+      }
+    } else {
+      t_stat <- sum_bs / se_sum
+      p_val  <- 2 * pt(-abs(t_stat),
+                       df = nobs(fit$fit) - length(cf))
+    }
+
+    rows[[sp]] <- tibble::tibble(
+      specification         = sp,
+      sample                = sample_label,
+      b_nla                 = b1,
+      b_debt                = b2,
+      sum                   = sum_bs,
+      se                    = se_sum,
+      t_stat                = t_stat,
+      p_value               = p_val,
+      restriction_accepted  = isTRUE(p_val > 0.05)
+    )
+  }
+
+  out <- if (length(rows)) bind_rows(rows) else
+    tibble::tibble(specification = character(), sample = character(),
+                   b_nla = numeric(), b_debt = numeric(),
+                   sum = numeric(), se = numeric(),
+                   t_stat = numeric(), p_value = numeric(),
+                   restriction_accepted = logical())
+  out
 }
 
 
@@ -844,6 +1002,19 @@ specs_precovid <- run_all_specifications(model_data, sample_end = as.Date("2019-
 cat("[Step 5] Building results tables...\n")
 results_full     <- build_results_table(specs_full,     output_dir, period_label = "full")
 results_precovid <- build_results_table(specs_precovid, output_dir, period_label = "precovid")
+
+cat("[Step 5b] Wald test of NLA cross-equation restriction (gamma_LA + gamma_LOANS = 0)...\n")
+nla_test_full     <- test_nla_restriction(model_data,
+                       sample_label = "full",
+                       sample_end   = as.Date("2024-10-01"))
+nla_test_precovid <- test_nla_restriction(model_data,
+                       sample_label = "precovid",
+                       sample_end   = as.Date("2019-10-01"))
+nla_test <- bind_rows(nla_test_full, nla_test_precovid)
+write.csv(nla_test,
+          file.path(output_dir, "australia_nla_restriction_test.csv"),
+          row.names = FALSE)
+print(nla_test)
 
 # Combined file with both periods
 combined_coef <- bind_rows(results_full$coef_combined, results_precovid$coef_combined)

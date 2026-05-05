@@ -651,9 +651,18 @@ master <- master %>%
     eq_y           = fin_equities                / ydi_ann_nom,   # equities
     super_y        = fin_super                   / ydi_ann_nom,   # superannuation
     ilfa_y         = eq_y + super_y,                              # combined (for Specs 1–3)
-    nla_y          = (fin_deposits - fin_loans)  / ydi_ann_nom,   # net liquid assets
-    ha_y           = housing_wealth              / ydi_ann_nom,   # housing assets
-    debt_y         = fin_loans                   / ydi_ann_nom,
+    # Net liquid assets = liquid financial assets MINUS total household debt.
+    # Italy paper Section 2 eq 2.5 / Table 3 col 3 and Australia paper eq 7
+    # both define NLA this way and impose the cross-equation restriction
+    # gamma_LA + gamma_LOANS = 0. fin_loans here is ABS 5232035 total household
+    # liabilities (housing + consumer credit + other), the broadest available
+    # household debt measure on the official balance sheet.
+    nla_y                = (fin_deposits - fin_loans) / ydi_ann_nom,
+    # Unrestricted components retained so the gamma_LA = -gamma_LOANS
+    # restriction can be tested (see test_nla_restriction in the estimation script).
+    nla_y_unrestricted   = fin_deposits             / ydi_ann_nom,
+    debt_y               = fin_loans                / ydi_ann_nom,
+    ha_y                 = housing_wealth           / ydi_ann_nom, # housing assets
     # Use ABS official net worth (A83722648X) if available; otherwise sum components
     networth_y     = if_else(
       !is.na(closing_net_worth),
@@ -661,6 +670,17 @@ master <- master %>%
       (fin_deposits + fin_equities + fin_super + housing_wealth - fin_loans) / ydi_ann_nom
     )
   )
+
+# Range guard: nla_y is total deposits minus total household debt and is
+# expected to be NEGATIVE in modern Australia (debt stock exceeds liquid
+# assets). Allow a wide ratio band [-2, +2] before flagging a unit error.
+{
+  rng <- range(master$nla_y, na.rm = TRUE)
+  if (!all(is.finite(rng)) || rng[1L] < -2 || rng[2L] > 2) {
+    warning(sprintf("nla_y outside plausible band [-2, +2]: %.3f to %.3f",
+                    rng[1L], rng[2L]))
+  }
+}
 
 # Log versions
 master <- master %>%
@@ -739,7 +759,8 @@ master <- master %>%
 # Print coverage
 message("\n--- Coverage summary ---")
 for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",
-            "real_rate", "hpi", "ha_y", "eq_y", "super_y", "nla_y", "networth_y",
+            "real_rate", "hpi", "ha_y", "eq_y", "super_y", "nla_y",
+            "nla_y_unrestricted", "debt_y", "networth_y",
             "cci_ratio", "fhb_share")) {
   report_series(master[[v]], v, master$date)
 }
@@ -779,6 +800,12 @@ if (!is.null(master$mortgage_rate)) {
 
 message("\n--- Section 5: Dummy variables ---")
 
+# Logistic ogive transition: smooth 0->1 transition centred at t0 (in
+# quarter units after rescaling). half_width = 2.5 gives ~5-quarter ramp.
+ogive <- function(t, t0, half_width = 2.5) {
+  1 / (1 + exp(-(t - t0) / half_width))
+}
+
 master <- master %>%
   mutate(
     # GST introduction Q3 2000 — large one-off boost to nominal consumption
@@ -788,7 +815,22 @@ master <- master %>%
     # COVID lockdown Q2 2020 (consumption collapse)
     d2020_covid  = as.integer(date == as.Date("2020-04-01")),
     # COVID rebound Q3 2020 (partial mechanical reversal)
-    d2020_rebound = as.integer(date == as.Date("2020-07-01"))
+    d2020_rebound = as.integer(date == as.Date("2020-07-01")),
+    # Negative-gearing restriction 1985Q3 to 1987Q3 (9 quarters). Australia
+    # paper finds coef ~ -0.029 in the house-price equation for this episode.
+    d_neg_gearing_8587 = as.integer(date >= as.Date("1985-07-01") &
+                                    date <= as.Date("1987-07-01")),
+    # "Recession we had to have" — sharpest single-quarter pre-COVID drop.
+    d_recession_1991   = as.integer(date == as.Date("1991-04-01")),
+    # APRA macroprudential rounds: investor-loan caps (late 2014) and IO-loan
+    # caps (early 2017). Logistic transition (~5 quarters) so the dummy moves
+    # from 0 well before the announcement to 1 well after.
+    d_apra_2014 = ogive(as.numeric(date - as.Date("2014-10-01")) / 91.31, 0),
+    d_apra_2017 = ogive(as.numeric(date - as.Date("2017-04-01")) / 91.31, 0),
+    # JobKeeper income support, 2020Q2-2021Q1 (4 quarters). Distinct from the
+    # COVID consumption-shock impulse dummies above.
+    d_jobkeeper_2020   = as.integer(date >= as.Date("2020-04-01") &
+                                    date <= as.Date("2021-01-01"))
   )
 
 # ==============================================================================
