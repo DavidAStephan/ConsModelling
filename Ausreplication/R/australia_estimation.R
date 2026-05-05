@@ -731,15 +731,39 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
 
   # ------------------------------------------------------------------
   # Speed-of-adjustment (lambda) comparison table
-  # Italy: ecm_lag coefficient from ecm_coefficients.csv (negative = restoring)
-  # Australia: coefficient on ln_y_over_c (positive convention; abs value comparable)
+  # Italy: coefficient on ln_y_over_c in italy_table1_results.csv
+  #   (Italy script writes the OLS coefficient on ln(y/c) here; this is the
+  #    same object as Australia's lambda — the speed of adjustment, positive
+  #    convention since the dependent var is Δln c and ln(y/c) is positive when
+  #    consumption is below its long-run target.)
+  # Australia: coefficient on ln_y_over_c in australia_*_results.csv
+  #
+  # Earlier code looked for ecm_coefficients.csv with term == "ecm_lag".  That
+  # file did not exist in the Italy outputs dir; the path resolved up to the
+  # project-root /outputs/ which contained an unrelated old Australia ECM with
+  # ecm_lag = -0.0099.  That stale value was being reported as "Italy lambda".
   # ------------------------------------------------------------------
-  italy_ecm_path <- file.path(italy_dir, "ecm_coefficients.csv")
-  italy_lambda <- tryCatch({
-    ec <- read.csv(italy_ecm_path, stringsAsFactors = FALSE)
-    row <- ec[ec$term == "ecm_lag", ]
-    if (nrow(row) > 0L) row$estimate[1L] else NA_real_
+  italy_t1_candidates <- c(
+    file.path(output_dir, "italy_table1_results.csv"),
+    file.path(italy_dir,  "italy_table1_results.csv")
+  )
+  italy_t1_path <- italy_t1_candidates[file.exists(italy_t1_candidates)][1L]
+  italy_lambda_full <- tryCatch({
+    if (is.na(italy_t1_path)) NA_real_ else {
+      ec   <- read.csv(italy_t1_path, stringsAsFactors = FALSE)
+      pref <- ec[ec$term == "ln_y_over_c" &
+                 grepl("Preferred", ec$specification), ]
+      if (nrow(pref) == 0L) {
+        # Fall back to last spec (which is the preferred in italy_estimation.R)
+        all_lr <- ec[ec$term == "ln_y_over_c", ]
+        if (nrow(all_lr) > 0L) tail(all_lr$ols_estimate, 1L) else NA_real_
+      } else {
+        pref$ols_estimate[1L]
+      }
+    }
   }, error = function(e) NA_real_)
+  italy_lambda_source <- if (is.null(italy_t1_path) || is.na(italy_t1_path))
+    "italy_table1_results.csv (NOT FOUND)" else italy_t1_path
 
   aus_lambda <- aus_coef %>%
     filter(term == "ln_y_over_c") %>%
@@ -747,8 +771,8 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
     distinct()
 
   cat("\n--- Speed of adjustment (lambda) comparison ---\n")
-  cat(sprintf("  Italy (ecm_lag, full sample):  %8.4f  [abs = %.4f per quarter]\n",
-              italy_lambda, abs(italy_lambda)))
+  cat(sprintf("  Italy (ln_y_over_c, full, preferred spec):  %8.4f  [abs = %.4f per quarter]\n",
+              italy_lambda_full, abs(italy_lambda_full)))
   cat(sprintf("  %-8s  %-35s  %8s  %8s\n", "Period", "Australia specification", "lambda", "|lambda|"))
   cat(sprintf("  %s\n", strrep("-", 65)))
   for (i in seq_len(nrow(aus_lambda))) {
@@ -759,10 +783,17 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
 
   lambda_path <- file.path(output_dir, "italy_australia_lambda.csv")
   lambda_tbl <- bind_rows(
-    tibble(country = "Italy", specification = "Italy_Preferred (full)",
-           period = "full", lambda = italy_lambda),
-    aus_lambda %>% mutate(country = "Australia")
-  )
+    tibble(country = "Italy",
+           specification = "Italy_Preferred",
+           period = "full",
+           lambda = italy_lambda_full,
+           lambda_source = italy_lambda_source,
+           note = "OLS coefficient on ln(y/c) in italy_table1_results.csv (preferred spec, full sample)"),
+    aus_lambda %>% mutate(country = "Australia",
+                          lambda_source = "australia_*_results.csv (term == ln_y_over_c)",
+                          note = "OLS coefficient on ln(y/c)")
+  ) %>%
+    select(country, specification, period, lambda, lambda_source, note)
   write.csv(lambda_tbl, lambda_path, row.names = FALSE)
   message(sprintf("[build_comparison_table] Lambda table saved to %s", lambda_path))
 
@@ -807,6 +838,576 @@ plot_actual_vs_fitted <- function(spec, output_dir = "outputs") {
     paste0("australia_", tolower(sp_name), "_residuals.png"))
   ggsave(resid_path, p2, width = 9, height = 4, dpi = 150)
   message(sprintf("[plot_actual_vs_fitted] Residual plot saved to %s", resid_path))
+}
+
+
+# ==============================================================================
+# SECTION I: Preferred-Spec Selector
+# ==============================================================================
+#
+# Picks the spec used for downstream robustness/decomposition work.  Current
+# convention: the script's "preferred" spec is Spec6_Preferred when present;
+# fall back to the last spec in the list otherwise.
+# ==============================================================================
+
+select_preferred_spec <- function(specs) {
+  pref_keys <- intersect(c("spec6", "spec7"), names(specs))
+  if (length(pref_keys) > 0L) return(specs[[tail(pref_keys, 1L)]])
+  specs[[length(specs)]]
+}
+
+
+# ==============================================================================
+# SECTION J: Italy-style Robustness Suite (Italy.pdf §4.2)
+# ==============================================================================
+#
+# Implements the four robustness checks Italy uses to validate single-equation
+# OLS:
+#   (1) IV on current income (Hall 1978 endogeneity test)
+#   (2) Joint PI + consumption FIML (SUR)
+#   (3) Chow battery at 1995Q1, 2000Q1, 2008Q3, 2020Q1
+#   (4) Scaled-income alternative (where available)
+#   (5) Drehmann amortising-mortgage real rate (N=25y for Australia)
+#
+# Each block is wrapped in tryCatch — a failure in one does not break the rest.
+# ==============================================================================
+
+run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
+
+  spec_name <- preferred_spec$spec_name
+  est_data  <- preferred_spec$est_data
+  base_fit  <- preferred_spec$fit
+  lr_vars   <- preferred_spec$lr_vars
+  sr_vars   <- preferred_spec$sr_vars
+  dummies   <- preferred_spec$dummy_vars
+  fmla      <- preferred_spec$formula
+  response  <- as.character(fmla[[2L]])
+  rhs_terms <- attr(terms(fmla), "term.labels")
+
+  message(sprintf("\n[run_italy_style_robustness] Preferred spec: %s", spec_name))
+  message(sprintf("  N = %d observations, RHS terms = %d",
+                  nobs(base_fit), length(rhs_terms)))
+
+  # ----------------------------------------------------------------------
+  # (1) OLS vs IV-on-current-income
+  # ----------------------------------------------------------------------
+  iv_path <- file.path(output_dir, "australia_iv_robustness.csv")
+  tryCatch({
+    if (!requireNamespace("AER", quietly = TRUE))
+      stop("AER package not installed — install.packages('AER')")
+
+    iv_data <- model_data %>%
+      arrange(date) %>%
+      mutate(
+        lincome_l1   = lag(lincome,      1L),
+        lincome_l2   = lag(lincome,      2L),
+        lincome_l4   = lag(lincome,      4L),
+        unemp_l1     = lag(unemp_rate,   1L),
+        unemp_l2     = lag(unemp_rate,   2L),
+        mortgage_l1  = lag(mortgage_rate, 1L)
+      )
+
+    iv_data_aligned <- iv_data %>%
+      filter(date >= min(est_data$date),
+             date <= max(est_data$date))
+
+    instruments <- c("lincome_l1", "lincome_l2", "lincome_l4",
+                     "unemp_l1", "unemp_l2", "mortgage_l1")
+
+    # Identify endogenous regressors: anything that contains current lincome
+    # (lincome enters via ln_y_over_c = lincome - lag(lcons,1) and via
+    #  ln_yp_over_y = ln_yp - lincome path).  The cleanest test treats
+    #  ln_y_over_c as the endogenous regressor.
+    endog <- intersect(c("ln_y_over_c", "ln_yp_over_y"), rhs_terms)
+    if (length(endog) == 0L) endog <- intersect("ln_y_over_c", rhs_terms)
+    exog  <- setdiff(rhs_terms, endog)
+
+    iv_data_full <- iv_data_aligned %>%
+      filter(complete.cases(across(all_of(c(response, rhs_terms, instruments)))))
+
+    if (nrow(iv_data_full) < 30L)
+      stop(sprintf("only %d complete obs for IV", nrow(iv_data_full)))
+
+    fmla_iv <- as.formula(sprintf(
+      "%s ~ %s | %s",
+      response,
+      paste(rhs_terms,                        collapse = " + "),
+      paste(c(exog, instruments),             collapse = " + ")
+    ))
+
+    iv_fit <- AER::ivreg(fmla_iv, data = iv_data_full)
+
+    # Re-fit OLS on the same sample so the comparison is apples-to-apples
+    fmla_ols_same <- reformulate(rhs_terms, response = response)
+    ols_fit_same  <- lm(fmla_ols_same, data = iv_data_full)
+
+    cf_ols <- coef(ols_fit_same)
+    cf_iv  <- coef(iv_fit)
+    se_ols <- sqrt(diag(vcov(ols_fit_same)))
+    se_iv  <- sqrt(diag(vcov(iv_fit)))
+
+    iv_tbl <- tibble::tibble(
+      specification    = spec_name,
+      term             = names(cf_ols),
+      ols_estimate     = unname(cf_ols),
+      ols_se           = unname(se_ols),
+      iv_estimate      = unname(cf_iv[names(cf_ols)]),
+      iv_se            = unname(se_iv [names(cf_ols)]),
+      delta_iv_minus_ols = iv_estimate - ols_estimate,
+      pct_change       = 100 * (iv_estimate - ols_estimate) / ols_estimate,
+      n_obs            = nrow(iv_data_full),
+      n_instruments    = length(instruments)
+    )
+    write.csv(iv_tbl, iv_path, row.names = FALSE)
+    message(sprintf("[run_italy_style_robustness] IV table saved: %s", iv_path))
+  }, error = function(e) {
+    message(sprintf("  [IV block] FAILED: %s", conditionMessage(e)))
+    write.csv(tibble::tibble(
+      specification = spec_name, status = "FAILED",
+      error = conditionMessage(e)
+    ), iv_path, row.names = FALSE)
+  })
+
+  # ----------------------------------------------------------------------
+  # (2) Joint PI + consumption FIML (SUR)
+  # ----------------------------------------------------------------------
+  joint_path <- file.path(output_dir, "australia_joint_pi_robustness.csv")
+  tryCatch({
+    if (!requireNamespace("systemfit", quietly = TRUE))
+      stop("systemfit package not installed — install.packages('systemfit')")
+
+    # PI equation: regress lincome on its own AR(8) + trend + break + optional
+    # extras (matching construct_permanent_income's RHS).  We use a smaller,
+    # estimable subset that's stable on the same sample.
+    pi_data <- model_data %>%
+      arrange(date) %>%
+      mutate(
+        t_index = seq_len(n()),
+        step2008 = as.integer(date >= as.Date("2008-07-01")),
+        trend_brk = t_index * step2008,
+        inc_l1 = lag(lincome, 1L),
+        inc_l2 = lag(lincome, 2L),
+        inc_l4 = lag(lincome, 4L),
+        inc_l8 = lag(lincome, 8L)
+      )
+
+    pi_rhs <- c("t_index", "step2008", "trend_brk",
+                "inc_l1", "inc_l2", "inc_l4", "inc_l8", "unemp_rate")
+    pi_fmla <- reformulate(pi_rhs, response = "lincome")
+
+    sur_data <- pi_data %>%
+      filter(date >= min(est_data$date),
+             date <= max(est_data$date)) %>%
+      filter(complete.cases(across(all_of(c(response, rhs_terms, pi_rhs)))))
+
+    if (nrow(sur_data) < 30L)
+      stop(sprintf("only %d complete obs for SUR", nrow(sur_data)))
+
+    cons_fmla <- reformulate(rhs_terms, response = response)
+
+    # systemfit forbids blanks/underscores in equation labels
+    sur_fit <- systemfit::systemfit(
+      formula = list(consumption = cons_fmla, perminc = pi_fmla),
+      method  = "SUR",
+      data    = sur_data
+    )
+
+    # Re-fit consumption single-equation OLS on the SAME sample
+    ols_same <- lm(cons_fmla, data = sur_data)
+
+    cons_eq_idx <- 1L
+    cf_sur <- sur_fit$eq[[cons_eq_idx]]$coefficients
+    se_sur <- sqrt(diag(sur_fit$eq[[cons_eq_idx]]$coefCov))
+
+    cf_ols <- coef(ols_same)
+    se_ols <- sqrt(diag(vcov(ols_same)))
+
+    joint_tbl <- tibble::tibble(
+      specification    = spec_name,
+      equation         = "consumption",
+      term             = names(cf_ols),
+      single_eq_ols    = unname(cf_ols),
+      single_eq_se     = unname(se_ols),
+      sur_joint        = unname(cf_sur[names(cf_ols)]),
+      sur_joint_se     = unname(se_sur[names(cf_ols)]),
+      delta_sur_minus_ols = sur_joint - single_eq_ols,
+      pct_change       = 100 * (sur_joint - single_eq_ols) / single_eq_ols,
+      n_obs            = nrow(sur_data)
+    )
+    write.csv(joint_tbl, joint_path, row.names = FALSE)
+    message(sprintf("[run_italy_style_robustness] Joint PI+cons table saved: %s",
+                    joint_path))
+  }, error = function(e) {
+    message(sprintf("  [Joint SUR block] FAILED: %s", conditionMessage(e)))
+    write.csv(tibble::tibble(
+      specification = spec_name, status = "FAILED",
+      error = conditionMessage(e)
+    ), joint_path, row.names = FALSE)
+  })
+
+  # ----------------------------------------------------------------------
+  # (3) Chow battery at multiple sample cuts
+  # ----------------------------------------------------------------------
+  chow_path <- file.path(output_dir, "australia_chow_battery.csv")
+  tryCatch({
+    break_dates <- as.Date(c("1995-01-01", "2000-01-01",
+                             "2008-07-01", "2020-01-01"))
+    fit_dates <- est_data$date
+    n_full    <- nobs(base_fit)
+    chow_fmla <- formula(base_fit)
+    chow_rows <- lapply(break_dates, function(bd) {
+      bp_idx <- sum(fit_dates <= bd, na.rm = TRUE)
+      if (bp_idx < 5L || bp_idx > (n_full - 5L)) {
+        return(tibble::tibble(
+          specification = spec_name, break_date = bd,
+          chow_stat = NA_real_, chow_pval = NA_real_,
+          parameters_stable_5pct = NA, n_pre = bp_idx,
+          n_post = n_full - bp_idx,
+          note = "break too close to sample edge"
+        ))
+      }
+      # Use formula method: sctest(formula, type = "Chow", point = bp_idx)
+      # supports the `point` argument; the fit method does not.
+      sct <- tryCatch(
+        strucchange::sctest(chow_fmla, type = "Chow",
+                            point = bp_idx, data = est_data),
+        error = function(e) NULL
+      )
+      if (is.null(sct)) {
+        tibble::tibble(
+          specification = spec_name, break_date = bd,
+          chow_stat = NA_real_, chow_pval = NA_real_,
+          parameters_stable_5pct = NA, n_pre = bp_idx,
+          n_post = n_full - bp_idx,
+          note = "sctest failed"
+        )
+      } else {
+        tibble::tibble(
+          specification = spec_name, break_date = bd,
+          chow_stat = unname(as.numeric(sct$statistic)),
+          chow_pval = as.numeric(sct$p.value),
+          parameters_stable_5pct = as.numeric(sct$p.value) > 0.05,
+          n_pre = bp_idx,
+          n_post = n_full - bp_idx,
+          note = ""
+        )
+      }
+    })
+    chow_tbl <- bind_rows(chow_rows)
+    write.csv(chow_tbl, chow_path, row.names = FALSE)
+    message(sprintf("[run_italy_style_robustness] Chow battery saved: %s",
+                    chow_path))
+  }, error = function(e) {
+    message(sprintf("  [Chow block] FAILED: %s", conditionMessage(e)))
+    write.csv(tibble::tibble(
+      specification = spec_name, status = "FAILED",
+      error = conditionMessage(e)
+    ), chow_path, row.names = FALSE)
+  })
+
+  # ----------------------------------------------------------------------
+  # (4) Scaled-income alternative
+  # ----------------------------------------------------------------------
+  scaled_path <- file.path(output_dir, "australia_scaled_income_robustness.csv")
+  tryCatch({
+    labour_col <- intersect(
+      c("labour_transfer_income_real_pc",
+        "labour_transfer_real_pc",
+        "compensation_of_employees_real_pc",
+        "wages_real_pc"),
+      names(model_data)
+    )
+    if (length(labour_col) == 0L) {
+      message("  [Scaled-income block] No labour-income series in model_data ",
+              "(checked: labour_transfer_income_real_pc, ",
+              "compensation_of_employees_real_pc, wages_real_pc).  Skipping ",
+              "Italy-style scaled-income variant; documented in CSV.")
+      write.csv(tibble::tibble(
+        specification = spec_name, status = "SKIPPED",
+        reason = paste0(
+          "No clean labour+transfer income series available in current ",
+          "Australia data pipeline (ABS 5206020 wages component not extracted ",
+          "into model_data).  Italy uses average of labour+transfer and total ",
+          "disposable income; only ydi_real_pc is currently available.  ",
+          "Cannot construct scaled_income without fabrication.")
+      ), scaled_path, row.names = FALSE)
+    } else {
+      lcol <- labour_col[1L]
+      scaled_data <- model_data %>%
+        arrange(date) %>%
+        mutate(
+          scaled_income_real_pc = 0.5 * ydi_real_pc + 0.5 * .data[[lcol]],
+          lincome_scaled        = log(scaled_income_real_pc),
+          ln_y_over_c_scaled    = lincome_scaled - lag(lcons, 1L)
+        )
+
+      rhs_terms_scaled <- gsub("\\bln_y_over_c\\b", "ln_y_over_c_scaled",
+                               rhs_terms, perl = TRUE)
+      fmla_scaled <- reformulate(rhs_terms_scaled, response = response)
+
+      scaled_data_cc <- scaled_data %>%
+        filter(date >= min(est_data$date), date <= max(est_data$date)) %>%
+        filter(complete.cases(across(all_of(c(response, rhs_terms_scaled)))))
+
+      fit_scaled <- lm(fmla_scaled, data = scaled_data_cc)
+      cf_scaled  <- coef(fit_scaled)
+      se_scaled  <- sqrt(diag(vcov(fit_scaled)))
+      cf_base    <- coef(base_fit)
+      se_base    <- sqrt(diag(vcov(base_fit)))
+
+      align_name_scaled <- function(x)
+        gsub("ln_y_over_c_scaled", "ln_y_over_c", x)
+      cf_scaled_named <- setNames(cf_scaled, align_name_scaled(names(cf_scaled)))
+      se_scaled_named <- setNames(se_scaled, align_name_scaled(names(se_scaled)))
+
+      nm <- union(names(cf_base), names(cf_scaled_named))
+
+      scaled_tbl <- tibble::tibble(
+        specification     = spec_name,
+        term              = nm,
+        base_estimate     = unname(cf_base       [match(nm, names(cf_base))]),
+        base_se           = unname(se_base       [match(nm, names(se_base))]),
+        scaled_estimate   = unname(cf_scaled_named[match(nm, names(cf_scaled_named))]),
+        scaled_se         = unname(se_scaled_named[match(nm, names(se_scaled_named))]),
+        labour_income_var = lcol,
+        n_obs             = nrow(scaled_data_cc)
+      )
+      write.csv(scaled_tbl, scaled_path, row.names = FALSE)
+      message(sprintf("[run_italy_style_robustness] Scaled-income table saved: %s",
+                      scaled_path))
+    }
+  }, error = function(e) {
+    message(sprintf("  [Scaled-income block] FAILED: %s", conditionMessage(e)))
+    write.csv(tibble::tibble(
+      specification = spec_name, status = "FAILED",
+      error = conditionMessage(e)
+    ), scaled_path, row.names = FALSE)
+  })
+
+  # ----------------------------------------------------------------------
+  # (5) Drehmann amortising-mortgage-adjusted real rate
+  # adjR = R / (1 - (1+R)^-N), with N = 100 quarters (25 years for Australia)
+  # ----------------------------------------------------------------------
+  drehmann_path <- file.path(output_dir, "australia_drehmann_robustness.csv")
+  tryCatch({
+    if (!"mortgage_rate" %in% names(model_data) ||
+        !"hicp_4q_ann"   %in% names(model_data))
+      stop("mortgage_rate or hicp_4q_ann missing from model_data")
+
+    # mortgage_rate is reported as % per annum.  Convert to per-quarter rate
+    # for the amortisation formula (geometric: (1+R_q) = (1 + R_a/100)^(1/4)).
+    drehmann_data <- model_data %>%
+      arrange(date) %>%
+      mutate(
+        r_q                       = (1 + mortgage_rate / 100)^(1/4) - 1,
+        mortgage_rate_drehmann_q  = ifelse(r_q == 0, 0,
+                                           r_q / (1 - (1 + r_q)^(-100))),
+        mortgage_rate_drehmann_a  = ((1 + mortgage_rate_drehmann_q)^4 - 1) * 100,
+        real_rate_drehmann        = mortgage_rate_drehmann_a - hicp_4q_ann
+      )
+
+    if (!"real_rate" %in% rhs_terms) {
+      stop("preferred spec has no real_rate term — cannot substitute Drehmann")
+    }
+
+    rhs_terms_dre <- gsub("\\breal_rate\\b", "real_rate_drehmann",
+                          rhs_terms, perl = TRUE)
+    fmla_dre <- reformulate(rhs_terms_dre, response = response)
+
+    dre_data_cc <- drehmann_data %>%
+      filter(date >= min(est_data$date), date <= max(est_data$date)) %>%
+      filter(complete.cases(across(all_of(c(response, rhs_terms_dre)))))
+
+    fit_dre <- lm(fmla_dre, data = dre_data_cc)
+    cf_dre  <- coef(fit_dre)
+    se_dre  <- sqrt(diag(vcov(fit_dre)))
+    cf_base <- coef(base_fit)
+    se_base <- sqrt(diag(vcov(base_fit)))
+
+    align_name <- function(x) gsub("real_rate_drehmann", "real_rate", x)
+    cf_dre_named <- setNames(cf_dre, align_name(names(cf_dre)))
+    se_dre_named <- setNames(se_dre, align_name(names(se_dre)))
+
+    nm <- union(names(cf_base), names(cf_dre_named))
+
+    dre_tbl <- tibble::tibble(
+      specification     = spec_name,
+      term              = nm,
+      base_estimate     = unname(cf_base    [match(nm, names(cf_base))]),
+      base_se           = unname(se_base    [match(nm, names(se_base))]),
+      drehmann_estimate = unname(cf_dre_named[match(nm, names(cf_dre_named))]),
+      drehmann_se       = unname(se_dre_named[match(nm, names(se_dre_named))]),
+      n_obs             = nrow(dre_data_cc),
+      maturity_years    = 25,
+      maturity_quarters = 100
+    )
+    write.csv(dre_tbl, drehmann_path, row.names = FALSE)
+    message(sprintf("[run_italy_style_robustness] Drehmann table saved: %s",
+                    drehmann_path))
+  }, error = function(e) {
+    message(sprintf("  [Drehmann block] FAILED: %s", conditionMessage(e)))
+    write.csv(tibble::tibble(
+      specification = spec_name, status = "FAILED",
+      error = conditionMessage(e)
+    ), drehmann_path, row.names = FALSE)
+  })
+
+  invisible(NULL)
+}
+
+
+# ==============================================================================
+# SECTION K: Long-run Contributions Decomposition Plot
+# ==============================================================================
+#
+# Headline policy chart.  For the preferred spec, decompose fitted log(c/y) into
+# the de-meaned contribution of each long-run regressor:
+#
+#   contribution_t(j) = beta_j * (X_jt - mean(X_j))
+#
+# where beta_j = OLS coefficient on X_j divided by lambda (the structural param).
+#
+# Stacked area plot (geom_area, position = "stack") plus a thin line for the
+# residual = actual log(c/y) - sum of contributions.  Saved as 16x9 PNG at
+# 200 dpi for slide-quality.
+# ==============================================================================
+
+plot_longrun_decomposition <- function(preferred_spec, output_dir) {
+
+  spec_name <- preferred_spec$spec_name
+  est_data  <- preferred_spec$est_data
+  fit       <- preferred_spec$fit
+  lr_vars   <- preferred_spec$lr_vars
+  cf        <- coef(fit)
+
+  if (!"ln_y_over_c" %in% names(cf))
+    stop("[plot_longrun_decomposition] no ln_y_over_c term in preferred spec")
+
+  lambda <- cf["ln_y_over_c"]
+  if (is.na(lambda) || abs(lambda) < 1e-10)
+    stop("[plot_longrun_decomposition] lambda near zero — cannot rescale")
+
+  # Long-run regressors EXCLUDING the ECM term (ln_y_over_c itself); contributions
+  # are de-meaned and scaled by structural coef = OLS / lambda.
+  decomp_vars <- setdiff(lr_vars, "ln_y_over_c")
+  decomp_vars <- intersect(decomp_vars, names(est_data))
+  decomp_vars <- decomp_vars[!vapply(est_data[, decomp_vars, drop = FALSE],
+                                     function(x) all(is.na(x)), logical(1))]
+  if (length(decomp_vars) == 0L)
+    stop("[plot_longrun_decomposition] no usable long-run vars in preferred spec")
+
+  # Compute contributions
+  contrib_mat <- vapply(decomp_vars, function(v) {
+    x        <- est_data[[v]]
+    beta_str <- unname(cf[v]) / unname(lambda)
+    beta_str * (x - mean(x, na.rm = TRUE))
+  }, numeric(nrow(est_data)))
+
+  # log(c/y) actual: lcons - lincome (note ln_y_over_c = lincome - lag(lcons))
+  if (all(c("lcons", "lincome") %in% names(est_data))) {
+    log_c_over_y_actual <- est_data$lcons - est_data$lincome
+  } else if ("ln_y_over_c" %in% names(est_data)) {
+    # fallback: use -ln_y_over_c (lag-shifted by construction)
+    log_c_over_y_actual <- -est_data$ln_y_over_c
+  } else {
+    stop("[plot_longrun_decomposition] no lcons/lincome in est_data")
+  }
+  log_c_over_y_actual_dem <- log_c_over_y_actual - mean(log_c_over_y_actual,
+                                                        na.rm = TRUE)
+
+  sum_contrib <- rowSums(contrib_mat)
+  residual    <- log_c_over_y_actual_dem - sum_contrib
+
+  # Long-format CSV
+  long_df <- bind_rows(lapply(seq_along(decomp_vars), function(i) {
+    tibble::tibble(
+      date         = est_data$date,
+      term         = decomp_vars[i],
+      contribution = contrib_mat[, i]
+    )
+  }))
+  long_df <- bind_rows(
+    long_df,
+    tibble::tibble(date = est_data$date, term = "actual_demeaned",
+                   contribution = log_c_over_y_actual_dem),
+    tibble::tibble(date = est_data$date, term = "residual",
+                   contribution = residual)
+  )
+
+  csv_path <- file.path(output_dir, "australia_longrun_contributions.csv")
+  write.csv(long_df, csv_path, row.names = FALSE)
+  message(sprintf("[plot_longrun_decomposition] CSV saved: %s (%d rows)",
+                  csv_path, nrow(long_df)))
+
+  # Colour palette by economic role
+  term_palette <- c(
+    nla_y                 = "#1f78b4",  # blue (credit / liquid)
+    eq_y                  = "#33a02c",  # green (financial wealth)
+    super_y               = "#b2df8a",  # light green (long-horizon wealth)
+    ha_y                  = "#006d2c",  # dark green (housing wealth, level)
+    ln_hp_over_y          = "#fdae61",  # orange (housing affordability)
+    ilfa_y                = "#a6cee3",  # pale blue (illiquid financial)
+    networth_y            = "#33a02c",
+    ln_networth_y         = "#33a02c",
+    bonds_y               = "#0570b0",
+    real_rate             = "#e31a1c",  # red (interest rate)
+    ln_yp_over_y          = "#6a3d9a",  # purple (permanent income)
+    ln_yp_over_y_post2008 = "#cab2d6",  # light purple (PI x post-2008)
+    cohort_share          = "#8c510a",  # brown (demographics)
+    burden_y              = "#bf812d"   # brown (debt burden)
+  )
+
+  # Stacked-area data: drop actual + residual, keep only term contributions
+  area_df <- long_df %>%
+    filter(!term %in% c("actual_demeaned", "residual")) %>%
+    mutate(term = factor(term, levels = decomp_vars))
+
+  resid_df <- long_df %>% filter(term == "residual")
+
+  fmt_q <- function(d) {
+    sprintf("%dQ%d", lubridate::year(d), lubridate::quarter(d))
+  }
+  sample_label <- sprintf("%s to %s",
+                          fmt_q(min(est_data$date)),
+                          fmt_q(max(est_data$date)))
+
+  fill_cols <- term_palette[as.character(levels(area_df$term))]
+  miss <- is.na(fill_cols)
+  if (any(miss))
+    fill_cols[miss] <- scales::hue_pal()(sum(miss))
+
+  p <- ggplot() +
+    geom_area(data = area_df,
+              aes(x = date, y = contribution, fill = term),
+              position = "stack", alpha = 0.9) +
+    geom_line(data = resid_df,
+              aes(x = date, y = contribution),
+              colour = "grey20", linewidth = 0.4) +
+    geom_hline(yintercept = 0, colour = "black", linewidth = 0.3) +
+    scale_fill_manual(values = fill_cols, name = "Long-run term") +
+    scale_x_date(date_breaks = "5 years", date_labels = "%Y") +
+    labs(
+      title    = sprintf("Australia: Long-run contributions to log(c/y) — preferred spec %s",
+                         spec_name),
+      subtitle = sprintf("Sample window: %s  (N = %d quarters)",
+                         sample_label, nobs(fit)),
+      caption  = paste("De-meaned contributions of each long-run term to log(c/y);",
+                       "residual = actual − sum of contributions."),
+      x = NULL,
+      y = "De-meaned log(c/y)"
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "right",
+          plot.title    = element_text(face = "bold"),
+          plot.subtitle = element_text(colour = "grey30"),
+          plot.caption  = element_text(colour = "grey40"))
+
+  png_path <- file.path(output_dir, "australia_longrun_decomposition.png")
+  ggsave(png_path, p, width = 16, height = 9, dpi = 200)
+  message(sprintf("[plot_longrun_decomposition] PNG saved: %s", png_path))
+
+  invisible(list(plot = p, data = long_df, decomp_vars = decomp_vars,
+                 lambda = unname(lambda)))
 }
 
 
@@ -859,6 +1460,24 @@ build_comparison_table(aus_coef = combined_coef, output_dir = output_dir,
 cat("[Step 7] Generating plots...\n")
 plot_actual_vs_fitted(specs_full$spec6, output_dir = output_dir)
 plot_actual_vs_fitted(specs_full$spec1, output_dir = output_dir)
+
+cat("[Step 8] Selecting preferred spec for downstream robustness work...\n")
+preferred_spec <- select_preferred_spec(specs_full)
+cat(sprintf("  Preferred spec: %s\n", preferred_spec$spec_name))
+
+cat("[Step 9] Italy-style robustness suite (4 blocks)...\n")
+tryCatch(
+  run_italy_style_robustness(preferred_spec, model_data, output_dir),
+  error = function(e)
+    message(sprintf("  [Step 9] aborted: %s", conditionMessage(e)))
+)
+
+cat("[Step 10] Long-run decomposition plot (headline output)...\n")
+tryCatch(
+  plot_longrun_decomposition(preferred_spec, output_dir),
+  error = function(e)
+    message(sprintf("  [Step 10] aborted: %s", conditionMessage(e)))
+)
 
 cat(rep("=", 70), "\n", sep = "")
 cat("Estimation complete. Outputs written to:", output_dir, "\n")
