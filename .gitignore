@@ -1,0 +1,25 @@
+# R session and history files
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Claude Code agent worktree scratch space
+.claude/worktrees/
+
+# renv: keep activate.R, settings.json, .gitignore, and the lockfile in git;
+# the library itself is host-specific and is excluded by renv/.gitignore.
+# (Listed here too as a safety net.)
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/sandbox/
+renv/staging/

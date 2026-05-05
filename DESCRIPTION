@@ -1,0 +1,38 @@
+Package: consmodelling
+Type: Project
+Title: Australian Household Consumption ECM (Muellbauer-style)
+Version: 0.1.0
+Description: R replication of a Muellbauer/Duca-style integrated household
+    consumption equation for Australia, with a parallel Italy benchmark.
+    This DESCRIPTION is not a true installable package; it serves as a
+    machine-readable manifest of direct package dependencies. The pinned
+    versions of these dependencies (and their transitive closure) are held
+    in renv.lock; restore the environment with renv::restore().
+License: file LICENSE
+Encoding: UTF-8
+Imports:
+    readabs,
+    readxl,
+    dplyr,
+    tidyr,
+    stringr,
+    lubridate,
+    zoo,
+    httr,
+    jsonlite,
+    sandwich,
+    lmtest,
+    strucchange,
+    tibble,
+    ggplot2,
+    broom,
+    urca,
+    mFilter,
+    KFAS,
+    patchwork,
+    pdftools,
+    readr,
+    readrba
+Suggests:
+    testthat,
+    renv

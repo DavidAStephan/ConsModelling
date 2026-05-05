@@ -1,0 +1,82 @@
+name: check
+
+# Runs on every push and every pull request. The job restores the renv-locked
+# R package set, parses every R source file in the project, runs the cached
+# RDS-driven estimation pipeline, and runs the testthat unit tests.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+# Cancel in-flight runs for the same ref when a new commit lands.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    env:
+      # Keep CI logs readable: don't dump per-package install chatter.
+      RENV_CONFIG_INSTALL_VERBOSE: "FALSE"
+      # Avoid renv prompting for confirmation in non-interactive sessions.
+      RENV_CONFIG_AUTO_SNAPSHOT: "FALSE"
+      # CRAN binaries via Posit Public Package Manager: faster installs on
+      # Ubuntu runners. renv honours this through its repos config.
+      RENV_CONFIG_REPOS_OVERRIDE: "https://packagemanager.posit.co/cran/__linux__/jammy/latest"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          # Match the R version pinned in renv.lock (validated locally).
+          r-version: "4.5"
+          use-public-rspm: true
+
+      - name: Cache renv library
+        uses: actions/cache@v4
+        with:
+          # The renv project library lives under renv/library/. The cache
+          # key is bound to the renv.lock hash so a lockfile change forces a
+          # rebuild but unchanged lockfiles get a near-instant restore.
+          path: renv/library
+          key: ${{ runner.os }}-renv-${{ hashFiles('renv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-renv-
+
+      - name: Restore R packages from renv.lock
+        run: Rscript install_packages.R
+
+      - name: Parse R source files
+        # Calling parse() on each script catches syntax errors without
+        # executing any code. Each file is parsed in its own Rscript so a
+        # failure points at a specific path.
+        run: |
+          set -e
+          for f in \
+              Ausreplication/R/australia_consumption_model.R \
+              Ausreplication/R/australia_estimation.R \
+              Ausreplication/R/australia_data_download.R \
+              Ausreplication/R/model_helpers.R \
+              Ausreplication/R/italy_estimation.R \
+              Ausreplication/R/italy_data_download.R \
+              Ausreplication/R/italy_consumption_model.R \
+              Ausreplication/R/italy_australia_comparison.R \
+              Ausreplication/R/run_estimation_from_rds.R; do
+            echo "Parsing $f"
+            Rscript -e "invisible(parse('$f'))"
+          done
+
+      - name: Run estimation from cached RDS
+        # Uses the committed Ausreplication/outputs/australia_model_dataset.rds
+        # so we don't hit the ABS API in CI.
+        run: Rscript Ausreplication/R/run_estimation_from_rds.R
+
+      - name: Run unit tests
+        run: Rscript tests/testthat.R
