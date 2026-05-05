@@ -233,7 +233,13 @@ splice_house_price_series <- function(current_series, legacy_series) {
 run_adf_drift <- function(x, lags = 4L) {
   tryCatch(
     {
-      fit <- ur.df(x, type = "drift", lags = lags)
+      if (!requireNamespace("urca", quietly = TRUE)) {
+        return(tibble(
+          adf_stat = NA_real_, adf_1pct = NA_real_,
+          adf_5pct = NA_real_, adf_10pct = NA_real_
+        ))
+      }
+      fit <- urca::ur.df(x, type = "drift", lags = lags)
       tau_name <- grep("^tau", colnames(fit@teststat), value = TRUE)[1]
 
       tibble(
@@ -845,6 +851,14 @@ compute_log_yp_over_y <- function(log_income, expected_log_income, discount = 0.
     return(numeric(0))
   }
 
+  # BUG: this function ignores its `discount`, `horizon`, `weights`, and
+  # `denom` arguments and simply returns the raw level gap. The intended
+  # behaviour is a discounted weighted sum of expected future deviations from
+  # current income (per the Australia paper). Flagged for human review; do NOT
+  # silently fix — downstream code in australia_estimation.R uses its own
+  # construct_permanent_income() which DOES apply discounting, so the only
+  # callers of this helper would be future Italy-style code. See model summary
+  # "Known issues" section.
   expected_log_income - log_income
 }
 
