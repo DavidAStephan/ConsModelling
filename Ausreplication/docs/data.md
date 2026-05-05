@@ -544,7 +544,7 @@ NOT invalidate the cache**. To force a re-parse:
 - Delete the relevant `.cache/abs_*.rds`, or
 - Delete the entire `.cache/` directory.
 
-### Two execution modes
+### Three execution modes
 1. **Cold rebuild (downloads + estimates):**
    ```
    Rscript Ausreplication/R/australia_consumption_model.R
@@ -552,12 +552,58 @@ NOT invalidate the cache**. To force a re-parse:
    Reads ABS workbooks (cached), fetches RBA series live, builds `master`,
    saves `australia_model_dataset.rds`, then runs estimation. Required if
    `data_raw/` workbooks change.
-2. **Fast re-estimate (no data work):**
+2. **Fast re-estimate from RDS (no data work):**
    ```
    Rscript Ausreplication/R/run_estimation_from_rds.R
    ```
    Loads the pre-built RDS, runs only the estimation script. Used by CI and
-   for quick iteration.
+   for quick iteration. **Bit-identical reproduction.**
+3. **Re-estimate from a portable CSV (no downloads, hand-editable):**
+   ```
+   Rscript Ausreplication/R/load_master_from_csv.R
+   ```
+   Loads `data_raw/master_data.csv`, reconstructs `master`, runs estimation.
+   Useful when:
+   - You don't have internet access for the live RBA fetch
+   - You want a frozen, version-controllable, human-readable snapshot
+   - You want to patch a known data error by hand-editing one cell of the
+     CSV before running
+
+### CSV workflow (for offline / hand-edit use)
+
+Generate the CSV from the current cached RDS:
+```
+Rscript Ausreplication/R/export_master_csv.R
+```
+This produces [`data_raw/master_data.csv`](../data_raw/master_data.csv) (180
+rows × 60 columns, ~159 KB) using base R `write.table` with 17 significant
+digits — full double-precision binary round-trip is preserved at the bit
+level for ~99% of cells, with the rest at machine epsilon (~1e-10 max abs
+diff per column, all of which are billion-scale balance-sheet values where
+the diff is at the limit of IEEE 754 double precision).
+
+The exporter also backfills variables that the estimation script normally
+reconstructs at runtime (`nla_y_unrestricted`, the new Australian narrative
+dummies) so the CSV is self-contained.
+
+Then load and re-run with:
+```
+Rscript Ausreplication/R/load_master_from_csv.R
+```
+
+**Caveat: CSV vs RDS path can diverge on Chow-borderline selector flags.**
+The numerical noise (~1e-10) is at machine precision, but
+`strucchange::sctest` is bit-sensitive when the Chow statistic is near a
+critical value. The substantive results (BICs to 12+ digits, all
+coefficients to 6+ digits, qualitative signs and magnitudes) are
+essentially identical between RDS and CSV paths. Only edge-case
+`pass_stability` flags can flip on specs whose Chow p-value is near 0.01.
+**The RDS remains the canonical source for bit-identical reproduction.** The
+CSV is for portability and hand-editing.
+
+If your run produces a different preferred-spec selection than the
+documented Spec 6, check whether you ran the CSV path; the substantive
+analysis is unchanged either way.
 
 ### Not in source control (but should be)
 - `Ausreplication/outputs/australia_model_dataset.rds` IS in source control

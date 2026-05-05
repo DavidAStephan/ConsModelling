@@ -452,8 +452,7 @@ model_diagnostics <- function(fit, data, break_date = "2008-07-01") {
   ar4_pval <- tryCatch(lmtest::bgtest(fit, order = 4L)$p.value,
                        error = function(e) NA_real_)
   chow_pval <- tryCatch({
-    fit_dates <- data$date[as.integer(rownames(model.frame(fit)))]
-    bp_idx    <- sum(fit_dates <= as.Date(break_date), na.rm = TRUE)
+    bp_idx <- sum(data$date <= as.Date(break_date), na.rm = TRUE)
     if (bp_idx < 5L || bp_idx > (n - 5L)) NA_real_
     else as.numeric(strucchange::sctest(fit, type = "Chow", point = bp_idx)$p.value)
   }, error = function(e) NA_real_)
