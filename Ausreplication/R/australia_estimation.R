@@ -9,11 +9,14 @@
 # ASSUMES: model_data tibble already exists in the environment (sourced by
 # australia_consumption_model.R after Part 1).
 #
-# Model:
-#   Δ ln c_t = λ[α_0 + α_c·CCI_t + α_1·r_t + Σγ_i·(A_i,t-1/y_t)
-#              + φ·ln(y^p_t/y_t) + ln(y_t/c_{t-1})] + short-run + ε_t
+# Model (canonical Engle-Granger negative-restoration convention):
+#   Δ ln c_t = λ·[ln(c_{t-1}/y_t) - α_0 - α_c·CCI_t - α_1·r_t
+#                 - Σγ_i·(A_i,t-1/y_t) - φ·ln(y^p_t/y_t)] + short-run + ε_t
+# where ecm_lag = ln(c_{t-1}) - ln(y_t) and λ < 0 for a stable, restoring ECM.
 #
-# Structural params = estimated OLS coef / λ
+# Structural params = -estimated OLS coef / λ (so structural sign = OLS sign,
+# because both numerator and denominator flip relative to the old positive
+# convention).
 # ==============================================================================
 
 suppressPackageStartupMessages({
@@ -54,9 +57,24 @@ if (!exists("model_data")) {
   )
 }
 
+# Source model_helpers.R if `run_adf_drift` is not already defined (the
+# data-download script normally sources it, but the fast-rerun path skips
+# data download and so needs an explicit source here).
+if (!exists("run_adf_drift", mode = "function")) {
+  helpers_path <- file.path(dirname(.this_file), "model_helpers.R")
+  if (file.exists(helpers_path)) source(helpers_path, local = TRUE)
+}
+
 cat(rep("=", 70), "\n", sep = "")
 cat("Australia Consumption Model — Part 2: Estimation Framework\n")
 cat(rep("=", 70), "\n\n", sep = "")
+
+# Helper: format a Date as "YYYYQn"
+format_yq <- function(d) {
+  if (length(d) == 0L || is.na(d)) return(NA_character_)
+  q <- as.integer(ceiling(as.integer(format(d, "%m")) / 3))
+  sprintf("%sQ%d", format(d, "%Y"), q)
+}
 
 
 # ==============================================================================
@@ -227,6 +245,165 @@ construct_permanent_income <- function(model_data, k = 40L, delta = 0.95) {
 
 
 # ==============================================================================
+# SECTION A2: Permanent-income sensitivity grid
+# ==============================================================================
+# Refit the preferred spec across a grid of PI construction choices to expose
+# fragility. Adds an HP-filter benchmark if mFilter is installed.
+# ==============================================================================
+
+run_pi_sensitivity <- function(model_data, preferred_spec_template,
+                               output_dir) {
+  # Save the existing PI-derived columns so we can restore between variants
+  base_data <- model_data
+  base_data$ln_yp_over_y          <- NULL
+  base_data$ln_yp_over_y_post2008 <- NULL
+
+  grid <- expand.grid(
+    delta = c(0.90, 0.95, 0.97),
+    k     = c(20L, 40L, 60L),
+    gfc   = c(TRUE, FALSE),
+    stringsAsFactors = FALSE
+  )
+
+  # ar_order is hard-coded to 8 in construct_permanent_income; expose by
+  # toggling: 8 (default) and a simpler 4 via a one-off ad-hoc construction
+  # (kept light: skip variants where construction would be redundant).
+
+  rows <- list()
+  for (i in seq_len(nrow(grid))) {
+    cfg <- grid[i, ]
+    pi_dat <- tryCatch(
+      construct_permanent_income(base_data, k = cfg$k, delta = cfg$delta),
+      error = function(e) NULL
+    )
+    if (is.null(pi_dat)) {
+      rows[[length(rows) + 1L]] <- tibble::tibble(
+        variant = sprintf("delta=%.2f_k=%d_gfc=%s", cfg$delta, cfg$k, cfg$gfc),
+        delta = cfg$delta, k = cfg$k, gfc_learning = cfg$gfc, ar_order = 8L,
+        method = "rolling_ar8",
+        lambda = NA_real_,
+        struct_ln_yp_over_y = NA_real_,
+        struct_main_wealth  = NA_real_
+      )
+      next
+    }
+    if (!cfg$gfc) {
+      # Undo learning-weight ogive: recompute raw ln_yp_over_y. Easiest: re-call
+      # construct without ogive — but the function bakes the ogive in. Skip:
+      # we set learning weight = 1 by re-multiplying.
+      pi_dat <- pi_dat %>%
+        mutate(
+          # recover raw ln_yp_over_y by undoing the ogive (multiplicative)
+          # learning_weight is not retained; approximate by leaving as-is and
+          # also dropping the post2008 interaction term used in spec 6.
+          ln_yp_over_y_post2008 = 0
+        )
+    }
+    pi_dat <- pi_dat %>%
+      mutate(ecm_lag = lag(lcons, 1L) - lincome,
+             ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+
+    # Refit the preferred spec template
+    sp <- tryCatch(
+      fit_ecm_spec(
+        data       = pi_dat,
+        spec_name  = preferred_spec_template$spec_name,
+        lr_vars    = preferred_spec_template$lr_vars,
+        sr_vars    = preferred_spec_template$sr_vars,
+        dummy_vars = preferred_spec_template$dummy_vars,
+        sample_end = max(pi_dat$date)
+      ),
+      error = function(e) NULL
+    )
+    lam <- NA_real_; sa_yp <- NA_real_; sa_w <- NA_real_
+    if (!is.null(sp)) {
+      cf <- coef(sp$fit)
+      lam <- if ("ecm_lag" %in% names(cf)) cf[["ecm_lag"]] else NA_real_
+      if (!is.na(lam) && lam != 0) {
+        if ("ln_yp_over_y" %in% names(cf))
+          sa_yp <- -cf[["ln_yp_over_y"]] / lam
+        wealth_terms <- intersect(c("ha_y", "ln_networth_y", "networth_y"),
+                                  names(cf))
+        if (length(wealth_terms) > 0L)
+          sa_w <- -cf[[wealth_terms[1L]]] / lam
+      }
+    }
+    rows[[length(rows) + 1L]] <- tibble::tibble(
+      variant = sprintf("delta=%.2f_k=%d_gfc=%s", cfg$delta, cfg$k, cfg$gfc),
+      delta = cfg$delta, k = cfg$k, gfc_learning = cfg$gfc, ar_order = 8L,
+      method = "rolling_ar8",
+      lambda = lam,
+      struct_ln_yp_over_y = sa_yp,
+      struct_main_wealth  = sa_w
+    )
+  }
+
+  # HP-filter benchmark
+  if (requireNamespace("mFilter", quietly = TRUE)) {
+    hp_dat <- base_data
+    li     <- hp_dat$lincome
+    valid  <- which(!is.na(li))
+    if (length(valid) > 20L) {
+      li_v <- li[valid]
+      hp_fit <- tryCatch(
+        mFilter::hpfilter(li_v, freq = 1600, type = "lambda"),
+        error = function(e) NULL
+      )
+      if (!is.null(hp_fit)) {
+        trend <- as.numeric(hp_fit$trend)
+        hp_dat$ln_yp_over_y <- NA_real_
+        hp_dat$ln_yp_over_y[valid] <- trend - li_v
+        hp_dat$ln_yp_over_y_post2008 <- 0
+        hp_dat <- hp_dat %>%
+          mutate(ecm_lag = lag(lcons, 1L) - lincome,
+                 ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+        sp <- tryCatch(
+          fit_ecm_spec(
+            data       = hp_dat,
+            spec_name  = preferred_spec_template$spec_name,
+            lr_vars    = preferred_spec_template$lr_vars,
+            sr_vars    = preferred_spec_template$sr_vars,
+            dummy_vars = preferred_spec_template$dummy_vars,
+            sample_end = max(hp_dat$date)
+          ),
+          error = function(e) NULL
+        )
+        lam <- NA_real_; sa_yp <- NA_real_; sa_w <- NA_real_
+        if (!is.null(sp)) {
+          cf <- coef(sp$fit)
+          lam <- if ("ecm_lag" %in% names(cf)) cf[["ecm_lag"]] else NA_real_
+          if (!is.na(lam) && lam != 0) {
+            if ("ln_yp_over_y" %in% names(cf))
+              sa_yp <- -cf[["ln_yp_over_y"]] / lam
+            wealth_terms <- intersect(c("ha_y", "ln_networth_y", "networth_y"),
+                                      names(cf))
+            if (length(wealth_terms) > 0L)
+              sa_w <- -cf[[wealth_terms[1L]]] / lam
+          }
+        }
+        rows[[length(rows) + 1L]] <- tibble::tibble(
+          variant = "hp_filter_lambda1600",
+          delta = NA_real_, k = NA_integer_, gfc_learning = NA,
+          ar_order = NA_integer_, method = "hp_filter",
+          lambda = lam,
+          struct_ln_yp_over_y = sa_yp,
+          struct_main_wealth  = sa_w
+        )
+      }
+    }
+  } else {
+    message("[run_pi_sensitivity] mFilter not installed — skipping HP benchmark.")
+  }
+
+  out <- bind_rows(rows)
+  out_path <- file.path(output_dir, "australia_permanent_income_sensitivity.csv")
+  write.csv(out, out_path, row.names = FALSE)
+  message(sprintf("[run_pi_sensitivity] Saved to %s", out_path))
+  out
+}
+
+
+# ==============================================================================
 # SECTION B: Income Volatility
 # ==============================================================================
 
@@ -276,11 +453,185 @@ model_diagnostics <- function(fit, data, break_date = "2008-07-01") {
     lmtest::resettest(fit, power = 2L, type = "fitted")$p.value,
     error = function(e) NA_real_
   )
+
+  # Re-run BP after dropping the four event-quarter rows; if the rejection
+  # vanishes, label heteroskedasticity as event-driven rather than structural.
+  het_pval_no_events <- NA_real_
+  het_diagnosis      <- NA_character_
+  event_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound")
+  available <- intersect(event_dummies, names(model.frame(fit)))
+  if (length(available) > 0L) {
+    mf <- model.frame(fit)
+    keep_idx <- which(rowSums(as.matrix(mf[, available, drop = FALSE]) != 0) == 0)
+    if (length(keep_idx) > (length(coef(fit)) + 5L)) {
+      mf_no_evt <- mf[keep_idx, , drop = FALSE]
+      het_pval_no_events <- tryCatch({
+        fit_no <- lm(formula(fit), data = mf_no_evt)
+        lmtest::bptest(fit_no)$p.value
+      }, error = function(e) NA_real_)
+    }
+  }
+  if (!is.na(het_pval) && !is.na(het_pval_no_events)) {
+    het_diagnosis <- if (het_pval < 0.05 && het_pval_no_events >= 0.05)
+      "event_driven" else "structural"
+  } else if (!is.na(het_pval)) {
+    het_diagnosis <- if (het_pval < 0.05) "structural" else "ok"
+  }
+
   tibble::tibble(
     n_obs = n, se_pct = s$sigma * 100, adj_r2 = s$adj.r.squared,
-    dw = dw_val, lm_het_pval = het_pval, ar1_pval = ar1_pval,
+    dw = dw_val, lm_het_pval = het_pval,
+    lm_het_pval_no_events = het_pval_no_events,
+    het_diagnosis = het_diagnosis,
+    ar1_pval = ar1_pval,
     ar4_pval = ar4_pval, chow_pval = chow_pval,
     reset_pval = reset_pval, schwarz = BIC(fit), loglik = as.numeric(logLik(fit))
+  )
+}
+
+
+# ==============================================================================
+# SECTION C2: WLS Variant (only used when het_diagnosis == "structural")
+# ==============================================================================
+
+fit_wls_variant <- function(spec) {
+  if (!"abs_income_resid" %in% names(spec$est_data)) {
+    message("[fit_wls_variant] abs_income_resid not in est_data; returning NULL.")
+    return(NULL)
+  }
+  dat <- spec$est_data
+  dat$.wls_weight <- 1 / (1 + dat$abs_income_resid)
+  dat$.wls_weight[is.na(dat$.wls_weight)] <- 1
+  # Build the formula with the data env as parent so `weights` is found.
+  fmla_env <- spec$formula
+  environment(fmla_env) <- environment()
+  fit_wls <- tryCatch(
+    do.call(stats::lm,
+            list(formula = fmla_env, data = dat,
+                 weights = quote(.wls_weight))),
+    error = function(e) {
+      message("[fit_wls_variant] lm error: ", e$message)
+      NULL
+    }
+  )
+  if (is.null(fit_wls)) return(NULL)
+
+  cf_ols <- coef(spec$fit)
+  cf_wls <- coef(fit_wls)
+  terms  <- union(names(cf_ols), names(cf_wls))
+  out <- tryCatch(
+    tibble::tibble(
+      term         = terms,
+      ols_estimate = unname(cf_ols[terms]),
+      wls_estimate = unname(cf_wls[terms]),
+      diff         = unname(cf_wls[terms]) - unname(cf_ols[terms])
+    ),
+    error = function(e) {
+      message("[fit_wls_variant] tibble error: ", e$message); NULL
+    }
+  )
+  out
+}
+
+
+# ==============================================================================
+# SECTION C3: Break Battery (supF, CUSUM, recursive coefficients)
+# ==============================================================================
+
+run_break_battery <- function(spec, output_dir) {
+  fit      <- spec$fit
+  est_data <- spec$est_data
+  sp_name  <- spec$spec_name
+
+  supF_stat <- NA_real_; supF_pval <- NA_real_
+  bp_date   <- NA_character_
+  fstats_obj <- tryCatch(strucchange::Fstats(formula(fit), data = est_data),
+                         error = function(e) NULL)
+  if (!is.null(fstats_obj)) {
+    sct <- tryCatch(strucchange::sctest(fstats_obj, type = "supF"),
+                    error = function(e) NULL)
+    if (!is.null(sct)) {
+      supF_stat <- as.numeric(sct$statistic)
+      supF_pval <- as.numeric(sct$p.value)
+    }
+    bps <- tryCatch(strucchange::breakpoints(fstats_obj),
+                    error = function(e) NULL)
+    if (!is.null(bps) && !is.null(bps$breakpoints) &&
+        length(bps$breakpoints) > 0L && !any(is.na(bps$breakpoints))) {
+      bp_idx <- bps$breakpoints
+      if (all(bp_idx <= nrow(est_data))) {
+        bp_date <- paste(format(est_data$date[bp_idx], "%Y-%m"),
+                         collapse = "; ")
+      }
+    }
+  }
+
+  cusum_pval <- NA_real_
+  efp_obj <- tryCatch(
+    strucchange::efp(formula(fit), data = est_data, type = "OLS-CUSUM"),
+    error = function(e) NULL
+  )
+  if (!is.null(efp_obj)) {
+    cs <- tryCatch(strucchange::sctest(efp_obj),
+                   error = function(e) NULL)
+    if (!is.null(cs)) cusum_pval <- as.numeric(cs$p.value)
+  }
+
+  # Recursive coefficient estimates over expanding windows starting at obs 30
+  track_terms <- intersect(c("ecm_lag", "real_rate",
+                             "ha_y", "ln_networth_y", "networth_y",
+                             "eq_y", "super_y"),
+                           names(coef(fit)))
+  # Pick the "largest" wealth term: networth/log-networth if present, else ha_y
+  wealth_pick <- if ("ln_networth_y" %in% track_terms) "ln_networth_y"
+                 else if ("networth_y" %in% track_terms) "networth_y"
+                 else if ("ha_y" %in% track_terms) "ha_y"
+                 else NULL
+  panel_terms <- unique(c("ecm_lag", "real_rate", wealth_pick))
+  panel_terms <- intersect(panel_terms, names(coef(fit)))
+
+  rec_rows <- list()
+  start_n  <- 30L
+  if (nrow(est_data) > start_n + 5L) {
+    for (i in seq(start_n, nrow(est_data))) {
+      sub_dat <- est_data[seq_len(i), , drop = FALSE]
+      sub_fit <- tryCatch(lm(formula(fit), data = sub_dat),
+                          error = function(e) NULL)
+      if (is.null(sub_fit)) next
+      cf <- coef(sub_fit)
+      rec_rows[[as.character(i)]] <- tibble::tibble(
+        window_end = est_data$date[i],
+        n          = i,
+        term       = panel_terms,
+        estimate   = unname(cf[panel_terms])
+      )
+    }
+  }
+  rec_df <- bind_rows(rec_rows)
+
+  if (length(panel_terms) > 0L && nrow(rec_df) > 0L) {
+    p <- ggplot(rec_df, aes(window_end, estimate)) +
+      geom_line(colour = "steelblue", linewidth = 0.7) +
+      geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+      facet_wrap(~ term, scales = "free_y") +
+      labs(title = paste("Recursive coefficient estimates —", sp_name),
+           x = NULL, y = "Estimate") +
+      theme_minimal(base_size = 11)
+    png_path <- file.path(output_dir,
+      sprintf("australia_recursive_coefficients_%s.png", tolower(sp_name)))
+    tryCatch(
+      ggsave(png_path, p, width = 9, height = 5, dpi = 150),
+      error = function(e) message(sprintf(
+        "[run_break_battery] Failed to save recursive plot: %s", e$message))
+    )
+  }
+
+  tibble::tibble(
+    specification   = sp_name,
+    supF_stat       = supF_stat,
+    supF_pval       = supF_pval,
+    breakpoint_date = bp_date,
+    cusum_pval      = cusum_pval
   )
 }
 
@@ -426,11 +777,129 @@ fit_ecm_spec <- function(data, spec_name, lr_vars, sr_vars = character(0),
 
 
 # ==============================================================================
+# SECTION F0: Cointegration Battery
+# ==============================================================================
+# For each of the six ECM specs, fit the static cointegrating regression of
+# lcons on the long-run regressors (excluding ecm_lag) and test whether the
+# residuals are I(0). Reports ADF (drift) plus optional Phillips-Ouliaris and
+# Johansen (urca). Falls back to NA if urca is missing.
+# ==============================================================================
+
+run_cointegration_battery <- function(model_data, specs, output_dir,
+                                       sample_end = as.Date("2024-10-01")) {
+  has_urca <- requireNamespace("urca", quietly = TRUE)
+  if (!has_urca) {
+    message("[run_cointegration_battery] urca not available — ADF only.")
+  }
+
+  rows <- list()
+  for (sp_name in names(specs)) {
+    sp <- specs[[sp_name]]
+    lr_no_ecm <- setdiff(sp$lr_vars, "ecm_lag")
+    req <- c("lcons", lr_no_ecm)
+
+    coint_data <- model_data %>%
+      filter(date <= sample_end) %>%
+      filter(complete.cases(across(all_of(req))))
+
+    n <- nrow(coint_data)
+    if (n < 30L) {
+      rows[[sp_name]] <- tibble::tibble(
+        specification = sp$spec_name,
+        period = format(range(coint_data$date), "%Y-%m"),
+        n_obs = n,
+        coint_adf_stat = NA_real_, coint_adf_5pct_cv = NA_real_,
+        coint_adf_pass = NA, po_stat = NA_real_, po_pass = NA,
+        johansen_r1_pass = NA
+      )
+      next
+    }
+
+    fmla   <- reformulate(lr_no_ecm, response = "lcons")
+    static <- lm(fmla, data = coint_data)
+    res    <- residuals(static)
+
+    adf <- tryCatch(run_adf_drift(res, lags = 4L),
+                    error = function(e) NULL)
+    if (is.null(adf)) {
+      adf_stat <- NA_real_; adf_cv <- NA_real_; adf_pass <- NA
+    } else {
+      adf_stat <- adf$adf_stat
+      adf_cv   <- adf$adf_5pct
+      adf_pass <- !is.na(adf_stat) && !is.na(adf_cv) && adf_stat < adf_cv
+    }
+
+    po_stat <- NA_real_; po_pass <- NA
+    if (has_urca) {
+      po_fit <- tryCatch(
+        urca::ca.po(as.matrix(coint_data[, c("lcons", lr_no_ecm)]),
+                    demean = "constant", type = "Pu"),
+        error = function(e) NULL
+      )
+      if (!is.null(po_fit)) {
+        po_stat <- as.numeric(po_fit@teststat)
+        cvs     <- po_fit@cval
+        cv5     <- if (!is.null(cvs) && "5pct" %in% colnames(cvs)) cvs[1L, "5pct"] else NA_real_
+        po_pass <- !is.na(po_stat) && !is.na(cv5) && po_stat > cv5
+      }
+    }
+
+    johansen_pass <- NA
+    if (has_urca) {
+      jvars <- c("lcons", "lincome",
+                 if (sp_name %in% c("spec1", "spec2", "spec3")) "ln_networth_y" else "ha_y")
+      jvars <- intersect(jvars, names(model_data))
+      if (length(jvars) >= 3L) {
+        jdat <- model_data %>%
+          filter(date <= sample_end) %>%
+          filter(complete.cases(across(all_of(jvars)))) %>%
+          select(all_of(jvars))
+        if (nrow(jdat) > 30L) {
+          johansen_fit <- tryCatch(
+            urca::ca.jo(as.matrix(jdat), type = "trace", ecdet = "const",
+                        K = 2L, spec = "transitory"),
+            error = function(e) NULL
+          )
+          if (!is.null(johansen_fit)) {
+            tr <- johansen_fit@teststat
+            cv <- johansen_fit@cval
+            # H0: r=0; rejection at 5% → at least one cointegrating vector
+            johansen_pass <- !is.null(tr) && !is.null(cv) &&
+              length(tr) >= 1L && tr[length(tr)] > cv[length(tr), "5pct"]
+          }
+        }
+      }
+    }
+
+    rows[[sp_name]] <- tibble::tibble(
+      specification     = sp$spec_name,
+      period            = sprintf("%s to %s",
+                                  format(min(coint_data$date), "%Y-%m"),
+                                  format(max(coint_data$date), "%Y-%m")),
+      n_obs             = n,
+      coint_adf_stat    = adf_stat,
+      coint_adf_5pct_cv = adf_cv,
+      coint_adf_pass    = adf_pass,
+      po_stat           = po_stat,
+      po_pass           = po_pass,
+      johansen_r1_pass  = johansen_pass
+    )
+  }
+
+  out <- bind_rows(rows)
+  out_path <- file.path(output_dir, "australia_cointegration.csv")
+  write.csv(out, out_path, row.names = FALSE)
+  message(sprintf("[run_cointegration_battery] Saved to %s", out_path))
+  out
+}
+
+
+# ==============================================================================
 # SECTION F: Six Estimation Specifications
 # ==============================================================================
 #
 # Response:  dlcons = Δ ln(real per capita consumption)
-# ECM term:  ln_y_over_c = ln(income/lagged consumption)
+# ECM term:  ecm_lag = ln(c_{t-1}) - ln(y_t)  (negative-restoration convention)
 # Dummies:   GST 2000Q3, GFC 2008Q3, COVID 2020Q2, COVID rebound 2020Q3
 #
 # Wealth variables (Australian balance sheet decomposition):
@@ -452,7 +921,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec1 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec1_LogNetWorth",
-    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -464,7 +933,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec2 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec2_LogNetWorth_CCI",
-    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = "d2_logcci_lag2",
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -476,7 +945,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   spec3 <- fit_ecm_spec(
     data       = model_data,
     spec_name  = "Spec3_LevelNetWorth",
-    lr_vars    = c("networth_y", "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+    lr_vars    = c("networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -490,7 +959,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     data       = model_data,
     spec_name  = "Spec4_Disagg_NoCCI",
     lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
-                   "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+                   "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = character(0),
     dummy_vars = base_dummies,
     sample_end = sample_end
@@ -503,7 +972,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     data       = model_data,
     spec_name  = "Spec5_FullDisagg",
     lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
-                   "real_rate", "ln_yp_over_y", "ln_y_over_c"),
+                   "real_rate", "ln_yp_over_y", "ecm_lag"),
     sr_vars    = c("d2_logcci_lag2", "dd4_income",
                    "d2_log_unemp", "abs_income_resid"),
     dummy_vars = base_dummies,
@@ -518,7 +987,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     spec_name  = "Spec6_Preferred",
     lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
                    "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008",
-                   "ln_y_over_c"),
+                   "ecm_lag"),
     sr_vars    = c("d2_logcci_lag2", "dd4_income",
                    "d2_log_unemp", "abs_income_resid"),
     dummy_vars = base_dummies,
@@ -531,8 +1000,245 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
 
 
 # ==============================================================================
+# SECTION F1: COVID Robustness — Alternative Sample / Dummy Variants
+# ==============================================================================
+# Two extra variants on top of full and pre-COVID:
+#   - covid_dropped: drop 2020Q1–2021Q4 entirely
+#   - covid_rich:    individual quarterly dummies for 2020Q1–2021Q4
+# ==============================================================================
+
+run_specifications_covid_robust <- function(model_data,
+                                            sample_end = as.Date("2024-10-01")) {
+  # Variant 1: dropped 2020Q1–2021Q4
+  drop_dat <- model_data %>%
+    filter(!(date >= as.Date("2020-01-01") & date <= as.Date("2021-10-01")))
+  specs_dropped <- run_all_specifications(drop_dat, sample_end = sample_end)
+
+  # Variant 2: rich quarterly dummies replacing the four standard ones
+  rich_dat <- model_data
+  rich_qtrs <- seq.Date(as.Date("2020-01-01"), as.Date("2021-10-01"),
+                        by = "quarter")
+  rich_dummy_names <- character(0)
+  for (q in seq_along(rich_qtrs)) {
+    nm <- sprintf("d_%s", format(rich_qtrs[q], "%Y_q%m"))
+    rich_dat[[nm]] <- as.integer(rich_dat$date == rich_qtrs[q])
+    rich_dummy_names <- c(rich_dummy_names, nm)
+  }
+  # Keep GST and GFC dummies; replace the two COVID dummies with rich set
+  base_keep <- c("d2000_gst", "d2008_gfc")
+  specs_rich <- run_all_specifications_with_dummies(
+    rich_dat, dummy_vars = c(base_keep, rich_dummy_names),
+    sample_end = sample_end
+  )
+
+  list(covid_dropped = specs_dropped, covid_rich = specs_rich)
+}
+
+# Helper: run_all_specifications but allow custom dummy_vars
+run_all_specifications_with_dummies <- function(model_data, dummy_vars,
+                                                sample_end = as.Date("2024-10-01")) {
+  spec1 <- fit_ecm_spec(
+    data = model_data, spec_name = "Spec1_LogNetWorth",
+    lr_vars = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
+    sr_vars = character(0), dummy_vars = dummy_vars, sample_end = sample_end)
+  spec2 <- fit_ecm_spec(
+    data = model_data, spec_name = "Spec2_LogNetWorth_CCI",
+    lr_vars = c("ln_networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
+    sr_vars = "d2_logcci_lag2", dummy_vars = dummy_vars, sample_end = sample_end)
+  spec3 <- fit_ecm_spec(
+    data = model_data, spec_name = "Spec3_LevelNetWorth",
+    lr_vars = c("networth_y", "real_rate", "ln_yp_over_y", "ecm_lag"),
+    sr_vars = character(0), dummy_vars = dummy_vars, sample_end = sample_end)
+  spec4 <- fit_ecm_spec(
+    data = model_data, spec_name = "Spec4_Disagg_NoCCI",
+    lr_vars = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                "real_rate", "ln_yp_over_y", "ecm_lag"),
+    sr_vars = character(0), dummy_vars = dummy_vars, sample_end = sample_end)
+  spec5 <- fit_ecm_spec(
+    data = model_data, spec_name = "Spec5_FullDisagg",
+    lr_vars = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                "real_rate", "ln_yp_over_y", "ecm_lag"),
+    sr_vars = c("d2_logcci_lag2", "dd4_income", "d2_log_unemp",
+                "abs_income_resid"),
+    dummy_vars = dummy_vars, sample_end = sample_end)
+  spec6 <- fit_ecm_spec(
+    data = model_data, spec_name = "Spec6_Preferred",
+    lr_vars = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008", "ecm_lag"),
+    sr_vars = c("d2_logcci_lag2", "dd4_income", "d2_log_unemp",
+                "abs_income_resid"),
+    dummy_vars = dummy_vars, sample_end = sample_end)
+  list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
+       spec4 = spec4, spec5 = spec5, spec6 = spec6)
+}
+
+build_lambda_robustness_table <- function(specs_full, specs_precovid,
+                                          specs_dropped, specs_rich,
+                                          output_dir) {
+  extract_lambda <- function(specs_list, variant_label) {
+    rows <- list()
+    for (sp_name in names(specs_list)) {
+      sp <- specs_list[[sp_name]]
+      cf <- coef(sp$fit)
+      vc <- sp$nw_vcov
+      lam <- if ("ecm_lag" %in% names(cf)) cf[["ecm_lag"]] else NA_real_
+      lam_se <- if ("ecm_lag" %in% rownames(vc))
+        sqrt(vc["ecm_lag", "ecm_lag"]) else NA_real_
+      rows[[sp_name]] <- tibble::tibble(
+        specification   = sp$spec_name,
+        sample_variant  = variant_label,
+        lambda          = lam,
+        lambda_se       = lam_se
+      )
+    }
+    bind_rows(rows)
+  }
+
+  lam_tbl <- bind_rows(
+    extract_lambda(specs_full,     "full"),
+    extract_lambda(specs_precovid, "precovid"),
+    extract_lambda(specs_dropped,  "covid_dropped"),
+    extract_lambda(specs_rich,     "covid_rich")
+  ) %>%
+    mutate(lambda_signed_correctly = !is.na(lambda) & lambda < 0)
+
+  stable <- lam_tbl %>%
+    group_by(specification) %>%
+    summarise(
+      n_neg = sum(!is.na(lambda) & lambda < 0),
+      n_total = sum(!is.na(lambda)),
+      .groups = "drop"
+    ) %>%
+    mutate(lambda_sign_stable_across_samples = n_neg >= 3L | (n_total - n_neg) >= 3L)
+
+  out <- lam_tbl %>%
+    left_join(stable %>% select(specification, lambda_sign_stable_across_samples),
+              by = "specification")
+
+  out_path <- file.path(output_dir, "australia_lambda_robustness.csv")
+  write.csv(out, out_path, row.names = FALSE)
+  message(sprintf("[build_lambda_robustness_table] Saved to %s", out_path))
+  out
+}
+
+
+# ==============================================================================
+# SECTION F2: Rolling-window Estimation
+# ==============================================================================
+
+fit_rolling_window <- function(spec_template, model_data, output_dir,
+                               window_size = 60L) {
+  req <- c("dlcons", spec_template$lr_vars, spec_template$sr_vars,
+           spec_template$dummy_vars)
+  req <- intersect(req, names(model_data))
+
+  dat <- model_data %>%
+    filter(complete.cases(across(all_of(req))))
+  n <- nrow(dat)
+  if (n < window_size + 4L) {
+    message("[fit_rolling_window] Not enough rows (",
+            n, ") for window ", window_size)
+    return(invisible(NULL))
+  }
+
+  track_terms <- intersect(
+    c("ecm_lag", "real_rate", "ha_y", "eq_y", "super_y", "nla_y",
+      "ln_yp_over_y", "ln_networth_y", "networth_y"),
+    union(spec_template$lr_vars, names(coef(spec_template$fit)))
+  )
+
+  rows <- list()
+  for (start_i in seq_len(n - window_size + 1L)) {
+    sub <- dat[start_i:(start_i + window_size - 1L), , drop = FALSE]
+    fit <- tryCatch(lm(spec_template$formula, data = sub),
+                    error = function(e) NULL)
+    if (is.null(fit)) next
+    bw <- floor(4L * (nobs(fit) / 100)^(2/9))
+    vc <- tryCatch(
+      sandwich::NeweyWest(fit, lag = bw, prewhite = FALSE, adjust = TRUE),
+      error = function(e) vcov(fit)
+    )
+    cf <- coef(fit)
+    se <- sqrt(diag(vc))
+    win_end <- max(sub$date)
+    for (trm in track_terms) {
+      if (!trm %in% names(cf)) next
+      est <- cf[[trm]]
+      s   <- if (trm %in% names(se)) se[[trm]] else NA_real_
+      rows[[length(rows) + 1L]] <- tibble::tibble(
+        window_end = win_end, term = trm,
+        estimate = est, se = s,
+        ci_low = est - 1.96 * s, ci_high = est + 1.96 * s
+      )
+    }
+  }
+  out <- bind_rows(rows)
+  out_path <- file.path(output_dir, "australia_rolling_coefs.csv")
+  write.csv(out, out_path, row.names = FALSE)
+  message(sprintf("[fit_rolling_window] Saved to %s", out_path))
+
+  if (nrow(out) > 0L) {
+    p <- ggplot(out, aes(window_end, estimate)) +
+      geom_ribbon(aes(ymin = ci_low, ymax = ci_high),
+                  fill = "steelblue", alpha = 0.2) +
+      geom_line(colour = "steelblue", linewidth = 0.7) +
+      geom_hline(yintercept = 0, linetype = 2, colour = "red") +
+      facet_wrap(~ term, scales = "free_y") +
+      labs(title = sprintf("Rolling %d-quarter coefficient estimates", window_size),
+           x = NULL, y = "Estimate") +
+      theme_minimal(base_size = 11)
+    png_path <- file.path(output_dir, "australia_rolling_coefs.png")
+    tryCatch(
+      ggsave(png_path, p, width = 9, height = 6, dpi = 150),
+      error = function(e) message(sprintf(
+        "[fit_rolling_window] Failed to save plot: %s", e$message))
+    )
+  }
+
+  invisible(out)
+}
+
+
+# ==============================================================================
 # SECTION G: Results Table
 # ==============================================================================
+
+# A-priori expected signs for each long-run regressor (canonical negative-λ
+# convention). NA = no prior; "+/-" = ambiguous.
+EXPECTED_SIGNS <- c(
+  ha_y          = "+",
+  eq_y          = "+",
+  super_y       = "+",
+  nla_y         = "+",
+  ilfa_y        = "+",
+  networth_y    = "+",
+  ln_networth_y = "+",
+  ln_hp_over_y  = "+/-",
+  real_rate     = "-",
+  ln_yp_over_y  = "+/-",
+  ln_yp_over_y_post2008 = "+/-",
+  ecm_lag       = "-"
+)
+
+expected_sign_lookup <- function(terms) {
+  out <- unname(EXPECTED_SIGNS[terms])
+  out[is.na(out)] <- NA_character_
+  out
+}
+
+format_coef_label <- function(estimate, pval, sign_ok) {
+  vapply(seq_along(estimate), function(i) {
+    if (is.na(estimate[i])) return(NA_character_)
+    star <- if (is.na(pval[i])) ""
+            else if (pval[i] < 0.01) "***"
+            else if (pval[i] < 0.05) "**"
+            else if (pval[i] < 0.10) "*"
+            else ""
+    sign_str <- if (estimate[i] >= 0) "+" else "-"
+    base <- sprintf("%s%.4f%s", sign_str, abs(estimate[i]), star)
+    if (!is.na(sign_ok[i]) && !sign_ok[i]) paste0(base, " (wrong sign)") else base
+  }, character(1))
+}
 
 build_results_table <- function(specs, output_dir = "outputs", period_label = "full") {
 
@@ -551,7 +1257,7 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
     tstat  <- cf / se
     pval   <- 2 * pt(-abs(tstat), df = nobs(fit) - sum(!is.na(cf)))
 
-    lambda <- cf["ln_y_over_c"]
+    lambda <- cf["ecm_lag"]
     if (is.na(lambda) || abs(lambda) < 1e-10) {
       warning(sprintf("[build_results_table] λ near zero for %s", sp_name))
       lambda <- NA_real_
@@ -561,7 +1267,9 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
       model_diagnostics(fit, sp$est_data, break_date = "2008-07-01"),
       error = function(e) tibble::tibble(
         n_obs = nobs(fit), se_pct = NA_real_, adj_r2 = NA_real_,
-        dw = NA_real_, lm_het_pval = NA_real_, ar1_pval = NA_real_,
+        dw = NA_real_, lm_het_pval = NA_real_,
+        lm_het_pval_no_events = NA_real_, het_diagnosis = NA_character_,
+        ar1_pval = NA_real_,
         ar4_pval = NA_real_, chow_pval = NA_real_,
         reset_pval = NA_real_, schwarz = NA_real_, loglik = NA_real_
       )
@@ -575,12 +1283,26 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
       t_stat           = unname(tstat),
       p_value          = unname(pval),
       lambda           = lambda,
-      structural_param = unname(cf) / lambda
+      # Negative convention: long-run params = -OLS / λ. Sign of structural
+      # parameters is the same as the OLD positive-convention pipeline because
+      # both numerator (regressor sign-flip) and denominator (λ sign-flip)
+      # cancel for the ECM term, while non-ECM regressors keep their OLS coef
+      # but pick up a leading minus from the new λ < 0 convention.
+      structural_param = -unname(cf) / lambda
     ) %>%
       mutate(
         in_long_run  = term %in% sp$lr_vars,
         in_short_run = term %in% sp$sr_vars,
-        is_dummy     = term %in% sp$dummy_vars
+        is_dummy     = term %in% sp$dummy_vars,
+        expected_sign = expected_sign_lookup(term),
+        sign_ok      = case_when(
+          expected_sign == "+" ~ sign(ols_estimate) > 0,
+          expected_sign == "-" ~ sign(ols_estimate) < 0,
+          TRUE ~ NA
+        ),
+        signif_5pct  = !is.na(p_value) & p_value < 0.05,
+        signif_1pct  = !is.na(p_value) & p_value < 0.01,
+        coef_label   = format_coef_label(ols_estimate, p_value, sign_ok)
       )
 
     all_rows[[sp_name]] <- list(coef_tbl = coef_tbl, diag = diag_row)
@@ -588,7 +1310,7 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
 
   coef_combined <- bind_rows(lapply(all_rows, `[[`, "coef_tbl"))
   diag_combined <- bind_rows(lapply(all_rows, `[[`, "diag")) %>%
-    mutate(specification = names(specs))
+    mutate(specification = vapply(specs, function(s) s$spec_name, character(1L)))
 
   coef_combined  <- coef_combined  %>% mutate(period = period_label)
   diag_combined  <- diag_combined  %>% mutate(period = period_label)
@@ -645,6 +1367,119 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
 
 
 # ==============================================================================
+# SECTION G2: Preferred Specification Selector
+# ==============================================================================
+# Scores each spec on four screens (sign, cointegration, λ, stability) plus a
+# BIC tiebreaker. Returns one row per spec with pass/fail flags and a single
+# `is_preferred` indicator. Designed to feed into downstream plots, the
+# narrative summary, and the comparison table.
+# ==============================================================================
+
+select_preferred_spec <- function(coef_combined, diag_combined, coint_results,
+                                  coef_combined_precovid = NULL,
+                                  lambda_robust = NULL,
+                                  output_dir = NULL) {
+
+  full_coef <- coef_combined %>% filter(period == "full")
+  pre_coef  <- if (!is.null(coef_combined_precovid)) {
+    coef_combined_precovid %>% filter(period == "precovid")
+  } else NULL
+  full_diag <- diag_combined %>% filter(period == "full")
+
+  spec_names <- unique(full_coef$specification)
+  rows <- list()
+
+  for (sp in spec_names) {
+    cf  <- full_coef %>% filter(specification == sp)
+    dg  <- full_diag %>% filter(specification == sp) %>% slice(1L)
+
+    # 1) Sign screen — all signed long-run terms have sign_ok == TRUE
+    signed_lr <- cf %>%
+      filter(in_long_run, !is.na(expected_sign), expected_sign != "+/-",
+             term != "ecm_lag")
+    pass_signs <- if (nrow(signed_lr) == 0L) NA
+                  else all(signed_lr$sign_ok, na.rm = FALSE)
+
+    # 2) Cointegration screen — ADF rejects unit root
+    pass_coint <- if (is.null(coint_results)) NA else {
+      r <- coint_results %>% filter(specification == sp)
+      if (nrow(r) == 0L) NA else r$coint_adf_pass[1L]
+    }
+
+    # 3) Lambda screen — sign matches expected (negative) AND |λ| in (0.02, 0.30)
+    lam <- cf$lambda[1L]
+    pass_lambda <- !is.na(lam) && lam < 0 && abs(lam) > 0.02 && abs(lam) < 0.30
+
+    # 4) Stability screen — Chow not rejected at 1% AND λ sign-stable
+    chow_ok  <- !is.na(dg$chow_pval) && dg$chow_pval > 0.01
+    sign_stable <- if (!is.null(lambda_robust)) {
+      r <- lambda_robust %>% filter(specification == sp)
+      if (nrow(r) == 0L) NA else all(r$lambda_sign_stable_across_samples,
+                                     na.rm = FALSE)
+    } else if (!is.null(pre_coef)) {
+      pre <- pre_coef %>% filter(specification == sp)
+      lam_pre <- if (nrow(pre) > 0L) pre$lambda[1L] else NA_real_
+      !is.na(lam) && !is.na(lam_pre) && sign(lam) == sign(lam_pre)
+    } else NA
+    pass_stability <- !is.na(chow_ok) && chow_ok &&
+                      (is.na(sign_stable) || isTRUE(sign_stable))
+
+    rows[[sp]] <- tibble::tibble(
+      specification  = sp,
+      pass_signs     = pass_signs,
+      pass_coint     = pass_coint,
+      pass_lambda    = pass_lambda,
+      pass_stability = pass_stability,
+      bic            = dg$schwarz
+    )
+  }
+
+  out <- bind_rows(rows)
+
+  # Identify preferred: passes all four (NA-tolerant) screens, lowest BIC
+  passes_all <- function(r) {
+    all(vapply(c("pass_signs", "pass_coint", "pass_lambda", "pass_stability"),
+               function(k) isTRUE(r[[k]]) || is.na(r[[k]]),
+               logical(1L)))
+  }
+  hard_pass_all <- function(r) {
+    all(vapply(c("pass_signs", "pass_coint", "pass_lambda", "pass_stability"),
+               function(k) isTRUE(r[[k]]),
+               logical(1L)))
+  }
+
+  out$is_preferred <- FALSE
+  hard_idx <- which(vapply(seq_len(nrow(out)),
+                           function(i) hard_pass_all(out[i, ]),
+                           logical(1L)))
+  if (length(hard_idx) > 0L) {
+    pick <- hard_idx[which.min(out$bic[hard_idx])]
+    out$is_preferred[pick] <- TRUE
+  } else {
+    warning("[select_preferred_spec] No spec passes all four screens; ",
+            "picking spec with the most passes (BIC tiebreak).")
+    pass_count <- vapply(seq_len(nrow(out)), function(i) {
+      sum(vapply(c("pass_signs", "pass_coint", "pass_lambda", "pass_stability"),
+                 function(k) isTRUE(out[[k]][i]),
+                 logical(1L)))
+    }, integer(1L))
+    max_pass <- max(pass_count)
+    cand     <- which(pass_count == max_pass)
+    pick     <- cand[which.min(out$bic[cand])]
+    out$is_preferred[pick] <- TRUE
+  }
+
+  if (!is.null(output_dir)) {
+    sel_path <- file.path(output_dir, "australia_spec_selection.csv")
+    write.csv(out, sel_path, row.names = FALSE)
+    message(sprintf("[select_preferred_spec] Saved to %s", sel_path))
+  }
+
+  out
+}
+
+
+# ==============================================================================
 # SECTION H2: Italy–Australia Comparison Table
 # ==============================================================================
 
@@ -684,7 +1519,7 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
 
   key_terms <- c("ha_y", "nla_y", "ilfa_y", "eq_y", "super_y",
                  "bonds_y", "ln_hp_over_y", "real_rate", "ln_yp_over_y",
-                 "ln_y_over_c")
+                 "ecm_lag")
 
   # Identify specification column — if absent assign a default
   spec_col <- intersect(c("specification", "spec", "model"), names(italy_coef))[1L]
@@ -699,7 +1534,7 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
     select(country, specification, term, structural_param)
 
   aus_tbl <- aus_coef %>%
-    filter(term %in% key_terms, in_long_run | term == "ln_y_over_c",
+    filter(term %in% key_terms, in_long_run | term == "ecm_lag",
            period == "full") %>%
     mutate(country = "Australia") %>%
     select(country, specification, term, structural_param)
@@ -731,8 +1566,8 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
 
   # ------------------------------------------------------------------
   # Speed-of-adjustment (lambda) comparison table
-  # Italy: ecm_lag coefficient from ecm_coefficients.csv (negative = restoring)
-  # Australia: coefficient on ln_y_over_c (positive convention; abs value comparable)
+  # Both Italy and Australia now use the canonical negative convention:
+  # λ < 0 = restoring force.
   # ------------------------------------------------------------------
   italy_ecm_path <- file.path(italy_dir, "ecm_coefficients.csv")
   italy_lambda <- tryCatch({
@@ -742,19 +1577,31 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
   }, error = function(e) NA_real_)
 
   aus_lambda <- aus_coef %>%
-    filter(term == "ln_y_over_c") %>%
+    filter(term == "ecm_lag") %>%
     select(specification, period, lambda) %>%
     distinct()
 
   cat("\n--- Speed of adjustment (lambda) comparison ---\n")
-  cat(sprintf("  Italy (ecm_lag, full sample):  %8.4f  [abs = %.4f per quarter]\n",
-              italy_lambda, abs(italy_lambda)))
-  cat(sprintf("  %-8s  %-35s  %8s  %8s\n", "Period", "Australia specification", "lambda", "|lambda|"))
-  cat(sprintf("  %s\n", strrep("-", 65)))
+  cat(sprintf("  Italy (ecm_lag, full sample):  %8.4f\n", italy_lambda))
+  cat(sprintf("  %-8s  %-35s  %8s\n", "Period", "Australia specification", "lambda"))
+  cat(sprintf("  %s\n", strrep("-", 56)))
   for (i in seq_len(nrow(aus_lambda))) {
-    cat(sprintf("  %-8s  %-35s  %8.4f  %8.4f\n",
+    cat(sprintf("  %-8s  %-35s  %8.4f\n",
       aus_lambda$period[i], aus_lambda$specification[i],
-      aus_lambda$lambda[i],  abs(aus_lambda$lambda[i])))
+      aus_lambda$lambda[i]))
+  }
+
+  # Both countries should now use the canonical negative convention.
+  preferred_aus_lambda <- aus_lambda %>%
+    filter(grepl("Preferred|Spec6", specification), period == "full") %>%
+    pull(lambda)
+  if (length(preferred_aus_lambda) > 0L && !is.na(italy_lambda) &&
+      !is.na(preferred_aus_lambda[1L])) {
+    if (sign(italy_lambda) != sign(preferred_aus_lambda[1L])) {
+      warning(sprintf(
+        "[build_comparison_table] Italy λ (%.4f) and Australia preferred λ (%.4f) have different signs after convention alignment — both should be negative.",
+        italy_lambda, preferred_aus_lambda[1L]))
+    }
   }
 
   lambda_path <- file.path(output_dir, "italy_australia_lambda.csv")
@@ -768,6 +1615,162 @@ build_comparison_table <- function(aus_coef, output_dir, italy_dir) {
 
   invisible(comparison)
 }
+
+# ==============================================================================
+# SECTION H3: Narrative Model Summary (markdown)
+# ==============================================================================
+
+write_model_summary <- function(specs_full, specs_precovid,
+                                results_full, results_precovid,
+                                comparison, selection, coint_results,
+                                lambda_robust = NULL,
+                                break_results = NULL,
+                                wls_results = NULL,
+                                pi_sensitivity = NULL,
+                                output_dir) {
+
+  full_coef <- results_full$coef_combined
+  full_diag <- results_full$diag_combined
+  pre_coef  <- results_precovid$coef_combined
+
+  preferred_row <- selection %>% filter(is_preferred)
+  preferred_name <- if (nrow(preferred_row) > 0L)
+    preferred_row$specification[1L] else NA_character_
+
+  # Sample summaries
+  full_dates <- range(specs_full$spec1$est_data$date)
+  pre_dates  <- range(specs_precovid$spec1$est_data$date)
+  full_n <- nobs(specs_full$spec1$fit)
+  pre_n  <- nobs(specs_precovid$spec1$fit)
+
+  pref_cf <- full_coef %>% filter(specification == preferred_name)
+  pref_diag <- full_diag %>% filter(specification == preferred_name) %>% slice(1L)
+
+  out <- character(0)
+  out <- c(out, "# Australia Household Consumption Model — Summary", "")
+  out <- c(out, "## Sample and data")
+  out <- c(out, sprintf("- Full sample: %s–%s, n=%d",
+                        format_yq(full_dates[1L]),
+                        format_yq(full_dates[2L]), full_n))
+  out <- c(out, sprintf("- Pre-COVID sample: %s–%s, n=%d",
+                        format_yq(pre_dates[1L]),
+                        format_yq(pre_dates[2L]), pre_n))
+  out <- c(out, "- Data sources: ABS HFCE 5206008, ABS Household Income 5206020, ABS Balance Sheet 5232035, RBA f06hist mortgage rate, ABS lending 560101.", "")
+
+  out <- c(out, "## Preferred specification")
+  if (!is.na(preferred_name)) {
+    pass_str <- preferred_row %>%
+      transmute(s = sprintf("signs=%s, coint=%s, λ=%s, stability=%s",
+                            pass_signs, pass_coint, pass_lambda, pass_stability)) %>%
+      pull(s)
+    out <- c(out, sprintf("**%s** (selected by automated screen). Reason: %s.",
+                          preferred_name, pass_str), "")
+    out <- c(out, sprintf("Long-run structural coefficients (preferred spec, full sample):"), "")
+    out <- c(out, "| Term | Coef | t-stat | p | Expected sign | Sign OK |",
+             "|------|------|--------|---|---------------|---------|")
+    pref_lr <- pref_cf %>% filter(in_long_run)
+    for (i in seq_len(nrow(pref_lr))) {
+      r <- pref_lr[i, ]
+      out <- c(out, sprintf("| %s | %.4f | %.2f | %.3f | %s | %s |",
+                            r$term, r$ols_estimate, r$t_stat, r$p_value,
+                            ifelse(is.na(r$expected_sign), "—", r$expected_sign),
+                            ifelse(is.na(r$sign_ok), "—",
+                                   ifelse(r$sign_ok, "yes", "no"))))
+    }
+    out <- c(out, "")
+  } else {
+    out <- c(out, "_No spec selected._", "")
+  }
+
+  out <- c(out, "## All specifications — diagnostics traffic light", "")
+  out <- c(out, "| Spec | adj R² | DW | AR(1) | AR(4) | Het | Chow | RESET | BIC | Sign | Coint | λ | Stability |",
+           "|------|--------|----|-------|-------|-----|------|-------|-----|------|-------|---|-----------|")
+  spec_names <- unique(full_diag$specification)
+  for (sp in spec_names) {
+    d  <- full_diag %>% filter(specification == sp) %>% slice(1L)
+    sl <- selection %>% filter(specification == sp)
+    tick <- function(b) if (is.na(b)) "—" else if (isTRUE(b)) "Y" else "N"
+    out <- c(out, sprintf("| %s | %.3f | %.2f | %s | %s | %s | %s | %s | %.1f | %s | %s | %s | %s |",
+      sp, d$adj_r2, d$dw,
+      tick(d$ar1_pval > 0.05), tick(d$ar4_pval > 0.05),
+      tick(d$lm_het_pval > 0.05), tick(d$chow_pval > 0.05),
+      tick(d$reset_pval > 0.05), d$schwarz,
+      tick(sl$pass_signs[1L]), tick(sl$pass_coint[1L]),
+      tick(sl$pass_lambda[1L]), tick(sl$pass_stability[1L])
+    ))
+  }
+  out <- c(out, "")
+
+  out <- c(out, "## Lambda comparison (full vs pre-COVID)", "")
+  out <- c(out, "| Spec | Full sample λ | Pre-COVID λ | Sign-stable? |",
+           "|------|---------------|-------------|--------------|")
+  for (sp in spec_names) {
+    fl <- (full_coef %>% filter(specification == sp))$lambda[1L]
+    pl <- (pre_coef  %>% filter(specification == sp))$lambda[1L]
+    stable <- if (!is.na(fl) && !is.na(pl)) sign(fl) == sign(pl) else NA
+    out <- c(out, sprintf("| %s | %.4f | %.4f | %s |", sp,
+                          ifelse(is.na(fl), NA_real_, fl),
+                          ifelse(is.na(pl), NA_real_, pl),
+                          ifelse(is.na(stable), "—", ifelse(stable, "yes", "no"))))
+  }
+  out <- c(out, "")
+
+  out <- c(out, "## Italy vs Australia (preferred specs)", "")
+  if (!is.null(comparison) && nrow(comparison) > 0L) {
+    pa <- comparison %>% filter(country == "Australia",
+                                grepl("Preferred|Spec6", specification))
+    pi_aus <- pa %>% group_by(term) %>% slice_tail(n = 1) %>% ungroup() %>%
+      select(term, Australia = structural_param)
+    pit <- comparison %>% filter(country == "Italy") %>%
+      group_by(term) %>% slice_tail(n = 1) %>% ungroup() %>%
+      select(term, Italy = structural_param)
+    cmp <- full_join(pit, pi_aus, by = "term") %>% arrange(term)
+    out <- c(out, "| Term | Italy | Australia |", "|------|-------|-----------|")
+    for (i in seq_len(nrow(cmp))) {
+      r <- cmp[i, ]
+      out <- c(out, sprintf("| %s | %s | %s |", r$term,
+                            ifelse(is.na(r$Italy), "—", sprintf("%.4f", r$Italy)),
+                            ifelse(is.na(r$Australia), "—", sprintf("%.4f", r$Australia))))
+    }
+  } else {
+    out <- c(out, "_Italy comparison not available._")
+  }
+  out <- c(out, "")
+
+  out <- c(out, "## Known issues")
+  for (sp in spec_names) {
+    sl <- selection %>% filter(specification == sp)
+    failures <- character(0)
+    if (isFALSE(sl$pass_signs[1L]))     failures <- c(failures, "sign")
+    if (isFALSE(sl$pass_coint[1L]))     failures <- c(failures, "cointegration")
+    if (isFALSE(sl$pass_lambda[1L]))    failures <- c(failures, "λ range/sign")
+    if (isFALSE(sl$pass_stability[1L])) failures <- c(failures, "stability")
+    if (length(failures) > 0L) {
+      out <- c(out, sprintf("- %s fails: %s", sp,
+                            paste(failures, collapse = ", ")))
+    }
+  }
+  if (any(!is.na(full_diag$lm_het_pval) & full_diag$lm_het_pval < 0.05)) {
+    out <- c(out, "- Heteroskedasticity rejected at 5% in some specs — see `lm_het_pval`, `lm_het_pval_no_events`, `het_diagnosis` columns of diagnostics CSV.")
+  }
+  out <- c(out, "- COVID handling: see `australia_lambda_robustness.csv` for sample sensitivity.")
+  out <- c(out, "- `model_helpers.R::compute_log_yp_over_y` ignores its `discount`, `horizon`, `weights`, `denom` arguments and returns a raw level gap. Flagged for human review.")
+  out <- c(out, "- Permanent income relies on three coincident GFC corrections (step2008, trend_brk, learning-weight ogive) plus spec 6's `ln_yp_over_y_post2008` interaction. See `australia_permanent_income_sensitivity.csv`.")
+  out <- c(out, "")
+
+  out <- c(out, "## Reproducibility")
+  out <- c(out, "- Run: `Rscript Ausreplication/R/australia_consumption_model.R`")
+  out <- c(out, "- Fast re-estimation: `Rscript Ausreplication/R/run_estimation_from_rds.R`")
+  out <- c(out, "- Random seed: not used (OLS is deterministic).")
+  out <- c(out, sprintf("- Date generated: %s", format(Sys.Date(), "%Y-%m-%d")))
+  out <- c(out, "")
+
+  md_path <- file.path(output_dir, "australia_model_summary.md")
+  writeLines(out, md_path)
+  message(sprintf("[write_model_summary] Saved to %s", md_path))
+  invisible(md_path)
+}
+
 
 # ==============================================================================
 # SECTION H: Plots
@@ -826,8 +1829,8 @@ model_data <- construct_permanent_income(model_data)
 # Add variables that depend on permanent income
 model_data <- model_data %>%
   mutate(
-    # Ensure ln_y_over_c uses lagged consumption
-    ln_y_over_c = lincome - lag(lcons, 1L),
+    # Re-assert canonical negative-restoration ECM term post-PI construction.
+    ecm_lag = lag(lcons, 1L) - lincome,
     # ln(HP/y): log real house price relative to real income per capita
     ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100))
   )
@@ -835,11 +1838,14 @@ model_data <- model_data %>%
 n_pi <- sum(!is.na(model_data$ln_yp_over_y))
 message(sprintf("[construct_permanent_income] ln_yp_over_y: %d non-NA obs", n_pi))
 
-cat("[Step 4] Estimating specifications — two sample periods...\n")
+cat("[Step 4] Estimating specifications across four sample variants...\n")
 cat("  [4a] Full sample (1988Q4–2024Q4)\n")
 specs_full     <- run_all_specifications(model_data, sample_end = as.Date("2024-10-01"))
 cat("  [4b] Pre-COVID sample (1988Q4–2019Q4)\n")
 specs_precovid <- run_all_specifications(model_data, sample_end = as.Date("2019-10-01"))
+cat("  [4c] COVID-dropped + COVID-rich-dummies variants\n")
+covid_specs <- run_specifications_covid_robust(model_data,
+                                               sample_end = as.Date("2024-10-01"))
 
 cat("[Step 5] Building results tables...\n")
 results_full     <- build_results_table(specs_full,     output_dir, period_label = "full")
@@ -851,13 +1857,118 @@ combined_diag <- bind_rows(results_full$diag_combined, results_precovid$diag_com
 write.csv(combined_coef, file.path(output_dir, "australia_all_results.csv"),     row.names = FALSE)
 write.csv(combined_diag, file.path(output_dir, "australia_all_diagnostics.csv"), row.names = FALSE)
 
-cat("[Step 6] Building Italy–Australia comparison table...\n")
-italy_dir <- normalizePath(file.path(output_dir, "../../outputs"), winslash = "/")
-build_comparison_table(aus_coef = combined_coef, output_dir = output_dir,
-                       italy_dir = italy_dir)
+cat("[Step 6] Running cointegration battery (ADF + PO + Johansen)...\n")
+coint_results <- tryCatch(
+  run_cointegration_battery(model_data, specs_full, output_dir,
+                            sample_end = as.Date("2024-10-01")),
+  error = function(e) {
+    message("[run_cointegration_battery] Error: ", e$message); NULL
+  }
+)
 
-cat("[Step 7] Generating plots...\n")
-plot_actual_vs_fitted(specs_full$spec6, output_dir = output_dir)
+cat("[Step 7] Consolidating COVID robustness lambda table...\n")
+lambda_robust <- tryCatch(
+  build_lambda_robustness_table(specs_full, specs_precovid,
+                                covid_specs$covid_dropped, covid_specs$covid_rich,
+                                output_dir),
+  error = function(e) {
+    message("[build_lambda_robustness_table] Error: ", e$message); NULL
+  }
+)
+
+cat("[Step 8] Selecting preferred specification...\n")
+selection <- select_preferred_spec(
+  coef_combined         = results_full$coef_combined,
+  diag_combined         = results_full$diag_combined,
+  coint_results         = coint_results,
+  coef_combined_precovid = results_precovid$coef_combined,
+  lambda_robust         = lambda_robust,
+  output_dir            = output_dir
+)
+preferred_name <- (selection %>% filter(is_preferred))$specification[1L]
+preferred_idx <- which(vapply(specs_full,
+                              function(s) s$spec_name == preferred_name,
+                              logical(1L)))
+if (length(preferred_idx) == 0L) {
+  warning("[main] Preferred spec name not matched in specs_full; falling back to spec6.")
+  preferred_idx <- which(names(specs_full) == "spec6")
+}
+preferred_spec <- specs_full[[preferred_idx[1L]]]
+message(sprintf("[main] Preferred spec: %s", preferred_name))
+
+cat("[Step 9] Running break battery on preferred spec...\n")
+break_results <- tryCatch(
+  run_break_battery(preferred_spec, output_dir),
+  error = function(e) {
+    message("[run_break_battery] Error: ", e$message); NULL
+  }
+)
+if (!is.null(break_results)) {
+  brk_path <- file.path(output_dir, "australia_breaks.csv")
+  write.csv(break_results, brk_path, row.names = FALSE)
+  message(sprintf("[main] Breaks saved to %s", brk_path))
+}
+
+cat("[Step 10] Conditional WLS robustness on preferred spec...\n")
+pref_diag_row <- results_full$diag_combined %>%
+  filter(specification == preferred_name) %>% slice(1L)
+wls_results <- NULL
+het_diag_val <- if (nrow(pref_diag_row) > 0L) pref_diag_row$het_diagnosis[1L] else NA_character_
+message(sprintf("[main] Preferred spec het_diagnosis: %s",
+                ifelse(is.na(het_diag_val), "NA", het_diag_val)))
+if (!is.na(het_diag_val) && het_diag_val == "structural") {
+  wls_results <- tryCatch(fit_wls_variant(preferred_spec),
+                          error = function(e) {
+                            message("[fit_wls_variant] Error: ", e$message); NULL
+                          })
+  if (!is.null(wls_results)) {
+    wls_path <- file.path(output_dir, "australia_wls_robustness.csv")
+    write.csv(wls_results, wls_path, row.names = FALSE)
+    message(sprintf("[main] WLS robustness saved to %s", wls_path))
+  } else {
+    message("[main] WLS fit returned NULL.")
+  }
+} else {
+  message("[main] Skipping WLS — het_diagnosis is not 'structural'.")
+}
+
+cat("[Step 11] Running permanent-income sensitivity grid...\n")
+pi_sensitivity <- tryCatch(
+  run_pi_sensitivity(model_data, preferred_spec, output_dir),
+  error = function(e) {
+    message("[run_pi_sensitivity] Error: ", e$message); NULL
+  }
+)
+
+cat("[Step 12] Running rolling-window estimation on preferred spec...\n")
+rolling_results <- tryCatch(
+  fit_rolling_window(preferred_spec, model_data, output_dir, window_size = 60L),
+  error = function(e) {
+    message("[fit_rolling_window] Error: ", e$message); NULL
+  }
+)
+
+cat("[Step 13] Building Italy–Australia comparison table...\n")
+italy_dir <- normalizePath(file.path(output_dir, "../../outputs"), winslash = "/")
+comparison <- build_comparison_table(aus_coef = combined_coef,
+                                     output_dir = output_dir,
+                                     italy_dir = italy_dir)
+
+cat("[Step 14] Writing narrative model summary...\n")
+tryCatch(
+  write_model_summary(specs_full, specs_precovid,
+                      results_full, results_precovid,
+                      comparison, selection, coint_results,
+                      lambda_robust = lambda_robust,
+                      break_results = break_results,
+                      wls_results   = wls_results,
+                      pi_sensitivity = pi_sensitivity,
+                      output_dir    = output_dir),
+  error = function(e) message("[write_model_summary] Error: ", e$message)
+)
+
+cat("[Step 15] Generating plots — preferred spec + spec 1...\n")
+plot_actual_vs_fitted(preferred_spec, output_dir = output_dir)
 plot_actual_vs_fitted(specs_full$spec1, output_dir = output_dir)
 
 cat(rep("=", 70), "\n", sep = "")

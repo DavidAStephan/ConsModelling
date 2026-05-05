@@ -1,0 +1,7 @@
+"specification","period","n_obs","coint_adf_stat","coint_adf_5pct_cv","coint_adf_pass","po_stat","po_pass","johansen_r1_pass"
+"Spec1_LogNetWorth","1991-10 to 2024-10",133,-1.6614234345868,-2.88,FALSE,2.34766796096201,FALSE,TRUE
+"Spec2_LogNetWorth_CCI","1991-10 to 2024-10",133,-1.6614234345868,-2.88,FALSE,2.34766796096201,FALSE,TRUE
+"Spec3_LevelNetWorth","1991-10 to 2024-10",133,-1.64294074407311,-2.88,FALSE,1.85913766568095,FALSE,TRUE
+"Spec4_Disagg_NoCCI","1991-10 to 2024-10",133,-3.36921979203992,-2.88,TRUE,NA,NA,TRUE
+"Spec5_FullDisagg","1991-10 to 2024-10",133,-3.36921979203992,-2.88,TRUE,NA,NA,TRUE
+"Spec6_Preferred","1991-10 to 2024-10",133,-3.38349540159221,-2.88,TRUE,NA,NA,TRUE

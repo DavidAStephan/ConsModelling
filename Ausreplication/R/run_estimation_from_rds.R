@@ -42,11 +42,12 @@ model_data <- master %>%
     lcons   = ln_cons_real_pc
   ) %>%
   mutate(
-    ln_y_over_c = lincome - lag(lcons, 1L)
+    # Canonical Engle-Granger ECM lag: λ < 0 = restoring force.
+    ecm_lag = lag(lcons, 1L) - lincome
   )
 
 complete_core <- sum(complete.cases(model_data %>%
-  select(dlcons, ln_y_over_c, real_rate, lincome)))
+  select(dlcons, ecm_lag, real_rate, lincome)))
 message(sprintf("  model_data rows: %d   complete for core vars: %d",
                 nrow(model_data), complete_core))
 
