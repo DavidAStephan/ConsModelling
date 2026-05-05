@@ -736,6 +736,25 @@ master <- master %>%
     fhb_share = fhb_loans / (fhb_loans + non_fhb_loans)
   )
 
+# ------------------------------------------------------------------------------
+# Williams (2010) reduced-form 4-knot CCI basis (institutional smoothed-step
+# dummies at 1979Q1, 1992Q1, 1998Q1, 2007Q1). When USE_INSTITUTIONAL_CCI is
+# TRUE the basis columns are attached to master so the estimation step can
+# build a fitted CCI series jointly with the consumption equation.
+# The flow-based cci_ratio above is preserved for backwards compatibility
+# with Specs 2 and 5.
+# ------------------------------------------------------------------------------
+USE_INSTITUTIONAL_CCI <- TRUE
+if (USE_INSTITUTIONAL_CCI) {
+  williams_basis <- build_williams_cci_basis(master$date)
+  for (j in seq_len(ncol(williams_basis))) {
+    master[[colnames(williams_basis)[j]]] <- williams_basis[, j]
+  }
+  message("Williams 4-knot CCI basis added to master (SDMMA series at ",
+          "1979/1992/1998/2007); CCI fitted series will be computed in",
+          " estimation step.")
+}
+
 # Print coverage
 message("\n--- Coverage summary ---")
 for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",

@@ -34,6 +34,19 @@ if (!file.exists(rds_path)) stop("RDS not found: ", rds_path)
 master <- readRDS(rds_path)
 cat(sprintf("Loaded: %d rows, %d cols\n", nrow(master), ncol(master)))
 
+# Source helpers and (re-)attach Williams 4-knot CCI basis if not already present
+source(file.path(script_dir, "model_helpers.R"), local = TRUE)
+USE_INSTITUTIONAL_CCI <- TRUE
+if (USE_INSTITUTIONAL_CCI &&
+    !any(grepl("^sdmma_", names(master)))) {
+  williams_basis <- build_williams_cci_basis(master$date)
+  for (j in seq_len(ncol(williams_basis))) {
+    master[[colnames(williams_basis)[j]]] <- williams_basis[, j]
+  }
+  cat("Attached Williams 4-knot CCI basis to master (",
+      paste(colnames(williams_basis), collapse = ", "), ")\n", sep = "")
+}
+
 # Build model_data exactly as australia_consumption_model.R does
 model_data <- master %>%
   rename(

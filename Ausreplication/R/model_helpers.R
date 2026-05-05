@@ -630,6 +630,34 @@ extract_trend_level <- function(fit, model) {
 }
 
 
+# Smoothed step dummy: 5-quarter MA of 4-quarter MA of a 0/1 step.
+# Williams (2010) construction: SDMMA_s. Leading NAs (from MA windows that do
+# not yet have enough history) are filled as 0, consistent with the step being
+# 0 prior to its onset.
+smoothed_step <- function(date_vec, knot_date) {
+  raw <- as.integer(as.Date(date_vec) >= as.Date(knot_date))
+  ma4 <- zoo::rollmean(raw, k = 4L, fill = NA, align = "right")
+  ma5 <- zoo::rollmean(ma4, k = 5L, fill = NA, align = "right")
+  ifelse(is.na(ma5), 0, ma5)
+}
+
+
+# Williams (2010) reduced-form 4-knot CCI basis. Each column is a smoothed
+# step dummy at one of the major Australian deregulation/credit turning points.
+# `sign_priors` follow institutional history (deregulation = +, retrenchment = −).
+build_williams_cci_basis <- function(dates,
+                                      knots = c("1979-01-01", "1992-01-01",
+                                                "1998-01-01", "2007-01-01"),
+                                      sign_priors = c(1, -1, 1, -1)) {
+  basis <- vapply(knots, function(k) smoothed_step(dates, k),
+                  numeric(length(dates)))
+  colnames(basis) <- paste0("sdmma_", gsub("-", "_", substr(knots, 1, 7)))
+  attr(basis, "sign_priors") <- sign_priors
+  attr(basis, "knots")       <- knots
+  basis
+}
+
+
 build_credit_regime_basis <- function(dates) {
   dates <- as.Date(dates)
   time_num <- as.numeric(dates)
