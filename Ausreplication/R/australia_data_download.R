@@ -63,6 +63,12 @@ dir.create(cache_dir,  recursive = TRUE, showWarnings = FALSE)
 
 source(file.path(project_root, "R", "model_helpers.R"), local = TRUE)
 
+# Set TRUE to overlay the Muellbauer-style regime+indicator institutional CCI
+# (see construct_institutional_cci in model_helpers.R) on top of the post-2002
+# housing-loan-flow series. Default FALSE: spec 2/5 effective sample starts
+# 2002Q3 (after lagging) using the housing-flow CCI alone.
+USE_INSTITUTIONAL_CCI <- FALSE
+
 # ==============================================================================
 # HELPERS
 # ==============================================================================
@@ -287,6 +293,51 @@ if (nrow(pop_ann) >= 10L) {
     mutate(pop_millions = pop_thousands / 1000)
   message(sprintf("  pop: %d obs (working-age fallback)", nrow(pop_q)))
 }
+
+## 2.5b Prime-age share (25-54). Muellbauer's life-cycle adjustment: a higher
+## share of working-age households shifts the aggregate consumption-to-income
+## relationship toward saving and house-purchase behaviour.
+## ABS 3101059 has single-year cohorts under "Persons" only up to age 47 in
+## current vintages, so we sum across Male + Female single-year cohorts to get
+## consistent numerator and denominator across the full 0-100 age range.
+prime_age_share_q <- tryCatch({
+  pop_mf <- pop_raw %>%
+    filter(str_detect(series_name,
+      "^Estimated Resident Population ; (Male|Female) ; ")) %>%
+    mutate(
+      age = suppressWarnings(as.integer(
+        str_match(series_name,
+          "^Estimated Resident Population ; (?:Male|Female) ; ([0-9]+)")[, 2]
+      )),
+      date = abs_to_qstart(date)
+    ) %>%
+    filter(!is.na(age))
+
+  if (nrow(pop_mf) == 0L) stop("no Male/Female age-cohort series found")
+
+  total_ann <- pop_mf %>%
+    group_by(date) %>%
+    summarise(total = sum(value, na.rm = TRUE), .groups = "drop")
+  prime_ann <- pop_mf %>%
+    filter(age >= 25, age <= 54) %>%
+    group_by(date) %>%
+    summarise(prime = sum(value, na.rm = TRUE), .groups = "drop")
+
+  share_ann <- inner_join(total_ann, prime_ann, by = "date") %>%
+    filter(total > 0) %>%
+    mutate(value = prime / total) %>%
+    select(date, value) %>%
+    arrange(date)
+
+  share_q <- annual_to_quarterly_spline(share_ann, spine_dates) %>%
+    rename(prime_age_share = value)
+  message(sprintf("  prime_age_share: %d quarterly obs via spline (from %d annual obs)",
+                  nrow(share_q), nrow(share_ann)))
+  share_q
+}, error = function(e) {
+  message("  prime_age_share: failed (", e$message, ") — leaving NA")
+  tibble(date = spine_dates, prime_age_share = NA_real_)
+})
 
 ## 2.6  Unemployment rate (6202001)
 message("2.6 Unemployment rate (6202001)")
@@ -601,6 +652,7 @@ master <- master %>%
   left_join(gdi_q,             by = "date") %>%   # $m, current, quarterly
   left_join(unemp_q,           by = "date") %>%   # %
   left_join(pop_q %>% select(date, pop_millions), by = "date") %>%
+  left_join(prime_age_share_q,                    by = "date") %>%   # prime working-age share (25-54)
   left_join(fin_deposits_q,    by = "date") %>%   # $m
   left_join(fin_equities_q,    by = "date") %>%   # $m
   left_join(fin_super_q,       by = "date") %>%   # $m
@@ -685,62 +737,92 @@ master <- master %>%
     real_rate    = mortgage_rate - hicp_4q_ann
   )
 
+# ------------------------------------------------------------------------------
+# Credit Conditions Index (CCI)
+# ------------------------------------------------------------------------------
+# Three options were considered for constructing CCI back through the 1980s
+# and 1990s when ABS housing-finance flow data is unavailable:
+#
+#   A) Muellbauer-style institutional CCI: regime-step indicators for major
+#      Australian credit-policy episodes (1983 deregulation, 1992 recession,
+#      1998 Wallis reforms, 2007 GFC tightening) blended with standardised
+#      housing-finance, leverage, and rate-headwind indicators. See
+#      construct_institutional_cci() and build_credit_regime_basis() in
+#      model_helpers.R.
+#   B) Drop the pre-2002 backfill: cci_ratio is NA before 2002Q3 and the
+#      specs that use it (Spec 2 and Spec 5) get a truncated effective
+#      sample. Honest about what we know.
+#   C) State-space (Kalman) latent factor over multiple credit indicators.
+#
+# Default is Option B because it is the most defensible without further
+# domain calibration: the previous spread-normalisation backfill (mortgage
+# rate minus cash rate) conflates funding costs and risk premia with credit
+# availability and is theoretically suspect for an LIVES adaptation.
+# Option A is wired in but disabled behind USE_INSTITUTIONAL_CCI (see top of
+# file); flip the flag to overlay the institutional CCI back to 1980Q1.
+# ------------------------------------------------------------------------------
+
 # CCI proxy: log(housing credit flow / 8q moving average GDP proxy)
-# (GDP proxy = 4 × quarterly income)
+# (GDP proxy = 4 × quarterly income). Only available 2002Q3+.
 master <- master %>%
   mutate(
     ydi_ann_8qma = zoo::rollmean(ydi_ann_nom, 8L, fill = NA, align = "right"),
     cci_ratio    = log(housing_loan_flow / ydi_ann_8qma)
   )
 
-# Extend CCI backwards using mortgage-to-cash-rate spread
-# The spread captures credit tightness pre-2002 when housing flow data is absent.
-# Normalised in the 2002-2024 overlap so scale is consistent with cci_ratio.
-if (!is.null(cash_rate_q) && nrow(cash_rate_q) > 0L) {
+message(sprintf("  cci_ratio (housing-flow): %d non-NA obs starting %s",
+                sum(!is.na(master$cci_ratio)),
+                format(min(master$date[!is.na(master$cci_ratio)]), "%Y-%m-%d")))
+message("  CCI specs (Spec 2 / Spec 5) effective sample now starts 2002Q3 ",
+        "after lagging — pre-2002 spread backfill dropped (Option B default).")
+
+if (USE_INSTITUTIONAL_CCI) {
+  # Build the regime basis on the master spine, then alias master columns to
+  # the names expected by construct_institutional_cci(). The helper signature
+  # is fixed in model_helpers.R; we adapt the call site rather than touching it.
+  basis <- build_credit_regime_basis(master$date)
+  cci_input <- master %>%
+    transmute(
+      date,
+      housing_loan_flow,
+      house_price_index      = hpi,
+      debt_income_ratio      = debt_y,
+      first_home_buyer_share = fhb_share,
+      real_mortgage_rate     = real_rate
+    )
+  inst_cci <- construct_institutional_cci(cci_input, basis)
+  # Overlay where the housing-flow series is missing; preserves the post-2002
+  # series (which is anchored to actual ABS data) and only fills back-history.
   master <- master %>%
-    left_join(cash_rate_q, by = "date") %>%
-    mutate(mort_spread = mortgage_rate - cash_rate)
-
-  overlap <- master %>% filter(!is.na(cci_ratio), !is.na(mort_spread))
-  n_pre   <- sum(is.na(master$cci_ratio) & !is.na(master$mort_spread))
-  message(sprintf("  CCI overlap period: %d obs; pre-2002 to backfill: %d obs",
-                  nrow(overlap), n_pre))
-
-  if (nrow(overlap) >= 20L && n_pre > 0L) {
-    s_mn <- mean(overlap$mort_spread, na.rm = TRUE)
-    s_sd <- sd(overlap$mort_spread,   na.rm = TRUE)
-    c_mn <- mean(overlap$cci_ratio,   na.rm = TRUE)
-    c_sd <- sd(overlap$cci_ratio,     na.rm = TRUE)
-
-    master <- master %>%
-      mutate(
-        cci_spread_norm = c_sd * ((mort_spread - s_mn) / s_sd) + c_mn,
-        cci_ratio = ifelse(!is.na(cci_ratio), cci_ratio, cci_spread_norm)
-      ) %>%
-      select(-cci_spread_norm, -mort_spread, -cash_rate)
-
-    message(sprintf("  CCI extended: %d total obs (housing-flow 2002+, spread proxy pre-2002)",
-                    sum(!is.na(master$cci_ratio))))
-  } else {
-    master <- master %>% select(-mort_spread, -cash_rate)
-    if (n_pre == 0L)
-      message("  CCI: no pre-2002 gap to fill — keeping housing-flow series only")
-    else
-      message("  CCI extension: insufficient overlap — keeping housing-flow only")
-  }
+    left_join(inst_cci %>% select(date, cci_institutional_raw), by = "date") %>%
+    mutate(
+      cci_ratio = ifelse(is.na(cci_ratio), cci_institutional_raw, cci_ratio)
+    ) %>%
+    select(-cci_institutional_raw)
+  message("  Using institutional CCI (Muellbauer-style regime+indicator blend) ",
+          "to backfill pre-2002 cci_ratio.")
 }
 
-# FHB share
+# FHB share. Available 2002Q3+ from ABS 560101. Now consumed by Spec 7 (cohort +
+# burden) in australia_estimation.R as a credit-access proxy for younger buyers.
 master <- master %>%
   mutate(
     fhb_share = fhb_loans / (fhb_loans + non_fhb_loans)
+  )
+
+# Mortgage cash-flow burden. Standard Muellbauer construction:
+# (debt stock x interest rate) / annual disposable income.
+# Available 1988Q3+ (limited by fin_loans from balance sheet).
+master <- master %>%
+  mutate(
+    mortgage_burden = (fin_loans * mortgage_rate / 100) / ydi_ann_nom
   )
 
 # Print coverage
 message("\n--- Coverage summary ---")
 for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",
             "real_rate", "hpi", "ha_y", "eq_y", "super_y", "nla_y", "networth_y",
-            "cci_ratio", "fhb_share")) {
+            "cci_ratio", "fhb_share", "prime_age_share", "mortgage_burden")) {
   report_series(master[[v]], v, master$date)
 }
 
@@ -771,6 +853,44 @@ message(sprintf("  networth_y range: %.2f – %.2f  (mean %.2f)", min(master$net
 if (!is.null(master$mortgage_rate)) {
   mr <- master$mortgage_rate[!is.na(master$mortgage_rate)]
   message(sprintf("  mortgage_rate range: %.2f – %.2f %%  (mean %.2f %%)", min(mr), max(mr), mean(mr)))
+}
+
+# Hard data-construction assertions. Failures here mean ABS changed a unit,
+# vintage, or series structure and downstream estimation results would be
+# silently wrong. Better to halt here than to publish spurious coefficients.
+stopifnot(
+  "master has wrong row count (expected 180 quarters 1980Q1-2024Q4)" =
+    nrow(master) == 180,
+  "ha_y out of plausible range (expected ~1-10)" =
+    min(master$ha_y, na.rm = TRUE) > 1 &&
+    max(master$ha_y, na.rm = TRUE) < 10,
+  "networth_y out of plausible range (expected ~2-12)" =
+    min(master$networth_y, na.rm = TRUE) > 2 &&
+    max(master$networth_y, na.rm = TRUE) < 12,
+  "mortgage_rate out of plausible range (expected ~1-25%)" =
+    min(master$mortgage_rate, na.rm = TRUE) > 1 &&
+    max(master$mortgage_rate, na.rm = TRUE) < 25,
+  "Insufficient complete cases for core ECM variables" =
+    sum(complete.cases(master[, c("d_ln_cons_pc", "ln_y_over_c",
+                                   "real_rate", "ln_ydi_real_pc",
+                                   "ha_y")])) >= 130,
+  "Quarterly date spacing is irregular" =
+    all(as.numeric(diff(master$date)) %in% 89:92)
+)
+
+if ("prime_age_share" %in% names(master)) {
+  stopifnot(
+    "prime_age_share out of plausible range (expected 0.35-0.50)" =
+      min(master$prime_age_share, na.rm = TRUE) > 0.35 &&
+      max(master$prime_age_share, na.rm = TRUE) < 0.50
+  )
+}
+if ("mortgage_burden" %in% names(master)) {
+  stopifnot(
+    "mortgage_burden out of plausible range (expected 0.02-0.20)" =
+      min(master$mortgage_burden, na.rm = TRUE) > 0.02 &&
+      max(master$mortgage_burden, na.rm = TRUE) < 0.20
+  )
 }
 
 # ==============================================================================
