@@ -961,6 +961,66 @@ master <- master %>%
     mortgage_burden = (fin_loans * mortgage_rate / 100) / ydi_ann_nom
   )
 
+## RBA E13 — measured housing-loan-payment burden (preferred over synthetic)
+## Source: data_raw/e13-data.csv, table E13 published by RBA jointly with
+## APRA. Two ratios of interest:
+##   LPHTICRI  Interest charged on total housing loans / disposable income
+##   LPHTSPRI  Scheduled repayments on total housing loans / disposable income
+##             (this is the closer analogue of the Muellbauer cash-flow
+##              burden — covers both interest AND principal)
+## Both quarterly, SA, in PER CENT (we divide by 100 for fraction-of-income).
+## Coverage: 2009Q1 onwards only (~16 years), so this CANNOT replace the
+## synthetic mortgage_burden which we need back to 1988Q3. Both series are
+## kept; the synthetic is used in Spec 7, the measured is available for
+## post-2009 robustness or replacement when sample length permits.
+e13_path <- file.path(raw_dir, "e13-data.csv")
+if (file.exists(e13_path)) {
+  tryCatch({
+    # Header is 10 lines of metadata before the data; the row "Series ID"
+    # is the column-name row, followed by date,value rows. Read whole file
+    # and locate the Series ID line dynamically.
+    raw_lines <- readLines(e13_path, encoding = "UTF-8")
+    # Strip a leading BOM if present on the first line
+    raw_lines[1L] <- sub("^\\xef\\xbb\\xbf", "", raw_lines[1L], useBytes = TRUE)
+    sid_row <- grep("^Series ID,", raw_lines)
+    if (length(sid_row) == 0L)
+      stop("Series ID header row not found in e13-data.csv")
+    e13 <- read.csv(text = paste(raw_lines[sid_row:length(raw_lines)],
+                                  collapse = "\n"),
+                    stringsAsFactors = FALSE, check.names = FALSE)
+    # First column header is "Series ID" but holds dates in the data rows.
+    names(e13)[1L] <- "date_str"
+    e13 <- e13[!is.na(e13$date_str) & nzchar(e13$date_str), , drop = FALSE]
+    e13_dates <- as.Date(e13$date_str, format = "%d-%b-%Y")
+    keep <- !is.na(e13_dates)
+    e13 <- e13[keep, , drop = FALSE]
+    e13_dates <- e13_dates[keep]
+    e13_q <- tibble(
+      date                          = abs_to_qstart(e13_dates),
+      mortgage_interest_burden_rba  = suppressWarnings(as.numeric(e13$LPHTICRI)) / 100,
+      mortgage_payment_burden_rba   = suppressWarnings(as.numeric(e13$LPHTSPRI)) / 100
+    ) %>%
+      arrange(date) %>%
+      distinct(date, .keep_all = TRUE) %>%
+      filter(date <= spine_end)
+    master <- master %>% left_join(e13_q, by = "date")
+    message(sprintf("  RBA E13 burden ratios: %d obs, %s to %s",
+      nrow(e13_q),
+      format(min(e13_q$date), "%Y-%m-%d"),
+      format(max(e13_q$date), "%Y-%m-%d")))
+    cat(sprintf("  LPHTICRI (interest burden): mean %.3f, range %.3f - %.3f\n",
+      mean(e13_q$mortgage_interest_burden_rba, na.rm=TRUE),
+      min(e13_q$mortgage_interest_burden_rba, na.rm=TRUE),
+      max(e13_q$mortgage_interest_burden_rba, na.rm=TRUE)))
+    cat(sprintf("  LPHTSPRI (payment burden):  mean %.3f, range %.3f - %.3f\n",
+      mean(e13_q$mortgage_payment_burden_rba, na.rm=TRUE),
+      min(e13_q$mortgage_payment_burden_rba, na.rm=TRUE),
+      max(e13_q$mortgage_payment_burden_rba, na.rm=TRUE)))
+  }, error = function(e) message("  e13-data.csv parse error: ", e$message))
+} else {
+  message("  e13-data.csv NOT FOUND — RBA-measured burden ratios unavailable")
+}
+
 # Institutional CCI overlay (USE_INSTITUTIONAL_CCI flag set near top of file).
 # When TRUE, two things happen:
 #   1. construct_institutional_cci backfills cci_ratio pre-2002 from a
@@ -1004,7 +1064,8 @@ for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",
             "nla_y", "nla_y_unrestricted", "debt_y", "networth_y",
             "cci_ratio", "fhb_share", "prime_age_share", "mortgage_burden",
             "labour_force", "lf_share",
-            "labour_transfer_real_pc", "scaled_income_real_pc")) {
+            "labour_transfer_real_pc", "scaled_income_real_pc",
+            "mortgage_interest_burden_rba", "mortgage_payment_burden_rba")) {
   report_series(master[[v]], v, master$date)
 }
 

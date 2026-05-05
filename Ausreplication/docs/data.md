@@ -266,16 +266,32 @@ substantially different scale.
   third-party (e.g. an RBA chartpack or a private compilation), record that.
 
 ### 4.2 `data_raw/e13-data.csv`
-- **Format:** RBA E13 housing-loan-payments table (offset/redraw, scheduled vs
-  actual repayments, by loan type).
-- **Status: NOT USED.** Present on disk but no call site references it.
-- **Potential use:** could replace the synthetic `mortgage_burden` term with
-  an actually-measured housing-payment ratio. **Gap to fix: either delete
-  or wire in.** If wired in, the `Payments; Housing; Total; Scheduled
-  repayments to income` row already gives a clean
-  scheduled-payment-to-income ratio, which would be a stronger
-  `mortgage_burden` than our synthetic
-  `(fin_loans * mortgage_rate / 100) / ydi_ann_nom`.
+- **Format:** RBA E13 housing-loan-payments table (12 columns: scheduled vs
+  excess repayments, interest, payment-to-income ratios, offset/redraw share,
+  split by owner-occupied vs investment).
+- **Source:** Published quarterly by RBA jointly with APRA.
+- **Status: WIRED IN.** Two ratios extracted:
+  - **`mortgage_interest_burden_rba`** — series `LPHTICRI`, interest charged
+    on total housing loans / household disposable income, in fraction.
+    Quarterly SA; coverage 2009Q1–2024Q4 (n=64).
+  - **`mortgage_payment_burden_rba`** — series `LPHTSPRI`, scheduled
+    repayments on total housing loans / disposable income, in fraction.
+    The closer Muellbauer cash-flow burden analogue (interest + principal).
+    Same coverage and frequency.
+- **Coverage caveat:** starts only 2009Q1 because RBA-APRA Common Reporting
+  Standard for housing loans started then. CANNOT replace the synthetic
+  `mortgage_burden` (which goes back to 1988Q3) without losing ~80 quarters
+  of Spec 7 history. Both series coexist in `master`.
+- **Substantive comparison vs synthetic** (over 2009Q1–2024Q4 overlap):
+  - Synthetic mortgage_burden mean = 0.107 (overstated — uses total
+    household debt × headline SVR)
+  - RBA interest burden mean = 0.053 (housing-only interest)
+  - RBA payment burden mean = 0.081 (interest + principal)
+  - cor(synthetic, RBA payment) = **0.93** — synthetic captures the cycle
+    well but is biased ~30% high in level
+- **Open follow-up:** decide whether to add a Spec 7b that uses
+  `mortgage_payment_burden_rba` over the post-2009 sample for an explicit
+  measured-vs-synthetic comparison.
 
 ### 4.3 `data_raw/italy_results.csv`
 - **Format:** Italy paper's published Table 1 results (variable, symbol,
@@ -511,9 +527,12 @@ In rough order of payoff:
 5. **Fix the `pop_millions` naming** — rename to `pop_thousands`
    everywhere, fix `pop_q` to use Male+Female cohorts. Single-line rename
    plus a one-helper change. **(§2.5, §6.2)**
-6. **Wire in or delete `e13-data.csv`** — RBA E13 has a measured housing-
-   payments-to-income ratio that would replace our synthetic
-   `mortgage_burden` with something economically cleaner. **(§4.2)**
+6. **(DONE)** RBA E13 wired in as `mortgage_interest_burden_rba` and
+   `mortgage_payment_burden_rba` (2009Q1+, 64 obs). Coexists with the
+   synthetic `mortgage_burden` (1988Q3+) so Spec 7's pre-2009 history
+   is preserved. Open question: add a Spec 7b that uses the RBA payment
+   burden over post-2009 sample for an explicit measured-vs-synthetic
+   comparison. **(§4.2)**
 7. **Source pre-1988 ABS Financial Accounts annual data** for sample back-
    extension via Bonci-Coletta splicing. Required to identify the 1979
    deregulation knot of the Williams CCI. Days of work; needs ABS Time
