@@ -2466,11 +2466,20 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
         mutate(
           scaled_income_real_pc = 0.5 * ydi_real_pc + 0.5 * .data[[lcol]],
           lincome_scaled        = log(scaled_income_real_pc),
-          ln_y_over_c_scaled    = lincome_scaled - lag(lcons, 1L)
+          # Provide both conventions so the substitution below works regardless
+          # of whether the spec uses canonical ecm_lag or legacy ln_y_over_c.
+          ln_y_over_c_scaled    = lincome_scaled - lag(lcons, 1L),
+          ecm_lag_scaled        = lag(lcons, 1L) - lincome_scaled
         )
 
+      # Replace WHICHEVER ECM term the spec uses with its scaled counterpart.
+      rhs_terms_scaled <- rhs_terms
       rhs_terms_scaled <- gsub("\\bln_y_over_c\\b", "ln_y_over_c_scaled",
-                               rhs_terms, perl = TRUE)
+                               rhs_terms_scaled, perl = TRUE)
+      rhs_terms_scaled <- gsub("\\becm_lag\\b", "ecm_lag_scaled",
+                               rhs_terms_scaled, perl = TRUE)
+      # Also swap any direct lincome references (some specs may reference it
+      # via ln_yp_over_y constructions, but those are pre-built — skip).
       fmla_scaled <- reformulate(rhs_terms_scaled, response = response)
 
       scaled_data_cc <- scaled_data %>%
@@ -2483,8 +2492,10 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
       cf_base    <- coef(base_fit)
       se_base    <- sqrt(diag(vcov(base_fit)))
 
-      align_name_scaled <- function(x)
-        gsub("ln_y_over_c_scaled", "ln_y_over_c", x)
+      align_name_scaled <- function(x) {
+        x <- gsub("ln_y_over_c_scaled", "ln_y_over_c", x)
+        gsub("ecm_lag_scaled", "ecm_lag", x)
+      }
       cf_scaled_named <- setNames(cf_scaled, align_name_scaled(names(cf_scaled)))
       se_scaled_named <- setNames(se_scaled, align_name_scaled(names(se_scaled)))
 

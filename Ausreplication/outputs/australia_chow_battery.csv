@@ -1,5 +1,5 @@
 "specification","break_date","chow_stat","chow_pval","parameters_stable_5pct","n_pre","n_post","note"
 "Spec6_Preferred",1995-01-01,NA,NA,NA,0,86,"break too close to sample edge"
 "Spec6_Preferred",2000-01-01,NA,NA,NA,0,86,"break too close to sample edge"
-"Spec6_Preferred",2008-07-01,1.2488198835909,0.261129341917169,TRUE,21,65,""
+"Spec6_Preferred",2008-07-01,1.181029534976,0.311981143730899,TRUE,21,65,""
 "Spec6_Preferred",2020-01-01,NA,NA,NA,67,19,"sctest failed"

@@ -257,41 +257,98 @@ mort_int_q <- pick_abs(inc_raw,
 if (nrow(mort_int_q) == 0L)
   message("  mortgage interest paid: not found — will use RBA rate series")
 
-## 2.5  Population (3101059 — sum single-year age cohorts, annual → spline)
-message("2.5 Population (3101059)")
+## 2.4b  Household income components (data_raw/household_income.csv)
+##   - compensation_of_employees: nominal $m, quarterly
+##   - prop_inc_rec:               property income receivable, $m
+##   - social_assisatance_ben:     social assistance benefits in cash, $m  [note typo in source]
+##   - prop_inc_pay:               property income payable, $m (= mortgage interest etc.)
+## Used to construct labour+transfer income for the Italy-style scaled-income
+## robustness column (Italy.pdf §3.1: scaled_income = mean of disposable
+## income and labour-plus-transfer income, down-weighting mismeasured property
+## income).
+message("2.4b Household income components (CSV)")
+hh_inc_csv <- file.path(raw_dir, "household_income.csv")
+hh_inc_q <- tibble(date = as.Date(character()))
+if (file.exists(hh_inc_csv)) {
+  raw <- read.csv(hh_inc_csv, stringsAsFactors = FALSE,
+                  fileEncoding = "UTF-8-BOM")
+  raw <- raw[!is.na(raw[[1L]]) & nzchar(raw[[1L]]), , drop = FALSE]
+  raw_dates <- as.Date(paste0("01-", raw[[1L]]), format = "%d-%b-%Y")
+  keep <- !is.na(raw_dates)
+  raw  <- raw[keep, , drop = FALSE]
+  raw_dates <- raw_dates[keep]
+  hh_inc_q <- tibble(
+    date                       = abs_to_qstart(raw_dates),
+    compensation_of_employees  = suppressWarnings(as.numeric(raw$compensation_of_employees)),
+    prop_inc_rec               = suppressWarnings(as.numeric(raw$prop_inc_rec)),
+    social_assistance_benefits = suppressWarnings(as.numeric(raw$social_assisatance_ben)),
+    prop_inc_pay               = suppressWarnings(as.numeric(raw$prop_inc_pay))
+  ) %>%
+    arrange(date) %>%
+    distinct(date, .keep_all = TRUE) %>%
+    filter(date <= spine_end)
+  message(sprintf("  hh_inc components (CSV): %d obs, %s to %s",
+    nrow(hh_inc_q),
+    format(min(hh_inc_q$date), "%Y-%m-%d"),
+    format(max(hh_inc_q$date), "%Y-%m-%d")))
+} else {
+  message("  household_income.csv NOT FOUND — labour+transfer income unavailable, ",
+          "Italy-style scaled-income robustness will be skipped")
+}
+
+## 2.5  Population (15+ civilian population — ABS A84423091W)
+message("2.5 Population (15+ civilian, ABS A84423091W)")
+# Source: data_raw/population_workingage.csv (user-supplied ABS series).
+# This is "Civilian Population aged 15 years and over", monthly, in
+# thousands. It IS the correct denominator for the per-capita series
+# used in the model (the README says we scale by 15+ pop, and Muellbauer's
+# convention is the same).
+#
+# We previously summed single-year age cohorts from 3101059, but the
+# Persons-by-age series in current ABS vintages truncates at age 47,
+# producing a ~65% underestimate of total population. The 3101059
+# workbook is still loaded below for the prime-age share construction
+# (which uses Male+Female cohorts and is therefore unaffected).
 pop_raw <- read_abs_cached(
   file.path(raw_dir, "3101059.xlsx"),
   "abs_pop"
 )
-# 3101059 contains one series per single-year age cohort.
-# Sum all cohorts to get total ERP, then spline annual obs to quarterly.
-pop_ann <- pop_raw %>%
-  filter(str_detect(series_name,
-    "^Estimated Resident Population ; Persons ; ")) %>%
-  mutate(date = abs_to_qstart(date)) %>%
-  group_by(date) %>%
-  summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
-  arrange(date) %>%
-  filter(value > 0)
 
-if (nrow(pop_ann) >= 10L) {
+pop_csv <- file.path(raw_dir, "population_workingage.csv")
+if (file.exists(pop_csv)) {
+  raw <- read.csv(pop_csv, stringsAsFactors = FALSE,
+                  fileEncoding = "UTF-8-BOM")
+  raw <- raw[!is.na(raw[[1L]]) & nzchar(raw[[1L]]), , drop = FALSE]
+  raw_dates <- as.Date(paste0("01-", raw[[1L]]), format = "%d-%b-%Y")
+  raw_vals  <- suppressWarnings(as.numeric(raw[[2L]]))
+  keep <- !is.na(raw_dates) & !is.na(raw_vals)
+  pop_m <- tibble(date = raw_dates[keep],
+                  value = raw_vals[keep]) %>%
+    arrange(date) %>%
+    filter(date <= spine_end)  # trim ABS forward projections
+  pop_q <- monthly_to_quarterly(pop_m) %>%
+    rename(pop_thousands = value) %>%
+    mutate(pop_millions = pop_thousands / 1000)
+  message(sprintf("  pop_15plus (CSV): %d quarterly obs, %s to %s, last=%.1fM",
+    nrow(pop_q),
+    format(min(pop_q$date), "%Y-%m-%d"),
+    format(max(pop_q$date), "%Y-%m-%d"),
+    tail(pop_q$pop_millions, 1)))
+} else {
+  # Legacy fallback: sum single-year cohorts (KNOWN BIASED LOW per above).
+  message("  population_workingage.csv NOT FOUND — falling back to (biased) cohort sum")
+  pop_ann <- pop_raw %>%
+    filter(str_detect(series_name,
+      "^Estimated Resident Population ; Persons ; ")) %>%
+    mutate(date = abs_to_qstart(date)) %>%
+    group_by(date) %>%
+    summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
+    arrange(date) %>%
+    filter(value > 0)
   pop_q <- annual_to_quarterly_spline(pop_ann, spine_dates) %>%
     rename(pop_thousands = value) %>%
     mutate(pop_millions = pop_thousands / 1000)
-  message(sprintf("  pop: %d quarterly obs via spline (from %d source obs)",
-                  nrow(pop_q), nrow(pop_ann)))
-} else {
-  message("  pop: age-cohort series not found; falling back to working-age pop")
-  pop_q <- pop_raw %>%
-    filter(str_detect(series_name,
-      regex("civilian population aged 15|working.age|persons.15", ignore_case = TRUE))) %>%
-    filter(series_type %in% c("Original", "Seasonally Adjusted")) %>%
-    mutate(date = abs_to_qstart(date)) %>%
-    group_by(date) %>% summarise(value = sum(value, na.rm = TRUE), .groups = "drop") %>%
-    arrange(date) %>%
-    rename(pop_thousands = value) %>%
-    mutate(pop_millions = pop_thousands / 1000)
-  message(sprintf("  pop: %d obs (working-age fallback)", nrow(pop_q)))
+  message(sprintf("  pop (biased cohort fallback): %d quarterly obs", nrow(pop_q)))
 }
 
 ## 2.5b Prime-age share (25-54). Muellbauer's life-cycle adjustment: a higher
@@ -461,31 +518,59 @@ for (nm in c("fin_deposits", "fin_equities", "fin_super", "fin_loans",
 
 ## 2.9  Mortgage interest rate
 message("2.9 Mortgage interest rate")
-# Primary: RBA series FILRHLBVS (standard variable owner-occupier rate) via readrba.
-# Fallback: implicit rate from ABS mortgage interest paid / lagged debt stock.
+# Source order:
+#   1. data_raw/rba_filrhlbvs.csv  — user-supplied RBA F6 historical CSV.
+#      This is the canonical source. Eliminates network dependence and
+#      avoids the readrba fetch failing silently.
+#   2. readrba::read_rba_seriesid("FILRHLBVS") — live fallback.
+#   3. ABS-implicit (mort_int_paid / lagged debt stock) — last resort;
+#      systematically biased low (peaks ~7% vs RBA's ~17% in 1989).
 mort_rate_q <- NULL
 
-if (requireNamespace("readrba", quietly = TRUE)) {
+rba_csv <- file.path(raw_dir, "rba_filrhlbvs.csv")
+if (file.exists(rba_csv)) {
   tryCatch({
-    message("  Fetching FILRHLBVS via readrba...")
-    rba_series <- readrba::read_rba_seriesid("FILRHLBVS")
-    if (!is.null(rba_series) && nrow(rba_series) > 0L) {
-      mort_rate_m <- rba_series %>%
-        select(date, value) %>%
-        filter(!is.na(value), date >= as.Date("1970-01-01")) %>%
-        arrange(date)
-      mort_rate_q <- monthly_to_quarterly(mort_rate_m) %>%
-        rename(mortgage_rate = value)
-      message(sprintf("  mortgage_rate (RBA FILRHLBVS): %d obs, %s to %s",
-        nrow(mort_rate_q),
-        format(min(mort_rate_q$date), "%Y-%m-%d"),
-        format(max(mort_rate_q$date), "%Y-%m-%d")))
-    } else {
-      message("  FILRHLBVS returned no data from readrba")
-    }
-  }, error = function(e) message("  readrba fetch failed: ", e$message))
-} else {
-  message("  readrba not installed — install with install.packages('readrba')")
+    raw <- read.csv(rba_csv, stringsAsFactors = FALSE,
+                    fileEncoding = "UTF-8-BOM")
+    raw <- raw[!is.na(raw[[1L]]) & nzchar(raw[[1L]]), , drop = FALSE]
+    raw_dates <- as.Date(paste0("01-", raw[[1L]]), format = "%d-%b-%Y")
+    raw_vals  <- suppressWarnings(as.numeric(raw[[2L]]))
+    keep <- !is.na(raw_dates) & !is.na(raw_vals)
+    mort_rate_m <- tibble(date = raw_dates[keep],
+                          value = raw_vals[keep]) %>% arrange(date)
+    mort_rate_q <- monthly_to_quarterly(mort_rate_m) %>%
+      rename(mortgage_rate = value)
+    message(sprintf("  mortgage_rate (RBA F6 CSV): %d obs, %s to %s, peak %.2f%%",
+      nrow(mort_rate_q),
+      format(min(mort_rate_q$date), "%Y-%m-%d"),
+      format(max(mort_rate_q$date), "%Y-%m-%d"),
+      max(mort_rate_q$mortgage_rate, na.rm = TRUE)))
+  }, error = function(e) message("  rba_filrhlbvs.csv parse error: ", e$message))
+}
+
+if (is.null(mort_rate_q) || nrow(mort_rate_q) == 0L) {
+  if (requireNamespace("readrba", quietly = TRUE)) {
+    tryCatch({
+      message("  Fetching FILRHLBVS via readrba...")
+      rba_series <- readrba::read_rba_seriesid("FILRHLBVS")
+      if (!is.null(rba_series) && nrow(rba_series) > 0L) {
+        mort_rate_m <- rba_series %>%
+          select(date, value) %>%
+          filter(!is.na(value), date >= as.Date("1970-01-01")) %>%
+          arrange(date)
+        mort_rate_q <- monthly_to_quarterly(mort_rate_m) %>%
+          rename(mortgage_rate = value)
+        message(sprintf("  mortgage_rate (RBA FILRHLBVS via readrba): %d obs, %s to %s",
+          nrow(mort_rate_q),
+          format(min(mort_rate_q$date), "%Y-%m-%d"),
+          format(max(mort_rate_q$date), "%Y-%m-%d")))
+      } else {
+        message("  FILRHLBVS returned no data from readrba")
+      }
+    }, error = function(e) message("  readrba fetch failed: ", e$message))
+  } else {
+    message("  readrba not installed AND rba_filrhlbvs.csv not found")
+  }
 }
 
 # Fallback: implicit rate from ABS mortgage interest / lagged debt stock
@@ -673,6 +758,7 @@ master <- master %>%
   left_join(cons_nom_q,        by = "date") %>%   # $m, current
   left_join(deflator_q,        by = "date") %>%   # index, 2023=100
   left_join(gdi_q,             by = "date") %>%   # $m, current, quarterly
+  left_join(hh_inc_q,          by = "date") %>%   # $m, components from CSV
   left_join(unemp_q,           by = "date") %>%   # %
   left_join(lf_q,              by = "date") %>%   # persons (thousands)
   left_join(pop_q %>% select(date, pop_millions), by = "date") %>%
@@ -710,6 +796,30 @@ master <- master %>%
     fin_super_r       = fin_super      / (cons_deflator_norm / 100),
     fin_loans_r       = fin_loans      / (cons_deflator_norm / 100)
   )
+
+# Italy-style "scaled income" inputs: labour+transfer income (CSV) deflated
+# and per-capita. Italy.pdf §3.1 averages this with full disposable income to
+# down-weight property income (which is mismeasured in national accounts —
+# imputed financial returns rather than realised cash flow).
+if ("compensation_of_employees" %in% names(master) &&
+    "social_assistance_benefits" %in% names(master)) {
+  master <- master %>%
+    mutate(
+      labour_transfer_nom        = compensation_of_employees +
+                                    social_assistance_benefits,
+      labour_transfer_real_pc    = (labour_transfer_nom /
+                                     (cons_deflator_norm / 100)) / pop_millions,
+      ln_labour_transfer_real_pc = log(pmax(labour_transfer_real_pc, 1e-9)),
+      # Scaled income: 50/50 average of disposable and labour+transfer.
+      # Used by run_italy_style_robustness as the alternative income measure.
+      scaled_income_real_pc      = 0.5 * ydi_real_pc + 0.5 * labour_transfer_real_pc,
+      ln_scaled_income_real_pc   = log(pmax(scaled_income_real_pc, 1e-9))
+    )
+  message(sprintf("  labour+transfer real per-capita: %d obs, range %.0f - %.0f",
+    sum(!is.na(master$labour_transfer_real_pc)),
+    min(master$labour_transfer_real_pc, na.rm = TRUE),
+    max(master$labour_transfer_real_pc, na.rm = TRUE)))
+}
 
 # Annualised income (quarterly flow × 4) for ratio construction
 master <- master %>%
@@ -893,7 +1003,8 @@ for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",
             "real_rate", "hpi", "ha_y", "eq_y", "super_y",
             "nla_y", "nla_y_unrestricted", "debt_y", "networth_y",
             "cci_ratio", "fhb_share", "prime_age_share", "mortgage_burden",
-            "labour_force", "lf_share")) {
+            "labour_force", "lf_share",
+            "labour_transfer_real_pc", "scaled_income_real_pc")) {
   report_series(master[[v]], v, master$date)
 }
 
