@@ -817,9 +817,12 @@ master <- master %>%
     mortgage_burden = (fin_loans * mortgage_rate / 100) / ydi_ann_nom
   )
 
-# Option-A overlay: institutional CCI from regime indicators + standardised
-# credit-quality indicators. Backfills cci_ratio pre-2002 only (preserving
-# the housing-flow anchor for the post-2002 period).
+# Institutional CCI overlay (USE_INSTITUTIONAL_CCI flag set near top of file).
+# When TRUE, two things happen:
+#   1. construct_institutional_cci backfills cci_ratio pre-2002 from a
+#      regime+indicator blend (preserving the post-2002 housing-flow anchor).
+#   2. The Williams (2010) 4-knot SDMMA basis (1979Q1/1992Q1/1998Q1/2007Q1)
+#      is attached so the estimation step can fit Spec 8 (CCI interactions).
 if (USE_INSTITUTIONAL_CCI) {
   basis <- build_credit_regime_basis(master$date)
   cci_input <- master %>%
@@ -840,6 +843,14 @@ if (USE_INSTITUTIONAL_CCI) {
     select(-cci_institutional_raw)
   message("  Using institutional CCI (Muellbauer-style regime+indicator blend) ",
           "to backfill pre-2002 cci_ratio.")
+
+  williams_basis <- build_williams_cci_basis(master$date)
+  for (j in seq_len(ncol(williams_basis))) {
+    master[[colnames(williams_basis)[j]]] <- williams_basis[, j]
+  }
+  message("  Williams 4-knot CCI basis added to master (SDMMA series at ",
+          "1979/1992/1998/2007); CCI fitted series will be computed in",
+          " estimation step.")
 }
 
 # Print coverage

@@ -2,9 +2,11 @@
 "Australia","Spec4_Disagg_NoCCI","eq_y",0.18135566727527
 "Australia","Spec5_FullDisagg","eq_y",0.208481449569728
 "Australia","Spec6_Preferred","eq_y",0.237587311891158
+"Australia","Spec8_CCI_Interactions","eq_y",-0.159713460270621
 "Australia","Spec4_Disagg_NoCCI","ha_y",0.0469157402756983
 "Australia","Spec5_FullDisagg","ha_y",0.042721290326747
 "Australia","Spec6_Preferred","ha_y",0.0428043088272607
+"Australia","Spec8_CCI_Interactions","ha_y",0.0429159030051094
 "Italy","Italy_Preferred","ha_y",0.00460968883210896
 "Italy","Italy_Preferred","ilfa_y",0.00112095602868892
 "Australia","Spec4_Disagg_NoCCI","ln_hp_over_y",-0.126327450884836
@@ -16,16 +18,19 @@
 "Australia","Spec4_Disagg_NoCCI","ln_y_over_c",1
 "Australia","Spec5_FullDisagg","ln_y_over_c",1
 "Australia","Spec6_Preferred","ln_y_over_c",1
+"Australia","Spec8_CCI_Interactions","ln_y_over_c",1
 "Australia","Spec1_LogNetWorth","ln_yp_over_y",-0.0756123272160252
 "Australia","Spec2_LogNetWorth_CCI","ln_yp_over_y",-0.0824966808694319
 "Australia","Spec3_LevelNetWorth","ln_yp_over_y",-0.0738159384741282
 "Australia","Spec4_Disagg_NoCCI","ln_yp_over_y",-0.0409017388160389
 "Australia","Spec5_FullDisagg","ln_yp_over_y",-0.0160969640733738
 "Australia","Spec6_Preferred","ln_yp_over_y",-0.0802322175305864
+"Australia","Spec8_CCI_Interactions","ln_yp_over_y",-0.0100693245225809
 "Italy","Italy_Preferred","ln_yp_over_y",-0.0183939978052012
 "Australia","Spec4_Disagg_NoCCI","nla_y",-0.0198579344628866
 "Australia","Spec5_FullDisagg","nla_y",-0.00041832854365943
 "Australia","Spec6_Preferred","nla_y",-0.000641999460841458
+"Australia","Spec8_CCI_Interactions","nla_y",-0.0603038273492651
 "Italy","Italy_Preferred","nla_y",0.0255075813823135
 "Australia","Spec1_LogNetWorth","real_rate",-0.0135930507852164
 "Australia","Spec2_LogNetWorth_CCI","real_rate",-0.0139838950770254
@@ -37,3 +42,4 @@
 "Australia","Spec4_Disagg_NoCCI","super_y",-0.0648282333360864
 "Australia","Spec5_FullDisagg","super_y",-0.0766984063084122
 "Australia","Spec6_Preferred","super_y",-0.0809101926417238
+"Australia","Spec8_CCI_Interactions","super_y",-0.00154203853272489
