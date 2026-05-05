@@ -1,0 +1,2 @@
+"specification","status","reason"
+"Spec6_Preferred","SKIPPED","No clean labour+transfer income series available in current Australia data pipeline (ABS 5206020 wages component not extracted into model_data).  Italy uses average of labour+transfer and total disposable income; only ydi_real_pc is currently available.  Cannot construct scaled_income without fabrication."
