@@ -32,7 +32,7 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec4_Disagg_NoCCI | 0.724 | 2.54 | N | N | N | — | N | -811.9 | Y | Y | Y | N |
 | Spec5_FullDisagg | 0.788 | 2.38 | N | N | N | — | N | -489.2 | N | Y | Y | N |
 | Spec6_Preferred | 0.801 | 2.40 | N | N | N | N | N | -491.5 | Y | Y | Y | Y |
-| Spec7_CohortBurden | 0.823 | 2.44 | N | N | N | — | N | -492.3 | N | Y | Y | N |
+| Spec7_CohortBurden | 0.824 | 2.43 | N | N | N | Y | N | -495.9 | N | Y | Y | Y |
 | Spec8_CCI_Interactions | 0.740 | 2.34 | N | N | N | — | N | -804.9 | N | — | Y | N |
 
 ## Lambda comparison (full vs pre-COVID)
@@ -45,7 +45,7 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec4_Disagg_NoCCI | -0.0676 | -0.0364 | yes |
 | Spec5_FullDisagg | -0.0833 | -0.1445 | yes |
 | Spec6_Preferred | -0.0462 | -0.1069 | yes |
-| Spec7_CohortBurden | -0.2264 | -0.2157 | yes |
+| Spec7_CohortBurden | -0.2519 | -0.2158 | yes |
 | Spec8_CCI_Interactions | -0.0938 | -0.0605 | yes |
 
 ## Italy vs Australia (preferred specs)
@@ -68,7 +68,7 @@ Long-run structural coefficients (preferred spec, full sample):
 - Spec3_LevelNetWorth fails: cointegration, stability
 - Spec4_Disagg_NoCCI fails: stability
 - Spec5_FullDisagg fails: sign, stability
-- Spec7_CohortBurden fails: sign, stability
+- Spec7_CohortBurden fails: sign
 - Spec8_CCI_Interactions fails: sign, stability
 - Heteroskedasticity rejected at 5% in some specs — see `lm_het_pval`, `lm_het_pval_no_events`, `het_diagnosis` columns of diagnostics CSV.
 - COVID handling: see `australia_lambda_robustness.csv` for sample sensitivity.
