@@ -78,5 +78,5 @@ Long-run structural coefficients (preferred spec, full sample):
 - Run: `Rscript Ausreplication/R/australia_consumption_model.R`
 - Fast re-estimation: `Rscript Ausreplication/R/run_estimation_from_rds.R`
 - Random seed: not used (OLS is deterministic).
-- Date generated: 2026-05-05
+- Date generated: 2026-05-06
 

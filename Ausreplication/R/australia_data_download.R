@@ -273,24 +273,53 @@ if (file.exists(hh_inc_csv)) {
   raw <- read.csv(hh_inc_csv, stringsAsFactors = FALSE,
                   fileEncoding = "UTF-8-BOM")
   raw <- raw[!is.na(raw[[1L]]) & nzchar(raw[[1L]]), , drop = FALSE]
+  # File has been supplied in two date conventions: "Sep-1959" (4-digit
+  # year) and "Sep-59" (2-digit year). Try 4-digit first; if results land
+  # before 1900 (i.e. parsed "59" as year 59 AD), reparse with century
+  # inference (50-99 -> 19xx, 00-49 -> 20xx).
   raw_dates <- as.Date(paste0("01-", raw[[1L]]), format = "%d-%b-%Y")
+  needs_century_fix <- mean(is.na(raw_dates)) > 0.5 ||
+    (any(!is.na(raw_dates)) && min(raw_dates, na.rm = TRUE) < as.Date("1900-01-01"))
+  if (needs_century_fix) {
+    parts <- strsplit(raw[[1L]], "-")
+    fixed <- vapply(parts, function(p) {
+      if (length(p) != 2L) return(NA_character_)
+      yy <- suppressWarnings(as.integer(p[2L]))
+      if (is.na(yy)) return(NA_character_)
+      yyyy <- if (yy >= 50L) 1900L + yy else 2000L + yy
+      sprintf("01-%s-%d", p[1L], yyyy)
+    }, character(1))
+    raw_dates <- as.Date(fixed, format = "%d-%b-%Y")
+  }
   keep <- !is.na(raw_dates)
   raw  <- raw[keep, , drop = FALSE]
   raw_dates <- raw_dates[keep]
+  num_or_na <- function(col) {
+    if (is.null(col)) return(rep(NA_real_, nrow(raw)))
+    suppressWarnings(as.numeric(col))
+  }
   hh_inc_q <- tibble(
-    date                       = abs_to_qstart(raw_dates),
-    compensation_of_employees  = suppressWarnings(as.numeric(raw$compensation_of_employees)),
-    prop_inc_rec               = suppressWarnings(as.numeric(raw$prop_inc_rec)),
-    social_assistance_benefits = suppressWarnings(as.numeric(raw$social_assisatance_ben)),
-    prop_inc_pay               = suppressWarnings(as.numeric(raw$prop_inc_pay))
+    date                         = abs_to_qstart(raw_dates),
+    compensation_of_employees    = num_or_na(raw$compensation_of_employees),
+    prop_inc_rec                 = num_or_na(raw$prop_inc_rec),
+    social_assistance_benefits   = num_or_na(raw$social_assisatance_ben),
+    prop_inc_pay                 = num_or_na(raw$prop_inc_pay),
+    # Williams (2009) §4.2.1 inputs (added in 2026 update):
+    gos_dwellings                = num_or_na(raw$gos_dwellings),
+    gross_mixed_income           = num_or_na(raw$gross_mixed_income),
+    income_tax_payable           = num_or_na(raw$income_tax_payable),
+    total_income_rec             = num_or_na(raw$total_income_rec),
+    total_income_pay             = num_or_na(raw$total_income_pay),
+    wage_share                   = num_or_na(raw$wage_share_incoem)  # source typo retained
   ) %>%
     arrange(date) %>%
     distinct(date, .keep_all = TRUE) %>%
     filter(date <= spine_end)
-  message(sprintf("  hh_inc components (CSV): %d obs, %s to %s",
+  message(sprintf("  hh_inc components (CSV): %d obs, %s to %s, %d non-NA cols",
     nrow(hh_inc_q),
     format(min(hh_inc_q$date), "%Y-%m-%d"),
-    format(max(hh_inc_q$date), "%Y-%m-%d")))
+    format(max(hh_inc_q$date), "%Y-%m-%d"),
+    sum(sapply(hh_inc_q[-1], function(c) any(!is.na(c))))))
 } else {
   message("  household_income.csv NOT FOUND — labour+transfer income unavailable, ",
           "Italy-style scaled-income robustness will be skipped")
@@ -821,6 +850,54 @@ if ("compensation_of_employees" %in% names(master) &&
     max(master$labour_transfer_real_pc, na.rm = TRUE)))
 }
 
+# Williams (2009) §4.2.1 — Non-property household disposable income (NPY).
+# Recipe (verbatim from p.10):
+#   npy_rec = total_income_rec − GOS_dwellings − prop_inc_rec
+#   property_tax_share = (GOS_dwellings + prop_inc_rec) / total_income_rec
+#   npy_pay = total_income_pay − interest_on_dwellings (= prop_inc_pay)
+#             − property_tax_share × income_tax_payable
+#   NPY     = npy_rec − npy_pay
+# Then npy_real_pc = NPY / cons_deflator_norm * 100 / pop_millions and
+#       ln_npy_real_pc = log(npy_real_pc).
+# This is the income measure that appears as `y` in Williams (2010) WP 492's
+# consumption equation. We add it as a parallel series to ydi_real_pc; the
+# two coexist so a robustness column can compare Spec 6 estimates under
+# each. Williams' paper uses property tax payable rather than total income
+# tax — we follow his proxy (the receivable share applied to total tax).
+williams_required <- c("gos_dwellings", "prop_inc_rec", "prop_inc_pay",
+                       "income_tax_payable", "total_income_rec", "total_income_pay")
+if (all(williams_required %in% names(master)) &&
+    all(sapply(williams_required, function(v) any(!is.na(master[[v]]))))) {
+  master <- master %>%
+    mutate(
+      property_tax_share = (gos_dwellings + prop_inc_rec) / total_income_rec,
+      npy_rec_nom        = total_income_rec - gos_dwellings - prop_inc_rec,
+      npy_pay_nom        = total_income_pay - prop_inc_pay -
+                           property_tax_share * income_tax_payable,
+      npy_nom            = npy_rec_nom - npy_pay_nom,
+      npy_real_pc        = (npy_nom / (cons_deflator_norm / 100)) / pop_millions,
+      ln_npy_real_pc     = log(pmax(npy_real_pc, 1e-9))
+    )
+  npy_obs <- master$npy_real_pc[!is.na(master$npy_real_pc)]
+  message(sprintf("  Williams NPY (non-property income) real pc: %d obs, range %.0f - %.0f, mean %.0f",
+    length(npy_obs), min(npy_obs), max(npy_obs), mean(npy_obs)))
+  # Sanity: NPY/disposable ratio should be roughly 0.85-1.05 in modern
+  # quarters (property income receivable is a meaningful share of GDI).
+  ratio_modern <- master %>%
+    filter(date >= as.Date("2010-01-01")) %>%
+    mutate(r = npy_nom / ydi_nom) %>% pull(r)
+  if (length(ratio_modern) > 0L) {
+    message(sprintf("  NPY / GDI ratio (post-2010): %.3f - %.3f (mean %.3f)",
+      min(ratio_modern, na.rm=TRUE), max(ratio_modern, na.rm=TRUE),
+      mean(ratio_modern, na.rm=TRUE)))
+  }
+} else {
+  missing <- setdiff(williams_required, names(master))
+  if (length(missing) == 0L) missing <- "all-NA columns"
+  message("  Williams NPY: not constructed — missing inputs: ",
+          paste(missing, collapse = ", "))
+}
+
 # Annualised income (quarterly flow × 4) for ratio construction
 master <- master %>%
   mutate(
@@ -1065,6 +1142,7 @@ for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",
             "cci_ratio", "fhb_share", "prime_age_share", "mortgage_burden",
             "labour_force", "lf_share",
             "labour_transfer_real_pc", "scaled_income_real_pc",
+            "npy_real_pc", "property_tax_share",
             "mortgage_interest_burden_rba", "mortgage_payment_burden_rba")) {
   report_series(master[[v]], v, master$date)
 }

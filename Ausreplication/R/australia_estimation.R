@@ -2524,6 +2524,78 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
   })
 
   # ----------------------------------------------------------------------
+  # (4b) Williams (2009/2010) non-property income alternative
+  # Replaces ydi_real_pc with npy_real_pc — the income measure used in
+  # Williams's Australia LIVES estimation. NPY strips imputed property
+  # income (and a corresponding share of property-related tax) from gross
+  # disposable income. This is a different choice from Italy's scaled
+  # income (which is a 50/50 average); Williams uses NPY directly.
+  # ----------------------------------------------------------------------
+  npy_path <- file.path(output_dir, "australia_williams_income_robustness.csv")
+  tryCatch({
+    if (!"npy_real_pc" %in% names(model_data)) {
+      message("  [Williams-income block] npy_real_pc not in model_data; ",
+              "skipping (need ABS 5206020 components from household_income.csv)")
+      write.csv(tibble::tibble(
+        specification = spec_name, status = "SKIPPED",
+        reason = "npy_real_pc not constructed in current data pipeline"
+      ), npy_path, row.names = FALSE)
+    } else {
+      npy_data <- model_data %>%
+        arrange(date) %>%
+        mutate(
+          lincome_npy        = log(pmax(npy_real_pc, 1e-9)),
+          ln_y_over_c_npy    = lincome_npy - lag(lcons, 1L),
+          ecm_lag_npy        = lag(lcons, 1L) - lincome_npy
+        )
+      rhs_terms_npy <- rhs_terms
+      rhs_terms_npy <- gsub("\\bln_y_over_c\\b", "ln_y_over_c_npy",
+                            rhs_terms_npy, perl = TRUE)
+      rhs_terms_npy <- gsub("\\becm_lag\\b", "ecm_lag_npy",
+                            rhs_terms_npy, perl = TRUE)
+      fmla_npy <- reformulate(rhs_terms_npy, response = response)
+
+      npy_data_cc <- npy_data %>%
+        filter(date >= min(est_data$date), date <= max(est_data$date)) %>%
+        filter(complete.cases(across(all_of(c(response, rhs_terms_npy)))))
+
+      fit_npy <- lm(fmla_npy, data = npy_data_cc)
+      cf_npy  <- coef(fit_npy)
+      se_npy  <- sqrt(diag(vcov(fit_npy)))
+      cf_base <- coef(base_fit)
+      se_base <- sqrt(diag(vcov(base_fit)))
+
+      align_npy <- function(x) {
+        x <- gsub("ln_y_over_c_npy", "ln_y_over_c", x)
+        gsub("ecm_lag_npy", "ecm_lag", x)
+      }
+      cf_npy_named <- setNames(cf_npy, align_npy(names(cf_npy)))
+      se_npy_named <- setNames(se_npy, align_npy(names(se_npy)))
+
+      nm <- union(names(cf_base), names(cf_npy_named))
+      npy_tbl <- tibble::tibble(
+        specification = spec_name,
+        term          = nm,
+        base_estimate = unname(cf_base       [match(nm, names(cf_base))]),
+        base_se       = unname(se_base       [match(nm, names(se_base))]),
+        npy_estimate  = unname(cf_npy_named  [match(nm, names(cf_npy_named))]),
+        npy_se        = unname(se_npy_named  [match(nm, names(se_npy_named))]),
+        income_var    = "npy_real_pc (Williams 2009 §4.2.1)",
+        n_obs         = nrow(npy_data_cc)
+      )
+      write.csv(npy_tbl, npy_path, row.names = FALSE)
+      message(sprintf("[run_italy_style_robustness] Williams-income table saved: %s",
+                      npy_path))
+    }
+  }, error = function(e) {
+    message(sprintf("  [Williams-income block] FAILED: %s", conditionMessage(e)))
+    write.csv(tibble::tibble(
+      specification = spec_name, status = "FAILED",
+      error = conditionMessage(e)
+    ), npy_path, row.names = FALSE)
+  })
+
+  # ----------------------------------------------------------------------
   # (5) Drehmann amortising-mortgage-adjusted real rate
   # adjR = R / (1 - (1+R)^-N), with N = 100 quarters (25 years for Australia)
   # ----------------------------------------------------------------------
