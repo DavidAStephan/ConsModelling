@@ -94,27 +94,273 @@ long-run decomposition and policy implications. Section 11 concludes.
 
 ## 2. Literature review
 
-> [SKELETON — paragraph each on:]
+This paper sits at the intersection of three literatures: the
+Muellbauer-Williams "LIVES" tradition that integrates wealth, credit
+conditions and life-cycle behaviour into consumption equations; the
+Australian empirical consumption literature, which has historically
+focused on aggregate wealth effects without the explicit credit-conditions
+machinery; and the small but growing body of work that disciplines
+permanent-income measurement using forecasting approaches more robust
+than the standard AR(p) recipe. We review each in turn before placing
+the present contribution.
 
-- **The LIVES family.** Muellbauer (2007 UK theoretical foundation),
-  Aron-Muellbauer-Murphy (2012, UK), Duca-Muellbauer-Tobin (2013), Duca
-  et al. (2010 US) and Aron et al. (2012 UK and US comparison).
-- **The Australian application.** Williams (2009, 2010), Muellbauer-Williams
-  (2012 BIS chapter). Recent Australian work: cite RBA RDPs on consumption
-  and household balance sheets; cite Atkin-Hambur, Cusbert, Hambur-La Cava
-  if relevant (CHECK).
-- **Comparator implementations.** De Bonis et al. (2024, Italy);
-  Chauvin-Muellbauer (Online Complement, France); Duca-Muellbauer-Tobin
-  (2013) for UK and US.
-- **Permanent-income forecasting.** Hall (1978), Carroll-Kimball (1996),
-  Campbell-Mankiw (1989, 1991) on excess sensitivity, Jordà (2005) on
-  local projections.
-- **Identification of credit conditions.** Williams (2010) on the
-  smoothed-step spline approach; Bayoumi (1993) on early Australian
-  liberalisation; Battellino-McMillan (1989), Edey-Gray (1996) on
-  Australian financial deregulation chronology.
-- **The Australian "permanent-income puzzle."** Cite where this has
-  been previously noted in Australian consumption modelling (TODO).
+### 2.1 Theoretical foundations
+
+The empirical specification estimated below has its origins in the
+Davidson-Hendry-Srba-Yeo (1978) error-correction consumption function
+and the canonical permanent-income hypothesis (PIH) of Friedman (1957)
+and Hall (1978). The DHSY approach embeds a long-run cointegrating
+relationship between consumption, income and wealth into a short-run
+dynamic equation in growth rates, with an error-correction term
+governing the speed at which the consumption ratio reverts to its
+long-run determinants. Engle and Granger (1987) provide the formal
+econometric framework, with Hendry and Krolzig (2005) and Doornik
+(2009) refining the general-to-specific reduction methodology that
+disciplines the choice of short-run regressors.
+
+A long line of empirical work has documented systematic departures from
+strict PIH behaviour. Campbell and Mankiw (1989, 1991) show that
+roughly half of US consumption tracks current rather than permanent
+income, consistent with rule-of-thumb behaviour or liquidity
+constraints. Carroll and Kimball (1996) establish the concavity of the
+consumption function under prudence, providing a microeconomic basis
+for differential marginal propensities to consume across wealth classes.
+Carroll (2001) and Deaton (1992) develop the buffer-stock interpretation
+that motivates the distinction between liquid and illiquid wealth in the
+Muellbauer specifications used here. The empirical implication —
+that wealth components with different liquidity, transactions costs, and
+ownership concentration should enter the consumption equation with
+different coefficients — is the cornerstone of the disaggregated
+specifications (Specs 4–7) reported in §7.
+
+### 2.2 The LIVES framework
+
+Muellbauer (2007), originally prepared for the Federal Reserve Bank of
+Kansas City Jackson Hole symposium, sets out the integrated approach to
+modelling consumption with wealth, housing collateral and credit
+conditions. The paper's central insight is that credit-market
+liberalisation interacts with the wealth and interest-rate channels:
+when credit is tight, housing wealth collateralises borrowing only
+weakly and the down-payment hurdle dampens consumption; when credit is
+loose, housing wealth and current consumption become more tightly
+linked. This insight requires a credit-conditions index (CCI) entering
+both as a long-run intercept shifter and as a multiplicative interaction
+with the wealth, interest-rate and permanent-income terms.
+
+The framework was operationalised in a series of country studies. Aron,
+Duca, Muellbauer, Murata and Murphy (2012) jointly estimate the framework
+on Japan, the United Kingdom and the United States, finding consistent
+positive long-run housing wealth effects in the UK and US (where home
+equity withdrawal is institutionally available) and a much smaller
+effect in Japan (where it is not). Duca, Muellbauer and Murphy (2010)
+apply the framework to the global financial crisis, demonstrating that
+the abrupt tightening in CCI from 2007 quantitatively rationalises the
+sharp consumption pullback observed in heavy-MEW economies. Duca,
+Muellbauer and Tobin (2013), in *European Economy* Discussion Paper 14,
+formalise what they label the "LIVES" approach — the *l*ife-cycle
+*I*ntegration of *V*ariable *E*xpectations and *S*tructure — emphasising
+the joint determination of consumption, house prices, mortgage debt
+and home equity withdrawal in a four-equation system identified by
+common factors and cross-equation sign restrictions.
+
+Two parallel implementations frame the present paper. De Bonis, Marino
+and Muellbauer (2024) [VERIFY] estimate a single-equation Italian
+adaptation that imposes the cross-equation restriction γ_LA + γ_LOANS = 0
+(deposits and household debt enter with equal-and-opposite coefficients),
+adopts a Jordà (2005) local-projection permanent-income forecaster,
+applies a Drehmann (2017) amortising-mortgage adjustment to the real
+mortgage rate, and validates the single-equation OLS estimator against
+joint SUR. Chauvin and Muellbauer [VERIFY year — likely 2018], in the
+*Banque de France Working Paper* series with associated Online
+Complement, undertake a similar France adaptation, with particular
+attention to the institutional differences (limited home equity
+withdrawal, larger social housing sector) that shape the housing-wealth
+channel. Both papers explicitly use Williams' Australia work as a
+methodological precedent, and the present paper closes the loop by
+applying the Italian methodology back to the Australian data on which
+the original LIVES Australia estimation was performed.
+
+### 2.3 The Australian application and prior Australian consumption work
+
+The Australian application was developed in two companion papers by
+David Williams during his Oxford doctorate. Williams (2009), Oxford
+Economics Series Working Paper 432, focuses on the house-price equation
+and its identification under financial liberalisation; the paper develops
+the spline-based credit-conditions index from STAMP (Koopman et al.
+2000) unobserved-components estimation, anchors the index at the four
+institutional turning points 1979/1992/1998/2007, and constructs the
+non-property household disposable income measure that we replicate in
+§3.6. Williams (2010), Oxford Economics Series Working Paper 492,
+estimates the four-equation LIVES system (consumption, house prices,
+mortgage stock, home equity withdrawal) on Australian data 1977Q2–2008Q2.
+The published version of this work, Muellbauer and Williams (2012) "Credit
+conditions and the real economy: the elephant in the room", appears as
+the lead chapter of *BIS Papers* No. 64 and constitutes our primary
+benchmark.
+
+Australian consumption modelling outside the LIVES tradition has a long
+history. Tan and Voss (2003) [VERIFY: RBA Research Discussion Paper
+2000-09] estimate aggregate-wealth effects on Australian consumption
+using ABS National Accounts and RBA balance-sheet data, finding
+significant positive effects of both housing and financial wealth.
+Dvornak and Kohler (2003) [VERIFY: RBA RDP 2003-07] use a state-level
+panel to identify wealth effects from cross-state variation, finding
+larger marginal propensities to consume out of stock-market wealth
+than out of housing wealth, in apparent contrast to the time-series
+evidence; their findings are reconciled by the Muellbauer-Williams
+framework once credit-conditions interactions are introduced.
+
+The Reserve Bank of Australia's macroeconometric model MARTIN, introduced
+in Cusbert and Kendall (2018) [VERIFY: RBA Bulletin] and documented in
+Ballantyne et al. (2019) [VERIFY: RBA Research Discussion Paper 2019-07],
+includes a household consumption block that incorporates wealth effects
+and credit conditions in a more reduced-form way than the LIVES
+specification. The MARTIN consumption equation imposes calibrated
+elasticities for several channels rather than estimating the full long-
+run cointegrating vector, and abstracts from the explicit CCI spline.
+The present paper complements MARTIN by providing a freely estimated
+benchmark against which calibrated coefficients can be evaluated, and
+by surfacing the identification choices that drive the estimated speed
+of adjustment.
+
+A separate strand of Australian work has examined the cyclical
+co-movement of consumption with credit and housing conditions in
+Bayesian VAR frameworks, including Hambur and Cassidy [VERIFY] on
+mortgage payments and consumption, and the broader RBA literature on
+debt-burden effects [VERIFY: identify specific refs]. These approaches
+identify shorter-run dynamics but do not deliver the long-run
+cointegrating vector that the LIVES specification produces, and so are
+complementary to the present analysis rather than substitutes.
+
+### 2.4 Identification of credit conditions
+
+The credit-conditions index is the most contested ingredient in the
+LIVES framework. Williams (2010) constructs CCI as a latent variable
+identified by smoothed-step dummies (`SDMMA` series — five-quarter
+moving averages of four-quarter moving averages of step dummies) at
+four institutional turning points: 1979 (Campbell Committee, removal
+of interest-rate ceilings on bank deposits), 1992 (banking distress and
+the entry of the first mortgage originator, Aussie Home Loans), 1998
+(the rise of non-bank financial institutions and securitisation), and
+2007 (the global financial crisis tightening). The institutional
+chronology of Australian financial deregulation underpinning these
+choices is documented in Battellino and McMillan (1989) and Edey and
+Gray (1996); Bayoumi (1993) provides a cross-country analysis of the
+consumption response to financial liberalisation, including Australia,
+that quantitatively validates a structural CCI shift in the early
+1980s.
+
+In the system-estimation context of Muellbauer and Williams (2012),
+each spline coefficient is identified by being a common factor across
+the four equations: the same CCI value enters consumption, house
+prices, the mortgage stock and home equity withdrawal, with different
+loadings. This common-factor identification is the central methodological
+contribution of the LIVES family. In single-equation OLS, the
+identification is weaker but the spline can still be estimated under
+sign-prior restrictions enforced by general-to-specific reduction
+(Hendry-Krolzig 2005). We adopt this approach as a robustness check
+(Spec 8) in the present paper.
+
+The alternative, observable proxy for CCI — the ratio of housing credit
+flow to disposable income, in logs — has the advantage of being measured
+directly but the disadvantage of being available only from the early
+2000s, after the most informative deregulation episodes have already
+occurred. We use the observable proxy as a short-run regressor in the
+specifications that include it (Specs 2 and 5), and the spline approach
+for the long-run identification in Spec 8.
+
+A separate identification approach uses survey-based credit-conditions
+indices. The Federal Reserve's Senior Loan Officer Opinion Survey is
+the prototype; the European Central Bank's Bank Lending Survey serves
+the same function in the euro area; the Reserve Bank of Australia
+operates a Liaison Programme but does not produce a published numerical
+index of credit conditions [VERIFY: check whether RBA publishes any
+quantitative CCI]. The unavailability of a long-running survey-based
+Australian CCI is the practical reason for adopting Williams' spline
+approach in the LIVES tradition.
+
+### 2.5 Permanent-income forecasting
+
+The empirical operationalisation of permanent income — the discounted
+expected weighted average of future income — requires either explicit
+forecasts or a parametric assumption about the income process. The
+standard practice in the consumption literature has been to assume an
+AR(p) process for log income, fit it on the available sample, and
+aggregate the multi-step-ahead forecasts using exponentially declining
+weights with discount factor δ. This recipe descends directly from the
+PIH literature of Hall (1978) and the consumption-Euler-equation tests
+of Campbell and Mankiw (1989).
+
+Two recent methodological developments have improved on this recipe.
+Jordà (2005), originally proposed for impulse-response identification,
+estimates the discounted weighted average of income over the relevant
+horizon directly as the dependent variable in a single regression, with
+predictors observable at time *t*. The local-projection approach
+sidesteps the compounding of AR misspecification across forecast horizons
+that the standard recipe is vulnerable to, and admits a richer predictor
+set than is feasible in a parsimonious AR(p). Carroll, Slacalek and
+Tokuoka (2014) [VERIFY: ECB working paper] document substantial
+differences between the permanent-income series implied by AR(p)
+forecasting and by direct local-projection forecasting in the consumer-
+expenditure context; the differences are concentrated at structural-break
+episodes, where AR(p) forecasts inherit the slow adjustment of the
+estimated AR coefficients while local projections can incorporate
+predictors capturing the regime change.
+
+De Bonis et al. (2024) explicitly adopt the Jordà local-projection
+approach for their Italian permanent-income series, reporting that the
+choice "captures much of the slow-down of permanent income growth in
+the early 1990s" — a structural feature of Italian growth that the
+AR-based forecaster missed. The Italian local projection includes a
+`log(labour_force / population)` predictor, which slowly trends with
+demographic change and is a natural input to long-horizon income
+forecasting. We adopt the same predictor in our Italy-style PI helper
+(§4.3) and find a quantitatively similar role: the PI series implied by
+local projection in Australia diverges materially from the AR-based PI
+series in the early 1990s and after the 2008 GFC. Substantively, the
+implied long-run coefficient on log(y^p/y) flips from significantly
+negative under the AR forecaster to significantly positive under the
+local-projection forecaster, matching Williams' calibrated value.
+
+### 2.6 Where this paper sits
+
+The contribution of this paper is best understood as a contemporary
+single-equation revisit and extension of Williams (2010) with three
+methodological refinements drawn from the parallel Italian and French
+implementations. First, we estimate on a non-overlapping post-1988
+sample that adds sixteen additional years of post-GFC data, providing
+external validation of Williams' published wealth-coefficient estimates
+on data he did not see. Second, we introduce three corrected data
+inputs — RBA F6 mortgage rate (replacing a previously biased ABS-implicit
+fallback), ABS A84423091W 15+ population (replacing a previously biased
+single-year-of-age cohort sum), and ABS Cat 5206.0 Table 20 income
+components (enabling Williams' 2009 non-property-income recipe) — that
+are typical of the revisions a current vintage of the same data would
+deliver. Third, we adopt the Italian methodology of single-equation OLS
+with a structured robustness suite covering instrumental variables,
+joint SUR estimation, multi-window Chow tests, scaled-income and Drehmann
+real-rate alternatives, and a Williams-style spline credit-conditions
+robustness column.
+
+The paper does not extend to the multi-equation LIVES system. Williams
+(2010) estimates four equations jointly by FIML; we estimate the
+consumption equation alone. Italy's experience (De Bonis et al. 2024,
+§4.2) suggests that single-equation OLS produces consumption-equation
+coefficients "only a whisker away" from joint SUR estimation, and we
+replicate that finding (§8.2). The full multi-equation system extension,
+which would estimate house-price, mortgage-stock and home-equity-
+withdrawal equations jointly with consumption and identify the credit-
+conditions spline as a common factor across equations, is left for a
+companion paper.
+
+The paper also does not — at present — extend the sample back to
+~1975Q1, which would be required for full identification of the
+Williams CCI 1979 deregulation knot. The binding obstacle is access to
+the unpublished RBA pre-1988 housing wealth and total financial assets
+series Williams used. We have requested these data and will report
+back-extended results in a companion paper.
+
+
 
 ---
 
