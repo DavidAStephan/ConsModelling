@@ -33,6 +33,17 @@ suppressPackageStartupMessages({
 
 options(stringsAsFactors = FALSE, scipen = 999)
 
+# Permanent-income construction method.
+#   "ar"    rolling AR(8) + trend + post-2008 break + GFC-learning ogive
+#           (the original method; default for backwards compatibility)
+#   "italy" Jordà (2005) local projection — directly forecasts the
+#           discounted weighted average of log income in one step.
+#           Adds labour-force-share predictor (Italy.pdf §3.3 highlights
+#           this as the predictor that captures the early-1990s slowdown).
+# A `compare_pi_methods()` step writes both side-by-side regardless of
+# which is selected as the canonical input to the spec loop.
+PI_METHOD <- "ar"
+
 # Resolve output directory relative to this script
 .this_file <- tryCatch(
   normalizePath(sys.frame(1)$ofile, winslash = "/", mustWork = FALSE),
@@ -249,6 +260,235 @@ construct_permanent_income <- function(model_data, k = 40L, delta = 0.95) {
            -learning_weight)
 
   dat
+}
+
+
+# ==============================================================================
+# SECTION A.italy: Italy-style local-projection permanent income
+# ==============================================================================
+#
+# Jordà (2005) local projection of the discounted weighted average of log
+# income k quarters ahead, in ONE regression rather than a rolling AR(p)
+# whose forecasts are aggregated. Predictors are selected to match Italy
+# Appendix A.6 / Table A2 as closely as data availability permits:
+#
+#   - time trend, post-2008 split-trend (level shift + slope shift)
+#   - 4Q-MA of log per-capita income
+#   - log(lf_share) — labour-force-to-population ratio (Italy's headline
+#     contribution: captures the demographic slowdown of trend income in
+#     the early 1990s).
+#   - unemployment rate level
+#   - log oil, log REER, log stocks (if any are early-enough)
+#   - short-run dynamics: Δ4 ln(y), Δ4 unemp_rate
+#
+# Optional 2008Q3 sigmoid learning-weight (matching AR method default).
+#
+# Returns model_data with `ln_yp_over_y` and `ln_yp_over_y_post2008`
+# overwritten by the LP-derived values, in the same convention as
+# `construct_permanent_income`.
+# ==============================================================================
+
+construct_permanent_income_italy <- function(model_data, k = 40L,
+                                             delta = 0.95,
+                                             gfc_ogive = TRUE) {
+
+  delta_q  <- delta^(1 / 4)
+  weights  <- delta_q^(seq_len(k) - 1L)
+  weights  <- weights / sum(weights)
+
+  dat <- model_data %>% arrange(date)
+  n   <- nrow(dat)
+
+  # ---- Build the LP target: weighted average of log income over t+1 .. t+k
+  inc <- dat$lincome
+  y_p_target <- rep(NA_real_, n)
+  for (t in seq_len(n - k)) {
+    fut <- inc[(t + 1L):(t + k)]
+    if (!anyNA(fut)) y_p_target[t] <- sum(weights * fut)
+  }
+
+  # ---- Assemble predictors
+  early_enough <- function(col) {
+    if (!col %in% names(dat)) return(FALSE)
+    vals <- dat[[col]]
+    if (all(is.na(vals))) return(FALSE)
+    min(dat$date[!is.na(vals)], na.rm = TRUE) < as.Date("2000-01-01")
+  }
+  has_lf     <- early_enough("lf_share")
+  has_unemp  <- early_enough("unemp_rate")
+  has_oil    <- early_enough("log_oil")
+  has_reer   <- early_enough("log_reer")
+  has_stocks <- early_enough("log_stocks")
+
+  dat <- dat %>%
+    mutate(
+      t_index   = seq_len(n),
+      step2008  = as.integer(date >= as.Date("2008-07-01")),
+      trend_brk = t_index * step2008,
+      inc_ma4   = (lag(lincome, 1L) + lag(lincome, 2L) +
+                   lag(lincome, 3L) + lag(lincome, 4L)) / 4,
+      d4_lincome = lincome - lag(lincome, 4L)
+    )
+  if (has_lf)    dat$ln_lf_share <- log(pmax(dat$lf_share, 1e-9))
+  if (has_unemp) dat$d4_unemp     <- dat$unemp_rate - lag(dat$unemp_rate, 4L)
+
+  predictor_vars <- c("t_index", "step2008", "trend_brk",
+                      "inc_ma4", "d4_lincome")
+  if (has_lf)     predictor_vars <- c(predictor_vars, "ln_lf_share")
+  if (has_unemp)  predictor_vars <- c(predictor_vars, "unemp_rate", "d4_unemp")
+  if (has_oil)    predictor_vars <- c(predictor_vars, "log_oil")
+  if (has_reer)   predictor_vars <- c(predictor_vars, "log_reer")
+  if (has_stocks) predictor_vars <- c(predictor_vars, "log_stocks")
+
+  message("[construct_permanent_income_italy] LP predictors: ",
+          paste(predictor_vars, collapse = ", "))
+
+  # ---- Fit the local projection on the training sample (t where target obs)
+  train_mask <- !is.na(y_p_target) &
+                complete.cases(dat[, predictor_vars, drop = FALSE])
+  n_train <- sum(train_mask)
+  if (n_train < 30L) {
+    message("[construct_permanent_income_italy] insufficient training obs (",
+            n_train, "); leaving ln_yp_over_y unchanged")
+    return(model_data)
+  }
+
+  fit_df <- dat[train_mask, c(predictor_vars), drop = FALSE]
+  fit_df$y_p_target <- y_p_target[train_mask]
+  fmla <- reformulate(predictor_vars, response = "y_p_target")
+  lp_fit <- lm(fmla, data = fit_df)
+
+  message(sprintf(
+    "[construct_permanent_income_italy] LP fit: n=%d, R^2=%.3f",
+    nobs(lp_fit), summary(lp_fit)$r.squared
+  ))
+
+  # ---- Predict y_p_hat for ALL t (including tail where target is NA)
+  pred_df <- dat[, predictor_vars, drop = FALSE]
+  cf      <- coef(lp_fit)
+  y_p_hat <- rep(NA_real_, n)
+  has_intercept <- "(Intercept)" %in% names(cf)
+  for (i in seq_len(n)) {
+    row_i <- as.list(pred_df[i, ])
+    if (any(vapply(row_i, function(x) is.na(x), logical(1L)))) next
+    val <- if (has_intercept) cf[["(Intercept)"]] else 0
+    for (v in predictor_vars) val <- val + cf[[v]] * row_i[[v]]
+    y_p_hat[i] <- val
+  }
+
+  ln_yp_over_y <- y_p_hat - dat$lincome
+
+  # ---- Optional GFC ogive learning-weight (match AR method for comparability)
+  if (gfc_ogive) {
+    gfc_start  <- as.Date("2008-07-01")
+    adj_end    <- as.Date("2012-04-01")
+    n_adj_qtrs <- 15L
+    learning_w <- ifelse(
+      dat$date < gfc_start, 1.0,
+      ifelse(dat$date >= adj_end, 0.5,
+             1.0 - 0.5 * (pmin(
+               as.integer(round(as.numeric(difftime(dat$date, gfc_start,
+                                                    units = "days")) / 91.25)),
+               n_adj_qtrs) / n_adj_qtrs))
+    )
+    ln_yp_over_y <- ln_yp_over_y * learning_w
+  }
+
+  dat$ln_yp_over_y          <- ln_yp_over_y
+  dat$ln_yp_over_y_post2008 <- ln_yp_over_y * dat$step2008
+
+  dat <- dat %>%
+    select(-t_index, -step2008, -trend_brk, -inc_ma4, -d4_lincome) %>%
+    select(-any_of(c("ln_lf_share", "d4_unemp")))
+
+  dat
+}
+
+
+# ==============================================================================
+# SECTION A.compare: PI method comparison (AR vs Italy LP)
+# ==============================================================================
+# Refits the preferred-spec template under both PI methods and writes a
+# side-by-side coefficient table. Written to outputs unconditionally so
+# the reader can compare regardless of which method was used for the
+# canonical estimation.
+
+compare_pi_methods <- function(model_data, preferred_spec_template,
+                               output_dir) {
+  base <- model_data %>%
+    select(-any_of(c("ln_yp_over_y", "ln_yp_over_y_post2008")))
+
+  refit_under <- function(method_name, pi_dat) {
+    pi_dat <- pi_dat %>%
+      mutate(ecm_lag      = lag(lcons, 1L) - lincome,
+             ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+    sp <- tryCatch(
+      fit_ecm_spec(
+        data       = pi_dat,
+        spec_name  = paste0(preferred_spec_template$spec_name, "_", method_name),
+        lr_vars    = preferred_spec_template$lr_vars,
+        sr_vars    = preferred_spec_template$sr_vars,
+        dummy_vars = preferred_spec_template$dummy_vars,
+        sample_end = max(pi_dat$date)
+      ),
+      error = function(e) NULL
+    )
+    if (is.null(sp)) return(NULL)
+    cf  <- coef(sp$fit)
+    se  <- sqrt(diag(sp$nw_vcov))
+    se  <- se[match(names(cf), names(se))]
+    tibble::tibble(
+      method   = method_name,
+      term     = names(cf),
+      estimate = unname(cf),
+      se       = unname(se),
+      n_obs    = nobs(sp$fit),
+      r2_adj   = summary(sp$fit)$adj.r.squared
+    )
+  }
+
+  ar_dat <- tryCatch(construct_permanent_income(base),
+                     error = function(e) NULL)
+  it_dat <- tryCatch(construct_permanent_income_italy(base),
+                     error = function(e) NULL)
+
+  rows <- list()
+  if (!is.null(ar_dat))  rows$ar    <- refit_under("ar",    ar_dat)
+  if (!is.null(it_dat))  rows$italy <- refit_under("italy", it_dat)
+  long <- bind_rows(rows)
+  if (nrow(long) == 0L) {
+    message("[compare_pi_methods] both refits failed; skipping")
+    return(invisible(NULL))
+  }
+
+  # Wide format: term, ar_estimate, italy_estimate, ar_se, italy_se
+  wide <- long %>%
+    pivot_wider(id_cols = term,
+                names_from = method,
+                values_from = c(estimate, se),
+                names_glue = "{method}_{.value}")
+  meta <- long %>%
+    select(method, n_obs, r2_adj) %>% distinct() %>%
+    pivot_wider(names_from = method, values_from = c(n_obs, r2_adj),
+                names_glue = "{method}_{.value}")
+
+  out_path <- file.path(output_dir, "australia_pi_method_comparison.csv")
+  write.csv(wide, out_path, row.names = FALSE)
+  message(sprintf("[compare_pi_methods] Saved: %s", out_path))
+
+  meta_path <- file.path(output_dir, "australia_pi_method_meta.csv")
+  write.csv(meta, meta_path, row.names = FALSE)
+
+  cat("\n--- PI method comparison (preferred spec, full sample) ---\n")
+  cat(sprintf("  %-30s %12s %12s\n", "term", "AR estimate", "Italy LP est"))
+  cat(sprintf("  %s\n", strrep("-", 56)))
+  for (i in seq_len(nrow(wide))) {
+    cat(sprintf("  %-30s %12.6f %12.6f\n",
+      wide$term[i],
+      ifelse(is.na(wide$ar_estimate[i]),    0, wide$ar_estimate[i]),
+      ifelse(is.na(wide$italy_estimate[i]), 0, wide$italy_estimate[i])))
+  }
+  invisible(wide)
 }
 
 
@@ -2834,8 +3074,13 @@ model_data <- add_model_variables(model_data)
 cat("[Step 2] Computing income volatility (AR8 residuals)...\n")
 model_data <- compute_income_volatility(model_data)
 
-cat("[Step 3] Constructing permanent income series...\n")
-model_data <- construct_permanent_income(model_data)
+cat(sprintf("[Step 3] Constructing permanent income series (PI_METHOD = '%s')...\n",
+            PI_METHOD))
+model_data <- if (identical(PI_METHOD, "italy")) {
+  construct_permanent_income_italy(model_data)
+} else {
+  construct_permanent_income(model_data)
+}
 
 # Add variables that depend on permanent income
 model_data <- model_data %>%
@@ -3087,6 +3332,14 @@ pi_sensitivity <- tryCatch(
   run_pi_sensitivity(model_data, preferred_spec, output_dir),
   error = function(e) {
     message("[run_pi_sensitivity] Error: ", e$message); NULL
+  }
+)
+
+cat("[Step 11b] Comparing PI methods (AR vs Italy LP) on preferred spec...\n")
+tryCatch(
+  compare_pi_methods(model_data, preferred_spec, output_dir),
+  error = function(e) {
+    message("[compare_pi_methods] Error: ", e$message); NULL
   }
 )
 
