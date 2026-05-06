@@ -3121,6 +3121,12 @@ cat("[Step 15] Generating plots — preferred spec + spec 1...\n")
 plot_actual_vs_fitted(preferred_spec, output_dir = output_dir)
 plot_actual_vs_fitted(specs_full$spec1, output_dir = output_dir)
 
+cat("[Step 16] Building Williams structural-parameter comparison table...\n")
+tryCatch(
+  source(file.path(dirname(.this_file), "williams_comparison.R"), local = TRUE),
+  error = function(e) message("[williams_comparison] Error: ", e$message)
+)
+
 cat("[Step 8] Selecting preferred spec for downstream robustness work...\n")
 preferred_name_val <- if (exists("selection") && "is_preferred" %in% names(selection)) {
   sel_row <- selection[isTRUE(selection$is_preferred) | selection$is_preferred, ]

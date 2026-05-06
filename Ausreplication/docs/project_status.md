@@ -140,6 +140,14 @@ Everything in [`Ausreplication/outputs/`](../outputs/):
 - `italy_australia_lambda.csv` — λ in each country's native convention with
   explicit `lambda_source` and `note` columns (the previous −0.0099 stale-
   file bug is fixed)
+- `australia_williams_comparison.csv` + `.md` — side-by-side vs Williams
+  (2010) WP 492 / Muellbauer-Williams (2012) Table 1. Both forms (γ and
+  implied OLS) so the reader can disentangle "OLS coefficient differs"
+  from "λ differs". **Headline finding:** OLS wealth coefficients agree
+  with Williams to within 6-17% (ha_y +6%, nla_y -11%, ln_hp_over_y -17%);
+  the 5x divergence in implied γ is almost entirely a λ story.
+- `australia_williams_spec8_comparison.csv` — Spec 8 CCI-interaction
+  comparison (only 2 of 4 Williams knots identify on our 1988+ sample).
 
 ### Narrative
 - `australia_model_summary.md` — auto-generated markdown summary
