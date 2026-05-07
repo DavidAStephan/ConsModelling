@@ -3431,6 +3431,24 @@ tryCatch(
   error = function(e) message("[cci_method_comparison] Error: ", e$message)
 )
 
+cat("[Step 19] CCI alternatives (PCA, credit-to-GDP gap, macropru intensity)...\n")
+tryCatch(
+  source(file.path(dirname(.this_file), "cci_alternatives.R"), local = TRUE),
+  error = function(e) message("[cci_alternatives] Error: ", e$message)
+)
+
+cat("[Step 20] Random-knot placebo test for Williams' canonical 4-knot...\n")
+tryCatch(
+  source(file.path(dirname(.this_file), "cci_placebo_test.R"), local = TRUE),
+  error = function(e) message("[cci_placebo_test] Error: ", e$message)
+)
+
+cat("[Step 21] CCI fit-improvement decomposition (detrending vs identification)...\n")
+tryCatch(
+  source(file.path(dirname(.this_file), "cci_fit_decomposition.R"), local = TRUE),
+  error = function(e) message("[cci_fit_decomposition] Error: ", e$message)
+)
+
 cat("[Step 8] Selecting preferred spec for downstream robustness work...\n")
 preferred_name_val <- if (exists("selection") && "is_preferred" %in% names(selection)) {
   sel_row <- selection[isTRUE(selection$is_preferred) | selection$is_preferred, ]

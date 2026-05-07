@@ -324,7 +324,15 @@ analysis these items respond to. Headline question: in our
 single-equation OLS implementation, is the CCI identifying something
 structural or is it just a flexible detrending term?
 
-### NS-105 Wire up the state-space Kalman CCI
+### ~~NS-105 Wire up the state-space Kalman CCI~~ ✅ **DONE**
+
+Implemented as `fit_kalman_cci()` in `model_helpers.R` (May 2026).
+Uses anchor loading on `log(housing_loan_flow)` at +1, ML estimation
+via `KFAS::fitSSM`. Wired into data pipeline; Spec 9 uses `cci_kalman`
+in CCI interactions. Pearson correlation with `cci_williams`: −0.375.
+Both methods deliver identical λ = −0.121.
+
+### NS-105 (original) Wire up the state-space Kalman CCI
 
 `build_credit_ssm_factor()` and `build_credit_ssm_local_trend()` exist
 in `model_helpers.R` (lines 416-510) as dead code. Wire them into the
@@ -342,7 +350,17 @@ the Williams basis as exogenous regressors.
   `cci_williams`); compare correlation to `cci_williams` and
   consumption-equation coefficients
 
-### NS-106 Random-knot placebo test
+### ~~NS-106 Random-knot placebo test~~ ✅ **DONE**
+
+Implemented as `Ausreplication/R/cci_placebo_test.R`. 200 random 4-knot
+draws uniformly distributed in 1979-2007. Verdict: Williams' canonical
+4-knot dates (1979/1992/1998/2007) sit at the **49th percentile of
+random draws on adj R²** and the **22nd percentile on |λ|** on our
+1988+ sample. Result vindicates the user's detrending critique for
+the canonical 4-knot setup specifically. The maximal-GETS alternative
+(now canonical) avoids this problem by letting data choose the knots.
+
+### NS-106 (original) Random-knot placebo test
 
 Generate 100 random sets of 4 knot dates uniformly in 1979-2007.
 Refit Spec 8 under each. Compute distribution of `R²` and λ.
@@ -379,7 +397,17 @@ knot.
   documented provenance; Spec 8-style refit shows coefficient
   stability between Williams spline and APRA observable
 
-### NS-108 Fit-improvement decomposition (Test 2 in cci_exploration §5)
+### ~~NS-108 Fit-improvement decomposition~~ ✅ **DONE**
+
+Implemented as `Ausreplication/R/cci_fit_decomposition.R`. Verdict:
+**adding CCI degrades adj R²** (Spec 6 → Spec 8: −0.046; Spec 6 → Spec 9:
+−0.081) but substantially shifts wealth coefficients. Mean shift on
+nla_y/eq_y/super_y/ha_y: 20.8% under Williams CCI, 89.1% under Kalman.
+This is the *opposite* of detrending (which would improve R² without
+shifting structural coefficients). CCI is doing identification work,
+not residual absorption.
+
+### NS-108 (original) Fit-improvement decomposition (Test 2 in cci_exploration §5)
 
 Re-fit Spec 6 *without* CCI and *with* CCI (full Spec 8). Decompose
 adj-R² improvement into: variance explained by CCI alone, vs
@@ -394,7 +422,16 @@ one-day exercise to discriminate detrending vs identification.
   shifts when CCI is added; if shifts are < 5%, CCI is mostly
   detrending; if > 30%, CCI is doing identification work.
 
-### NS-109 BIS credit-to-GDP gap comparator
+### ~~NS-109 BIS credit-to-GDP gap comparator~~ ✅ **DONE**
+
+Implemented as part of `Ausreplication/R/cci_alternatives.R`. HP filter
+(λ=400000) on log(household debt-to-income); positive gap = looser
+credit. Adds `cci_creditgap` column to master. Pearson correlation with
+`cci_williams`: +0.381. With `cci_kalman`: +0.304. With `cci_pca`:
++0.235. Captures cyclical credit deviations rather than regime-shift
+identification.
+
+### NS-109 (original) BIS credit-to-GDP gap comparator
 
 One-sided HP filter on log(household credit / GDP). Use as a
 different-family CCI alternative.
@@ -407,7 +444,17 @@ different-family CCI alternative.
   the spline is largely capturing the credit cycle; if < 0.5 the
   spline is identifying something different from the cycle
 
-### NS-110 PCA factor across multiple credit indicators
+### ~~NS-110 PCA factor across multiple credit indicators~~ ✅ **DONE**
+
+Implemented as part of `Ausreplication/R/cci_alternatives.R`. PCA on 5
+standardised credit indicators; first PC explains 34% of variance.
+Loadings: housing-loan-flow +0.42, debt-to-income +0.44, FHB share
++0.21, mortgage burden +0.72, mortgage-rate change +0.26. Adds
+`cci_pca` column to master. Pearson correlation with `cci_kalman`:
+**+0.770** (very strong — both methods extract the level-of-leverage
+factor); with `cci_williams`: −0.563.
+
+### NS-110 (original) PCA factor across multiple credit indicators
 
 Simple benchmark to NS-105. PCA on standardised
 `(housing_loan_flow, debt_y, fhb_share, mortgage_burden, real_rate
@@ -420,7 +467,16 @@ spread, super_y growth)`. First PC = `cci_pca`.
   loading on credit-flow indicators; correlation reported with
   `cci_williams` and `cci_kalman`
 
-### NS-111 Macroprudential intensity index
+### ~~NS-111 Macroprudential intensity index~~ ✅ **DONE**
+
+Implemented as part of `Ausreplication/R/cci_alternatives.R`. Combines
+seven post-2014 events (2014 investor cap, 2017 IO cap, 2018 Hayne RC
+start, 2019 Hayne findings, 2019Q3 cap removal, 2020 RBA emergency cut,
+2021Q4 buffer hike) into a continuous `macropru_intensity` series.
+Pre-2014 set to NA (the index only describes the macroprudential era).
+Range −1 to ~−0.07 on our sample.
+
+### NS-111 (original) Macroprudential intensity index
 
 Aggregate the existing `d_apra_2014`, `d_apra_2017` ogives plus the
 2018-19 relaxation and 2020 COVID-related adjustments into a single
