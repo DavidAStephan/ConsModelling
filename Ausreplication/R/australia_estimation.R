@@ -1205,6 +1205,122 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
 #   ln_networth_y = log(networth_y)
 # ==============================================================================
 
+# ==============================================================================
+# fit_williams_prior_spec — Spec 10 — Williams-prior calibrated estimation
+# ==============================================================================
+#
+# Imposes Williams' (Aust system paper Table 1, BIS chapter) calibrated
+# coefficients on three terms:
+#   gamma_IFA  = 0.022   illiquid financial wealth MPC (eq + super)
+#   psi(CCI)   = psi_0 + psi_1 * CCI  with psi_0 = 0.20, psi_1 = 0.93
+#   varpi      = 1.2     log(HP/y) interaction multiplier
+#
+# In the OLS form Δlog c = sum_i β_i x_i + ε, the imposed restrictions
+# become non-linear in OLS-coefficient space because β_i = λ * γ_i where
+# γ_i are calibrated and λ is unknown. Solve via iterative fixed-point
+# OLS: at each iteration, subtract λ * (calibrated regressor sum) from
+# the dependent variable, OLS-regress the adjusted dependent on the
+# remaining free regressors, read off the new λ from the ecm_lag
+# coefficient, repeat until |λ - λ_old| < tol.
+#
+# Inputs:
+#   model_data  the master tibble with cci_williams already attached
+#   sample_end  as.Date("2024-10-01") by default
+#   gamma_ifa, psi_0, psi_1, varpi  Williams' calibrated values
+#   cci_col     "cci_williams" (default; the maximal-GETS canonical) or
+#               other available CCI column
+#
+# Output:
+#   Same structure as fit_ecm_spec(): list with $fit, $nw_vcov, $est_data,
+#   etc., plus attributes recording the calibrated coefficients,
+#   converged lambda, and iteration count.
+
+fit_williams_prior_spec <- function(model_data,
+                                     sample_end = as.Date("2024-10-01"),
+                                     gamma_ifa = 0.022,
+                                     psi_0     = 0.20,
+                                     psi_1     = 0.93,
+                                     varpi     = 1.2,
+                                     cci_col   = "cci_williams",
+                                     max_iter  = 50L,
+                                     tol       = 1e-6) {
+  if (!cci_col %in% names(model_data) || all(is.na(model_data[[cci_col]]))) {
+    return(NULL)
+  }
+  cci <- model_data[[cci_col]]
+
+  d <- model_data %>% mutate(
+    ifa_y_internal     = eq_y + super_y,
+    hp_x_1_minus_cci_w = ln_hp_over_y * (1 - varpi * cci),
+    r_x_cci_w          = real_rate    * cci,
+    yp_x_cci_w         = ln_yp_over_y * cci
+  )
+  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
+                    "d_neg_gearing_8587", "d_recession_1991",
+                    "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
+  free_lr <- c("ha_y", "nla_y", "hp_x_1_minus_cci_w", "r_x_cci_w", "ecm_lag")
+  free_sr <- c("d2_logcci_lag2", "dd4_income", "d2_log_unemp", "abs_income_resid")
+
+  # offset(t) = gamma_IFA * IFA + psi_0 * yp + psi_1 * yp*CCI
+  offset_calib <- gamma_ifa * d$ifa_y_internal +
+                  psi_0     * d$ln_yp_over_y +
+                  psi_1     * d$yp_x_cci_w
+
+  fit_at_lambda <- function(lambda_guess) {
+    d_local <- d
+    d_local$dlcons_adj <- d_local$dlcons - lambda_guess * offset_calib
+    fit_ecm_spec(d_local, "Spec10_WilliamsPrior",
+                 lr_vars    = free_lr,
+                 sr_vars    = free_sr,
+                 dummy_vars = base_dummies,
+                 response   = "dlcons_adj",
+                 sample_end = sample_end)
+  }
+
+  lambda_guess  <- -0.12  # initial value from Spec 8
+  iters_used    <- 0L
+  converged     <- FALSE
+  diverged      <- FALSE
+  for (i in seq_len(max_iter)) {
+    spec <- fit_at_lambda(lambda_guess)
+    cf <- coef(spec$fit)
+    new_lambda <- if ("ecm_lag" %in% names(cf)) cf[["ecm_lag"]] else NA_real_
+    if (is.na(new_lambda)) break
+    if (abs(new_lambda) > 5 || !is.finite(new_lambda)) {
+      diverged <- TRUE
+      break
+    }
+    if (abs(new_lambda - lambda_guess) < tol) {
+      iters_used <- i
+      converged  <- TRUE
+      break
+    }
+    lambda_guess <- new_lambda
+    iters_used   <- i
+  }
+  if (diverged) {
+    message(sprintf(
+      "[fit_williams_prior_spec] diverged (|lambda| > 5 at iter %d); returning NULL",
+      iters_used))
+    return(NULL)
+  }
+
+  spec$spec_name              <- "Spec10_WilliamsPrior"
+  attr(spec, "calibrated")    <- c(gamma_ifa = gamma_ifa,
+                                    psi_0 = psi_0, psi_1 = psi_1,
+                                    varpi = varpi)
+  attr(spec, "iterations")    <- iters_used
+  attr(spec, "converged")     <- converged
+  attr(spec, "lambda_solved") <- lambda_guess
+  attr(spec, "cci_used")      <- cci_col
+  message(sprintf(
+    "[fit_williams_prior_spec] %s in %d iterations: lambda = %.4f",
+    if (converged) "converged" else "stopped (max_iter)",
+    iters_used, lambda_guess))
+  spec
+}
+
+
 run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01")) {
 
   base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
@@ -1324,6 +1440,37 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   )
 
   # ------------------------------------------------------------------
+  # Spec 7b: same as Spec 7 but uses the RBA E13 measured payment-burden
+  # ratio (mortgage_payment_burden_rba) instead of the synthetic
+  # mortgage_burden series. Sample is automatically truncated to 2009Q1+
+  # because RBA E13 is unavailable before then. This is the
+  # measurement-quality robustness column for the WP §8.
+  # The synthetic mortgage_burden has correlation 0.93 with the RBA
+  # measured series over the 2009+ overlap but is biased ~30% high in
+  # level (synthetic uses total household debt × headline SVR; RBA uses
+  # housing-only interest at effective rates).
+  # ------------------------------------------------------------------
+  if ("mortgage_payment_burden_rba" %in% names(model_data) &&
+      any(!is.na(model_data$mortgage_payment_burden_rba))) {
+    spec7b <- fit_ecm_spec(
+      data       = model_data,
+      spec_name  = "Spec7b_RBABurden",
+      lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
+                     "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008",
+                     "prime_age_share", "fhb_share",
+                     "mortgage_payment_burden_rba",
+                     "ecm_lag"),
+      sr_vars    = c("d2_logcci_lag2", "dd4_income",
+                     "d2_log_unemp", "abs_income_resid"),
+      dummy_vars = base_dummies,
+      sample_end = sample_end
+    )
+  } else {
+    spec7b <- NULL
+    message("Spec 7b skipped: mortgage_payment_burden_rba not available")
+  }
+
+  # ------------------------------------------------------------------
   # Spec 8: Williams CCI + interaction terms (Aust paper eq 7).
   # Requires cci_williams in model_data (built by the iterative Williams
   # CCI fit step in MAIN execution). Returns NULL otherwise so downstream
@@ -1391,9 +1538,34 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
             "(KFAS may not be installed or fit_kalman_cci failed)")
   }
 
+  # ------------------------------------------------------------------
+  # Spec 10: Williams-prior calibrated specification.
+  # Imposes Williams' published calibrations on the illiquid wealth MPC
+  # (gamma_2 = 0.022, BIS Table 1), the permanent-income weight
+  # psi(CCI) = 0.20 + 0.93*CCI, and the housing-affordability
+  # interaction multiplier varpi = 1.2. Estimates the remaining free
+  # coefficients (lambda, gamma_HA, gamma_NLA, gamma_HP, alpha_r) by
+  # iterative OLS that solves the fixed-point lambda condition.
+  # ------------------------------------------------------------------
+  if ("cci_williams" %in% names(model_data) &&
+      any(!is.na(model_data$cci_williams))) {
+    spec10 <- tryCatch(
+      fit_williams_prior_spec(model_data, sample_end = sample_end),
+      error = function(e) {
+        message("Spec 10 (Williams-prior calibrated) failed: ",
+                conditionMessage(e))
+        NULL
+      }
+    )
+  } else {
+    spec10 <- NULL
+    message("Spec 10 skipped: cci_williams not present in model_data")
+  }
+
   specs <- list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
                 spec4 = spec4, spec5 = spec5, spec6 = spec6,
-                spec7 = spec7, spec8 = spec8, spec9 = spec9)
+                spec7 = spec7, spec7b = spec7b,
+                spec8 = spec8, spec9 = spec9, spec10 = spec10)
   Filter(Negate(is.null), specs)
 }
 
