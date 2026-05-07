@@ -317,6 +317,172 @@ The project has accumulated three documentation files (data.md, project_status.m
 
 ---
 
+## Tier 6 — CCI methodology (added May 2026 after exploration)
+
+See [`cci_exploration.md`](cci_exploration.md) for the substantive
+analysis these items respond to. Headline question: in our
+single-equation OLS implementation, is the CCI identifying something
+structural or is it just a flexible detrending term?
+
+### NS-105 Wire up the state-space Kalman CCI
+
+`build_credit_ssm_factor()` and `build_credit_ssm_local_trend()` exist
+in `model_helpers.R` (lines 416-510) as dead code. Wire them into the
+data pipeline as an alternative CCI extractor. Indicator set:
+`log(housing_loan_flow)`, `log(debt_y)`, `fhb_share`,
+`mortgage_burden`, `mortgage_rate − cash_rate` spread, plus optionally
+the Williams basis as exogenous regressors.
+
+- **Effort:** 1 week
+- **Depends on:** nothing (KFAS already in renv)
+- **Files:** `australia_data_download.R` (new section); new helper
+  `fit_kalman_cci()` in `australia_estimation.R`
+- **Success criterion:** new `cci_kalman` column on master, used by
+  a new Spec 9 (Williams interactions but with `cci_kalman` instead of
+  `cci_williams`); compare correlation to `cci_williams` and
+  consumption-equation coefficients
+
+### NS-106 Random-knot placebo test
+
+Generate 100 random sets of 4 knot dates uniformly in 1979-2007.
+Refit Spec 8 under each. Compute distribution of `R²` and λ.
+Position the actual Williams knots in this distribution.
+
+- **Effort:** 2 days
+- **Depends on:** Spec 8 framework (working)
+- **Files:** new `Ausreplication/R/williams_placebo_test.R`; output
+  `australia_williams_knot_placebo.csv` and `.png`
+- **Success criterion:** Williams' actual knots fall in upper tail
+  (top 10%) of the placebo distribution → identification claim
+  supported. If they fall near median, the WP narrative needs
+  adjusting.
+
+### NS-107 Direct APRA observable CCI (post-2008)
+
+Source from APRA Form ARF 320 / ARF 392 and macroprudential
+statistics:
+- Interest-only loan share (proportion of new lending)
+- Average loan-to-value ratio
+- Loan approvals to applications ratio
+
+Combine into a measured CCI from 2008Q1+. Use as a robustness
+column on Spec 8 and as an external validator of the 2007 Williams
+knot.
+
+- **Effort:** 3 days
+- **Depends on:** sourcing the APRA series (publicly available;
+  needs CSV extraction from APRA quarterly publications)
+- **Files:** new `data_raw/apra_macroprudential.csv`;
+  `australia_data_download.R` extension; new spec or robustness
+  column
+- **Success criterion:** measured CCI series 2008Q1-2024Q4 with
+  documented provenance; Spec 8-style refit shows coefficient
+  stability between Williams spline and APRA observable
+
+### NS-108 Fit-improvement decomposition (Test 2 in cci_exploration §5)
+
+Re-fit Spec 6 *without* CCI and *with* CCI (full Spec 8). Decompose
+adj-R² improvement into: variance explained by CCI alone, vs
+variance reattributed *from* the wealth coefficients to CCI. Quick
+one-day exercise to discriminate detrending vs identification.
+
+- **Effort:** 1 day
+- **Depends on:** nothing
+- **Files:** extend `williams_comparison.R` with a
+  `decompose_cci_contribution()` function
+- **Success criterion:** Output table showing wealth-coefficient
+  shifts when CCI is added; if shifts are < 5%, CCI is mostly
+  detrending; if > 30%, CCI is doing identification work.
+
+### NS-109 BIS credit-to-GDP gap comparator
+
+One-sided HP filter on log(household credit / GDP). Use as a
+different-family CCI alternative.
+
+- **Effort:** half a day
+- **Depends on:** nothing
+- **Files:** `australia_data_download.R` extension; new column
+  `cci_creditgap` on master; report correlation with `cci_williams`
+- **Success criterion:** correlation reported in WP §8; if > 0.85
+  the spline is largely capturing the credit cycle; if < 0.5 the
+  spline is identifying something different from the cycle
+
+### NS-110 PCA factor across multiple credit indicators
+
+Simple benchmark to NS-105. PCA on standardised
+`(housing_loan_flow, debt_y, fhb_share, mortgage_burden, real_rate
+spread, super_y growth)`. First PC = `cci_pca`.
+
+- **Effort:** 1 day
+- **Depends on:** nothing
+- **Files:** new helper in `model_helpers.R`; column on master
+- **Success criterion:** `cci_pca` column with sensible variance
+  loading on credit-flow indicators; correlation reported with
+  `cci_williams` and `cci_kalman`
+
+### NS-111 Macroprudential intensity index
+
+Aggregate the existing `d_apra_2014`, `d_apra_2017` ogives plus the
+2018-19 relaxation and 2020 COVID-related adjustments into a single
+continuous "macroprudential tightening intensity" series. Replaces
+multiple dummies with one continuous measure.
+
+- **Effort:** 2 days
+- **Depends on:** APRA policy chronology verification (NS-004)
+- **Files:** `australia_data_download.R` Section 5
+- **Success criterion:** one new column `macropru_intensity` on
+  master; comparison to existing dummy specification in `d_apra_*`
+
+### NS-112 Smooth-transition ogive CCI (France-style)
+
+Replace smoothed-step (5-MA of 4-MA) with parametric ogive
+`1 / (1 + exp(-(t - t0)/w))` at each knot. Estimate location
+`t0` and width `w` jointly with the consumption equation.
+
+- **Effort:** 3 days
+- **Depends on:** Spec 8 framework
+- **Files:** new helper `build_ogive_cci_basis()` in
+  `model_helpers.R`; new fitting function
+- **Success criterion:** estimated `(t0, w)` pairs at each knot;
+  comparison to Williams' smoothed-step parameterisation
+
+### NS-113 Discrimination tests battery (cci_exploration §5 tests 1-5)
+
+Bundle the five discrimination tests (common-factor, fit-decomposition,
+out-of-sample forecast, cross-country sign discipline, random-knot
+placebo) into a single `run_cci_discrimination_battery()` that produces
+a single output CSV summarising whether the CCI is identifying
+something structural or detrending.
+
+- **Effort:** 1 week (if NS-105, NS-106, NS-108 done independently
+  this becomes ~2 days assembly)
+- **Depends on:** NS-105, NS-106, NS-108
+- **Files:** new orchestrator in `australia_estimation.R`; output
+  `australia_cci_discrimination_results.csv` and a markdown
+  commentary
+- **Success criterion:** reader can answer "is the CCI doing
+  identification work?" with a single yes/no/qualified-yes from
+  the output
+
+### NS-114 Hand-coded survey CCI from RBA Statement of Monetary Policy
+
+Read each quarterly SoMP from 1996Q1 onwards. For each quarter,
+score "credit standards" and "credit availability" from the
+"Domestic Financial Conditions" section on a -2 to +2 scale.
+Construct a survey-style Australian CCI that no other researcher
+has built.
+
+- **Effort:** 2-3 weeks of careful reading
+- **Decision point:** This is a substantial investment. Worth doing
+  only if the resulting series would be a headline data contribution
+  of the WP / a companion paper.
+- **Files:** new `data_raw/rba_somp_credit_score.csv` (manually
+  populated); pipeline integration
+- **Success criterion:** ~115 quarters of scores with documented
+  scoring rubric; correlation with `cci_williams` reported
+
+---
+
 ## Items requiring user judgement (no agent can decide)
 
 ### NS-100 Choose canonical PI_METHOD for the WP
