@@ -3621,6 +3621,12 @@ tryCatch(
   error = function(e) message("[cci_fit_decomposition] Error: ", e$message)
 )
 
+cat("[Step 22] Out-of-sample forecast validation (NS-033)...\n")
+tryCatch(
+  source(file.path(dirname(.this_file), "oos_forecast.R"), local = TRUE),
+  error = function(e) message("[oos_forecast] Error: ", e$message)
+)
+
 cat("[Step 8] Selecting preferred spec for downstream robustness work...\n")
 preferred_name_val <- if (exists("selection") && "is_preferred" %in% names(selection)) {
   sel_row <- selection[isTRUE(selection$is_preferred) | selection$is_preferred, ]
