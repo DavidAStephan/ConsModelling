@@ -1356,9 +1356,44 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
             "(USE_INSTITUTIONAL_CCI may be FALSE or Williams fit failed)")
   }
 
+  # ------------------------------------------------------------------
+  # Spec 9: Kalman state-space CCI + interaction terms.
+  # Same long-run + short-run structure as Spec 8 but uses cci_kalman
+  # (latent factor extracted by Kalman filter from multiple credit
+  # indicators; see fit_kalman_cci() in model_helpers.R) instead of the
+  # spline-based cci_williams. This is the methodologically-distinct
+  # alternative requested in cci_exploration.md NS-105.
+  # ------------------------------------------------------------------
+  if ("cci_kalman" %in% names(model_data) &&
+      any(!is.na(model_data$cci_kalman))) {
+    md9 <- model_data %>%
+      mutate(
+        r_x_cci_k          = real_rate * cci_kalman,
+        hp_x_1_minus_cci_k = ln_hp_over_y * (1 - 1.2 * cci_kalman),
+        yp_x_cci_k         = ln_yp_over_y * cci_kalman
+      )
+    spec9 <- fit_ecm_spec(
+      data       = md9,
+      spec_name  = "Spec9_KalmanCCI",
+      lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y",
+                     "hp_x_1_minus_cci_k",
+                     "r_x_cci_k",
+                     "ln_yp_over_y",
+                     "yp_x_cci_k",
+                     "ecm_lag"),
+      sr_vars    = c("dd4_income", "d2_log_unemp", "abs_income_resid"),
+      dummy_vars = base_dummies,
+      sample_end = sample_end
+    )
+  } else {
+    spec9 <- NULL
+    message("Spec 9 skipped: cci_kalman not present in model_data ",
+            "(KFAS may not be installed or fit_kalman_cci failed)")
+  }
+
   specs <- list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
                 spec4 = spec4, spec5 = spec5, spec6 = spec6,
-                spec7 = spec7, spec8 = spec8)
+                spec7 = spec7, spec8 = spec8, spec9 = spec9)
   Filter(Negate(is.null), specs)
 }
 
@@ -3388,6 +3423,12 @@ cat("[Step 17] Knot-experiment: testing 7 CCI spline variants...\n")
 tryCatch(
   source(file.path(dirname(.this_file), "knot_experiment.R"), local = TRUE),
   error = function(e) message("[knot_experiment] Error: ", e$message)
+)
+
+cat("[Step 18] CCI method comparison (Williams maximal-GETS vs Kalman)...\n")
+tryCatch(
+  source(file.path(dirname(.this_file), "cci_method_comparison.R"), local = TRUE),
+  error = function(e) message("[cci_method_comparison] Error: ", e$message)
 )
 
 cat("[Step 8] Selecting preferred spec for downstream robustness work...\n")

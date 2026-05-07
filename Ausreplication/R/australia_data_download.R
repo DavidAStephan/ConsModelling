@@ -1129,9 +1129,52 @@ if (USE_INSTITUTIONAL_CCI) {
   for (j in seq_len(ncol(williams_basis))) {
     master[[colnames(williams_basis)[j]]] <- williams_basis[, j]
   }
-  message("  Williams 4-knot CCI basis added to master (SDMMA series at ",
-          "1979/1992/1998/2007); CCI fitted series will be computed in",
-          " estimation step.")
+  message("  Maximal-GETS CCI basis added to master (15 SDMMA candidate ",
+          "knots; cci_williams fitted series will be computed in ",
+          "estimation step).")
+}
+
+# Kalman state-space CCI (always built when KFAS is available; provides a
+# methodologically-distinct alternative to the spline-based cci_williams).
+# Indicators: log(housing_loan_flow), log(debt_y), fhb_share, mortgage_burden,
+# Δ(mortgage_rate). Each is z-standardised inside fit_kalman_cci() on its own
+# non-NA window. Single common factor identified by anchoring loading on
+# log(housing_loan_flow) at +1. KFAS handles missing observations (e.g. flow
+# data pre-2002) by extending uncertainty during unobserved periods rather
+# than dropping rows.
+if (requireNamespace("KFAS", quietly = TRUE)) {
+  k_in <- master %>%
+    transmute(
+      date,
+      log_housing_loan_flow = log(pmax(housing_loan_flow, 1e-9)),
+      log_debt_y            = log(pmax(debt_y, 1e-9)),
+      fhb_share,
+      mortgage_burden,
+      mortgage_rate
+    )
+  cci_k <- tryCatch(
+    fit_kalman_cci(k_in,
+                    indicator_cols = c("log_housing_loan_flow",
+                                        "log_debt_y",
+                                        "fhb_share",
+                                        "mortgage_burden",
+                                        "mortgage_rate_spread"),
+                    anchor_col = "log_housing_loan_flow",
+                    verbose = TRUE),
+    error = function(e) {
+      message("  Kalman CCI: estimation failed: ", conditionMessage(e))
+      NULL
+    }
+  )
+  if (!is.null(cci_k)) {
+    master <- master %>% left_join(cci_k, by = "date")
+    message(sprintf("  Kalman CCI (cci_kalman): %d non-NA obs, range %.2f - %.2f",
+      sum(!is.na(master$cci_kalman)),
+      min(master$cci_kalman, na.rm = TRUE),
+      max(master$cci_kalman, na.rm = TRUE)))
+  }
+} else {
+  message("  KFAS not available; Kalman CCI skipped")
 }
 
 # Print coverage
@@ -1143,7 +1186,8 @@ for (v in c("cons_real_pc", "ydi_real_pc", "unemp_rate", "mortgage_rate",
             "labour_force", "lf_share",
             "labour_transfer_real_pc", "scaled_income_real_pc",
             "npy_real_pc", "property_tax_share",
-            "mortgage_interest_burden_rba", "mortgage_payment_burden_rba")) {
+            "mortgage_interest_burden_rba", "mortgage_payment_burden_rba",
+            "cci_kalman")) {
   report_series(master[[v]], v, master$date)
 }
 

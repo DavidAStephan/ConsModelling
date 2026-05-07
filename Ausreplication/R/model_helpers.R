@@ -413,6 +413,195 @@ build_credit_ssm <- function(y_matrix, log_h, log_q, lambda_2, lambda_3) {
 }
 
 
+# ==============================================================================
+# Kalman state-space CCI extractor
+# ==============================================================================
+#
+# Estimates a single common latent factor across a set of credit indicators
+# via maximum likelihood on the linear Gaussian state-space model:
+#
+#   y_t = Z * alpha_t + epsilon_t,   epsilon_t ~ N(0, H)
+#   alpha_t = T * alpha_{t-1} + R * eta_t,   eta_t ~ N(0, Q)
+#
+# where alpha_t is the scalar latent CCI, Z is the n_series × 1 vector of
+# loadings, H is the diagonal n_series × n_series indicator-noise covariance
+# and Q is the scalar factor-innovation variance. T = 1 (random walk) and
+# R = 1 by convention.
+#
+# Identification: the factor has scale + sign indeterminacy. We fix the
+# loading on the first (anchor) indicator at +1, and orient the resulting
+# smoothed factor such that its correlation with the anchor is positive.
+#
+# Indicators are passed via a tibble of `model_data` plus a vector of column
+# names. Each is standardised (mean 0, sd 1) within the function. Missing
+# observations (e.g. housing_loan_flow before 2002Q3) are passed through to
+# the Kalman filter, which handles them by extending uncertainty during
+# unobserved periods.
+fit_kalman_cci <- function(model_data,
+                            indicator_cols = c("log_housing_loan_flow",
+                                                "log_debt_y",
+                                                "fhb_share",
+                                                "mortgage_burden",
+                                                "mortgage_rate_spread"),
+                            anchor_col = "log_housing_loan_flow",
+                            initial_loadings = NULL,
+                            verbose = TRUE) {
+  if (!requireNamespace("KFAS", quietly = TRUE)) {
+    stop("KFAS package required for fit_kalman_cci(); install with ",
+         "install.packages('KFAS').")
+  }
+  # Local bindings so formulas inside SSModel() resolve via lexical scoping.
+  # KFAS::SSMcustom and KFAS::SSModel inside a formula don't bind correctly;
+  # bare names do.
+  SSModel    <- KFAS::SSModel
+  SSMcustom  <- KFAS::SSMcustom
+
+  # Construct indicator series we can derive on the fly from master columns
+  d <- model_data %>% arrange(date)
+  if ("housing_loan_flow" %in% names(d) && !"log_housing_loan_flow" %in% names(d)) {
+    d$log_housing_loan_flow <- log(pmax(d$housing_loan_flow, 1e-9))
+  }
+  if ("debt_y" %in% names(d) && !"log_debt_y" %in% names(d)) {
+    d$log_debt_y <- log(pmax(d$debt_y, 1e-9))
+  }
+  if (!"mortgage_rate_spread" %in% names(d) && all(c("mortgage_rate") %in% names(d))) {
+    # Use the change in mortgage rate as a credit-tightness proxy (price not
+    # non-price; included as one component for a balanced indicator set).
+    d$mortgage_rate_spread <- c(NA, diff(d$mortgage_rate))
+  }
+
+  available <- intersect(indicator_cols, names(d))
+  if (length(available) < 2L) {
+    stop("Need at least 2 available indicators; have: ",
+         paste(available, collapse = ", "))
+  }
+  if (!anchor_col %in% available) {
+    anchor_col <- available[1L]
+    if (verbose) message("[fit_kalman_cci] anchor switched to ", anchor_col)
+  }
+
+  # Pull out the indicator matrix and standardise each column on its own
+  # non-NA values (so missing periods do not bias the standardisation).
+  Y_raw <- as.matrix(d[, available, drop = FALSE])
+  Y_std <- apply(Y_raw, 2L, function(x) {
+    if (sum(!is.na(x)) < 4L) return(rep(NA_real_, length(x)))
+    (x - mean(x, na.rm = TRUE)) / stats::sd(x, na.rm = TRUE)
+  })
+  colnames(Y_std) <- available
+
+  n_series <- ncol(Y_std)
+  if (verbose) {
+    message("[fit_kalman_cci] indicators (", n_series, "): ",
+            paste(available, collapse = ", "))
+    message("[fit_kalman_cci] anchor: ", anchor_col)
+  }
+
+  # Initial values for ML
+  if (is.null(initial_loadings)) {
+    initial_loadings <- rep(1, n_series)
+    initial_loadings[match(anchor_col, available)] <- 1
+  }
+  init_log_h <- rep(log(0.5), n_series)
+  init_log_q <- log(0.1)
+  free_loading_idx <- setdiff(seq_len(n_series), match(anchor_col, available))
+
+  pars0 <- c(init_log_h, init_log_q, initial_loadings[free_loading_idx])
+
+  # Update function: modifies the components of the existing model in place
+  # (as the KFAS API expects). Z is stored as a (p x m x 1) array.
+  update_fn <- function(pars, model) {
+    log_h_p <- pars[seq_len(n_series)]
+    log_q_p <- pars[n_series + 1L]
+    free_l  <- pars[(n_series + 2L):length(pars)]
+    loadings <- numeric(n_series)
+    loadings[match(anchor_col, available)] <- 1  # anchor fixed at +1
+    loadings[free_loading_idx] <- free_l
+    model$Z[, , 1L] <- loadings
+    model$Q[1L, 1L, 1L] <- exp(log_q_p)
+    diag(model$H[, , 1L]) <- exp(log_h_p)
+    model
+  }
+
+  # Build initial fully-specified model directly (no template route — that
+  # caused 'Misspecified Z' because the empty template had no SSMcustom).
+  initial_loadings_all <- numeric(n_series)
+  initial_loadings_all[match(anchor_col, available)] <- 1
+  initial_loadings_all[free_loading_idx] <- initial_loadings[free_loading_idx]
+
+  model0 <- SSModel(
+    Y_std ~ -1 + SSMcustom(
+      Z = matrix(initial_loadings_all, nrow = n_series, ncol = 1L),
+      T = matrix(1),
+      R = matrix(1),
+      Q = matrix(exp(init_log_q), nrow = 1L, ncol = 1L),
+      a1 = matrix(0),
+      P1 = matrix(10)
+    ),
+    H = diag(exp(init_log_h), nrow = n_series)
+  )
+
+  fit <- tryCatch(
+    KFAS::fitSSM(model0, inits = pars0, updatefn = update_fn,
+                 method = "BFGS"),
+    error = function(e) {
+      message("[fit_kalman_cci] BFGS failed: ", conditionMessage(e),
+              "; trying Nelder-Mead fallback")
+      KFAS::fitSSM(model0, inits = pars0, updatefn = update_fn,
+                   method = "Nelder-Mead")
+    }
+  )
+
+  # Extract smoothed state
+  kfs <- KFAS::KFS(fit$model, filtering = "state", smoothing = "state")
+  cci_smoothed <- as.numeric(kfs$alphahat[, 1L])
+
+  # Recover estimated loadings/variances
+  pars_hat   <- fit$optim.out$par
+  log_h_hat  <- pars_hat[seq_len(n_series)]
+  log_q_hat  <- pars_hat[n_series + 1L]
+  loadings_hat <- numeric(n_series)
+  loadings_hat[match(anchor_col, available)] <- 1
+  loadings_hat[free_loading_idx] <- pars_hat[(n_series + 2L):length(pars_hat)]
+  names(loadings_hat) <- available
+
+  # Final orientation: positive correlation with the anchor on its observed
+  # subsample (already implied by anchor loading = +1, but cross-check).
+  anc <- Y_std[, anchor_col]
+  ok  <- !is.na(anc) & !is.na(cci_smoothed)
+  if (sum(ok) > 4L) {
+    rho <- stats::cor(anc[ok], cci_smoothed[ok])
+    if (is.finite(rho) && rho < 0) {
+      cci_smoothed <- -cci_smoothed
+      loadings_hat <- -loadings_hat
+    }
+  }
+
+  # Peak-normalise to unity for comparability with cci_williams
+  mx <- max(abs(cci_smoothed), na.rm = TRUE)
+  if (is.finite(mx) && mx > 0) cci_smoothed <- cci_smoothed / mx
+
+  out <- tibble::tibble(date = d$date, cci_kalman = cci_smoothed)
+
+  attr(out, "loadings") <- loadings_hat
+  attr(out, "log_h")    <- setNames(log_h_hat, available)
+  attr(out, "log_q")    <- log_q_hat
+  attr(out, "convergence") <- fit$optim.out$convergence
+  attr(out, "logLik")   <- if (!is.null(fit$model)) {
+    -fit$optim.out$value
+  } else NA_real_
+
+  if (verbose) {
+    message("[fit_kalman_cci] estimated loadings:")
+    for (nm in names(loadings_hat)) {
+      message(sprintf("  %-30s % .3f", nm, loadings_hat[nm]))
+    }
+    message(sprintf("[fit_kalman_cci] log-Q = %.3f, mean log-H = %.3f, convergence = %d",
+                    log_q_hat, mean(log_h_hat), fit$optim.out$convergence))
+  }
+  out
+}
+
+
 build_credit_ssm_factor <- function(y_matrix, log_h, log_q, loadings) {
   n_series <- ncol(y_matrix)
 

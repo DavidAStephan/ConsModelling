@@ -34,6 +34,7 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec6_Preferred | 0.807 | 2.35 | Y | N | N | N | N | -493.6 | Y | Y | Y | Y |
 | Spec7_CohortBurden | 0.828 | 2.40 | N | N | N | — | N | -497.6 | N | Y | Y | N |
 | Spec8_CCI_Interactions | 0.761 | 2.38 | N | N | N | — | Y | -816.3 | Y | — | Y | N |
+| Spec9_KalmanCCI | 0.726 | 2.29 | N | N | N | — | N | -797.9 | N | — | Y | N |
 
 ## Lambda comparison (full vs pre-COVID)
 
@@ -47,6 +48,7 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec6_Preferred | -0.0525 | -0.0931 | yes |
 | Spec7_CohortBurden | -0.2388 | -0.2160 | yes |
 | Spec8_CCI_Interactions | -0.1208 | -0.0564 | yes |
+| Spec9_KalmanCCI | -0.1207 | -0.0894 | yes |
 
 ## Italy vs Australia (preferred specs)
 
@@ -59,6 +61,7 @@ _Italy comparison not available._
 - Spec4_Disagg_NoCCI fails: stability
 - Spec7_CohortBurden fails: sign, stability
 - Spec8_CCI_Interactions fails: stability
+- Spec9_KalmanCCI fails: sign, stability
 - Heteroskedasticity rejected at 5% in some specs — see `lm_het_pval`, `lm_het_pval_no_events`, `het_diagnosis` columns of diagnostics CSV.
 - COVID handling: see `australia_lambda_robustness.csv` for sample sensitivity.
 - `model_helpers.R::compute_log_yp_over_y` ignores its `discount`, `horizon`, `weights`, `denom` arguments and returns a raw level gap. Flagged for human review.
