@@ -3352,10 +3352,14 @@ rolling_results <- tryCatch(
 )
 
 cat("[Step 13] Building Italy–Australia comparison table...\n")
-italy_dir <- normalizePath(file.path(output_dir, "../../outputs"), winslash = "/")
+# italy_table1_results.csv (published Italy reference numbers from De Bonis
+# et al. 2024) lives in Ausreplication/outputs/. The Italy estimation
+# pipeline itself was removed during the May 2026 repo cleanup; we keep
+# only the published reference file as a benchmark for the cross-country
+# comparison in build_comparison_table.
 comparison <- build_comparison_table(aus_coef = combined_coef,
                                      output_dir = output_dir,
-                                     italy_dir = italy_dir)
+                                     italy_dir = output_dir)
 
 cat("[Step 14] Writing narrative model summary...\n")
 tryCatch(

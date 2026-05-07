@@ -26,8 +26,8 @@ adjustment (λ) can be compared on a like-for-like basis.
   `Rscript Ausreplication/R/australia_consumption_model.R`
 - Fast re-estimation from the cached dataset (skips ABS downloads):
   `Rscript Ausreplication/R/run_estimation_from_rds.R`
-- Italy benchmark pipeline:
-  `Rscript Ausreplication/R/italy_consumption_model.R`
+- Offline / hand-edit re-estimation from the portable CSV:
+  `Rscript Ausreplication/R/load_master_from_csv.R`
 
 The Australia master orchestrator is
 [australia_consumption_model.R](Ausreplication/R/australia_consumption_model.R);

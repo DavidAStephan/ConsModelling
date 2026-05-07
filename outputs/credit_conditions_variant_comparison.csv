@@ -1,3 +1,0 @@
-"specification","n_obs","aic","bic","adj_r2","sigma","adf_stat","adf_1pct","adf_5pct","adf_10pct","adf_reject_5pct","cci_variant","cci_start","cci_end","sign_score","corr_loan_flow","corr_house_prices","corr_real_mortgage_rate"
-"institutional_spline",141,-137.974504680229,-108.486905776447,0.799625153294613,0.142822478597552,-3.38644867183986,-3.46,-2.88,-2.57,TRUE,"institutional_spline",1989-09-01,2025-09-01,2,0.224010804532014,0.328045086005181,0.181528507172213
-"diagnostic_spline",141,-178.552923456122,-149.065324552341,0.849735114236889,0.123681207590722,-4.13470716223471,-3.46,-2.88,-2.57,TRUE,"diagnostic_spline",1989-09-01,2025-09-01,1,0.781356403649116,0.498180773005264,-0.673603744362504

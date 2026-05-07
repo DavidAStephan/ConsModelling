@@ -293,17 +293,15 @@ substantially different scale.
   `mortgage_payment_burden_rba` over the post-2009 sample for an explicit
   measured-vs-synthetic comparison.
 
-### 4.3 `data_raw/italy_results.csv`
-- **Format:** Italy paper's published Table 1 results (variable, symbol,
-  section, stat, column, value).
-- **Status: NOT USED** by the Australia pipeline. Used only by the Italy
-  comparator script.
-
-### 4.4 `data_raw_italy/` — full Italy comparator data tree
-- Separate directory at the project root (not under `Ausreplication/`). Used
-  exclusively by [`italy_data_download.R`](../R/italy_data_download.R) and
-  the Italy estimation script. Out of scope for this document; see the Italy
-  source for details.
+### 4.3 `outputs/italy_table1_results.csv` (reference benchmark)
+- **Format:** Hand-coded Italy reference numbers from De Bonis et al.
+  (2024) Table 1, used by `build_comparison_table()` in
+  `australia_estimation.R` for the cross-country comparison output
+  `italy_australia_comparison.csv`.
+- **Status: REFERENCE ONLY.** This file contains *published* coefficient
+  values from the Italian comparator paper; the Italy estimation pipeline
+  itself was removed during the May 2026 repo cleanup. The Australia
+  pipeline does not re-estimate Italy.
 
 ---
 
@@ -633,12 +631,16 @@ analysis is unchanged either way.
 
 ---
 
-## 11. Italy comparator data (out of scope here)
+## 11. Italy comparator (REMOVED — May 2026 cleanup)
 
-The Italy pipeline uses [`data_raw_italy/`](../../data_raw_italy/) at the
-project root (NOT under `Ausreplication/`). It's organised differently
-(per-source RDS pickles rather than raw workbooks), uses BIS, Eurostat, and
-Bank of Italy sources, and is independent of the Australia data flow except
-through the post-estimation comparison table in
-[`outputs/italy_australia_*.csv`](../outputs/). See
-[`italy_data_download.R`](../R/italy_data_download.R) for details.
+The original repository included a parallel Italy estimation pipeline
+(under `data_raw_italy/` and `R/italy_*.R`). This was removed during the
+May 2026 repo cleanup because the Australia paper does not re-estimate
+Italy; instead it compares to *published* numbers from De Bonis et al.
+(2024). The single reference file retained is
+[`outputs/italy_table1_results.csv`](../outputs/italy_table1_results.csv)
+(hand-coded from the Italy paper's Table 1), which is read by
+`build_comparison_table()` to produce
+[`outputs/italy_australia_comparison.csv`](../outputs/italy_australia_comparison.csv)
+and `italy_australia_lambda.csv`. These are *outputs* of the Australia
+pipeline, not Italy outputs.

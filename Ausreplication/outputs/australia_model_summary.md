@@ -50,17 +50,7 @@ Long-run structural coefficients (preferred spec, full sample):
 
 ## Italy vs Australia (preferred specs)
 
-| Term | Italy | Australia |
-|------|-------|-----------|
-| ecm_lag | — | -1.0000 |
-| eq_y | — | 0.8431 |
-| ha_y | 0.0046 | 0.2817 |
-| ilfa_y | 0.0011 | — |
-| ln_hp_over_y | — | -0.5908 |
-| ln_yp_over_y | -0.0184 | -3.8366 |
-| nla_y | 0.0255 | 0.7752 |
-| real_rate | -0.0272 | -0.0131 |
-| super_y | — | 0.2376 |
+_Italy comparison not available._
 
 ## Known issues
 - Spec1_LogNetWorth fails: cointegration, stability
@@ -78,5 +68,5 @@ Long-run structural coefficients (preferred spec, full sample):
 - Run: `Rscript Ausreplication/R/australia_consumption_model.R`
 - Fast re-estimation: `Rscript Ausreplication/R/run_estimation_from_rds.R`
 - Random seed: not used (OLS is deterministic).
-- Date generated: 2026-05-06
+- Date generated: 2026-05-07
 
