@@ -38,8 +38,11 @@ additions.
 | 4 | Disaggregated wealth | `nla_y, eq_y, super_y, ha_y, ln_hp_over_y, real_rate, ln_yp_over_y, ecm_lag` |
 | 5 | Spec 4 + full SR dynamics | (same long-run as 4) |
 | 6 | Spec 5 + post-2008 break in φ | adds `ln_yp_over_y_post2008` |
-| 7 | Spec 6 + life-cycle terms | adds `prime_age_share, fhb_share` (mortgage_burden dropped — collinearity) |
-| 8 | CCI interactions per Aust paper eq 7 | `nla_y, eq_y, super_y, ha_y, hp_x_1_minus_cci, r_x_cci, ln_yp_over_y, yp_x_cci, ecm_lag` (only when `USE_INSTITUTIONAL_CCI = TRUE`) |
+| 7 | Spec 6 + cohort + synthetic burden | adds `prime_age_share, fhb_share`; replaces `real_rate` with synthetic `mortgage_burden` |
+| 7b | Spec 6 + cohort + RBA E13 burden | as Spec 7 but uses `mortgage_payment_burden_rba` (post-2009 sample) |
+| 8 | Williams CCI interactions (maximal-GETS) | `nla_y, eq_y, super_y, ha_y, hp_x_1_minus_cci, r_x_cci, ln_yp_over_y, yp_x_cci, ecm_lag` |
+| 9 | Kalman state-space CCI interactions | as Spec 8 but with `cci_kalman` (single-factor SSM) replacing the Williams smoothed-step spline |
+| 10 | Williams-prior calibrated | impose γ_IFA=0.022, ψ_0=0.20, ψ_1=0.93, ϖ=1.2; iterative fixed-point OLS |
 
 **Nine narrative dummies** in the default set: `d2000_gst`, `d2008_gfc`,
 `d2020_covid`, `d2020_rebound`, `d_neg_gearing_8587`, `d_recession_1991`,
@@ -62,23 +65,41 @@ on four screens:
 4. **Stability screen** — Chow at 2008Q3 not rejected at 1% AND λ sign-stable
    across full / pre-COVID / COVID-dropped / COVID-rich-dummies samples
 
-BIC tiebreaker. As of latest run:
+BIC tiebreaker. Under canonical `PI_METHOD = "italy"` (set in
+[`australia_estimation.R`](../R/australia_estimation.R) line 45), no
+spec passes all four screens; the selector falls back to the
+most-passes / BIC tiebreak rule and returns Spec 3 as the
+auto-preferred:
 
-| Spec | Signs | Coint | λ | Stability | BIC | Preferred |
+| Spec | Signs | Coint | λ | Stability | BIC | Auto-preferred |
 |------|------|------|---|-----------|------|-----------|
-| 1 | ✓ | ✗ | ✓ | ✗ | -824 | |
-| 2 | ✓ | ✗ | ✓ | ✓ | -496 | |
-| 3 | ✓ | ✗ | ✓ | ✗ | -825 | |
-| 4 | ✓ | ✓ | ✓ | ✗ | -812 | |
-| 5 | ✗ | ✓ | ✓ | ✗ | -489 | |
-| **6** | ✓ | ✓ | ✓ | ✓ | -491 | **✓** |
-| 7 | ✗ | ✓ | ✓ | ✓ | -496 | |
-| 8 | ✗ | NA | ✓ | ✗ | -805 | |
+| 1 | ✗ | ✗ | ✓ | ✗ | -923 | |
+| 2 | ✗ | ✗ | ✓ | ✗ | -504 | |
+| **3** | **✓** | ✗ | **✓** | ✗ | **-923** | **✓** *(BIC-best of 2-pass)* |
+| 4 | ✗ | ✓ | ✓ | ✗ | -909 | |
+| 5 | ✗ | ✓ | ✓ | ✗ | -498 | |
+| 6 | ✗ | ✓ | ✓ | ✗ | -496 | |
+| 7 | ✗ | ✓ | ✗ | ✓ | -501 | |
+| 7b | ✗ | ✓ | ✗ | ✗ | -363 | |
+| 8 | ✗ | NA | ✓ | ✗ | -911 | |
+| 9 | ✗ | NA | ✓ | ✗ | -900 | |
+| 10 | ✗ | NA | ✓ | ✓ | -492 | |
 
-**Spec 6 is the auto-preferred** — the only spec that passes all four screens.
-Spec 7 has the strongest λ stability but its `nla_y` is small-negative due to
-collinearity with `prime_age_share` (see [data.md §10](data.md) and the
-Step A investigation in commit `3dbc18c`).
+**Methodologically the disaggregated, Williams-form Spec 6 remains the
+narrative headline spec** for the WP, because (a) it is the form
+Williams (2010) and the LIVES tradition use, (b) it permits the
+γ_LA + γ_LOANS = 0 cross-equation restriction test, and (c) the
+sign-screen failure (eq_y small-negative under Italy LP) is a known
+identification effect that disappears once CCI interactions are added
+(Spec 8: eq_y = +0.036, t = 2.11). Spec 3 is the BIC-best 2-pass
+alternative reported alongside.
+
+Why the rubric tightens under Italy LP: because |λ| is roughly four
+times larger under Italy LP than under AR, the implied long-run γ on
+each disaggregated wealth term is correspondingly compressed, so a
+modest negative coefficient on (e.g.) eq_y is no longer crowded out by
+larger positives. Spec 3 (aggregated `networth_y`) avoids this by
+lumping all wealth into a single positive coefficient.
 
 ---
 
@@ -161,86 +182,110 @@ Everything in [`Ausreplication/outputs/`](../outputs/):
 
 ---
 
-## 5. Headline statistical findings (latest run)
+## 5. Headline statistical findings (latest run, canonical Italy LP)
 
-1. **NLA cross-equation restriction (Italy's `γ_LA + γ_LOANS = 0`) is
-   accepted across the board** — every spec/sample combination has
+1. **Spec 6 λ = −0.218 (NW SE 0.098), within 25% of Williams' −0.286.**
+   Under canonical Italy LP. Under the AR robustness column λ = −0.052
+   — that is the historical "Australian PI puzzle" specification, which
+   we now treat as a methodology artefact.
+
+2. **`ln_yp_over_y` = +0.302 under canonical Italy LP**, matching
+   Williams' calibrated value (0.20) in sign and broad magnitude. Under
+   AR it is −0.20. The Australian PI puzzle resolved.
+
+3. **Implied long-run wealth γ undershoots Williams' published values
+   by ~4×** under canonical Italy LP (e.g. ha_y γ = 0.028 vs Williams'
+   0.0488; nla_y γ = 0.040 vs Williams' 0.159). Attributed to truncated
+   CCI variation on the post-deregulation 1988Q4+ sample; would resolve
+   under sample back-extension to ~1975 (NS-020).
+
+4. **NLA cross-equation restriction γ_LA + γ_LOANS = 0 is accepted
+   across the board** — every spec × sample combination has
    `restriction_accepted = TRUE` in
    [`australia_nla_restriction_test.csv`](../outputs/australia_nla_restriction_test.csv),
-   p-values 0.27–0.79. This validates the netting choice for `nla_y`.
+   p-values 0.27–0.79. Validates the Italian netting convention.
 
-2. **The `nla_y` wrong-sign bug is gone in Specs 4–6** but resurfaces in
-   Spec 7 because `prime_age_share` (coef ~+5) absorbs wealth-effect
-   variance in the post-1988 sample. Demographics-vs-wealth collinearity
-   over the post-deregulation period is real, not a fixable bug.
+5. **λ sign-stable across all 4 sample variants for Spec 6** (full
+   −0.218, pre-COVID −0.213, COVID-dropped −0.139, COVID-rich-dummies
+   −0.173). The sign-stability screen passes; it is the Chow stability
+   sub-criterion that fails. Spec 7 (cohort) is even tighter
+   (range −0.20 to −0.37).
 
-3. **λ stability across 4 sample variants** (full / pre-COVID /
-   COVID-dropped / COVID-rich-dummies):
-   - Spec 6 (preferred): −0.046 to −0.121 (factor ~3 spread)
-   - Spec 7 (cohort): −0.21 to −0.25 (very tight; the most stable)
-   The selector chose Spec 6 over Spec 7 because Spec 7 fails the sign
-   screen on `nla_y`.
+6. **Williams 4-knot CCI is at the placebo distribution median on the
+   1988Q4+ sample** (placebo test in
+   [`australia_williams_knot_placebo.png`](../outputs/australia_williams_knot_placebo.png)):
+   Williams' canonical 4-knot adj-R² = 0.7268 sits at the 49th
+   percentile of 200 random 4-knot draws. The maximal-GETS reduction
+   (15 → 6 knots) is the methodologically defensible response and is
+   the canonical CCI basis (`build_williams_cci_basis()`).
 
-4. **Williams 4-knot CCI partially identifies on 1988Q4+ data**:
-   1998 (NBFI/securitisation, +0.0015) and 2007 (GFC, −0.017) survive with
-   correct signs; 1992 (banking distress) is a sign-violator (dropped); 1979
-   (deregulation) is constant in our window and drops by collinearity. This
-   is the expected outcome — the paper's full identification needs
-   pre-1980 data.
+7. **Adding CCI does identification work, not detrending.** The fit
+   decomposition ([`australia_cci_fit_decomposition.md`](../outputs/australia_cci_fit_decomposition.md))
+   shows the Williams maximal-GETS CCI shifts wealth coefficients by
+   150.7% on average between Spec 6 (no CCI) and Spec 8 (CCI
+   interactions); the Kalman state-space CCI shifts them by 16.6%. R²
+   actually drops slightly when CCI is added (Spec 8 adj R² 0.763 vs
+   Spec 6's 0.812), so the CCI is not residual-absorbing.
 
-5. **Italy comparator λ corrected to +0.519** (positive convention; was
-   reported as −0.0099 before the cross-country comparison was reading
-   from a stale file at the project root).
+8. **Out-of-sample forecasting**: at h = 1, structural specs match
+   random-walk-with-drift (Spec 7 best at RMSE 0.0306; RW-drift 0.0310).
+   At h ∈ {4, 8}, RW-drift dominates every structural spec by 5–15% in
+   RMSE — a standard "macro forecasting puzzle" finding. See
+   [`australia_oos_rmse.csv`](../outputs/australia_oos_rmse.csv).
 
-6. **OLS ≈ IV ≈ Joint-SUR** on the preferred spec. Italy's
-   "the parameter estimates and even the standard errors are only a
-   whisker away" finding (Italy.pdf p.32) replicates for Australia.
+9. **OLS ≈ IV** on the preferred spec under Italy LP — Italy's "a
+   whisker away" finding (Italy.pdf p.32) replicates qualitatively. The
+   joint SUR block currently fails on a CHOLMOD singular-matrix error
+   under the new sample (the consumption + PI joint system has high
+   collinearity); not a binding gap for the WP narrative.
 
-7. **Heteroskedasticity is event-driven** (`het_diagnosis = "structural"`
-   for some specs, "event_driven" for others) — Newey-West HAC is the
-   right correction; no need for WLS.
-
-8. **Institutional CCI flag is OFF by default** (`USE_INSTITUTIONAL_CCI =
-   FALSE` in `australia_data_download.R:70`). Set to `TRUE` to switch from
-   the post-2002 housing-flow proxy to the Williams-2010 4-knot SDMMA
-   spline + institutional overlay. See [data.md §5.2](data.md).
+10. **Heteroskedasticity is structural** (`het_diagnosis = "structural"`
+    for every spec on the full sample) — Newey-West HAC is the right
+    correction; WLS not needed.
 
 ---
 
 ## 6. Open items — what's left
 
-### Items deferred (work attempted but not landed)
-- **Italy-style PI helper** — Agent C wrote a `construct_permanent_income_italy()`
-  + `PI_METHOD` flag + `compare_pi_methods()` function set in a parallel
-  worktree, but the worktree was based on a stale `main` so a full merge
-  was infeasible. Only the bug fix and labour-force series were cherry-
-  picked. The labour-force data is now in place; the helper itself can be
-  rebuilt against current `main` in ~2–3 hours.
-- **Spec 7 promotion** — Spec 7's λ-stability story is compelling but
-  blocked by `nla_y` sign failure. Possible escape: add a
-  `prime_age_share × nla_y` interaction so demographics scale wealth
-  rather than competing with it, but that is exploratory work, not a
-  defensible default.
-
-### Items that need user judgement
-- **CCI strategy** (currently default Path A — flow-only; Path B
-  Williams-2010 spline available behind `USE_INSTITUTIONAL_CCI`). Three
-  options were laid out in
-  [README's "Scoping decision required"](../../README.md#scoping-decision-required--lives-extension)
-  section — pick one explicitly so the project has a stable CCI baseline.
-- **LIVES extension scope** — single-equation, two-equation, or full LIVES
-  port. Same README section. Multi-equation work is multi-week to
-  multi-month.
+The full backlog with stable IDs (NS-001 … NS-114) is in
+[`next_steps.md`](next_steps.md). Highlights:
 
 ### Items requiring fresh data sourcing
-- **Sample back-extension to 1980** — needs pre-1988 ABS Financial
-  Accounts annual data + Bonci-Coletta splicing. Days of work + careful
-  unit reconciliation.
-- **Compensation of employees and social benefits** from ABS 5206020 —
-  unblocks Italy-style scaled-income robustness check. ~30 min of
-  data-download additions.
-- **Document `houseprice_old.csv` provenance** — the splicing chain's
-  earliest layer has no recorded source URL or vintage. ~15 min.
+- **Sample back-extension to ~1975 (NS-020)** — biggest empirical
+  unlock. Needs pre-1988 ABS Financial Accounts annual data +
+  Bonci-Coletta splicing. Would resolve the truncated-CCI identification
+  problem and likely close the implied-γ gap with Williams. Days of work
+  + careful unit reconciliation.
+- **Document `houseprice_old.csv` provenance (NS-003)** — the splicing
+  chain's earliest layer has no recorded source URL or vintage.
+  ~15 min.
+- **APRA / RBA / Treasury sourcing follow-ups** — see NS-021, NS-030,
+  NS-107, NS-114.
+
+### Items that need user judgement
+- **LIVES extension scope (NS-101)** — single-equation, two-equation, or
+  full LIVES port. Multi-equation work is multi-week to multi-month.
+- **Counterfactuals (NS-012)** — three suggested for §10: no-APRA,
+  no-JobKeeper, CCI-at-Williams-peak.
+- **WP framing decisions (NS-102, 103, 104)** — target journal, BIS
+  Shrapnel sourcing, companion paper structure.
+
+### WP drafting items
+- **§1 Introduction (NS-010)** and **§11 Conclusion (NS-011)** — currently
+  skeleton; need full prose.
+- **Auto-fill table placeholders (NS-001)** — splice
+  `[TABLE-FROM-DATA: ...]` markers in §7-§9 from the relevant CSVs.
+- **Verify [VERIFY] citation tags in lit review (NS-002)** — ~9 tags.
+- **Quarto rendering pipeline (NS-013, NS-014)**.
+
+### Recently completed (struck through in `next_steps.md`)
+- Italy-style PI helper — landed; canonical method as of 2026-05-07.
+- Williams maximal-GETS CCI knot identification — landed.
+- Kalman state-space CCI extraction — landed (Spec 9).
+- Spec 7b RBA E13 burden — landed.
+- Spec 10 Williams-prior calibrated — landed.
+- OOS forecast validation — landed (NS-033).
+- Williams CCI placebo test, knot experiment, fit decomposition — landed.
 
 ---
 

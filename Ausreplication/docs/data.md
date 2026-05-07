@@ -459,18 +459,17 @@ for the full list):
 | `fhb_share`            | 2002-07-01  | 2024-10-01  | 90  | (after regex fix; was constant 0.5)            |
 | `cci_ratio`            | 2002-07-01  | 2024-10-01  | 90  | Specs 2, 5 effectively start here              |
 | `mortgage_burden`      | 1988-10-01  | 2024-10-01  | 145 | Synthetic                                      |
-| `labour_force`         | (?) live    | 2024-10-01  |     | Added recently; not yet in cached RDS          |
-| `lf_share`             | (?) live    | 2024-10-01  |     | Added recently; not yet in cached RDS          |
+| `labour_force`         | 1980-01-01  | 2024-10-01  | 180 | ABS 6202001; canonical Italy LP predictor      |
+| `lf_share`             | 1980-01-01  | 2024-10-01  | 180 | `labour_force / pop_millions`                  |
+| `cci_kalman`           | 1988-07-01  | 2024-10-01  | 146 | KFAS state-space single-factor CCI (Spec 9)    |
+| `cci_pca`              | 2002-07-01  | 2024-10-01  | 90  | First principal component, 5 indicators        |
+| `cci_creditgap`        | 1988-07-01  | 2024-10-01  | 146 | BIS-style HP-filter credit gap                 |
+| `mortgage_payment_burden_rba` | 2009-01-01 | 2024-10-01 | 64 | RBA E13 measured burden (Spec 7b)             |
 
-**Discrepancy between cached RDS and current pipeline:** the cached
+The cached
 [`outputs/australia_model_dataset.rds`](../outputs/australia_model_dataset.rds)
-was produced before `labour_force`, `lf_share`, the new Australian narrative
-dummies, `nla_y_unrestricted`, and the cohort additions were wired in. The
-estimation script's `add_model_variables()` reconstructs these on the fly
-when running `run_estimation_from_rds.R`, so the pipeline still works end-to-
-end, but the RDS itself is stale. **A fresh run of `australia_consumption_model.R`
-(which downloads data) is needed to refresh the RDS.** Until then, anyone
-reading the RDS directly will see an older variable set.
+and the portable [`data_raw/master_data.csv`](../data_raw/master_data.csv)
+both currently hold 180 rows × 89 columns and are mutually consistent.
 
 ---
 

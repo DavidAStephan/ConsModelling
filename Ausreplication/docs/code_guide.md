@@ -251,13 +251,13 @@ to the console.
 **Key configuration variables** (top of file):
 
 ```r
-PI_METHOD <- "ar"   # "ar" (rolling AR(8)) or "italy" (Jordà LP)
+PI_METHOD <- "italy"  # canonical: Jordà LP. Set to "ar" for rolling AR(8) robustness.
 ```
 
-Setting `PI_METHOD <- "italy"` flips Step 3 to use the Italy local
-projection method. The comparison output (Step 11b) is produced
-regardless. See `next_steps.md` NS-100 for the open decision on
-canonical method choice.
+The canonical method is Italy LP (resolved 2026-05-07; NS-100). Setting
+`PI_METHOD <- "ar"` reverts Step 3 to the rolling AR(8) forecaster used
+historically. The AR vs Italy comparison output (Step 11b) is produced
+regardless of which method is selected as canonical.
 
 **Modify when:**
 - Adding a new specification → edit `run_all_specifications()` (around
@@ -422,11 +422,14 @@ of the main `australia_estimation.R` block.
 - `outputs/australia_williams_comparison.md` — markdown commentary
   ~80 lines, structured for direct inclusion in the WP.
 
-**Methodology framing.** The comparison reports both forms because the
-divergence between our γ and Williams' γ is almost entirely driven by
-the divergence in λ (we have −0.052 vs his −0.286 under default
-`PI_METHOD = "ar"`). At the OLS level our wealth coefficients are
-within 6–17% of Williams' implied OLS — substantively the same.
+**Methodology framing.** Under canonical `PI_METHOD = "italy"`, our λ
+is within 25% of Williams' published value (−0.218 vs −0.286). The
+implied long-run γ on individual wealth terms undershoots Williams by
+roughly a factor of four — attributed to truncated CCI variation on
+the post-deregulation 1988Q4+ sample. Under the `PI_METHOD = "ar"`
+robustness column we instead see |λ| ~0.05 with a wrong-signed
+permanent-income coefficient (the historical "Australian PI puzzle"),
+which we treat as a methodology artefact.
 
 **Modify when:**
 - Williams' published values need updating (e.g. if a new edition
@@ -441,21 +444,18 @@ within 6–17% of Williams' implied OLS — substantively the same.
 There are **two** runtime flags that materially change pipeline
 behaviour. Both are at the top of their respective files.
 
-### `PI_METHOD` (in `australia_estimation.R`, ~line 35)
+### `PI_METHOD` (in `australia_estimation.R`, ~line 45)
 
 ```r
-PI_METHOD <- "ar"     # default: rolling AR(8) + trend + ogive
-PI_METHOD <- "italy"  # alternative: Jordà (2005) local projection
+PI_METHOD <- "italy"  # canonical (resolved 2026-05-07): Jordà (2005) local projection
+PI_METHOD <- "ar"     # robustness column: rolling AR(8) + trend + ogive
 ```
 
-The Italy method (a) uses the labour-force-share predictor, (b) flips
-the sign of `ln_yp_over_y` from negative to positive (resolves the
-Australian PI puzzle), (c) raises `|λ|` from ~0.05 to ~0.22 (closer to
-Williams). The comparison output (Step 11b) is produced regardless of
-which is canonical.
-
-See `next_steps.md` NS-100 for the open decision on which to use as
-the canonical.
+Italy LP (a) uses the labour-force-share predictor, (b) gives a
+positive long-run permanent-income coefficient (resolving the
+Australian PI puzzle reported under AR), (c) gives `|λ| ≈ 0.22`,
+within 25 per cent of Williams' published −0.286. The comparison
+output (Step 11b) is produced regardless of which is canonical.
 
 ### `USE_INSTITUTIONAL_CCI` (in `australia_data_download.R`, ~line 70)
 
@@ -507,9 +507,9 @@ Rscript Ausreplication/R/australia_consumption_model.R
 Rscript Ausreplication/R/export_master_csv.R
 ```
 
-### "I want to test the Italy LP permanent-income method."
-Open `Ausreplication/R/australia_estimation.R`, change `PI_METHOD <- "ar"`
-to `PI_METHOD <- "italy"` (around line 35), then
+### "I want to switch to the AR robustness column."
+Open `Ausreplication/R/australia_estimation.R`, change
+`PI_METHOD <- "italy"` to `PI_METHOD <- "ar"` (around line 45), then
 `Rscript Ausreplication/R/run_estimation_from_rds.R`. Compare
 `australia_pi_method_comparison.csv` for the side-by-side.
 

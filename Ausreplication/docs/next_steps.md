@@ -60,12 +60,12 @@ The smooth-transition dummies `d_apra_2014` and `d_apra_2017` are centred on 201
 
 ### NS-005 Regenerate decomposition chart under Italy LP PI method
 
-The headline `australia_longrun_decomposition.png` is currently produced under the default `PI_METHOD = "ar"`. Generate a parallel chart under `PI_METHOD = "italy"` for comparison.
+Following the canonical PI flip in NS-100, `australia_longrun_decomposition.png` is now produced under `PI_METHOD = "italy"` by default. Optional follow-up: also save a `_ar.png` variant for direct visual comparison in §10.
 
-- **Effort:** ~1 hour (just flip the flag and rerun, save chart with a different filename)
+- **Effort:** ~30 min (flip flag, rerun, save chart with `_ar` suffix)
 - **Depends on:** nothing
-- **Files:** `Ausreplication/R/australia_estimation.R` (modify the `plot_longrun_decomposition` call to optionally tag filename with PI method); `Ausreplication/outputs/australia_longrun_decomposition_italy.png` (new)
-- **Success criterion:** Both charts exist; the Italy version shows the post-2008 PI step shift much more strongly (reflecting the +0.30 vs +0.20 sign-flip on `ln_yp_over_y`)
+- **Files:** `Ausreplication/R/australia_estimation.R` (tag filename with PI method when in non-canonical mode); `Ausreplication/outputs/australia_longrun_decomposition_ar.png` (new)
+- **Success criterion:** Both charts exist; the AR version shows the post-2008 PI step shift in the opposite direction.
 
 ### ~~NS-006/NS-022 Add Spec 7b: cohort + RBA-measured mortgage payment burden~~ ✅ **DONE**
 
@@ -596,11 +596,9 @@ has built.
 
 ## Items requiring user judgement (no agent can decide)
 
-### NS-100 Choose canonical PI_METHOD for the WP
+### ~~NS-100 Choose canonical PI_METHOD for the WP~~ ✅ **DONE (2026-05-07)**
 
-`PI_METHOD = "ar"` is the current default; `"italy"` delivers the headline result. The WP §4.3 needs a clear methodology choice. My recommendation: **canonical = "italy"** with `"ar"` as the headline robustness column, justified by (a) the Italian methodology precedent, (b) the resolution of the Australian PI puzzle, (c) the closer match to Williams' λ, (d) the labour-force-share predictor's substantive role in capturing demographic effects. But it's a judgement call.
-
-- **Decision needed**: Choose canonical. If "italy", the default `PI_METHOD <- "ar"` line in `australia_estimation.R` should be flipped, and downstream specs/charts/tables regenerated.
+Decision: canonical PI method is `"italy"` (Jordà 2005 local projection with labour-force-share predictor). `australia_estimation.R` line 45 flipped from `PI_METHOD <- "ar"` to `PI_METHOD <- "italy"`; pipeline re-run; all downstream outputs (Spec results, Williams comparison, decomposition, OOS forecast, model summary) now reflect the Italy LP method. The "ar" method remains available as a robustness column.
 
 ### NS-101 Multi-equation LIVES extension scope
 
@@ -636,12 +634,22 @@ Several large items (multi-equation LIVES, full sample back-extension, counterfa
 - **A.0** ✅ Williams (2009) §4.2.1 non-property income recipe (`npy_real_pc`)
 - **A.1** ✅ Williams (2010/2012) structural-parameter comparison table
 - **Italy LP PI helper** ✅ `construct_permanent_income_italy()` + `compare_pi_methods()` + `PI_METHOD` flag
+- **NS-100 Canonical PI method** ✅ `PI_METHOD <- "italy"` (resolved 2026-05-07)
 - **Three user-supplied CSVs** ✅ RBA F6 mortgage rate, ABS 15+ population, ABS 5206020 income components — all wired in
 - **RBA E13 burden ratios** ✅ `mortgage_interest_burden_rba`, `mortgage_payment_burden_rba`
 - **NLA cross-equation restriction** ✅ Wald test, accepted in every spec/sample
-- **Williams 4-knot CCI** ✅ Reduced-form spline, 2 of 4 knots survive on 1988+ sample
-- **WP draft** ✅ §2 Lit Review, §3 Data, §4 Model, §5 Identification, §6 Specs, §7 Results, §8 Robustness, §9 Williams comparison fully written. §1 Intro, §10 Decomp counterfactuals, §11 Conclusion still skeletal.
+- **Williams 4-knot CCI canonical → maximal-GETS** ✅ Default `build_williams_cci_basis()` switched to 15-knot maximal candidate set with sign-prior reduction; original 4-knot retained as `build_williams_cci_basis_canonical()`
+- **NS-105 Kalman state-space CCI** ✅ Spec 9 wired in; KFAS::SSMcustom single-factor model
+- **NS-106 Random-knot placebo** ✅ Williams canonical 4-knot at 49th/22nd percentile of 200-draw distribution
+- **NS-108 Fit-improvement decomposition** ✅ Williams maximal-GETS shifts wealth coefs 150.7%; Kalman 16.6%
+- **NS-109 BIS credit-to-GDP gap** ✅ `cci_creditgap` (HP filter λ = 400 000)
+- **NS-110 PCA factor** ✅ `cci_pca` (first PC, 5 indicators)
+- **NS-111 Macroprudential intensity** ✅ `macropru_intensity` ogive over 7 events
+- **NS-015 Williams-prior calibrated spec** ✅ Spec 10 (iterative fixed-point OLS)
+- **NS-006/NS-022 Spec 7b RBA E13 burden** ✅ `mortgage_payment_burden_rba` over post-2009 sample
+- **NS-033 OOS forecast validation** ✅ 5 specs × 3 horizons × 36 windows; honest "macro forecasting puzzle" finding
+- **WP draft** ✅ §2 Lit Review, §3 Data, §4 Model, §5 Identification, §6 Specs, §7 Results, §8 Robustness, §9 Williams comparison fully written under canonical Italy LP. §1 Intro, §10 Decomp counterfactuals, §11 Conclusion still skeletal.
 
 ---
 
-**Last updated:** generated alongside wp_draft.md commit. Update timestamps as items move between tiers or are completed.
+**Last updated:** 2026-05-07 (canonical-method switch + doc cleanup pass). Update timestamps as items move between tiers or are completed.

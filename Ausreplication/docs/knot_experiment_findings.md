@@ -197,42 +197,28 @@ near-collinearity with the existing macroprudential dummies, which is
 why the 2014 and 2017 knots fail in our spec (the dummies absorb their
 identifiable variation).
 
-## Open follow-up: which approach should be canonical?
+## Resolved: canonical CCI basis
 
-The choice for the WP is between three options:
+**Decision: Option C — maximal-GETS spec is canonical** (resolved
+2026-04). `build_williams_cci_basis()` in `model_helpers.R` defaults to
+the 15-knot maximal candidate set with sign-prior reduction;
+`build_williams_cci_basis_canonical()` retains the original Williams
+4-knot basis as a benchmark for replication.
 
-**Option A — Stay with Williams' canonical 4-knot spec.** Defensible
-because it follows published precedent, but acknowledge in §5 that
-3 of 4 knots fail or alias on our sample. Most conservative; smallest
-change to the existing draft.
+The placebo test (200 random 4-knot draws over 1979–2007) provides
+empirical justification for the choice: Williams' canonical 4-knot
+benchmark sits at the **49th percentile** of the placebo distribution
+by adj-R² and the **22nd percentile** by |λ|, indicating that the
+specific 1979/1992/1998/2007 knot dates are arbitrary on our sample.
+The maximal-GETS reduction lets the data choose the surviving knots
+through Hendry-Krolzig drop-on-violation, recovering six that match
+known institutional events.
 
-**Option B — Adopt the within-sample-only spec (5 knots: 1992/1998/
-2007/2014/2017).** Drops the 1979 (aliased) and 1986 (also aliased)
-pre-sample knots that can't identify. More honest about what the
-sample actually supports. Currently produces 2 surviving knots
-(2007 and 2017).
-
-**Option C — Adopt the maximal-GETS spec (15 candidates → 5
-survivors).** Methodologically the strongest because the surviving
-knots emerge from data-driven reduction rather than authorial
-choice. Highest λ in magnitude (−0.127), highest adjusted R² (0.734).
-Departs furthest from Williams' published methodology.
-
-My recommendation is **Option C** for the headline spec, with **Option
-A** as a robustness column reproducing the canonical Williams setup.
-This gives the WP a clean two-spec framing: "we replicate Williams'
-canonical setup as a benchmark and it produces a marginal CCI on our
-sample (only the 2007 knot identifies); we then adopt a maximal-GETS
-specification that lets the institutional chronology emerge from the
-data, recovering five surviving knots that materially improve λ and
-fit". This is honest about the canonical spec's limitations and offers
-a constructive alternative.
-
-If you prefer to stay closer to Williams, **Option B** is the
-compromise: keep the spline framework but drop the structurally
-unidentifiable knots and frame the 2014/2017 macroprudential knots
-as failed empirically, attributing the macropru effect to the
-existing dummies.
+The Kalman state-space CCI (Spec 9) is the **methodology robustness
+column** — a model-based latent-factor extraction that delivers a
+significant λ in the consumption equation (−0.206), confirming the
+identification result is not an artefact of the smoothed-step spline
+parameterisation.
 
 ---
 

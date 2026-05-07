@@ -42,7 +42,7 @@ options(stringsAsFactors = FALSE, scipen = 999)
 #           this as the predictor that captures the early-1990s slowdown).
 # A `compare_pi_methods()` step writes both side-by-side regardless of
 # which is selected as the canonical input to the spec loop.
-PI_METHOD <- "ar"
+PI_METHOD <- "italy"
 
 # Resolve output directory relative to this script
 .this_file <- tryCatch(

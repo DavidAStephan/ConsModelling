@@ -2,10 +2,13 @@
 
 ## Project status
 
-This repository is undergoing a documentation, statistical-hardening and
-reproducibility-engineering pass. Some output files referenced below
-(a markdown model summary and explicit cointegration tables) are
-forthcoming and may be added in subsequent commits.
+Active research repository for a Muellbauer-Williams Australian
+household consumption ECM, targeting a central-bank working paper. As
+of 2026-05-07 the canonical permanent-income method is `"italy"` (Jordà
+2005 local projection); see [`Ausreplication/docs/project_status.md`](Ausreplication/docs/project_status.md)
+for the latest preferred-spec coefficients and
+[`Ausreplication/docs/wp_draft.md`](Ausreplication/docs/wp_draft.md) for
+the WP draft.
 
 ## What this is
 
@@ -38,15 +41,24 @@ and estimation in
 
 ## Estimation specifications
 
-Six specifications are fit on both the full sample (1988Q4–2024Q4) and a
-pre-COVID sample (1988Q4–2019Q4):
+Eleven specifications are fit on both the full sample (1988Q4–2024Q4)
+and a pre-COVID sample (1988Q4–2019Q4):
 
 - **Spec 1** — log net worth (aggregate).
 - **Spec 2** — log net worth plus a credit-conditions short-run term (Δ² log CCI, lag 2).
 - **Spec 3** — net worth in levels.
 - **Spec 4** — disaggregated wealth (housing, equities, superannuation, net liquid assets) without credit conditions.
 - **Spec 5** — disaggregated wealth with the full short-run dynamics block (CCI shock, income acceleration, unemployment shock, income volatility).
-- **Spec 6** — disaggregated wealth with a post-2008 break in the permanent-income coefficient. Currently the implicit preferred specification.
+- **Spec 6** — disaggregated wealth with a post-2008 break in the permanent-income coefficient. The narrative headline specification (Williams form).
+- **Spec 7** — Spec 6 + cohort terms (prime-age share, FHB share) and synthetic mortgage burden.
+- **Spec 7b** — Spec 7 with the RBA E13 measured mortgage payment burden over the post-2009 sample.
+- **Spec 8** — Williams CCI interactions on the maximal-GETS basis (15-knot candidate set → 6 surviving via Hendry-Krolzig sign-prior reduction).
+- **Spec 9** — Spec 8 with the Kalman state-space CCI replacing the Williams smoothed-step spline.
+- **Spec 10** — Williams-prior calibrated specification (γ_IFA = 0.022, ψ_0 = 0.20, ψ_1 = 0.93, ϖ = 1.2; iterative fixed-point OLS).
+
+The canonical permanent-income method is `PI_METHOD = "italy"` (Jordà
+2005 local projection with labour-force-share predictor); the
+historical AR(8) forecaster is retained as a robustness column.
 
 ## Outputs
 
@@ -75,9 +87,14 @@ Plots (Spec 1 baseline, Spec 6 preferred):
 [australia_spec6_preferred_actual_vs_fitted.png](Ausreplication/outputs/australia_spec6_preferred_actual_vs_fitted.png),
 [australia_spec6_preferred_residuals.png](Ausreplication/outputs/australia_spec6_preferred_residuals.png).
 
-Forthcoming (in-progress, not yet produced by every run): a markdown
-model summary (`australia_model_summary.md`) and explicit cointegration
-test tables.
+Additional outputs (now produced by every run):
+[australia_model_summary.md](Ausreplication/outputs/australia_model_summary.md),
+[australia_cointegration.csv](Ausreplication/outputs/australia_cointegration.csv),
+[australia_williams_comparison.csv](Ausreplication/outputs/australia_williams_comparison.csv),
+[australia_williams_knot_placebo.png](Ausreplication/outputs/australia_williams_knot_placebo.png),
+[australia_cci_fit_decomposition.md](Ausreplication/outputs/australia_cci_fit_decomposition.md),
+[australia_oos_rmse.csv](Ausreplication/outputs/australia_oos_rmse.csv),
+[australia_oos_forecast_paths.png](Ausreplication/outputs/australia_oos_forecast_paths.png).
 
 ## Data sources
 
@@ -97,12 +114,11 @@ All series are public.
 ## Current limitations
 
 - This is a single-equation consumption model, not the full multi-equation LIVES system. Wealth, debt, house prices and credit conditions are taken as conditioning variables rather than jointly modelled. See [Scoping decision required](#scoping-decision-required--lives-extension).
-- λ flips sign between the full and pre-COVID samples for Specs 1–3, indicating that the GFC/COVID dummies are load-bearing in the aggregate-wealth specifications. The disaggregated specs (4–6) are noticeably more stable across the two samples.
-- `networth_y` carries the wrong theoretical sign in Specs 1–3. This is the empirical motivation for moving to the disaggregated-wealth specifications.
-- Heteroskedasticity is rejected in every full-sample spec. Newey-West HAC standard errors are reported, but the underlying issue is largely event-driven (GST, GFC, COVID) rather than a pure variance-scaling problem.
-- No formal cointegration test is reported in the current output set; adding one is on the in-progress list above.
-- The estimation sample begins 1988Q3, bound by ABS 5232035 (household balance sheet). Earlier consumption and income data exist but cannot be used without back-extrapolating the wealth series.
-- Cohort and demographic terms — the prime working-age population share, the mortgage cash-flow burden, and the first-home-buyer loan share — are constructed in the data step but only some are wired into the estimation specifications as of writing.
+- The estimation sample begins 1988Q4, bound by ABS 5232035 (household balance sheet). Williams' canonical 4-knot CCI (1979/1992/1998/2007) is at the median of a random-knot placebo distribution on this sample (only one knot survives sign-prior reduction); the maximal-GETS reduction is the methodological response. Sample back-extension to ~1975 would resolve the truncated-CCI identification.
+- The implied long-run γ on individual wealth terms is roughly a quarter of Williams' published values under canonical Italy LP, attributed to the same truncated-CCI variation problem.
+- Heteroskedasticity is structural in every full-sample spec. Newey-West HAC standard errors are reported.
+- The joint SUR consumption-plus-PI block currently fails on a CHOLMOD singular-matrix error under the new Italy LP sample; not a binding gap for the WP narrative.
+- Out-of-sample forecasting at h ≥ 4 quarters does not systematically beat random-walk-with-drift — a standard "macro forecasting puzzle" finding the WP records honestly.
 
 ## Scoping decision required — LIVES extension
 

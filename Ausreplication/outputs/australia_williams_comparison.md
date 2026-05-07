@@ -34,12 +34,12 @@ Showing both forms below to disentangle the channels:
 
 | Term | Williams γ | Williams implied OLS (γ × \|λ\|) | Our OLS | Our γ (= OLS / \|λ\|) | OLS gap | γ gap |
 |------|-----------:|----------------------------------:|--------:|---------------------:|--------:|------:|
-| **λ** | -0.2860 | (same) | -0.0525 | (same) | -82% | (same) |
-| Housing `ha_y` | 0.0488 | 0.0140 | 0.0148 | 0.2817 | +6% | +477% |
-| Illiquid `eq_y + super_y` | 0.0220 (calibrated) | 0.0063 | 0.0567 | 1.0807 | +801% | +4812% |
-| Net liquid `nla_y` | 0.1590 | 0.0455 | 0.0407 | 0.7752 | -11% | +388% |
-| log(HP/y) | -0.1300 | -0.0372 | -0.0310 | -0.5908 | — | — |
-| ψ (PI weight) at CCI=0 | 0.2000 (calibrated) | 0.0572 | -0.2013 | -3.8366 | — | — |
+| **λ** | -0.2860 | (same) | -0.2183 | (same) | -24% | (same) |
+| Housing `ha_y` | 0.0488 | 0.0140 | 0.0062 | 0.0283 | -56% | -42% |
+| Illiquid `eq_y + super_y` | 0.0220 (calibrated) | 0.0063 | -0.0094 | 0.0431 | -249% | +96% |
+| Net liquid `nla_y` | 0.1590 | 0.0455 | 0.0088 | 0.0401 | -81% | -75% |
+| log(HP/y) | -0.1300 | -0.0372 | -0.0003 | -0.0012 | — | — |
+| ψ (PI weight) at CCI=0 | 0.2000 (calibrated) | 0.0572 | 0.3021 | 1.3837 | — | — |
 
 ## Spec 8 (CCI-interaction) match
 
@@ -49,9 +49,9 @@ with our reduced-form 2-knot Williams CCI (1998 + 2007 only — the 1979 and
 
 | Williams term | Williams γ | Spec 8 OLS coef | Spec 8 implied γ | Note |
 |---|---:|---:|---:|---|
-| α_c1 (r × CCI) | -0.8710 | 0.0003 | 0.0022 | Sign FAIL on our sample (small +ve) |
-| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | 0.0009 | 0.0075 | Sign agrees; magnitude smaller |
-| ψ_1 (log(y^p/y) × CCI) | 0.9300 | -0.0399 | -0.3304 | Williams calibrates; we estimate freely (sign FAIL) |
+| α_c1 (r × CCI) | -0.8710 | 0.0024 | 0.0096 | Sign FAIL on our sample (small +ve) |
+| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | -0.0012 | -0.0051 | Sign agrees; magnitude smaller |
+| ψ_1 (log(y^p/y) × CCI) | 0.9300 | 0.4228 | 1.7239 | Williams calibrates; we estimate freely (sign FAIL) |
 
 ## Where we agree, where we differ
 
