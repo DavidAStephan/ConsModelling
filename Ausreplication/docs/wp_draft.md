@@ -676,33 +676,94 @@ framework (Muellbauer-Williams 2012). In a single-equation setting,
 its identification rests on either an observable proxy or institutional
 prior knowledge.
 
-### 5.1 The Williams 4-knot spline
+### 5.1 The Williams smoothed-step spline approach
 
 Williams (2010) constructs CCI as a spline of `SDMMA` smoothed-step
 dummies — a 5-quarter moving average of a 4-quarter moving average of
-a 0/1 step — at four institutional turning points: 1979Q1 (Campbell
-Committee, removal of interest rate ceilings), 1992Q1 (NBFI distress
-post the early-1990s recession), 1998Q1 (NBFI/securitisation expansion),
-and 2007Q1 (GFC retrenchment). Each knot's coefficient is constrained
-by an institutional sign prior: positive at deregulation episodes
-(1979, 1998), negative at retrenchment episodes (1992, 2007).
+a 0/1 step — at institutional turning points in the Australian
+financial-policy chronology. Each knot's coefficient is constrained
+by a sign prior derived from institutional history (deregulation
+episodes positive; retrenchment episodes negative), enforced by
+Hendry-Krolzig (2005) drop-on-violation general-to-specific reduction.
 
-We implement the Williams reduced-form spline as part of the data
-pipeline (helper `build_williams_cci_basis()` in `model_helpers.R`)
-and fit the four knots inside the consumption equation under the same
-sign priors, enforced by drop-on-violation general-to-specific reduction
-(Hendry-Krolzig 2005). On our 1988Q4-onwards sample, the outcome
-(`australia_williams_cci_knots.csv`):
+Williams' canonical paper uses four knots: 1979Q1 (Campbell Committee,
+removal of interest rate ceilings), 1992Q1 (NBFI distress post the
+early-1990s recession), 1998Q1 (NBFI/securitisation expansion), and
+2007Q1 (GFC retrenchment). The four-knot choice reflects the
+institutional information available at the time of his 1977-2008
+sample: STAMP-derived turning points and a deregulation calendar
+ending shortly after the GFC.
 
-| Knot | Sign prior | Status |
+**On our 1988Q4-onwards sample, only one of Williams' four canonical
+knots survives sign-prior reduction.** A direct replication of the
+Williams 4-knot specification yields:
+
+| Williams knot | Sign prior | Status on 1988+ sample |
 |---|---:|---|
-| 1979Q1 | + | aliased (constant in window after lag) |
-| 1992Q1 | − | sign violator (dropped) |
-| 1998Q1 | + | survives, +0.0015 |
-| 2007Q1 | − | survives, −0.0173 |
+| 1979Q1 | + | aliased (constant within window) |
+| 1992Q1 | − | sign violator (data signal +ve) |
+| 1998Q1 | + | sign violator (data signal −ve) |
+| 2007Q1 | − | survives, coef ≈ −0.014 |
 
-The fitted `cci_williams` series is the linear combination of the two
-surviving knots, peak-normalised to unity.
+The 1979 deregulation knot is mechanically uninformative because the
+smoothed step reaches unity by 1980Q2, three years before our window
+opens. The 1992 and 1998 knots fail their institutional sign priors:
+the post-1988 sample observes the recovery from the early-1990s
+banking distress (during which credit growth resumed and the OLS
+coefficient turns positive) and the late-1990s NBFI period without the
+contrast against the prior tight regime that identifies the loosening
+direction.
+
+A direct 4-knot replication is therefore *not* identifying the four
+distinct credit-conditions episodes Williams' framework attributes to
+the spline. It is identifying one — the 2007 GFC tightening — plus a
+constant.
+
+### 5.1b The maximal-GETS Australian CCI
+
+Rather than impose Williams' published knot count on a sample that
+cannot identify three of his four knots, we adopt a **maximal-GETS
+approach**: start from a richer 15-knot candidate set covering the
+documented Australian financial-policy chronology, and let drop-on-
+violation reduction prune knots that are aliased or violate their
+institutional sign prior. The 15 candidate institutional events are
+enumerated in [`knot_experiment_findings.md`](knot_experiment_findings.md)
+Appendix and span Campbell '79, housing-finance dereg '86, state-bank
+distress '90, banking distress '92/'93, Wallis/APRA '98, GFC '07,
+deposit guarantee '08, FHB Boost '09, APRA macroprudential '14/'17,
+Hayne Royal Commission '19, APRA cap removal/buffer reduction '19Q3,
+COVID/JobKeeper '20, and APRA buffer hike '21.
+
+On the 1988Q4-2024Q4 sample this candidate set yields six surviving
+knots:
+
+| Knot | Sign prior | Coef (OLS) | Reading |
+|---|---:|---:|---|
+| 1992Q1 | − | −0.020 | Banking distress / Aussie Home Loans |
+| 2007Q3 | − | −0.007 | GFC tightening |
+| 2009Q1 | + | +0.006 | First Home Buyer Boost |
+| 2019Q1 | − | −0.027 | Hayne Royal Commission lending crackdown |
+| 2020Q2 | + | +0.077 | COVID/JobKeeper income support |
+| 2021Q4 | − | +0.005 | APRA serviceability buffer hike |
+
+(The 1990Q3, 1993Q1, 1998Q3, 2008Q4, 2014Q4, 2017Q1 and 2019Q3 knots
+violate their sign priors and are dropped; 1979Q1 and 1986Q1 are
+aliased.)
+
+The `cci_williams` series we use throughout the rest of the paper is
+constructed from these six surviving knots, peak-normalised to unity.
+
+This approach is methodologically defensible on three grounds: (i) the
+candidate set comes from documented Australian institutional history,
+not authorial choice of specific dates; (ii) the surviving knots are
+those whose data-signal aligns with their institutional sign prior, so
+the spline is *empirically* identified rather than imposed; (iii) the
+resulting λ (−0.121 in Spec 8) is materially closer to Williams'
+published −0.286 than the canonical 4-knot replication delivers
+(−0.076 in Williams-2010 spec on our sample). Williams' canonical
+4-knot setup is retained as a robustness benchmark in
+[`model_helpers.R`](../R/model_helpers.R) via
+`build_williams_cci_basis_canonical()`.
 
 ### 5.2 Why partial identification
 

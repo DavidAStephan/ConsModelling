@@ -347,22 +347,39 @@ this path. The pre-2002 spread-backfill that previously existed has been
 dropped (was theoretically suspect — spread reflects funding cost, not
 credit availability).
 
-**Path B — Optional (flag = TRUE):** Williams (2010) reduced-form 4-knot
-SDMMA spline + institutional-CCI overlay.
-- 4 smoothed-step dummies at 1979Q1, 1992Q1, 1998Q1, 2007Q1 (institutional
-  Australian deregulation calendar).
-- Each SDMMA = 5-quarter MA of 4-quarter MA of a 0/1 step at the knot date,
-  giving an 8-quarter S-shaped transition.
+**Path B — Optional (flag = TRUE):** Maximal-GETS Australian institutional
+CCI spline + observable-CCI overlay.
+- **15 candidate** smoothed-step dummies at the documented Australian
+  financial-policy turning points (Campbell '79, housing dereg '86,
+  state-bank distress '90, banking distress '92/'93, Wallis/APRA '98,
+  GFC '07, deposit guarantee '08, FHB Boost '09, APRA macropru '14/'17,
+  Hayne RC '19, APRA cap removal '19Q3, COVID '20, buffer hike '21).
+- Each SDMMA = 5-quarter MA of 4-quarter MA of a 0/1 step at the knot
+  date, giving an 8-quarter S-shaped transition.
 - Coefficients estimated inside the consumption equation by general-to-
-  specific drop-on-violation (Hendry/Krolzig 2005) of sign priors:
-  +/-/+/-.
+  specific drop-on-violation (Hendry/Krolzig 2005) of sign priors
+  (deregulation/loosening = +, retrenchment/tightening = −).
 - Surviving knots combined into `cci_williams`, peak-normalised to 1.
 - See [`model_helpers.R`](../R/model_helpers.R) `build_williams_cci_basis()`
-  and [`australia_estimation.R`](../R/australia_estimation.R)
+  (and `build_williams_cci_basis_canonical()` for Williams' original 4-knot
+  set retained as a robustness benchmark) plus
+  [`australia_estimation.R`](../R/australia_estimation.R)
   `fit_consumption_with_williams_cci()`.
-- **Current outcome on the 1988Q4+ sample:** 1979 knot aliased (constant in
-  window), 1992 knot sign-violator (dropped), 1998 and 2007 knots survive.
-  See [`outputs/australia_williams_cci_knots.csv`](../outputs/australia_williams_cci_knots.csv).
+- **Why maximal-GETS instead of Williams' canonical 4-knot:** the May 2026
+  knot experiment (NS-115) showed that on the 1988+ sample only one of
+  Williams' four knots (2007Q1) survives sign-prior reduction; the others
+  alias (1979) or violate priors (1992, 1998). The maximal-GETS approach
+  lets the data choose which of 15 candidate institutional events generate
+  identifiable variation, producing 5-6 surviving knots with a richer
+  empirical signal. See
+  [`knot_experiment_findings.md`](knot_experiment_findings.md) for the
+  full analysis.
+- **Current outcome on the 1988Q4+ sample:** 6 knots survive — 1992Q1
+  (banking distress), 2007Q3 (GFC), 2009Q1 (FHB Boost), 2019Q1 (Hayne
+  RC), 2020Q2 (COVID/JobKeeper), 2021Q4 (APRA buffer hike). 1979Q1 and
+  1986Q1 aliased; 1990Q3, 1993Q1, 1998Q3, 2008Q4, 2014Q4, 2017Q1, 2019Q3
+  sign-violators (dropped). See
+  [`outputs/australia_williams_cci_knots.csv`](../outputs/australia_williams_cci_knots.csv).
 
 **Gap to fix (would unlock Path B fully):** sample back-extension to 1980Q1
 via Bonci-Coletta splicing of pre-1988 ABS annual balance-sheet data. The

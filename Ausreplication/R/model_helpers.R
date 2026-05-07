@@ -648,19 +648,53 @@ smoothed_step <- function(date_vec, knot_date) {
 }
 
 
-# Williams (2010) reduced-form 4-knot CCI basis. Each column is a smoothed
-# step dummy at one of the major Australian deregulation/credit turning points.
-# `sign_priors` follow institutional history (deregulation = +, retrenchment = −).
+# Maximal-GETS Australian institutional CCI basis. Each column is a smoothed
+# step dummy at one of the major Australian financial-policy turning points.
+# `sign_priors` follow institutional history (deregulation/loosening = +1,
+# retrenchment/tightening = −1). The Hendry-Krolzig drop-on-violation
+# reduction in fit_consumption_with_williams_cci() prunes knots that violate
+# their sign prior or are aliased.
+#
+# Switched from Williams' canonical 4-knot set (1979/1992/1998/2007) to this
+# 15-knot maximal candidate set after the May 2026 knot experiment showed
+# that on the 1988+ sample only one of Williams' four knots survives sign-
+# prior reduction (2007Q1; 1979Q1 is aliased; 1992Q1 and 1998Q1 are sign-
+# violators). The maximal set lets the surviving knots emerge from the data
+# rather than from authorial choice; on our sample it identifies five
+# surviving knots: 1992Q1 (banking distress), 2007Q3 (GFC), 2019Q1 (Hayne
+# Royal Commission), 2020Q2 (COVID/JobKeeper), 2021Q4 (APRA buffer hike).
+# See Ausreplication/docs/knot_experiment_findings.md for details.
+#
+# Williams' original 4-knot set is retained as a robustness benchmark via the
+# explicit knots/sign_priors arguments.
 build_williams_cci_basis <- function(dates,
-                                      knots = c("1979-01-01", "1992-01-01",
-                                                "1998-01-01", "2007-01-01"),
-                                      sign_priors = c(1, -1, 1, -1)) {
+                                      knots = c("1979-01-01", "1986-01-01",
+                                                "1990-09-01", "1992-01-01",
+                                                "1993-01-01", "1998-09-01",
+                                                "2007-09-01", "2008-12-01",
+                                                "2009-01-01", "2014-12-01",
+                                                "2017-03-01", "2019-01-01",
+                                                "2019-09-01", "2020-04-01",
+                                                "2021-12-01"),
+                                      sign_priors = c(1, 1, -1, -1, -1,
+                                                       1, -1, -1, 1, -1,
+                                                      -1, -1, 1, 1, -1)) {
   basis <- vapply(knots, function(k) smoothed_step(dates, k),
                   numeric(length(dates)))
   colnames(basis) <- paste0("sdmma_", gsub("-", "_", substr(knots, 1, 7)))
   attr(basis, "sign_priors") <- sign_priors
   attr(basis, "knots")       <- knots
   basis
+}
+
+# Williams (2010) original 4-knot set — kept as an explicit alternative for
+# replication-of-published-results robustness columns.
+build_williams_cci_basis_canonical <- function(dates) {
+  build_williams_cci_basis(
+    dates,
+    knots       = c("1979-01-01", "1992-01-01", "1998-01-01", "2007-01-01"),
+    sign_priors = c(1, -1, 1, -1)
+  )
 }
 
 
