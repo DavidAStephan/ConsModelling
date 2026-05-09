@@ -1,0 +1,7 @@
+metric,value
+"OLS rho(eps_C, eps_H)",0.0006
+"SUR rho(eps_C, eps_H)",0.0007
+SUR sigma_CC,0.000072
+SUR sigma_HH,0.000317
+SUR sigma_CH,0.000000
+Verdict,NEGLIGIBLE cross-equation linkage — single-equation OLS approximately efficient

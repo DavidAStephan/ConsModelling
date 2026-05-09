@@ -1,0 +1,11 @@
+metric,value
+Canonical maximal-GETS adj R^2,0.6856
+Canonical maximal-GETS |lambda|,-0.2150
+Canonical surviving knots,7
+Canonical adj R^2 percentile rank,64th
+Canonical |lambda| percentile rank,36th
+Placebo n,200
+Placebo adj R^2 median,0.6833
+Placebo |lambda| median,0.2230
+Placebo surviving knots median,8
+Verdict,WEAK SUPPORT — institutional choice above median but not far

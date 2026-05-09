@@ -7,9 +7,10 @@ change.
 
 If you are looking for a summary of:
 
-- the **modelling content** (specifications, results, decisions) → see [`project_status.md`](project_status.md)
+- the **modelling content** (specifications, results, decisions) → see [`wp_draft.md`](wp_draft.md) §3 (data), §4 (model), §6 (specs), §7 (results)
 - the **data sources** (ABS catalogues, RBA tables, the master dataset) → see [`data.md`](data.md)
 - the **paper draft** → see [`wp_draft.md`](wp_draft.md)
+- the **forward-looking plan** (what's next) → see [`next_steps_plan_2026.md`](next_steps_plan_2026.md)
 - the **outstanding modelling work** → see [`next_steps.md`](next_steps.md)
 
 This guide is the **code-level companion** to those documents.
@@ -750,4 +751,5 @@ yourself wondering "what is `australia_X.csv`?".
 ---
 
 **Generated alongside the May 2026 repo cleanup. Cross-linked with
-`data.md`, `project_status.md`, `wp_draft.md`, and `next_steps.md`.**
+`data.md`, `wp_draft.md`, `next_steps.md` (historical backlog), and
+`next_steps_plan_2026.md` (forward-looking tier plan).**

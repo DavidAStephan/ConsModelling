@@ -886,6 +886,37 @@ build_williams_cci_basis_canonical <- function(dates) {
   )
 }
 
+# Sectional sign-prior CCI basis (Williams Aust paper §5.1). Williams
+# imposes sign priors over periods rather than knot-by-knot:
+#   1982-1990  : non-negative (financial deregulation)
+#   1990-1993  : non-positive (banking sector distress)
+#   1993-2007  : non-negative (new entrants, securitisation, debt innovation)
+#   2007+      : non-positive (GFC tightening; extended for our 1976-2024
+#                sample to cover 2014/2017 APRA macroprudential, 2019 Hayne RC,
+#                with a 2020-21 COVID easing interlude that gets a +1 prior)
+#
+# Each period contributes ONE knot at its onset date. The basis is sparser
+# than the maximal-GETS 15-knot set (only one knot per regime), so the
+# implied CCI is monotonic within each period by construction. This is a
+# tighter constraint than knot-by-knot point priors and is the form Williams
+# actually estimated (per Aust paper §5.1).
+build_williams_cci_basis_sectional <- function(dates) {
+  # Period definitions: (start_date, sign_prior, label)
+  periods <- list(
+    list(start = "1982-01-01", sign =  1L, label = "deregulation_1982"),
+    list(start = "1990-09-01", sign = -1L, label = "banking_distress_1990"),
+    list(start = "1993-01-01", sign =  1L, label = "new_entrants_1993"),
+    list(start = "2007-09-01", sign = -1L, label = "GFC_2007"),
+    list(start = "2014-12-01", sign = -1L, label = "APRA_2014"),
+    list(start = "2017-03-01", sign = -1L, label = "APRA_2017"),
+    list(start = "2020-04-01", sign =  1L, label = "COVID_easing_2020"),
+    list(start = "2021-12-01", sign = -1L, label = "APRA_buffer_2021")
+  )
+  knots       <- vapply(periods, function(p) p$start, character(1))
+  sign_priors <- vapply(periods, function(p) p$sign,  integer(1))
+  build_williams_cci_basis(dates, knots = knots, sign_priors = sign_priors)
+}
+
 
 build_credit_regime_basis <- function(dates) {
   dates <- as.Date(dates)

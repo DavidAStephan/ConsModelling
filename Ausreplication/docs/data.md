@@ -6,7 +6,10 @@ or fragile. The intended reader is someone who needs to either rerun the
 pipeline cold, swap a series for a better one, or back-extend the sample.
 
 The pipeline assembles a single `master` tibble keyed on quarterly dates
-1980Q1–2024Q4 (n=180). All data construction lives in
+1976Q3–2024Q4 (n=194). The spine was extended back from 1980Q1 in May 2026
+once the public-data backbone for NS-020 phase 1 was in place (TRYM long
+HPI; RBA D03 M3 monetary aggregate; RBA D02 total credit splice). All data
+construction lives in
 [australia_data_download.R](../R/australia_data_download.R). Estimation
 ([australia_estimation.R](../R/australia_estimation.R)) only renames a few
 columns and adds derived terms; it does not download anything.
@@ -245,6 +248,115 @@ substantially different scale.
   by default). If `USE_INSTITUTIONAL_CCI` is flipped to `TRUE`, this series
   becomes load-bearing.
 
+### 3.3 RBA D03 — Monetary Aggregates (M3)
+- **File:** [`data_raw/d03hist.xlsx`](../data_raw/d03hist.xlsx) (downloaded from
+  https://www.rba.gov.au/statistics/tables/xls/d03hist.xlsx, May 2026)
+- **Used as:** `m3_aggregate` (column added in NS-020 phase 1)
+- **Series ID:** `DMAM3N` — M3, original (not seasonally adjusted), $ billion
+- **Coverage:** 1959Q3+ in current vintage (covers the full TRYM/HPI window)
+- **Frequency:** monthly, averaged to quarterly via `monthly_to_quarterly()`
+- **Role:** unlocks pre-1988 liquid-asset proxy. The existing `nla_y` is
+  built from ABS B20 deposits (1988Q3+ only); `m3_aggregate` is the longer
+  public-data alternative for back-extension exercises.
+- **Caveat:** M3 is total economy-wide; for a household-only liquid-asset
+  series, multiply by the household share of M3. Williams (2010) uses the
+  household factor income share from ABS 5204-06 as the household-share
+  proxy. Not yet wired in here; `m3_aggregate` is provided raw.
+
+### 3.4 RBA D02 — Lending and Credit Aggregates
+- **File:** [`data_raw/d02hist.xlsx`](../data_raw/d02hist.xlsx) (downloaded from
+  https://www.rba.gov.au/statistics/tables/xls/d02hist.xlsx, May 2026)
+- **Used as:** `credit_total_d02` (column added in NS-020 phase 1)
+- **Series IDs:** `DLCACN` (Total credit, original, 1976-09 to 2019-06)
+  growth-rate spliced onto `DLCACSFN` (Total credit including select
+  financial businesses, the post-2019 RBA reform successor, 2019-07+)
+- **Coverage:** 1976Q3+ in current vintage
+- **Frequency:** monthly, averaged to quarterly
+- **Splice convention:** no quarterly overlap exists at the 2019Q2/Q3
+  boundary because the RBA replaced DLCACN with DLCACSFN at the July 2019
+  conceptual reform. The pipeline anchors levels at the boundary
+  (`first_post * pre[t] / last_pre`) so the join is continuous in level;
+  the implicit growth rate at the boundary is exactly zero (no overlap to
+  estimate it from). For analyses that hinge on the 2019Q2→Q3 quarter
+  specifically, treat with caution.
+- **Caveat:** This is *total* credit, not housing-specific. The
+  housing-specific series in D02 (`DLCACOHN`, `DLCACIHN`) only goes back
+  to 1990Q1 in current vintage and so cannot extend the housing-credit
+  history pre-1990. For pre-1990 housing credit decomposition, an older
+  RBA vintage or a non-public source would be needed.
+
+### 3.4a Disaggregated wealth proxies (`ha_y_proxy`, `nla_y_proxy`, `eq_y_proxy`, `super_y_proxy`)
+- **Construction:** built in the derived-variables block of
+  `australia_data_download.R` after `networth_y_proxy`. Each proxy
+  equals the official series for t ≥ 1988Q3 by construction; for
+  t < 1988Q3 it back-casts via the most relevant available aggregate.
+  - `ha_y_proxy = housing_wealth_proxy / ydi_ann_nom` — uses the
+    `hpi × pop_millions` back-cast of housing wealth.
+  - `fin_deposits_proxy[t] = fin_deposits[1988Q3] × m3_household_proxy[t] / m3_household_proxy[1988Q3]`
+    (deposits back-cast via household-allocated M3).
+  - `fin_loans_proxy[t] = fin_loans[1988Q3] × credit_total_d02[t] / credit_total_d02[1988Q3]`
+    (loans back-cast via RBA total credit).
+  - `nla_y_proxy = (fin_deposits_proxy − fin_loans_proxy) / ydi_ann_nom`.
+  - `eq_y_proxy`: held constant at the 1988Q3 value pre-1988 (Option B
+    in the methodology — Australian household equity holdings were a
+    small wealth share in the late-1970s/early-80s; the assumption is
+    straightforward to upgrade to ASX-All-Ords back-cast if needed).
+  - `super_y_proxy`: linear ramp from 0.1 × 1988Q3 value at 1976Q3
+    to 1988Q3 value (matches Williams 2010 Table A.1 ballpark for the
+    pre-Superannuation-Guarantee era; SGC mandate started 1992).
+- **Sum-of-disaggregated cross-check** (`networth_y_disagg_proxy`)
+  also exposed as a column. Note this differs from the aggregate
+  `networth_y_proxy` (built from M3 + housing) and from the official
+  `networth_y` (which uses ABS A83722648X closing net worth, the
+  *broader* definition that includes life-office reserves,
+  unincorporated business equity, etc.). At 1988Q3:
+  - networth_y (broad)        ≈ 5.37
+  - networth_y_proxy (agg)    = 5.37 (anchored to broad)
+  - networth_y_disagg_proxy   ≈ 4.04 (narrow definition: deposits +
+                                       equities + super + housing − loans)
+  The 25% gap is the "other" wealth component absent from the
+  narrow definition. For Spec 4–7 fits, which use the disaggregated
+  components individually, the disagg sum is the right reference.
+- **Coverage:** all four proxies have 194 non-NA obs from 1976Q3.
+- **Caveats** (also flagged in the data download script):
+  - `nla_y_proxy` assumes household shares of M3 and total credit are
+    stable pre-1988 — defensible for phase 1.
+  - `eq_y_proxy` constant pre-1988 ignores the ASX boom/bust dynamics
+    of the late 1970s/early 80s.
+  - `super_y_proxy` linear-ramp ignores actual super-fund growth
+    chronology (e.g. life office balances, pre-SGC voluntary super).
+  - All four use the boundary anchor 1988Q3 and inherit any noise in
+    the official series at that single quarter; not robust to a
+    different anchor choice.
+
+### 3.4b Household-allocated M3 (`m3_household_proxy`)
+- **Construction:** `m3_household_proxy = m3_aggregate × wage_share / 100`
+  (built in the derived-variables block in section 3 of
+  `australia_data_download.R`).
+- **Rationale:** Williams (2010) used the household factor income share
+  to allocate M3 to the household sector for the pre-1988 liquid-asset
+  splice. The wage share of GDP (compensation of employees / GDP) is a
+  defensible approximation: it captures most of household factor income
+  (wages + transfers + property income tracks wage share over time). For
+  a phase-1 back-extension this is sufficient; for a fully Williams-faithful
+  splice, replace `wage_share` with the broader `(compensation + mixed
+  income + property income receivable) / GDP` series.
+- **Coverage:** 1976Q3+ (limited by `wage_share` in `household_income.csv`).
+- **Role:** longer-sample alternative to the B20 deposit-derived `nla_y`,
+  which only starts 1988Q3. Used as a candidate proxy for aggregate
+  liquid-asset normalisation when Spec 1–3 are refitted on the extended
+  sample.
+
+### 3.5 RBA D01 — Growth in Selected Financial Aggregates
+- **File:** [`data_raw/d01hist.xlsx`](../data_raw/d01hist.xlsx) (downloaded from
+  https://www.rba.gov.au/statistics/tables/xls/d01hist.xlsx, May 2026)
+- **Status:** Downloaded but **not yet wired into the pipeline**. Provides
+  monthly growth rates of the same aggregates whose levels are in D02.
+  Williams (2010) used D01 housing-credit growth rates to back-cast D02
+  level pre-1976; in the current vintage D02 already extends to 1976Q3 so
+  D01 is not strictly needed for back-extension. Retained for future use
+  (e.g. validating splices, or constructing direct growth-rate series).
+
 ---
 
 ## 4. Project-supplied CSVs
@@ -293,7 +405,54 @@ substantially different scale.
   `mortgage_payment_burden_rba` over the post-2009 sample for an explicit
   measured-vs-synthetic comparison.
 
-### 4.3 `outputs/italy_table1_results.csv` (reference benchmark)
+### 4.3 `data_raw/house_price_history_long.csv`
+- **Format:** 236 rows, two columns: row-name date in `m/d/Y` format
+  (e.g. `9/1/1959`), `ph_long` (numeric, nominal index, normalised to
+  ~1.0 around 2015–2016).
+- **Provenance:** Treasury TRYM (Treasury Macroeconomic Model)
+  historical database. Nominal, national, quarterly. Treasury's TRYM
+  splice incorporates the same legacy sources Williams (2010) used —
+  BIS Shrapnel pre-1978, REIA 1978–1986, ABS thereafter — pre-chained
+  into a single coherent series.
+- **Sample:** 1959Q3–2018Q2 (236 quarters).
+- **Role:** deepest layer of the spliced house-price series; supersedes
+  `houseprice_old.csv` where they overlap (1986Q2–2003Q3) and extends
+  coverage back to 1959Q3, three years deeper than even Williams'
+  fullest sample. Note that the master is currently restricted to the
+  1980Q1+ date spine; the deeper TRYM history is available in
+  `hpi_spliced` upstream of the master assembly and will be exploited
+  once the rest of NS-020 (deposits, housing credit, demographics)
+  lands.
+- **Splice method:** pure growth-rate chain-linking from the first
+  overlap quarter (1986Q2). TRYM's QoQ growth rates are preserved
+  exactly for 1959Q3–1986Q1; the level is pinned to the legacy series
+  at 1986Q2. By construction the join is smooth.
+
+### 4.4 `data_raw/labour_force_historic.csv`
+- **Format:** 188 quarterly rows + trailing blank rows. Columns:
+  blank-header date (`Mon-YYYY`), `pop_total` ('000), `pop_15_64` ('000),
+  `labour_force` ('000), `unemployed` ('000).
+- **Provenance:** User-supplied historical compilation. Likely sources:
+  ABS Cat 6204.0 historical labour force, ABS Year Book Australia, Foster
+  *Australian Economic Statistics 1949–50 to 1996–97*, or RBA Occasional
+  Paper No. 8.
+- **Sample:** 1964Q3–2011Q2.
+- **Role:** unblocks pre-1978 labour force / population data that ABS 6202
+  doesn't cover. Growth-rate spliced onto the modern series in section
+  2.6b of `australia_data_download.R`:
+  - `pop_15_64` → `pop_millions` (anchored at 1978Q1 first overlap quarter)
+  - `labour_force` → `labour_force` (master)
+  - `unemployed/labour_force × 100` → `unemp_rate` (replacement before 1978Q1)
+- **Side-effect:** the 6 quarters 1976Q3–1977Q4 now have non-NA values for
+  all per-capita and labour-force-derived variables (cons_real_pc,
+  ydi_real_pc, npy_real_pc, labour_transfer_real_pc, scaled_income_real_pc,
+  lf_share, etc.).
+- **`pop_total`:** also exposed as `pop_total_thousands` master column;
+  partial coverage 1964Q3–2011Q2 only (no modern equivalent in 6202).
+  Use as alternative per-capita denominator if total resident population
+  is preferred over civilian 15+.
+
+### 4.5 `outputs/italy_table1_results.csv` (reference benchmark)
 - **Format:** Hand-coded Italy reference numbers from De Bonis et al.
   (2024) Table 1, used by `build_comparison_table()` in
   `australia_estimation.R` for the cross-country comparison output
@@ -307,12 +466,13 @@ substantially different scale.
 
 ## 5. Splicing logic
 
-### 5.1 House price index (3-layer splice)
-Implemented in
-[`australia_data_download.R:599-624`](../R/australia_data_download.R#L599) via
-the `splice_hpi()` helper.
+### 5.1 House price index (4-layer splice)
+Implemented via the `splice_hpi()` helper in
+[`australia_data_download.R`](../R/australia_data_download.R) section 2.10.
 
 ```
+Layer 0 (TRYM):    house_price_history_long.csv  [1959Q3 – 2018Q2]
+       ↓ chain on first 8 quarters of overlap with legacy
 Layer 1 (LEGACY):  houseprice_old.csv     [1986Q2 – 2003Q3]
        ↓ chain on overlap with bridge
 Layer 2 (BRIDGE):  ABS 641601 RPPI 8CC    [2003Q4 – 2017Q2]
@@ -320,18 +480,23 @@ Layer 2 (BRIDGE):  ABS 641601 RPPI 8CC    [2003Q4 – 2017Q2]
 Layer 3 (CURRENT): ABS 643201 mean price  [2003Q3 – 2024Q4]
 ```
 
-The chain mechanism: for each adjacent pair, compute
-`scale = mean(value_overlay / value_base)` over their overlap, multiply the
-base series by `scale`, then bind the rescaled base to the overlay. This
-preserves *growth rates* of the base while pinning *levels* to the overlay.
-Inevitable distortion: the overlap window is short (a few quarters between
-RPPI start and TVD start), so the scale factor is sensitive to those
-quarters.
+The chain mechanism: pure growth-rate chain-linking (standard ABS practice).
+For each adjacent pair, identify the first quarter where both series are
+non-NA, then back-cast the base series via its own QoQ growth rates from
+that anchor:
 
-**Gap to consider:** the splice could be replaced by a single longer source
-(e.g. CoreLogic's historical hedonic series, which goes back to 1980 with a
-single methodology). Trade-off: CoreLogic is proprietary; the ABS-only
-chain is reproducible from public data.
+```
+chained[t] = overlay[t_anchor] * (base[t] / base[t_anchor])  for t < t_anchor
+chained[t] = overlay[t]                                       for t >= t_anchor
+```
+
+This preserves the base series' growth rates exactly while pinning the
+level to the overlay at the join. By construction there is no level
+discontinuity at any join. Replaces an earlier `mean(overlay/base)` over
+the full overlap, which produced step jumps at the boundaries when the
+overlap ratio drifted (notably a –17% step at 1986Q2 under the long
+TRYM↔legacy overlap, and a +10% step at 2011Q2→Q3 under the bridge↔current
+overlap). Both are fixed under the growth-rate convention.
 
 ### 5.2 Credit-conditions index (CCI) — multi-source
 The CCI currently has **two operational paths** controlled by the

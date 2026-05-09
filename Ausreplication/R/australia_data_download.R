@@ -17,7 +17,11 @@
 #   - ABS 6202001  Labour Force (unemployment rate, population 15+)
 #   - ABS 3101059  Estimated Resident Population (for per-capita deflation)
 #   - RBA f06hist  Standard Variable Mortgage Rate (historical)
+#   - RBA d02hist  Lending and Credit Aggregates (total credit 1976Q3+)
+#   - RBA d03hist  Monetary Aggregates (M3 1959Q3+)
 #   - houseprice_old.csv  Pre-2003 house price back-fill
+#   - house_price_history_long.csv  Treasury TRYM model historical
+#                  nominal national house price index (1959Q3+)
 #
 # Output:
 #   outputs/australia_model_dataset.csv   — long-format coverage summary
@@ -111,6 +115,26 @@ monthly_to_quarterly <- function(df, date_col = "date", value_col = "value") {
     select(date, value)
 }
 
+# Read an RBA D-table by series ID. Standard RBA workbook layout:
+#   row 1  : table title
+#   row 2  : column titles
+#   row 4  : frequency
+#   row 6  : units
+#   row 11 : series IDs
+#   row 12+: data, col 1 = Excel-serial date, col k = value for series k
+read_rba_d_table <- function(path, series_id, sheet = "Data") {
+  df <- suppressMessages(read_excel(path, sheet = sheet, col_names = FALSE))
+  ids <- as.character(df[11, ])
+  col_idx <- which(ids == series_id)[1]
+  if (is.na(col_idx)) stop("series_id '", series_id, "' not found in ", path)
+  raw <- df[12:nrow(df), c(1, col_idx), drop = FALSE]
+  tibble(
+    date  = as.Date(suppressWarnings(as.numeric(unlist(raw[[1]]))),
+                    origin = "1899-12-30"),
+    value = suppressWarnings(as.numeric(unlist(raw[[2]])))
+  ) %>% filter(!is.na(date), !is.na(value)) %>% arrange(date)
+}
+
 # Annual → quarterly via spline (for population)
 annual_to_quarterly_spline <- function(ann_df, spine_dates,
                                        date_col = "date", val_col = "value") {
@@ -164,11 +188,26 @@ report_series <- function(v, name, dates) {
 }
 
 # ==============================================================================
-# SECTION 1: Date spine  (1980Q1 – 2024Q4)
+# SECTION 1: Date spine  (1976Q3 – 2024Q4)
 # ==============================================================================
+# Spine extended back to 1976Q3 (NS-020 phase 1 target). Variables sourced
+# from public data that cover the full window:
+#   - cons / income (ABS 5206)        : 1959Q3+
+#   - mortgage rate (RBA F6 hist)     : 1959Q3+
+#   - house price (TRYM splice)       : 1959Q3+
+#   - M3 monetary aggregate (RBA D03) : 1959Q3+
+#   - total credit (RBA D02 splice)   : 1976Q3+
+# Variables that remain NA pre-1978Q1 (ABS 6202 binding constraint):
+#   - unemployment rate, labour force, prime_age_share
+# Variables that remain NA pre-1988Q3 (ABS 5232 sectoral accounts):
+#   - disaggregated wealth (ha_y, eq_y, super_y, nla_y)
+#   - networth_y, debt_y
+# Specs that need wealth disaggregation are unaffected by the back-extension;
+# Spec 1-3 (aggregate net-worth) are the natural beneficiaries once an
+# aggregate net-worth proxy is built from M3 + housing wealth.
 
-message("\nDate spine: quarterly 1980Q1 to 2024Q4")
-spine_start <- as.Date("1980-01-01")
+message("\nDate spine: quarterly 1976Q3 to 2024Q4")
+spine_start <- as.Date("1976-07-01")
 spine_end   <- as.Date("2024-10-01")
 spine_dates <- seq(spine_start, spine_end, by = "quarter")
 n_spine     <- length(spine_dates)
@@ -461,6 +500,114 @@ if (nrow(lf_m) == 0L) {
     format(max(lf_q$date), "%Y-%m-%d")))
 }
 
+## 2.6b  Historical labour force back-extension (1964Q3 – 2011Q2)
+# User-supplied CSV pulling together pre-1978 series for population (total
+# and 15-64), labour force, and unemployed (counts in '000). Sources are
+# old ABS Labour Force / Year Book / Foster compilation tables (the
+# specifics are documented in data.md §3.6). Used to growth-rate-splice
+# the modern (1978+) labour force variables back through 1976Q3 and
+# beyond, unblocking per-capita variables on the extended sample.
+message("2.6b Historical labour force back-extension (labour_force_historic.csv)")
+lfh_path <- file.path(raw_dir, "labour_force_historic.csv")
+if (file.exists(lfh_path)) {
+  tryCatch({
+    lfh <- read.csv(lfh_path, stringsAsFactors = FALSE,
+                    fileEncoding = "UTF-8-BOM", check.names = FALSE)
+    # First column has a blank header and holds Mon-YYYY dates; access by
+    # index rather than by name so the empty header doesn't trip [[..]].
+    raw_dates <- as.Date(paste0("01-", lfh[[1]]), format = "%d-%b-%Y")
+    keep <- !is.na(raw_dates)
+    lfh <- lfh[keep, , drop = FALSE]
+    raw_dates <- raw_dates[keep]
+    qstart_dates <- abs_to_qstart(raw_dates)
+    pop_total_hist_q <- tibble(date = qstart_dates,
+                               value = suppressWarnings(as.numeric(lfh$pop_total))) %>%
+      filter(!is.na(date), !is.na(value)) %>% arrange(date) %>%
+      distinct(date, .keep_all = TRUE)
+    pop_1564_hist_q  <- tibble(date = qstart_dates,
+                               value = suppressWarnings(as.numeric(lfh$pop_15_64))) %>%
+      filter(!is.na(date), !is.na(value)) %>% arrange(date) %>%
+      distinct(date, .keep_all = TRUE)
+    lf_hist_q        <- tibble(date = qstart_dates,
+                               value = suppressWarnings(as.numeric(lfh$labour_force))) %>%
+      filter(!is.na(date), !is.na(value)) %>% arrange(date) %>%
+      distinct(date, .keep_all = TRUE)
+    unemp_lvl_hist_q <- tibble(date = qstart_dates,
+                               value = suppressWarnings(as.numeric(lfh$unemployed))) %>%
+      filter(!is.na(date), !is.na(value)) %>% arrange(date) %>%
+      distinct(date, .keep_all = TRUE)
+    # Historic unemployment RATE = unemployed / labour_force × 100
+    unemp_rate_hist_q <- inner_join(unemp_lvl_hist_q %>% rename(u = value),
+                                    lf_hist_q %>% rename(lf = value),
+                                    by = "date") %>%
+      transmute(date, value = 100 * u / lf)
+    message(sprintf("  historic raw: %d quarters, %s to %s",
+      nrow(unemp_rate_hist_q),
+      format(min(unemp_rate_hist_q$date), "%Y-%m-%d"),
+      format(max(unemp_rate_hist_q$date), "%Y-%m-%d")))
+
+    # Growth-rate splice the historic data onto each modern series. We
+    # reuse the splice_hpi helper (defined later in the file) by inlining
+    # the same logic here, since splice_hpi appears later in this script.
+    chain_back <- function(base, overlay_df, overlay_col) {
+      ov <- overlay_df %>% transmute(date, value = .data[[overlay_col]])
+      joined <- inner_join(base, ov, by = "date",
+                           suffix = c("_base", "_ov")) %>%
+        filter(!is.na(value_base), !is.na(value_ov)) %>% arrange(date)
+      if (nrow(joined) < 1L) return(overlay_df)
+      anchor <- joined[1, ]
+      before <- base %>%
+        filter(date < anchor$date) %>%
+        mutate(value = anchor$value_ov * value / anchor$value_base)
+      bind_rows(before %>% transmute(date, !!overlay_col := value),
+                overlay_df) %>%
+        arrange(date) %>% distinct(date, .keep_all = TRUE)
+    }
+
+    if (nrow(pop_1564_hist_q) > 0L && nrow(pop_q) > 0L) {
+      pop_q <- chain_back(pop_1564_hist_q, pop_q, "pop_thousands") %>%
+        mutate(pop_millions = pop_thousands / 1000)
+      message(sprintf("  pop (back-extended): %d obs, now %s to %s",
+        nrow(pop_q),
+        format(min(pop_q$date), "%Y-%m-%d"),
+        format(max(pop_q$date), "%Y-%m-%d")))
+    }
+    if (nrow(lf_hist_q) > 0L && nrow(lf_q) > 0L) {
+      lf_q <- chain_back(lf_hist_q, lf_q, "labour_force")
+      message(sprintf("  labour_force (back-extended): %d obs, now %s to %s",
+        nrow(lf_q),
+        format(min(lf_q$date), "%Y-%m-%d"),
+        format(max(lf_q$date), "%Y-%m-%d")))
+    }
+    if (nrow(unemp_rate_hist_q) > 0L && nrow(unemp_q) > 0L) {
+      # Unemployment RATE is a ratio (not a level), so scale-shift splicing
+      # would distort it. Use simple replacement: keep modern where modern
+      # exists; backfill with historic before modern starts.
+      modern_start <- min(unemp_q$date)
+      hist_pre <- unemp_rate_hist_q %>%
+        filter(date < modern_start) %>%
+        rename(unemp_rate = value)
+      unemp_q <- bind_rows(hist_pre, unemp_q) %>%
+        arrange(date) %>% distinct(date, .keep_all = TRUE)
+      message(sprintf("  unemp_rate (back-extended): %d obs, now %s to %s",
+        nrow(unemp_q),
+        format(min(unemp_q$date), "%Y-%m-%d"),
+        format(max(unemp_q$date), "%Y-%m-%d")))
+    }
+    # Expose pop_total as a separate master column (no modern equivalent
+    # in 6202; pop_total_hist ends 2011Q2, so it's a partial column).
+    pop_total_q <- pop_total_hist_q %>%
+      transmute(date, pop_total_thousands = value)
+    message(sprintf("  pop_total (raw historic): %d obs", nrow(pop_total_q)))
+  }, error = function(e) {
+    message("  labour_force_historic.csv parse error: ", e$message)
+    pop_total_q <<- tibble(date = as.Date(character()), pop_total_thousands = numeric())
+  })
+} else {
+  message("  labour_force_historic.csv NOT FOUND — pre-1978 labour force will remain NA")
+  pop_total_q <- tibble(date = as.Date(character()), pop_total_thousands = numeric())
+}
+
 ## 2.7  CPI / consumption deflator
 message("2.7 Consumption deflator (from 5206008 nominal / real)")
 deflator_q <- cons_real_q %>%
@@ -709,7 +856,42 @@ if (file.exists(legacy_path)) {
   }, error = function(e) message("  houseprice_old.csv parse error: ", e$message))
 }
 
-# Splice: chain link base onto overlay (both must have a `value` column)
+# Long history: house_price_history_long.csv
+# Source: Treasury TRYM (Treasury Macroeconomic Model) historical database.
+# Nominal, national, quarterly, 1959Q3 onwards. Provides the deepest layer
+# of the splice and supersedes the houseprice_old.csv legacy fill where
+# they overlap (1986Q2-2003Q3).
+trym_path <- file.path(raw_dir, "house_price_history_long.csv")
+hpi_trym_q <- tibble(date = as.Date(character()), value = numeric())
+if (file.exists(trym_path)) {
+  tryCatch({
+    trym <- read.csv(trym_path, stringsAsFactors = FALSE)
+    # Columns: first column is m/d/Y date string, value column is `ph_long`.
+    date_col <- names(trym)[1]
+    val_col  <- if ("ph_long" %in% names(trym)) "ph_long" else names(trym)[ncol(trym)]
+    parsed_dates <- as.Date(trym[[date_col]], format = "%m/%d/%Y")
+    hpi_trym_q <- tibble(
+      date  = abs_to_qstart(parsed_dates),
+      value = as.numeric(trym[[val_col]])
+    ) %>% filter(!is.na(date), !is.na(value)) %>% arrange(date)
+    message(sprintf("  hpi (TRYM long): %d obs, %s to %s",
+      nrow(hpi_trym_q),
+      format(min(hpi_trym_q$date), "%Y-%m-%d"),
+      format(max(hpi_trym_q$date), "%Y-%m-%d")))
+  }, error = function(e) message("  house_price_history_long.csv parse error: ", e$message))
+}
+
+# Splice: chain-link the BASE series onto the OVERLAY using growth rates.
+# Standard ABS chain-linking convention. Anchors the level at the first
+# overlapping quarter where both series have non-NA values, then back-casts
+# the base series via its own QoQ growth rates:
+#
+#   chained[t] = overlay[t_anchor] * (base[t] / base[t_anchor])  for t < t_anchor
+#   chained[t] = overlay[t]                                       for t >= t_anchor
+#
+# This preserves the BASE series' growth rates exactly while pinning the
+# level to the overlay at the join. No averaging over noisy overlap windows;
+# no level discontinuity at the join (by construction).
 splice_hpi <- function(base, overlay) {
   # Normalise to `value` column in both
   norm <- function(df) {
@@ -718,23 +900,29 @@ splice_hpi <- function(base, overlay) {
   }
   base    <- norm(base)
   overlay <- norm(overlay)
-  overlap <- inner_join(base, overlay, by = "date", suffix = c("_base", "_ov")) %>%
-    filter(!is.na(value_base), !is.na(value_ov))
-  if (nrow(overlap) < 4L) return(overlay)
-  scale  <- mean(overlap$value_ov / overlap$value_base, na.rm = TRUE)
+  joined <- inner_join(base, overlay, by = "date", suffix = c("_base", "_ov")) %>%
+    filter(!is.na(value_base), !is.na(value_ov)) %>%
+    arrange(date)
+  if (nrow(joined) < 1L) return(overlay)
+  anchor_date <- joined$date[1]
+  anchor_base <- joined$value_base[1]
+  anchor_ov   <- joined$value_ov[1]
   before <- base %>%
-    filter(date < min(overlay$date[!is.na(overlay$value)])) %>%
-    mutate(value = value * scale)
+    filter(date < anchor_date) %>%
+    mutate(value = anchor_ov * value / anchor_base)
   bind_rows(before, overlay) %>% arrange(date) %>% distinct(date, .keep_all = TRUE)
 }
 
-# Build spliced series: legacy → bridge → current (all as `hpi` column)
+# Build spliced series: TRYM → legacy → bridge → current (all as `hpi` column)
 hpi_spliced <- hpi_current_q %>% rename(hpi = value)
 if (nrow(hpi_bridge_q) > 0L && nrow(hpi_current_q) > 0L) {
   hpi_spliced <- splice_hpi(hpi_bridge_q, hpi_current_q) %>% rename(hpi = value)
 }
 if (nrow(hpi_legacy_q) > 0L && nrow(hpi_spliced) > 0L) {
   hpi_spliced <- splice_hpi(hpi_legacy_q, hpi_spliced) %>% rename(hpi = value)
+}
+if (nrow(hpi_trym_q) > 0L && nrow(hpi_spliced) > 0L) {
+  hpi_spliced <- splice_hpi(hpi_trym_q, hpi_spliced) %>% rename(hpi = value)
 }
 message(sprintf("  hpi (spliced): %d non-NA obs, %s to %s",
   sum(!is.na(hpi_spliced$hpi)),
@@ -775,6 +963,62 @@ non_fhb_q <- monthly_to_quarterly(non_fhb_m, value_col = "non_fhb_loans") %>%
 
 message(sprintf("  housing_loan_flow: %d obs", nrow(housing_loan_flow_q)))
 
+## 2.12  RBA D-tables: M3 monetary aggregate + total credit (back-extension)
+# Williams (2010) used these for the pre-1988 splice of liquid assets and
+# household credit. Both go back substantially further than the ABS 5232
+# household balance-sheet series (1988+) and unlock the back-extension of
+# nla_y / debt_y proxies under NS-020 phase 1.
+message("2.12 RBA D-tables (M3 + total credit, back-extension)")
+
+m3_aggregate_q   <- tibble(date = as.Date(character()), m3_aggregate = numeric())
+credit_total_d02_q <- tibble(date = as.Date(character()), credit_total_d02 = numeric())
+
+# M3 (DMAM3N — original, $bn). Full coverage 1959-07 to current.
+d03_path <- file.path(raw_dir, "d03hist.xlsx")
+if (file.exists(d03_path)) {
+  tryCatch({
+    m3_m <- read_rba_d_table(d03_path, "DMAM3N")
+    m3_aggregate_q <- monthly_to_quarterly(m3_m, value_col = "value") %>%
+      rename(m3_aggregate = value)
+    message(sprintf("  m3_aggregate (D03 DMAM3N): %d obs, %s to %s",
+      nrow(m3_aggregate_q),
+      format(min(m3_aggregate_q$date), "%Y-%m-%d"),
+      format(max(m3_aggregate_q$date), "%Y-%m-%d")))
+  }, error = function(e) message("  D03 M3 parse error: ", e$message))
+}
+
+# Total credit: DLCACN (1976-09 to 2019-06) growth-rate spliced onto
+# DLCACSFN (2019-07+, the post-2019 RBA reform successor). No quarterly
+# overlap, so the splice applies the level continuity at the boundary.
+d02_path <- file.path(raw_dir, "d02hist.xlsx")
+if (file.exists(d02_path)) {
+  tryCatch({
+    credit_pre_m  <- read_rba_d_table(d02_path, "DLCACN")     # pre-2019 reform
+    credit_post_m <- read_rba_d_table(d02_path, "DLCACSFN")   # post-2019 reform
+    credit_pre_q  <- monthly_to_quarterly(credit_pre_m,  value_col = "value")
+    credit_post_q <- monthly_to_quarterly(credit_post_m, value_col = "value")
+    # Splice: post-reform is the modern overlay; pre-reform is the legacy base.
+    # No overlap quarter (DLCACN ends 2019Q2; DLCACSFN starts 2019Q3), so
+    # the helper anchors at the first joined date — which falls back to the
+    # overlay's first date if no overlap. To preserve continuity at the
+    # boundary, we do an explicit growth-rate chain via the last pre-reform
+    # value and the first post-reform value.
+    last_pre  <- tail(credit_pre_q, 1)
+    first_post <- head(credit_post_q, 1)
+    # Scale pre-reform values to align with post-reform series at the boundary,
+    # using a growth-rate convention: pre_rescaled[t] = first_post * pre[t]/last_pre
+    pre_rescaled <- credit_pre_q %>%
+      mutate(value = first_post$value * value / last_pre$value)
+    credit_total_d02_q <- bind_rows(pre_rescaled, credit_post_q) %>%
+      arrange(date) %>% distinct(date, .keep_all = TRUE) %>%
+      rename(credit_total_d02 = value)
+    message(sprintf("  credit_total_d02 (D02 DLCACN→DLCACSFN): %d obs, %s to %s",
+      nrow(credit_total_d02_q),
+      format(min(credit_total_d02_q$date), "%Y-%m-%d"),
+      format(max(credit_total_d02_q$date), "%Y-%m-%d")))
+  }, error = function(e) message("  D02 total-credit parse error: ", e$message))
+}
+
 # ==============================================================================
 # SECTION 3: Assemble master dataset
 # ==============================================================================
@@ -791,6 +1035,7 @@ master <- master %>%
   left_join(unemp_q,           by = "date") %>%   # %
   left_join(lf_q,              by = "date") %>%   # persons (thousands)
   left_join(pop_q %>% select(date, pop_millions), by = "date") %>%
+  left_join(pop_total_q,                          by = "date") %>%   # total resident pop ('000), historic-only 1964-2011
   left_join(prime_age_share_q,                    by = "date") %>%   # prime working-age share (25-54)
   left_join(fin_deposits_q,    by = "date") %>%   # $m
   left_join(fin_equities_q,    by = "date") %>%   # $m
@@ -802,7 +1047,9 @@ master <- master %>%
   left_join(hpi_spliced,       by = "date") %>%   # index
   left_join(housing_loan_flow_q %>% select(date, housing_loan_flow), by = "date") %>%
   left_join(fhb_q     %>% select(date, fhb_loans),     by = "date") %>%
-  left_join(non_fhb_q %>% select(date, non_fhb_loans), by = "date")
+  left_join(non_fhb_q %>% select(date, non_fhb_loans), by = "date") %>%
+  left_join(m3_aggregate_q,    by = "date") %>%   # $bn (RBA D03 DMAM3N, 1959Q3+)
+  left_join(credit_total_d02_q, by = "date")      # $bn (RBA D02, spliced 1976Q3+)
 
 # Deflate to real (2015 price basis)
 # Normalise deflator to 2015 = 100
@@ -830,6 +1077,21 @@ master <- master %>%
 # and per-capita. Italy.pdf §3.1 averages this with full disposable income to
 # down-weight property income (which is mismeasured in national accounts —
 # imputed financial returns rather than realised cash flow).
+# M3 household-allocated proxy: M3 × wage_share/100. The wage share of
+# domestic factor income (labour income / GDP) is a defensible proxy for
+# the household share of M3 — Williams (2010) used the household factor
+# income share for this allocation. Coverage matches m3_aggregate × wage_share
+# (1976Q3+ on the current spine). Used downstream as a longer-sample
+# alternative to the B20 deposit-derived liquid-asset series.
+if ("m3_aggregate" %in% names(master) && "wage_share" %in% names(master)) {
+  master <- master %>%
+    mutate(m3_household_proxy = m3_aggregate * wage_share / 100)
+  message(sprintf("  m3_household_proxy: %d non-NA obs, range %.0f - %.0f $bn",
+    sum(!is.na(master$m3_household_proxy)),
+    min(master$m3_household_proxy, na.rm = TRUE),
+    max(master$m3_household_proxy, na.rm = TRUE)))
+}
+
 if ("compensation_of_employees" %in% names(master) &&
     "social_assistance_benefits" %in% names(master)) {
   master <- master %>%
@@ -933,6 +1195,195 @@ master <- master %>%
       (fin_deposits + fin_equities + fin_super + housing_wealth - fin_loans) / ydi_ann_nom
     )
   )
+
+# --------------------------------------------------------------------------
+# Back-extension proxies for ln_networth_y (NS-020 phase 1)
+# --------------------------------------------------------------------------
+# The official `networth_y` is bounded at 1988Q3+ by ABS 5232 sectoral
+# accounts. To enable Spec 1-3 fits on the longer (1976Q3+) sample, we
+# build a proxy that:
+#   (i)  uses M3-allocated-to-households (`m3_household_proxy`) plus a
+#        hpi×pop back-cast of housing_wealth as the raw wealth aggregate
+#   (ii) growth-rate-splices that raw aggregate ratio onto the official
+#        `networth_y` at 1988Q3 (so the proxy equals the official series
+#        from 1988Q3 onwards and back-casts smoothly through 1976Q3)
+#
+# Caveats explicitly noted: the back-cast omits equities and super
+# (quantitatively small in 1976-1988 — Australian super pre-SGC was a
+# negligible household asset class) and omits debt (mortgage debt was a
+# much smaller share of household balance sheets in the 1970s). Use this
+# proxy ONLY for back-extension exercises; never as a substitute for
+# `networth_y` on the modern sample where the official series exists.
+master <- master %>%
+  mutate(
+    # Housing wealth back-cast: anchor at first available official obs and
+    # back-cast via hpi × pop_millions growth (i.e. assume dwellings stock
+    # per capita is roughly constant across 1976-1988).
+    housing_wealth_proxy = {
+      anchor_idx <- which(!is.na(housing_wealth))[1L]
+      if (length(anchor_idx) == 0L) {
+        rep(NA_real_, n())
+      } else {
+        anchor_hw  <- housing_wealth[anchor_idx]
+        anchor_hpi <- hpi[anchor_idx]
+        anchor_pop <- pop_millions[anchor_idx]
+        backcast   <- anchor_hw * (hpi / anchor_hpi) * (pop_millions / anchor_pop)
+        if_else(is.na(housing_wealth), backcast, housing_wealth)
+      }
+    }
+  ) %>%
+  mutate(
+    # Raw proxy ratio: (M3-allocated + housing_wealth_proxy) / ydi_ann_nom
+    networth_y_raw_proxy = (m3_household_proxy + housing_wealth_proxy) /
+                           ydi_ann_nom
+  )
+# Growth-rate splice raw_proxy onto official networth_y at 1988Q3.
+{
+  anchor_date <- as.Date("1988-07-01")
+  off_at_anchor <- master$networth_y[master$date == anchor_date]
+  raw_at_anchor <- master$networth_y_raw_proxy[master$date == anchor_date]
+  if (length(off_at_anchor) == 1L && length(raw_at_anchor) == 1L &&
+      is.finite(off_at_anchor) && is.finite(raw_at_anchor) && raw_at_anchor != 0) {
+    scale <- off_at_anchor / raw_at_anchor
+    master <- master %>%
+      mutate(
+        networth_y_proxy = if_else(
+          date >= anchor_date & !is.na(networth_y),
+          networth_y,
+          networth_y_raw_proxy * scale
+        ),
+        ln_networth_y_proxy = log(pmax(networth_y_proxy, 1e-6))
+      )
+    message(sprintf("  networth_y_proxy: anchor %s, scale=%.4f, %d non-NA obs",
+      format(anchor_date), scale, sum(!is.na(master$networth_y_proxy))))
+  } else {
+    master <- master %>%
+      mutate(
+        networth_y_proxy    = NA_real_,
+        ln_networth_y_proxy = NA_real_
+      )
+    message("  networth_y_proxy: anchor unavailable, leaving NA")
+  }
+}
+
+# --------------------------------------------------------------------------
+# Disaggregated wealth proxies for back-extension (NS-020 phase 1, items 1-4)
+# --------------------------------------------------------------------------
+# For each official disaggregated wealth ratio (ha_y, nla_y, eq_y, super_y),
+# build a proxy that:
+#   - equals the official series for t >= 1988Q3 (the official series start)
+#   - back-casts via the most relevant available aggregate for t < 1988Q3
+#
+# Methodology:
+#   ha_y_proxy    = housing_wealth_proxy / ydi_ann_nom
+#                   (housing back-cast already built via hpi×pop)
+#   fin_deposits_proxy = anchor × m3_household_proxy[t] / m3_household_proxy[anchor]
+#   fin_loans_proxy    = anchor × credit_total_d02[t]   / credit_total_d02[anchor]
+#   nla_y_proxy   = (fin_deposits_proxy − fin_loans_proxy) / ydi_ann_nom
+#   eq_y_proxy    = official; pre-1988 held constant at the 1988Q3 value
+#                   (Option B — Australian household equity holdings were
+#                    a small wealth share in the late 1970s/early 80s; the
+#                    constant assumption introduces little level error and
+#                    is straightforward to upgrade to ASX-All-Ords back-cast)
+#   super_y_proxy = official; pre-1988 linear ramp from 0.1 × anchor at
+#                   1976Q3 to anchor at 1988Q3 (Australian super pre-SGC
+#                   1992 was a minor wealth class; matches Williams 2010
+#                   Table A.1 ballpark)
+#
+# All four equal the official series at 1988Q3 by construction (boundary
+# continuity). Caveats noted in data.md §3.4b.
+{
+  anchor_date <- as.Date("1988-07-01")
+  ai_log <- master$date == anchor_date
+  fin_dep_anc   <- master$fin_deposits[ai_log]
+  fin_loans_anc <- master$fin_loans[ai_log]
+  m3_anc        <- master$m3_household_proxy[ai_log]
+  credit_anc    <- master$credit_total_d02[ai_log]
+  eq_y_anc      <- master$eq_y[ai_log]
+  super_y_anc   <- master$super_y[ai_log]
+
+  if (length(fin_dep_anc) == 1L && is.finite(fin_dep_anc) &&
+      length(m3_anc)      == 1L && is.finite(m3_anc) && m3_anc != 0 &&
+      length(credit_anc)  == 1L && is.finite(credit_anc) && credit_anc != 0) {
+
+    earliest_date <- as.Date("1976-07-01")
+    span_days     <- as.numeric(anchor_date - earliest_date)
+
+    master <- master %>%
+      mutate(
+        # --- 1. Housing assets ratio (uses housing_wealth_proxy already built)
+        ha_y_proxy = housing_wealth_proxy / ydi_ann_nom,
+
+        # --- 2. Liquid components: deposits and loans back-cast via M3 and D02
+        fin_deposits_proxy = if_else(
+          date >= anchor_date & !is.na(fin_deposits),
+          fin_deposits,
+          fin_dep_anc * m3_household_proxy / m3_anc
+        ),
+        fin_loans_proxy = if_else(
+          date >= anchor_date & !is.na(fin_loans),
+          fin_loans,
+          fin_loans_anc * credit_total_d02 / credit_anc
+        ),
+        nla_y_proxy = (fin_deposits_proxy - fin_loans_proxy) / ydi_ann_nom,
+
+        # --- 3. Equities ratio: hold constant at 1988Q3 value pre-1988
+        eq_y_proxy = if_else(
+          date >= anchor_date & !is.na(eq_y),
+          eq_y,
+          eq_y_anc
+        ),
+
+        # --- 4. Super ratio: linear ramp from 0.1×anchor at 1976Q3 to anchor at 1988Q3
+        super_y_proxy = if_else(
+          date >= anchor_date & !is.na(super_y),
+          super_y,
+          {
+            t_norm <- pmin(pmax(as.numeric(date - earliest_date) / span_days,
+                                0), 1)
+            super_y_anc * (0.1 + 0.9 * t_norm)
+          }
+        )
+      )
+
+    # Sum-of-disaggregated cross-check: should match networth_y_proxy at 1988Q3
+    master <- master %>%
+      mutate(
+        networth_y_disagg_proxy = ha_y_proxy + nla_y_proxy +
+                                   eq_y_proxy + super_y_proxy,
+        ln_networth_y_disagg_proxy = log(pmax(networth_y_disagg_proxy, 1e-6))
+      )
+
+    message(sprintf(
+      "  Disagg proxies built: ha=%d nla=%d eq=%d super=%d non-NA obs",
+      sum(!is.na(master$ha_y_proxy)),
+      sum(!is.na(master$nla_y_proxy)),
+      sum(!is.na(master$eq_y_proxy)),
+      sum(!is.na(master$super_y_proxy))))
+    message(sprintf(
+      "  Coherence at 1988Q3 (boundary): networth_y=%.3f, agg_proxy=%.3f, disagg_sum=%.3f",
+      master$networth_y[ai_log],
+      master$networth_y_proxy[ai_log],
+      master$networth_y_disagg_proxy[ai_log]))
+    message(sprintf(
+      "  Coherence at 1976Q3 (deepest): agg_proxy=%.3f, disagg_sum=%.3f, gap=%.1f%%",
+      master$networth_y_proxy[master$date == earliest_date],
+      master$networth_y_disagg_proxy[master$date == earliest_date],
+      100 * (master$networth_y_disagg_proxy[master$date == earliest_date] -
+             master$networth_y_proxy[master$date == earliest_date]) /
+            master$networth_y_proxy[master$date == earliest_date]))
+  } else {
+    master <- master %>%
+      mutate(
+        ha_y_proxy = NA_real_, nla_y_proxy = NA_real_,
+        eq_y_proxy = NA_real_, super_y_proxy = NA_real_,
+        fin_deposits_proxy = NA_real_, fin_loans_proxy = NA_real_,
+        networth_y_disagg_proxy = NA_real_,
+        ln_networth_y_disagg_proxy = NA_real_
+      )
+    message("  Disagg proxies: anchor data unavailable, leaving NA")
+  }
+}
 
 # Range guard: nla_y is total deposits minus total household debt and is
 # expected to be NEGATIVE in modern Australia (debt stock exceeds liquid
@@ -1224,8 +1675,8 @@ if (!is.null(master$mortgage_rate)) {
 # vintage, or series structure and downstream estimation results would be
 # silently wrong. Better to halt here than to publish spurious coefficients.
 stopifnot(
-  "master has wrong row count (expected 180 quarters 1980Q1-2024Q4)" =
-    nrow(master) == 180,
+  "master has wrong row count (expected 194 quarters 1976Q3-2024Q4)" =
+    nrow(master) == 194,
   "ha_y out of plausible range (expected ~1-10)" =
     min(master$ha_y, na.rm = TRUE) > 1 &&
     max(master$ha_y, na.rm = TRUE) < 10,

@@ -1,0 +1,10 @@
+metric,value
+Sectional canonical adj R^2,0.6807
+Sectional canonical |lambda|,-0.2077
+Sectional adj R^2 percentile rank,36th
+Sectional |lambda| percentile rank,40th
+Maximal-GETS adj R^2 percentile (prior result),64th
+Maximal-GETS |lambda| percentile (prior result),36th
+Literal 4-knot adj R^2 percentile (prior result),19th
+Literal 4-knot |lambda| percentile (prior result),10th
+Verdict,DETRENDING CRITIQUE PERSISTS — sectional below random median

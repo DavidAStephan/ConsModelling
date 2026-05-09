@@ -1482,12 +1482,20 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
       mutate(
         r_x_cci          = real_rate * cci_williams,
         hp_x_1_minus_cci = ln_hp_over_y * (1 - 1.2 * cci_williams),
-        yp_x_cci         = ln_yp_over_y * cci_williams
+        yp_x_cci         = ln_yp_over_y * cci_williams,
+        # Time-varying housing-wealth m.p.c. (Williams Aust eq 7 γ_1t·HA;
+        # Tobin Lives 2013 eq 5.2 (HLI_{t-1})·HA/y). Captures Williams'
+        # central LIVES mechanism: housing wealth becomes more spendable
+        # as collateral when credit conditions ease. The total HA m.p.c.
+        # on consumption is γ_HA + γ_HA_cci · cci_williams. Sign prior:
+        # γ_HA_cci > 0 (m.p.c. rises with CCI).
+        ha_x_cci         = ha_y * cci_williams
       )
     spec8 <- fit_ecm_spec(
       data       = md8,
       spec_name  = "Spec8_CCI_Interactions",
       lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y",
+                     "ha_x_cci",
                      "hp_x_1_minus_cci",
                      "r_x_cci",
                      "ln_yp_over_y",
@@ -1656,8 +1664,9 @@ run_all_specifications_with_dummies <- function(model_data, dummy_vars,
 
 fit_consumption_with_williams_cci <- function(model_data, lr_vars, sr_vars,
                                                dummy_vars,
-                                               sample_end = as.Date("2024-10-01")) {
-  basis <- build_williams_cci_basis(model_data$date)
+                                               sample_end = as.Date("2024-10-01"),
+                                               basis_fn   = build_williams_cci_basis) {
+  basis <- basis_fn(model_data$date)
   sign_priors <- attr(basis, "sign_priors")
   cci_terms   <- colnames(basis)
   for (j in seq_along(cci_terms)) {

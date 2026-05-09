@@ -3,12 +3,16 @@
 ## Project status
 
 Active research repository for a Muellbauer-Williams Australian
-household consumption ECM, targeting a central-bank working paper. As
-of 2026-05-07 the canonical permanent-income method is `"italy"` (Jordà
-2005 local projection); see [`Ausreplication/docs/project_status.md`](Ausreplication/docs/project_status.md)
-for the latest preferred-spec coefficients and
-[`Ausreplication/docs/wp_draft.md`](Ausreplication/docs/wp_draft.md) for
-the WP draft.
+household consumption ECM, targeting a central-bank working paper.
+The canonical permanent-income method is `"italy"` (Jordà 2005 local
+projection). The headline empirical work — back-extension to 1976Q3,
+multi-equation LIVES system, placebo battery, items 1+2 cross-check
+— has now landed; see
+[`Ausreplication/docs/wp_draft.md`](Ausreplication/docs/wp_draft.md)
+for the full state-of-play (data construction, identification, results,
+robustness, Williams comparison, conclusion) and
+[`Ausreplication/docs/next_steps_plan_2026.md`](Ausreplication/docs/next_steps_plan_2026.md)
+for the forward-looking tier-based plan.
 
 ## What this is
 

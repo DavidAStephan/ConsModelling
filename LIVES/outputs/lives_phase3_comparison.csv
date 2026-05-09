@@ -1,0 +1,19 @@
+metric,value
+Consumption  λ (regime a),-0.2416
+Consumption  λ (regime b),-0.2041
+Consumption  λ (regime c),-0.2144
+Consumption  ha_y / netw LR (regime a),0.1101
+Consumption  ha_y / netw LR (regime b),0.1120
+Consumption  ha_y / netw LR (regime c),0.1059
+Consumption  cci coefficient sign (regime a),0.00582 (+)
+Consumption  cci coefficient sign (regime b),0.00417 (+)
+Consumption  cci coefficient sign (regime c),0.00386 (+)
+House price  cci coefficient sign (regime a),-0.02427 (-)
+House price  cci coefficient sign (regime b),0.02378 (+)
+House price  cci coefficient sign (regime c),0.02364 (+)
+Mortgage     cci coefficient sign (regime a),-0.00206 (-)
+Mortgage     cci coefficient sign (regime b),-0.00696 (-)
+Mortgage     cci coefficient sign (regime c),-0.00764 (-)
+"SUR rho(eps_C, eps_H)",-0.1074
+"SUR rho(eps_C, eps_M)",0.0910
+"SUR rho(eps_H, eps_M)",-0.2001
