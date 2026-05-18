@@ -59,16 +59,7 @@ jobs:
         # failure points at a specific path.
         run: |
           set -e
-          for f in \
-              Australia/R/australia_consumption_model.R \
-              Australia/R/australia_estimation.R \
-              Australia/R/australia_data_download.R \
-              Australia/R/model_helpers.R \
-              Australia/R/italy_estimation.R \
-              Australia/R/italy_data_download.R \
-              Australia/R/italy_consumption_model.R \
-              Australia/R/italy_australia_comparison.R \
-              Australia/R/run_estimation_from_rds.R; do
+          for f in Australia/R/*.R; do
             echo "Parsing $f"
             Rscript -e "invisible(parse('$f'))"
           done
