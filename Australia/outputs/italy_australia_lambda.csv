@@ -1,5 +1,5 @@
 "country","specification","period","lambda","lambda_source","note"
-"Italy","Italy_Preferred","full",0.519270269214832,"/Users/davidstephan/Documents/consmodelling/Ausreplication/outputs/italy_table1_results.csv","OLS coefficient on ln(y/c) in italy_table1_results.csv (preferred spec, full sample)"
+"Italy","Italy_Preferred","full",0.519270269214832,"/Users/davidstephan/Documents/consmodelling/Australia/outputs/italy_table1_results.csv","OLS coefficient on ln(y/c) in italy_table1_results.csv (preferred spec, full sample)"
 "Australia","Spec1_LogNetWorth","full",-0.0813976116461156,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
 "Australia","Spec2_LogNetWorth_CCI","full",-0.0827745072496983,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"
 "Australia","Spec3_LevelNetWorth","full",-0.0787706485427068,"australia_*_results.csv (term == ecm_lag)","OLS coefficient on ecm_lag (negative-restoration convention)"

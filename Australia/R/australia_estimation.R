@@ -2566,8 +2566,8 @@ write_model_summary <- function(specs_full, specs_precovid,
   out <- c(out, "")
 
   out <- c(out, "## Reproducibility")
-  out <- c(out, "- Run: `Rscript Ausreplication/R/australia_consumption_model.R`")
-  out <- c(out, "- Fast re-estimation: `Rscript Ausreplication/R/run_estimation_from_rds.R`")
+  out <- c(out, "- Run: `Rscript Australia/R/australia_consumption_model.R`")
+  out <- c(out, "- Fast re-estimation: `Rscript Australia/R/run_estimation_from_rds.R`")
   out <- c(out, "- Random seed: not used (OLS is deterministic).")
   out <- c(out, sprintf("- Date generated: %s", format(Sys.Date(), "%Y-%m-%d")))
   out <- c(out, "")
@@ -3569,7 +3569,7 @@ rolling_results <- tryCatch(
 
 cat("[Step 13] Building Italy–Australia comparison table...\n")
 # italy_table1_results.csv (published Italy reference numbers from De Bonis
-# et al. 2024) lives in Ausreplication/outputs/. The Italy estimation
+# et al. 2024) lives in Australia/outputs/. The Italy estimation
 # pipeline itself was removed during the May 2026 repo cleanup; we keep
 # only the published reference file as a benchmark for the cross-country
 # comparison in build_comparison_table.

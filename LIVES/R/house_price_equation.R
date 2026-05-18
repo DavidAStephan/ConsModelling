@@ -24,13 +24,13 @@ suppressPackageStartupMessages({
 
 options(stringsAsFactors = FALSE, scipen = 999)
 
-PROJ_AUS   <- "Ausreplication"
+PROJ_AUS   <- "Australia"
 PROJ_LIVES <- "LIVES"
 
 dat <- readRDS(file.path(PROJ_LIVES, "outputs", "lives_model_data.rds"))
 cat(sprintf("Loaded LIVES model data: %d rows\n", nrow(dat)))
 
-# Source the fit_ecm_spec helper from the Ausreplication estimation script
+# Source the fit_ecm_spec helper from the Australia estimation script
 src <- readLines(file.path(PROJ_AUS, "R", "australia_estimation.R"))
 guard_at <- grep("if \\(!exists\\(.model_data.\\)\\)", src)[1L]
 src_safe <- src[-(guard_at:(guard_at + 6L))]

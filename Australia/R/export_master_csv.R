@@ -13,7 +13,7 @@
 # with R/load_master_from_csv.R to round-trip.
 #
 # Run from the project root:
-#   Rscript Ausreplication/R/export_master_csv.R
+#   Rscript Australia/R/export_master_csv.R
 # ==============================================================================
 
 suppressPackageStartupMessages({
@@ -38,7 +38,7 @@ csv_path <- file.path(project_root, "data_raw", "master_data.csv")
 
 if (!file.exists(rds_path)) {
   stop("RDS not found at ", rds_path,
-       "\nRun Rscript Ausreplication/R/australia_consumption_model.R first ",
+       "\nRun Rscript Australia/R/australia_consumption_model.R first ",
        "to download data and build the RDS, OR provide the RDS by some other ",
        "means (e.g. download from a colleague).")
 }

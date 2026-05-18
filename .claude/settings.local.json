@@ -15,8 +15,8 @@
       "Bash(Rscript --vanilla -e \":*)",
       "Bash(grep -A 30 \"^Short-run ECM$\" outputs/model_summary.txt)",
       "Bash(powershell -Command \":*)",
-      "Bash(powershell -Command \"Rscript ''Ausreplication/R/run_estimation_from_rds.R''\")",
-      "Bash(powershell -Command \"Rscript ''Ausreplication/R/australia_consumption_model.R''\")"
+      "Bash(powershell -Command \"Rscript ''Australia/R/run_estimation_from_rds.R''\")",
+      "Bash(powershell -Command \"Rscript ''Australia/R/australia_consumption_model.R''\")"
     ]
   }
 }

@@ -27,7 +27,7 @@ options(stringsAsFactors = FALSE, scipen = 999)
 set.seed(20260508L)
 N_DRAWS <- 200L
 
-PROJ <- "Ausreplication"
+PROJ <- "Australia"
 output_dir <- file.path(PROJ, "outputs")
 
 master <- readRDS(file.path(PROJ, "outputs", "australia_model_dataset.rds"))

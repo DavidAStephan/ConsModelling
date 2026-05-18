@@ -15,7 +15,7 @@
 #     (e.g. patch a known data error) and run with the corrected values
 #
 # Run from the project root:
-#   Rscript Ausreplication/R/load_master_from_csv.R
+#   Rscript Australia/R/load_master_from_csv.R
 # ==============================================================================
 
 suppressPackageStartupMessages({
@@ -43,7 +43,7 @@ csv_path <- file.path(project_root, "data_raw", "master_data.csv")
 
 if (!file.exists(csv_path)) {
   stop("CSV not found at ", csv_path,
-       "\nRun Rscript Ausreplication/R/export_master_csv.R first to ",
+       "\nRun Rscript Australia/R/export_master_csv.R first to ",
        "produce it from the cached RDS, or have someone share the CSV.")
 }
 

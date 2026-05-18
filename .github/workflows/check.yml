@@ -60,23 +60,23 @@ jobs:
         run: |
           set -e
           for f in \
-              Ausreplication/R/australia_consumption_model.R \
-              Ausreplication/R/australia_estimation.R \
-              Ausreplication/R/australia_data_download.R \
-              Ausreplication/R/model_helpers.R \
-              Ausreplication/R/italy_estimation.R \
-              Ausreplication/R/italy_data_download.R \
-              Ausreplication/R/italy_consumption_model.R \
-              Ausreplication/R/italy_australia_comparison.R \
-              Ausreplication/R/run_estimation_from_rds.R; do
+              Australia/R/australia_consumption_model.R \
+              Australia/R/australia_estimation.R \
+              Australia/R/australia_data_download.R \
+              Australia/R/model_helpers.R \
+              Australia/R/italy_estimation.R \
+              Australia/R/italy_data_download.R \
+              Australia/R/italy_consumption_model.R \
+              Australia/R/italy_australia_comparison.R \
+              Australia/R/run_estimation_from_rds.R; do
             echo "Parsing $f"
             Rscript -e "invisible(parse('$f'))"
           done
 
       - name: Run estimation from cached RDS
-        # Uses the committed Ausreplication/outputs/australia_model_dataset.rds
+        # Uses the committed Australia/outputs/australia_model_dataset.rds
         # so we don't hit the ABS API in CI.
-        run: Rscript Ausreplication/R/run_estimation_from_rds.R
+        run: Rscript Australia/R/run_estimation_from_rds.R
 
       - name: Run unit tests
         run: Rscript tests/testthat.R

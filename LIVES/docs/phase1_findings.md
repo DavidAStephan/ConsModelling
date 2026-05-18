@@ -145,7 +145,7 @@ paper:
 
 - The single-equation paper's conclusions stand. The wealth-coefficient
   gap with Williams (Table 1 calibrations vs single-equation OLS)
-  documented in [back_extension_findings.md §3c](../../Ausreplication/docs/back_extension_findings.md)
+  documented in [back_extension_findings.md §3c](../../Australia/docs/back_extension_findings.md)
   is unchanged: SUR doesn't move the consumption coefficients meaningfully.
 - The placebo-test verdicts on the maximal-GETS CCI (64th/36th) stand.
 

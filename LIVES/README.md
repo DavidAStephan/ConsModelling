@@ -3,7 +3,7 @@
 Williams (2010) estimates the Australian LIVES system as **four
 simultaneous equations** by FIML, with a common credit-conditions
 spline and cross-equation parameter restrictions. The single-equation
-work in [`Ausreplication/`](../Ausreplication/) replicates the
+work in [`Australia/`](../Australia/) replicates the
 consumption block only.
 
 The placebo and back-extension findings landed in May 2026 produced
@@ -22,7 +22,7 @@ Both results are consistent with a multi-equation framework being
 required for the structural identification Williams claimed. This
 folder builds that framework, in phases.
 
-See [`Ausreplication/docs/back_extension_findings.md`](../Ausreplication/docs/back_extension_findings.md)
+See [`Australia/docs/back_extension_findings.md`](../Australia/docs/back_extension_findings.md)
 for the empirical motivation.
 
 ---
@@ -135,12 +135,12 @@ LIVES/
 ## Reproducibility
 
 LIVES depends on the master dataset built by
-[`Ausreplication/R/australia_data_download.R`](../Ausreplication/R/australia_data_download.R).
+[`Australia/R/australia_data_download.R`](../Australia/R/australia_data_download.R).
 Run the data download first; LIVES scripts then load the saved RDS.
 
 ```
 # From project root:
-Rscript Ausreplication/R/australia_data_download.R
+Rscript Australia/R/australia_data_download.R
 Rscript LIVES/R/lives_data_prep.R          # prepares LIVES-specific frame
 Rscript LIVES/R/house_price_equation.R     # standalone HP ECM
 Rscript LIVES/R/lives_sur_2eq.R            # phase 1 joint estimation
@@ -150,7 +150,7 @@ Rscript LIVES/R/lives_sur_2eq.R            # phase 1 joint estimation
 
 - Re-implementing the consumption equation from scratch — phase 1 reuses
   the existing `fit_ecm_spec()` + Spec 6 template from
-  `Ausreplication/R/australia_estimation.R`.
+  `Australia/R/australia_estimation.R`.
 - Williams' specific functional forms beyond the broad ECM structure —
   we follow Williams' Tables 2-4 in spirit (real-prices regressed on
   real-income/credit/rates with ECM), with deviations documented.

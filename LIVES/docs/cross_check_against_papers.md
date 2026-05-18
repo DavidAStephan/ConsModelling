@@ -1,6 +1,6 @@
 # LIVES — cross-check against the canonical papers
 
-Cross-check of our implementation in `LIVES/` and `Ausreplication/`
+Cross-check of our implementation in `LIVES/` and `Australia/`
 against:
 
 1. **Williams (2010 / Aust system paper)** — *Credit conditions and the
@@ -53,7 +53,7 @@ asset class. Tobin Lives also uses 3-fold (NLA, IFA, HA). ✓
 
 Williams uses `SDMMA_s(t)` = 5-quarter MA of 4-quarter MA of a 0/1
 step at knot date s (Aust paper §4.5). Our `smoothed_step()` in
-[model_helpers.R](../../Ausreplication/R/model_helpers.R) implements
+[model_helpers.R](../../Australia/R/model_helpers.R) implements
 exactly this. ✓
 
 ### 1.4 Hendry-Krolzig sign-prior reduction
@@ -108,7 +108,7 @@ estimated equation reports `+0.055·(HLI_{t-1})·HA_{t-1}/y_t` (eq 5.2)
 
 **We have CCI interactions on `ln_hp_over_y` and `ln_yp_over_y` in
 Spec 8, but NOT on `ha_y`.** Spec 8 lr_vars in
-[australia_estimation.R](../../Ausreplication/R/australia_estimation.R):
+[australia_estimation.R](../../Australia/R/australia_estimation.R):
 
 ```
 lr_vars = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
@@ -181,7 +181,7 @@ constraint:
 
 **This may be why our maximal-GETS canonical only weakly survives
 the placebo test (64th/36th percentile per
-[Ausreplication/docs/back_extension_findings.md §3b](../../Ausreplication/docs/back_extension_findings.md)).
+[Australia/docs/back_extension_findings.md §3b](../../Australia/docs/back_extension_findings.md)).
 Williams' tighter sectional constraint would be harder for random
 draws to satisfy.
 
@@ -358,7 +358,7 @@ Thompson discussant predicts will tighten the placebo identification.
 ## 6. Re-grading of our existing findings
 
 Given the cross-check, the empirical findings already in
-[back_extension_findings.md](../../Ausreplication/docs/back_extension_findings.md)
+[back_extension_findings.md](../../Australia/docs/back_extension_findings.md)
 and [phase1_findings.md](phase1_findings.md) /
 [phase3_findings.md](phase3_findings.md) need slight reframing:
 

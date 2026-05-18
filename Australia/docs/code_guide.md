@@ -91,7 +91,7 @@ the data download, sources the estimation script, and prints status
 banners between the two stages. Run this when you want a complete
 end-to-end pipeline including data refresh.
 
-**Invocation.** `Rscript Ausreplication/R/australia_consumption_model.R`
+**Invocation.** `Rscript Australia/R/australia_consumption_model.R`
 
 **What it does, line-by-line.**
 - Lines 18–33: load required packages.
@@ -326,7 +326,7 @@ convention with a one-paragraph docstring at the top.
 (produced by a previous Mode 1 run) and re-runs the estimation block
 without rebuilding the master dataset. Takes ~30 seconds end-to-end.
 
-**Invocation.** `Rscript Ausreplication/R/run_estimation_from_rds.R`
+**Invocation.** `Rscript Australia/R/run_estimation_from_rds.R`
 
 **What it does.**
 - Lines 1–25: same package loading and path resolution as the
@@ -357,7 +357,7 @@ columns by topic for readability, and writes
 double precision; default `readr::write_csv` truncates to ~15 digits
 which leaves room for round-trip drift).
 
-**Invocation.** `Rscript Ausreplication/R/export_master_csv.R`
+**Invocation.** `Rscript Australia/R/export_master_csv.R`
 
 **Use this when:**
 - After a Mode 1 cold-rebuild, to refresh the portable CSV.
@@ -379,7 +379,7 @@ runs the full estimation pipeline without touching ABS workbooks or
 the RDS. Useful when offline, when working with a manually edited
 dataset, or for portability.
 
-**Invocation.** `Rscript Ausreplication/R/load_master_from_csv.R`
+**Invocation.** `Rscript Australia/R/load_master_from_csv.R`
 
 **Subtle gotcha.** CSV round-trip is at machine precision (~1e-10 max
 abs diff per column). Most outputs match Mode 2 exactly; **edge-case
@@ -405,7 +405,7 @@ markdown commentary that is the basis for WP §9.
 **Run directly?** Yes, you can — but it's normally sourced as Step 16
 of the main `australia_estimation.R` block.
 
-**Invocation.** `Rscript Ausreplication/R/williams_comparison.R`
+**Invocation.** `Rscript Australia/R/williams_comparison.R`
 
 **Inputs.**
 - `outputs/australia_full_results.csv` — Spec 6 and Spec 8 OLS results
@@ -485,33 +485,33 @@ back-extension to ~1975Q1, which is the standing research priority.
 
 ### "I want to re-estimate without changing anything."
 ```
-Rscript Ausreplication/R/run_estimation_from_rds.R
+Rscript Australia/R/run_estimation_from_rds.R
 ```
 ~30 seconds. Reuses the cached RDS.
 
 ### "I want to refresh the master dataset from raw inputs."
 ```
-Rscript Ausreplication/R/australia_consumption_model.R
+Rscript Australia/R/australia_consumption_model.R
 ```
 A few minutes; re-parses ABS workbooks (cached) and the user CSVs.
 Refreshes `outputs/australia_model_dataset.rds`.
 
 ### "I want to run offline / from the portable CSV."
 ```
-Rscript Ausreplication/R/load_master_from_csv.R
+Rscript Australia/R/load_master_from_csv.R
 ```
 Reads `data_raw/master_data.csv`. No internet, no RDS needed.
 
 ### "I want to refresh the portable CSV after a cold rebuild."
 ```
-Rscript Ausreplication/R/australia_consumption_model.R
-Rscript Ausreplication/R/export_master_csv.R
+Rscript Australia/R/australia_consumption_model.R
+Rscript Australia/R/export_master_csv.R
 ```
 
 ### "I want to switch to the AR robustness column."
-Open `Ausreplication/R/australia_estimation.R`, change
+Open `Australia/R/australia_estimation.R`, change
 `PI_METHOD <- "italy"` to `PI_METHOD <- "ar"` (around line 45), then
-`Rscript Ausreplication/R/run_estimation_from_rds.R`. Compare
+`Rscript Australia/R/run_estimation_from_rds.R`. Compare
 `australia_pi_method_comparison.csv` for the side-by-side.
 
 ### "I want to add a new specification."
@@ -519,7 +519,7 @@ Open `Ausreplication/R/australia_estimation.R`, change
    line 875).
 2. Add a new `spec9 <- fit_ecm_spec(...)` block after Spec 8.
 3. Add `spec9 = spec9` to the returned list.
-4. Run `Rscript Ausreplication/R/run_estimation_from_rds.R`.
+4. Run `Rscript Australia/R/run_estimation_from_rds.R`.
 5. The new spec will automatically appear in `australia_full_results.csv`,
    `australia_full_diagnostics.csv`, and the spec selector.
 
@@ -539,8 +539,8 @@ Open `Ausreplication/R/australia_estimation.R`, change
 3. Add it to the `master <- master %>% left_join(...)` chain in §3.
 4. Add it to the coverage report `for (v in c(...))` loop in §9.
 5. If it should be range-checked, add a `stopifnot()` assertion in §9.
-6. Run a cold rebuild: `Rscript Ausreplication/R/australia_consumption_model.R`.
-7. Refresh the portable CSV: `Rscript Ausreplication/R/export_master_csv.R`.
+6. Run a cold rebuild: `Rscript Australia/R/australia_consumption_model.R`.
+7. Refresh the portable CSV: `Rscript Australia/R/export_master_csv.R`.
 
 ### "I want to change the preferred-spec selection criteria."
 Edit `select_preferred_spec()` in `australia_estimation.R`
