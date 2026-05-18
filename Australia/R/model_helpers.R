@@ -852,7 +852,7 @@ smoothed_step <- function(date_vec, knot_date) {
 # rather than from authorial choice; on our sample it identifies five
 # surviving knots: 1992Q1 (banking distress), 2007Q3 (GFC), 2019Q1 (Hayne
 # Royal Commission), 2020Q2 (COVID/JobKeeper), 2021Q4 (APRA buffer hike).
-# See Ausreplication/docs/knot_experiment_findings.md for details.
+# See Australia/docs/knot_experiment_findings.md for details.
 #
 # Williams' original 4-knot set is retained as a robustness benchmark via the
 # explicit knots/sign_priors arguments.

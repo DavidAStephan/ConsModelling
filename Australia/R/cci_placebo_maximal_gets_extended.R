@@ -44,7 +44,7 @@ N_KNOTS  <- 15L
 WINDOW_LO <- as.Date("1979-01-01")
 WINDOW_HI <- as.Date("2021-12-01")
 
-PROJ <- "Ausreplication"
+PROJ <- "Australia"
 output_dir <- file.path(PROJ, "outputs")
 
 master <- readRDS(file.path(PROJ, "outputs", "australia_model_dataset.rds"))

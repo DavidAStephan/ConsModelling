@@ -1,7 +1,7 @@
 # ==============================================================================
 # LIVES — phase 1 data preparation
 #
-# Loads the master dataset built by Ausreplication/R/australia_data_download.R
+# Loads the master dataset built by Australia/R/australia_data_download.R
 # and adds the variables needed by the house-price equation (and any other
 # equations introduced in later phases).
 #
@@ -15,7 +15,7 @@ suppressPackageStartupMessages({
 
 options(stringsAsFactors = FALSE, scipen = 999)
 
-PROJ_AUS   <- "Ausreplication"
+PROJ_AUS   <- "Australia"
 PROJ_LIVES <- "LIVES"
 
 master_rds <- file.path(PROJ_AUS, "outputs", "australia_model_dataset.rds")
@@ -25,7 +25,7 @@ cat(sprintf("Loaded master: %d rows, %d cols (1976Q3+ extended)\n",
             nrow(master), ncol(master)))
 
 # ----------------------------------------------------------------------------
-# Apply the same renames the Ausreplication estimation pipeline uses, then
+# Apply the same renames the Australia estimation pipeline uses, then
 # re-source its helpers (without main exec) to get add_model_variables(),
 # compute_income_volatility(), construct_permanent_income_italy(), and the
 # Williams CCI machinery. This keeps the consumption block bit-for-bit

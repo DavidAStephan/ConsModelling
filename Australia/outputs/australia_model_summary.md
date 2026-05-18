@@ -72,8 +72,8 @@ _Italy comparison not available._
 - Permanent income relies on three coincident GFC corrections (step2008, trend_brk, learning-weight ogive) plus spec 6's `ln_yp_over_y_post2008` interaction. See `australia_permanent_income_sensitivity.csv`.
 
 ## Reproducibility
-- Run: `Rscript Ausreplication/R/australia_consumption_model.R`
-- Fast re-estimation: `Rscript Ausreplication/R/run_estimation_from_rds.R`
+- Run: `Rscript Australia/R/australia_consumption_model.R`
+- Fast re-estimation: `Rscript Australia/R/run_estimation_from_rds.R`
 - Random seed: not used (OLS is deterministic).
 - Date generated: 2026-05-08
 

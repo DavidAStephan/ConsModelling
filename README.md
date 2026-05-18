@@ -8,10 +8,10 @@ The canonical permanent-income method is `"italy"` (Jordà 2005 local
 projection). The headline empirical work — back-extension to 1976Q3,
 multi-equation LIVES system, placebo battery, items 1+2 cross-check
 — has now landed; see
-[`Ausreplication/docs/wp_draft.md`](Ausreplication/docs/wp_draft.md)
+[`Australia/docs/wp_draft.md`](Australia/docs/wp_draft.md)
 for the full state-of-play (data construction, identification, results,
 robustness, Williams comparison, conclusion) and
-[`Ausreplication/docs/next_steps_plan_2026.md`](Ausreplication/docs/next_steps_plan_2026.md)
+[`Australia/docs/next_steps_plan_2026.md`](Australia/docs/next_steps_plan_2026.md)
 for the forward-looking tier-based plan.
 
 ## What this is
@@ -30,18 +30,18 @@ adjustment (λ) can be compared on a like-for-like basis.
 ## Entry points
 
 - Full pipeline (download, build dataset, estimate, write outputs):
-  `Rscript Ausreplication/R/australia_consumption_model.R`
+  `Rscript Australia/R/australia_consumption_model.R`
 - Fast re-estimation from the cached dataset (skips ABS downloads):
-  `Rscript Ausreplication/R/run_estimation_from_rds.R`
+  `Rscript Australia/R/run_estimation_from_rds.R`
 - Offline / hand-edit re-estimation from the portable CSV:
-  `Rscript Ausreplication/R/load_master_from_csv.R`
+  `Rscript Australia/R/load_master_from_csv.R`
 
 The Australia master orchestrator is
-[australia_consumption_model.R](Ausreplication/R/australia_consumption_model.R);
+[australia_consumption_model.R](Australia/R/australia_consumption_model.R);
 data construction lives in
-[australia_data_download.R](Ausreplication/R/australia_data_download.R)
+[australia_data_download.R](Australia/R/australia_data_download.R)
 and estimation in
-[australia_estimation.R](Ausreplication/R/australia_estimation.R).
+[australia_estimation.R](Australia/R/australia_estimation.R).
 
 ## Estimation specifications
 
@@ -66,39 +66,39 @@ historical AR(8) forecaster is retained as a robustness column.
 
 ## Outputs
 
-Written to [Ausreplication/outputs/](Ausreplication/outputs/).
+Written to [Australia/outputs/](Australia/outputs/).
 
 Per-spec coefficient tables:
-[australia_full_results.csv](Ausreplication/outputs/australia_full_results.csv),
-[australia_precovid_results.csv](Ausreplication/outputs/australia_precovid_results.csv),
-[australia_all_results.csv](Ausreplication/outputs/australia_all_results.csv).
+[australia_full_results.csv](Australia/outputs/australia_full_results.csv),
+[australia_precovid_results.csv](Australia/outputs/australia_precovid_results.csv),
+[australia_all_results.csv](Australia/outputs/australia_all_results.csv).
 
 Diagnostics:
-[australia_full_diagnostics.csv](Ausreplication/outputs/australia_full_diagnostics.csv),
-[australia_precovid_diagnostics.csv](Ausreplication/outputs/australia_precovid_diagnostics.csv).
+[australia_full_diagnostics.csv](Australia/outputs/australia_full_diagnostics.csv),
+[australia_precovid_diagnostics.csv](Australia/outputs/australia_precovid_diagnostics.csv).
 
 Italy–Australia comparison:
-[italy_australia_comparison.csv](Ausreplication/outputs/italy_australia_comparison.csv),
-[italy_australia_lambda.csv](Ausreplication/outputs/italy_australia_lambda.csv).
+[italy_australia_comparison.csv](Australia/outputs/italy_australia_comparison.csv),
+[italy_australia_lambda.csv](Australia/outputs/italy_australia_lambda.csv).
 
 Data coverage / cached dataset:
-[australia_model_dataset.csv](Ausreplication/outputs/australia_model_dataset.csv),
-[australia_model_dataset.rds](Ausreplication/outputs/australia_model_dataset.rds).
+[australia_model_dataset.csv](Australia/outputs/australia_model_dataset.csv),
+[australia_model_dataset.rds](Australia/outputs/australia_model_dataset.rds).
 
 Plots (Spec 1 baseline, Spec 6 preferred):
-[australia_spec1_lognetworth_actual_vs_fitted.png](Ausreplication/outputs/australia_spec1_lognetworth_actual_vs_fitted.png),
-[australia_spec1_lognetworth_residuals.png](Ausreplication/outputs/australia_spec1_lognetworth_residuals.png),
-[australia_spec6_preferred_actual_vs_fitted.png](Ausreplication/outputs/australia_spec6_preferred_actual_vs_fitted.png),
-[australia_spec6_preferred_residuals.png](Ausreplication/outputs/australia_spec6_preferred_residuals.png).
+[australia_spec1_lognetworth_actual_vs_fitted.png](Australia/outputs/australia_spec1_lognetworth_actual_vs_fitted.png),
+[australia_spec1_lognetworth_residuals.png](Australia/outputs/australia_spec1_lognetworth_residuals.png),
+[australia_spec6_preferred_actual_vs_fitted.png](Australia/outputs/australia_spec6_preferred_actual_vs_fitted.png),
+[australia_spec6_preferred_residuals.png](Australia/outputs/australia_spec6_preferred_residuals.png).
 
 Additional outputs (now produced by every run):
-[australia_model_summary.md](Ausreplication/outputs/australia_model_summary.md),
-[australia_cointegration.csv](Ausreplication/outputs/australia_cointegration.csv),
-[australia_williams_comparison.csv](Ausreplication/outputs/australia_williams_comparison.csv),
-[australia_williams_knot_placebo.png](Ausreplication/outputs/australia_williams_knot_placebo.png),
-[australia_cci_fit_decomposition.md](Ausreplication/outputs/australia_cci_fit_decomposition.md),
-[australia_oos_rmse.csv](Ausreplication/outputs/australia_oos_rmse.csv),
-[australia_oos_forecast_paths.png](Ausreplication/outputs/australia_oos_forecast_paths.png).
+[australia_model_summary.md](Australia/outputs/australia_model_summary.md),
+[australia_cointegration.csv](Australia/outputs/australia_cointegration.csv),
+[australia_williams_comparison.csv](Australia/outputs/australia_williams_comparison.csv),
+[australia_williams_knot_placebo.png](Australia/outputs/australia_williams_knot_placebo.png),
+[australia_cci_fit_decomposition.md](Australia/outputs/australia_cci_fit_decomposition.md),
+[australia_oos_rmse.csv](Australia/outputs/australia_oos_rmse.csv),
+[australia_oos_forecast_paths.png](Australia/outputs/australia_oos_forecast_paths.png).
 
 ## Data sources
 

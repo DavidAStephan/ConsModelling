@@ -17,7 +17,7 @@ suppressPackageStartupMessages({
 
 options(stringsAsFactors = FALSE, scipen = 999)
 
-PROJ <- "Ausreplication"
+PROJ <- "Australia"
 master <- readRDS(file.path(PROJ, "outputs", "australia_model_dataset.rds"))
 source(file.path(PROJ, "R", "model_helpers.R"), local = TRUE)
 

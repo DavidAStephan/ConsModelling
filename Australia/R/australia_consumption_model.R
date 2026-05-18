@@ -12,7 +12,7 @@
 #   3. Sources Part 2 (estimation framework → produces results, tables, plots)
 #
 # Run from the project root:
-#   Rscript Ausreplication/R/australia_consumption_model.R
+#   Rscript Australia/R/australia_consumption_model.R
 # ==============================================================================
 
 suppressPackageStartupMessages({

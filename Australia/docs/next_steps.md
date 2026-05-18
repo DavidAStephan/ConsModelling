@@ -20,15 +20,15 @@ renumbered. Strike completed items in place rather than deleting them.
 
 ### NS-001 Auto-fill WP table placeholders from CSVs
 
-The WP draft (`Ausreplication/docs/wp_draft.md`) has `[TABLE-FROM-DATA]`
+The WP draft (`Australia/docs/wp_draft.md`) has `[TABLE-FROM-DATA]`
 placeholders in §7, §8 and §9 that point to specific output CSVs. Build
 a small R helper that reads each CSV and emits a markdown table with
 appropriate columns + caption + footnotes.
 
 - **Effort:** half a day
 - **Depends on:** nothing
-- **Files:** new `Ausreplication/R/build_wp_tables.R`; references `Ausreplication/docs/wp_draft.md`
-- **Success criterion:** running `Rscript Ausreplication/R/build_wp_tables.R` produces an `Ausreplication/outputs/wp_tables.md` file with one section per WP placeholder, ready to splice into the draft. Tables formatted to 3-4 significant figures; significant-at-1%/5% terms emphasised.
+- **Files:** new `Australia/R/build_wp_tables.R`; references `Australia/docs/wp_draft.md`
+- **Success criterion:** running `Rscript Australia/R/build_wp_tables.R` produces an `Australia/outputs/wp_tables.md` file with one section per WP placeholder, ready to splice into the draft. Tables formatted to 3-4 significant figures; significant-at-1%/5% terms emphasised.
 
 ### NS-002 Verify the [VERIFY] citation tags in the lit review
 
@@ -36,16 +36,16 @@ The lit review (§2 of wp_draft.md) has ~9 inline `[VERIFY]` tags marking citati
 
 - **Effort:** 1-2 hours per tag
 - **Depends on:** access to academic search (Google Scholar, RBA website)
-- **Files:** `Ausreplication/docs/wp_draft.md` (replace [VERIFY] with confirmed citations); update References section
+- **Files:** `Australia/docs/wp_draft.md` (replace [VERIFY] with confirmed citations); update References section
 - **Success criterion:** zero remaining [VERIFY] tags; each citation has exact title, year, series/journal, volume/issue/page numbers if applicable, and a URL or DOI in a comment
 
 ### NS-003 Document houseprice_old.csv provenance
 
-`Ausreplication/data_raw/houseprice_old.csv` (77 rows, 1986Q2-2003Q3) has no recorded source. Likely an old ABS Cat 6416.0 vintage but unconfirmed. Add provenance metadata.
+`Australia/data_raw/houseprice_old.csv` (77 rows, 1986Q2-2003Q3) has no recorded source. Likely an old ABS Cat 6416.0 vintage but unconfirmed. Add provenance metadata.
 
 - **Effort:** ~1 hour
 - **Depends on:** access to ABS historical data services (or recall from whoever sourced the file originally)
-- **Files:** `Ausreplication/docs/data.md` §4.1 (replace "UNDOCUMENTED IN-REPO" with full provenance); optionally add a sidecar `houseprice_old.metadata.txt`
+- **Files:** `Australia/docs/data.md` §4.1 (replace "UNDOCUMENTED IN-REPO" with full provenance); optionally add a sidecar `houseprice_old.metadata.txt`
 - **Success criterion:** The data.md entry for this file lists: original ABS catalogue number, table number, vintage release date, retrieval URL, retrieval date, and the chosen base year if rescaled
 
 ### NS-004 Verify APRA macroprudential dates against actual policy announcements
@@ -54,7 +54,7 @@ The smooth-transition dummies `d_apra_2014` and `d_apra_2017` are centred on 201
 
 - **Effort:** half a day
 - **Depends on:** APRA Information Paper "Macroprudential Policy" historical timeline; media releases archive
-- **Files:** `Ausreplication/R/australia_data_download.R` Section 5 (potentially update centre dates and/or `half_width`); `Ausreplication/docs/data.md` §8 (document the verification)
+- **Files:** `Australia/R/australia_data_download.R` Section 5 (potentially update centre dates and/or `half_width`); `Australia/docs/data.md` §8 (document the verification)
 - **Success criterion:** Each macroprudential dummy's centre date matches APRA's announced policy date (not press-coverage date); half-width is justified either by the announced phase-in period or by a sensitivity test
 - **Sensitivity:** While verifying, run a quick `half_width ∈ {1.5, 2.5, 4.5}` sensitivity on Spec 6's `ecm_lag` to confirm robustness
 
@@ -64,7 +64,7 @@ Following the canonical PI flip in NS-100, `australia_longrun_decomposition.png`
 
 - **Effort:** ~30 min (flip flag, rerun, save chart with `_ar` suffix)
 - **Depends on:** nothing
-- **Files:** `Ausreplication/R/australia_estimation.R` (tag filename with PI method when in non-canonical mode); `Ausreplication/outputs/australia_longrun_decomposition_ar.png` (new)
+- **Files:** `Australia/R/australia_estimation.R` (tag filename with PI method when in non-canonical mode); `Australia/outputs/australia_longrun_decomposition_ar.png` (new)
 - **Success criterion:** Both charts exist; the AR version shows the post-2008 PI step shift in the opposite direction.
 
 ### ~~NS-006/NS-022 Add Spec 7b: cohort + RBA-measured mortgage payment burden~~ ✅ **DONE**
@@ -83,7 +83,7 @@ Currently Spec 7 uses the synthetic `mortgage_burden` (= debt × rate / income) 
 
 - **Effort:** ~30 min to add the spec, half a day to write up the result
 - **Depends on:** nothing (RBA E13 already wired in)
-- **Files:** `Ausreplication/R/australia_estimation.R` `run_all_specifications()` (add Spec 7b after Spec 7); `Ausreplication/docs/wp_draft.md` §8 (add a paragraph)
+- **Files:** `Australia/R/australia_estimation.R` `run_all_specifications()` (add Spec 7b after Spec 7); `Australia/docs/wp_draft.md` §8 (add a paragraph)
 - **Success criterion:** A new spec appears in `australia_full_results.csv` with `mortgage_payment_burden_rba` as a long-run regressor over the 2009Q1+ sub-sample. Spec 7b's `mortgage_burden`-equivalent coefficient is documented vs Spec 7's synthetic equivalent.
 
 ### NS-007 PI sensitivity on the discount rate
@@ -92,7 +92,7 @@ The default `delta = 0.95` quarterly (~5% per quarter discount) follows Williams
 
 - **Effort:** half a day
 - **Depends on:** nothing
-- **Files:** new `Ausreplication/R/pi_discount_sensitivity.R`; `Ausreplication/outputs/australia_pi_discount_sensitivity.csv`
+- **Files:** new `Australia/R/pi_discount_sensitivity.R`; `Australia/outputs/australia_pi_discount_sensitivity.csv`
 - **Success criterion:** A 12-row CSV (6 deltas × 2 methods) showing both coefficients. Result is referenced as a robustness footnote in the WP.
 
 ---
@@ -101,11 +101,11 @@ The default `delta = 0.95` quarterly (~5% per quarter discount) follows Williams
 
 ### NS-010 Draft the WP Introduction
 
-The WP draft (`Ausreplication/docs/wp_draft.md`) §1 is currently bullet points. Write a proper 3-page introduction matching the lit review's voice. Should: (a) motivate the paper, (b) state the three contributions explicitly, (c) preview the headline result, (d) note the methodology pivot (Italy LP), (e) acknowledge the binding obstacle (RBA pre-1988 data) and how the paper is honest about it, (f) signpost the structure.
+The WP draft (`Australia/docs/wp_draft.md`) §1 is currently bullet points. Write a proper 3-page introduction matching the lit review's voice. Should: (a) motivate the paper, (b) state the three contributions explicitly, (c) preview the headline result, (d) note the methodology pivot (Italy LP), (e) acknowledge the binding obstacle (RBA pre-1988 data) and how the paper is honest about it, (f) signpost the structure.
 
 - **Effort:** 2 days writing + revision
 - **Depends on:** §2 lit review (done); §10 decomposition (partially drafted)
-- **Files:** `Ausreplication/docs/wp_draft.md` §1
+- **Files:** `Australia/docs/wp_draft.md` §1
 - **Success criterion:** ~1,500-2,000 words (3 pages of an RBA RDP). Reads as substantive academic prose, not a bulleted summary. Numbers in the headline-result paragraph match the latest pipeline run.
 
 ### NS-011 Draft the WP Conclusion
@@ -114,7 +114,7 @@ The WP draft (`Ausreplication/docs/wp_draft.md`) §1 is currently bullet points.
 
 - **Effort:** half a day
 - **Depends on:** the rest of the WP being settled
-- **Files:** `Ausreplication/docs/wp_draft.md` §11
+- **Files:** `Australia/docs/wp_draft.md` §11
 - **Success criterion:** ~500-800 words. Includes a "limitations and future work" subsection with the three companion-paper extensions and an honest treatment of the partial-CCI-identification problem.
 
 ### NS-012 Implement the three counterfactuals for §10
@@ -137,8 +137,8 @@ The current draft is plain markdown. For a polished central-bank submission you'
 
 - **Effort:** 2-3 days (one to set up; rest is iteration on style)
 - **Depends on:** WP draft sufficiently stable that the structure won't change much
-- **Files:** new `Ausreplication/docs/wp_draft.qmd` (Quarto version of wp_draft.md), `Ausreplication/docs/wp.bib` (BibTeX), `Ausreplication/docs/_quarto.yml` (rendering config); add `quarto` to README dev requirements
-- **Success criterion:** `quarto render Ausreplication/docs/wp_draft.qmd` produces a PDF that looks like a central-bank WP (RDP / TPRP / Bank Italy temi). All citations resolve from the .bib. All cross-references are clickable. CI is updated to render the PDF on push.
+- **Files:** new `Australia/docs/wp_draft.qmd` (Quarto version of wp_draft.md), `Australia/docs/wp.bib` (BibTeX), `Australia/docs/_quarto.yml` (rendering config); add `quarto` to README dev requirements
+- **Success criterion:** `quarto render Australia/docs/wp_draft.qmd` produces a PDF that looks like a central-bank WP (RDP / TPRP / Bank Italy temi). All citations resolve from the .bib. All cross-references are clickable. CI is updated to render the PDF on push.
 
 ### NS-014 Auto-generated WP figures section
 
@@ -146,7 +146,7 @@ Currently figures are produced separately by the pipeline; they're referenced in
 
 - **Effort:** 1 day (depends on NS-013)
 - **Depends on:** NS-013
-- **Files:** `Ausreplication/docs/figures.qmd` (new); modify `australia_estimation.R` to write a captions sidecar JSON
+- **Files:** `Australia/docs/figures.qmd` (new); modify `australia_estimation.R` to write a captions sidecar JSON
 - **Success criterion:** Each WP figure can be regenerated by a single Rscript invocation; the Quarto build pulls them in with their captions automatically; no figure paths are hard-coded in the WP draft
 
 ### ~~NS-015 Add a "Williams-prior" calibrated specification (Spec 10)~~ ✅ **DONE**
@@ -174,7 +174,7 @@ Williams (2010) calibrates rather than estimates several parameters: γ_2 (illiq
 
 - **Effort:** 1-2 days
 - **Depends on:** Spec 8 framework (done); willingness to constrain coefficients in OLS (use `nlxb` or restricted OLS)
-- **Files:** `Ausreplication/R/australia_estimation.R` (new helper for restricted estimation); new spec; `australia_williams_prior_spec.csv`
+- **Files:** `Australia/R/australia_estimation.R` (new helper for restricted estimation); new spec; `australia_williams_prior_spec.csv`
 - **Success criterion:** Spec 9 reports OLS coefficients on free terms (lambda, the wealth coefs) given Williams' priors are imposed on the others. Compare implied lambda and adjusted R^2 against unrestricted Spec 6.
 
 ---
@@ -194,7 +194,7 @@ Wealth aggregates `ha_y` and `ifa_y` will remain NA pre-1988 until RBA delivers 
 
 - **Effort:** 3-4 days
 - **Depends on:** RBA D01, D02, D03 historical data (publicly available via RBA chartpacks); ABS 5204-06 historical (Time Series Service if needed); ABS 3201 historical
-- **Files:** `Ausreplication/R/australia_data_download.R` (new sections for pre-1988 splicing); `Ausreplication/docs/data.md` (new §10 "Sample back-extension")
+- **Files:** `Australia/R/australia_data_download.R` (new sections for pre-1988 splicing); `Australia/docs/data.md` (new §10 "Sample back-extension")
 - **Success criterion:** `master` has non-NA values for `cons_real_pc`, `ydi_real_pc`, `mortgage_rate`, `unemp_rate`, `prime_age_share`, `lf_share`, `cci_ratio`-equivalent, `nla_y` (deposits-only, debt-netted where available), `debt_y`, `hpi`, `ln_hp_over_y` back to **1976Q3**. Pipeline runs end-to-end without assertion failures. Spec 1 fits on the longer sample with all coefficients within 1.5 SE of the 1988+ baseline.
 
 ### NS-021 Source BIS Shrapnel pre-1978 house prices via Treasury
@@ -204,7 +204,7 @@ Williams (2010) splices BIS Shrapnel data 1972Q3-1978Q2 before the REIA segment,
 - **Effort:** 1-2 days of data sourcing, 1 day of integration
 - **Depends on:** Treasury contact
 - **Decision point:** whether to chase Treasury given diminishing marginal returns relative to NS-020 + RBA-supplied HA/FA
-- **Files:** `Ausreplication/data_raw/bis_shrapnel_hpi.csv` (new); `Ausreplication/R/australia_data_download.R` House Price section (extend the splice chain)
+- **Files:** `Australia/data_raw/bis_shrapnel_hpi.csv` (new); `Australia/R/australia_data_download.R` House Price section (extend the splice chain)
 - **Success criterion:** `hpi` is non-NA back to 1972Q3 in the back-extended master. The splice scale factors at the join quarters (1978Q2-1978Q3 BIS→REIA, 1986Q1-1986Q2 REIA→ABS-old, 2002Q4-2003Q1 ABS-old→ABS-new) are documented in data.md.
 
 ### NS-022 Replace synthetic with measured mortgage burden in Spec 7b only (E13 over post-2009 sample)
@@ -222,7 +222,7 @@ Currently the data download uses regex pattern matching against ABS series names
 
 - **Effort:** 1 day for an audit pass + verification
 - **Depends on:** running the pipeline cold and inspecting which series get picked
-- **Files:** `Ausreplication/R/australia_data_download.R` (replace regex `pick_abs()` calls with `pick_abs_by_id()`)
+- **Files:** `Australia/R/australia_data_download.R` (replace regex `pick_abs()` calls with `pick_abs_by_id()`)
 - **Success criterion:** Each ABS series is identified by its stable series_id rather than a regex pattern; an integration test confirms the loaded series matches the previous regex-picked series
 
 ### NS-024 Audit unused 5232.0 sectoral workbooks for bonds-as-separate-bucket
@@ -240,7 +240,7 @@ The current `abs_income_resid` is the absolute value of the AR(8) residual on lo
 
 - **Effort:** 1 day
 - **Depends on:** nothing
-- **Files:** `Ausreplication/R/australia_estimation.R` `compute_income_volatility()` (currently AR8); add an `AR_ORDER` config flag like `PI_METHOD`
+- **Files:** `Australia/R/australia_estimation.R` `compute_income_volatility()` (currently AR8); add an `AR_ORDER` config flag like `PI_METHOD`
 - **Success criterion:** Spec 6 is refit with AR(2), AR(4), AR(8), and GARCH(1,1) volatility proxies; the `abs_income_resid` coefficient is reported across the four; sensitivity is logged in a new robustness CSV
 
 ### NS-026 Add a rolling-CCI-inclusive specification
@@ -249,7 +249,7 @@ The Williams 4-knot CCI is currently used only in Spec 8. Add a parallel rolling
 
 - **Effort:** 1 day
 - **Depends on:** Williams CCI being identified (works on current sample with 2 surviving knots; better with NS-020)
-- **Files:** `Ausreplication/R/australia_estimation.R` `fit_rolling_window()` (extend); new chart
+- **Files:** `Australia/R/australia_estimation.R` `fit_rolling_window()` (extend); new chart
 - **Success criterion:** Rolling-coefficient chart on `cci_williams` shows whether the loading is stable post-2007; if it isn't, the WP §10 policy implications discussion needs adjusting
 
 ---
@@ -263,7 +263,7 @@ Once the RBA delivers their unpublished pre-1988 housing wealth and total financ
 - **Effort:** 1-2 weeks once data arrives
 - **Depends on:** RBA delivery (in progress per user message)
 - **Decision point:** Splicing methodology — Bonci-Coletta (Italy paper Appendix A.2) vs Williams' MSMEAS smoothed-step approach (Aust paper p.16-17). Likely mix.
-- **Files:** `Ausreplication/data_raw/rba_pre1988_hh_wealth.csv` (new); extend `australia_data_download.R`
+- **Files:** `Australia/data_raw/rba_pre1988_hh_wealth.csv` (new); extend `australia_data_download.R`
 - **Success criterion:** Wealth ratios `ha_y, eq_y, super_y, nla_y, networth_y` extend back to 1977Q1. Spec 1, 4, 6 refit on extended sample. Williams 4-knot CCI 1979 knot identifies (passes sign prior). Comparison report in WP §9 updated with the back-extended results.
 
 ### NS-031 Multi-equation LIVES system
@@ -273,7 +273,7 @@ Estimate the full four-equation LIVES system (consumption, house prices, mortgag
 - **Effort:** Months. This is a major rebuild.
 - **Depends on:** NS-030 (sample back-extension); also requires constructing house-price equation, mortgage-stock equation, HEW equation following Williams' Tables 2-4
 - **Decision point:** Whether the central-bank WP should be the single-equation paper with this as a follow-up, or whether to wait and produce the full system. Recommendation: ship single-equation now, full system as companion.
-- **Files:** new `Ausreplication/R/lives_system.R`; new sections in WP draft
+- **Files:** new `Australia/R/lives_system.R`; new sections in WP draft
 - **Success criterion:** All four equations estimate jointly with FIML; the common-factor CCI spline is identified by the cross-equation restrictions; the consumption-equation coefficients change by less than 30% from single-equation OLS estimates on the same sample
 
 ### NS-032 Multi-country comparison harmonisation
@@ -282,12 +282,12 @@ Build a single comparison table that puts our Australia results alongside Italy 
 
 - **Effort:** 1 week
 - **Depends on:** access to the original published coefficient tables for each country (we have them embedded in the relevant PDFs)
-- **Files:** new `Ausreplication/R/cross_country_comparison.R`; `australia_cross_country_comparison.csv` (~20 rows × 6 columns)
+- **Files:** new `Australia/R/cross_country_comparison.R`; `australia_cross_country_comparison.csv` (~20 rows × 6 columns)
 - **Success criterion:** Side-by-side structural parameters (housing MPC, illiquid MPC, NLA MPC, ψ, λ) for 6 countries. Sample windows clearly labelled. Notes on calibration vs free estimation per country. Reference for the WP §9 international-comparison paragraph.
 
 ### ~~NS-033 Out-of-sample forecast validation~~ ✅ **DONE**
 
-Implemented as `Ausreplication/R/oos_forecast.R` and wired into the
+Implemented as `Australia/R/oos_forecast.R` and wired into the
 pipeline as Step 22. Flexible interface — accepts any spec produced by
 `fit_ecm_spec()` (or any future spec with the same shape) via the
 `specs_list` argument. Conditional forecasts (use actual macro path).
@@ -317,7 +317,7 @@ Hold out the last 4 quarters of data, refit the preferred spec on 1988Q4-2023Q4,
 
 - **Effort:** 2-3 days
 - **Depends on:** preferred spec is settled
-- **Files:** new `Ausreplication/R/forecast_validation.R`; new outputs `australia_oos_forecast.csv`, `australia_rolling_oos_forecast.png`
+- **Files:** new `Australia/R/forecast_validation.R`; new outputs `australia_oos_forecast.csv`, `australia_rolling_oos_forecast.png`
 - **Success criterion:** Forecast RMSE on quarterly Δlog(c) is reported alongside a benchmark random-walk-with-drift forecast. Rolling-window RMSE is plotted; periods of larger error are documented and interpreted
 
 ---
@@ -339,7 +339,7 @@ The Italy LP method is fast (single regression). The AR method is slow because o
 
 - **Effort:** 1 day
 - **Depends on:** nothing
-- **Files:** `Ausreplication/R/australia_estimation.R` `construct_permanent_income()` (add caching)
+- **Files:** `Australia/R/australia_estimation.R` `construct_permanent_income()` (add caching)
 - **Success criterion:** Pipeline runtime drops from current ~30s to <15s for run_estimation_from_rds.R
 
 ### NS-042 Add a regression test for the master-data round-trip
@@ -353,11 +353,11 @@ The CSV round-trip can drift bits at machine precision, which we documented. Add
 
 ### NS-043 Clean up unused 5232 workbooks
 
-`Ausreplication/data_raw/` has ~60 ABS Cat 5232 workbooks that are not used. Either wire one in (NS-024) or delete. Same for the `5204055011do001-005` workbooks.
+`Australia/data_raw/` has ~60 ABS Cat 5232 workbooks that are not used. Either wire one in (NS-024) or delete. Same for the `5204055011do001-005` workbooks.
 
 - **Effort:** 1 hour (decision); hours to delete
 - **Decision point:** Are any of these expected to be useful for future work?
-- **Files:** `Ausreplication/data_raw/` cleanup
+- **Files:** `Australia/data_raw/` cleanup
 - **Success criterion:** `data_raw/` contains only files used by the pipeline (or deliberately retained with documented future use)
 
 ### NS-044 Migrate to a Quarto book for the project
@@ -407,7 +407,7 @@ the Williams basis as exogenous regressors.
 
 ### ~~NS-106 Random-knot placebo test~~ ✅ **DONE**
 
-Implemented as `Ausreplication/R/cci_placebo_test.R`. 200 random 4-knot
+Implemented as `Australia/R/cci_placebo_test.R`. 200 random 4-knot
 draws uniformly distributed in 1979-2007. Verdict: Williams' canonical
 4-knot dates (1979/1992/1998/2007) sit at the **49th percentile of
 random draws on adj R²** and the **22nd percentile on |λ|** on our
@@ -423,7 +423,7 @@ Position the actual Williams knots in this distribution.
 
 - **Effort:** 2 days
 - **Depends on:** Spec 8 framework (working)
-- **Files:** new `Ausreplication/R/williams_placebo_test.R`; output
+- **Files:** new `Australia/R/williams_placebo_test.R`; output
   `australia_williams_knot_placebo.csv` and `.png`
 - **Success criterion:** Williams' actual knots fall in upper tail
   (top 10%) of the placebo distribution → identification claim
@@ -454,7 +454,7 @@ knot.
 
 ### ~~NS-108 Fit-improvement decomposition~~ ✅ **DONE**
 
-Implemented as `Ausreplication/R/cci_fit_decomposition.R`. Verdict:
+Implemented as `Australia/R/cci_fit_decomposition.R`. Verdict:
 **adding CCI degrades adj R²** (Spec 6 → Spec 8: −0.046; Spec 6 → Spec 9:
 −0.081) but substantially shifts wealth coefficients. Mean shift on
 nla_y/eq_y/super_y/ha_y: 20.8% under Williams CCI, 89.1% under Kalman.
@@ -479,7 +479,7 @@ one-day exercise to discriminate detrending vs identification.
 
 ### ~~NS-109 BIS credit-to-GDP gap comparator~~ ✅ **DONE**
 
-Implemented as part of `Ausreplication/R/cci_alternatives.R`. HP filter
+Implemented as part of `Australia/R/cci_alternatives.R`. HP filter
 (λ=400000) on log(household debt-to-income); positive gap = looser
 credit. Adds `cci_creditgap` column to master. Pearson correlation with
 `cci_williams`: +0.381. With `cci_kalman`: +0.304. With `cci_pca`:
@@ -501,7 +501,7 @@ different-family CCI alternative.
 
 ### ~~NS-110 PCA factor across multiple credit indicators~~ ✅ **DONE**
 
-Implemented as part of `Ausreplication/R/cci_alternatives.R`. PCA on 5
+Implemented as part of `Australia/R/cci_alternatives.R`. PCA on 5
 standardised credit indicators; first PC explains 34% of variance.
 Loadings: housing-loan-flow +0.42, debt-to-income +0.44, FHB share
 +0.21, mortgage burden +0.72, mortgage-rate change +0.26. Adds
@@ -524,7 +524,7 @@ spread, super_y growth)`. First PC = `cci_pca`.
 
 ### ~~NS-111 Macroprudential intensity index~~ ✅ **DONE**
 
-Implemented as part of `Ausreplication/R/cci_alternatives.R`. Combines
+Implemented as part of `Australia/R/cci_alternatives.R`. Combines
 seven post-2014 events (2014 investor cap, 2017 IO cap, 2018 Hayne RC
 start, 2019 Hayne findings, 2019Q3 cap removal, 2020 RBA emergency cut,
 2021Q4 buffer hike) into a continuous `macropru_intensity` series.

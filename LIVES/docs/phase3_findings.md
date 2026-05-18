@@ -114,7 +114,7 @@ HP-equation sign violation), not quantitative (closing the wealth-
 elasticity gap).
 
 This is consistent with the prior diagnosis from
-[back_extension_findings.md §3c](../../Ausreplication/docs/back_extension_findings.md):
+[back_extension_findings.md §3c](../../Australia/docs/back_extension_findings.md):
 the wealth-coefficient gap is a **single-equation OLS framing** issue,
 and the phase-3 approximation (joint sign survival) is not sufficient
 to close it. True parameter-restriction FIML, with shared parameters
@@ -197,7 +197,7 @@ The combined placebo + joint-identification evidence now produces a
 
 This is a clean empirical case for the multi-equation companion paper
 (NS-031). It also empirically supports the interpretation in
-[back_extension_findings.md §4](../../Ausreplication/docs/back_extension_findings.md):
+[back_extension_findings.md §4](../../Australia/docs/back_extension_findings.md):
 the binding constraint is single-equation framing, not sample length.
 
 ### Outstanding work

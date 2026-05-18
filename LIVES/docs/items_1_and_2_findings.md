@@ -17,7 +17,7 @@ are mixed and partly surprising.
 
 ## 1. Item 1 — `ha_x_cci` interaction in Spec 8
 
-Implementation: [australia_estimation.R](../../Ausreplication/R/australia_estimation.R)
+Implementation: [australia_estimation.R](../../Australia/R/australia_estimation.R)
 ~lines 1480–1505. Added `ha_x_cci = ha_y * cci_williams` to the Spec 8
 mutate block and the lr_vars list.
 
@@ -88,7 +88,7 @@ error — it's a finding.
 ## 2. Item 2 — sectional sign priors
 
 Implementation: new `build_williams_cci_basis_sectional()` in
-[model_helpers.R](../../Ausreplication/R/model_helpers.R) ~lines 879+.
+[model_helpers.R](../../Australia/R/model_helpers.R) ~lines 879+.
 Eight knots at Williams' period boundaries (Aust paper §5.1) plus our
 post-2008 extensions:
 
@@ -176,7 +176,7 @@ The path to closing the Williams gap therefore likely requires items
 3-5 (full LIVES system with HEW, cross-equation parameter normalisation,
 iterated CCI estimation) — which together amount to a serious FIML
 build, not a single-equation tweak. This is what
-[next_steps.md NS-031](../../Ausreplication/docs/next_steps.md#L269)
+[next_steps.md NS-031](../../Australia/docs/next_steps.md#L269)
 contemplated as the "big rebuild" all along.
 
 ---
@@ -185,5 +185,5 @@ contemplated as the "big rebuild" all along.
 
 - [outputs/sectional_cci_comparison.csv](../outputs/sectional_cci_comparison.csv) — coefficient table (note: the Spec-4-style comparison has a known bug; the placebo result is correct)
 - [outputs/sectional_placebo_summary.csv](../outputs/sectional_placebo_summary.csv) — sectional placebo verdict
-- New helper: `build_williams_cci_basis_sectional()` in [Ausreplication/R/model_helpers.R](../../Ausreplication/R/model_helpers.R)
-- New regressor: `ha_x_cci` in Spec 8 in [Ausreplication/R/australia_estimation.R](../../Ausreplication/R/australia_estimation.R)
+- New helper: `build_williams_cci_basis_sectional()` in [Australia/R/model_helpers.R](../../Australia/R/model_helpers.R)
+- New regressor: `ha_x_cci` in Spec 8 in [Australia/R/australia_estimation.R](../../Australia/R/australia_estimation.R)

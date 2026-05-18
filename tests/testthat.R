@@ -35,7 +35,7 @@ suppressPackageStartupMessages({
   }
 )
 project_root <- normalizePath(file.path(dirname(.this_file), ".."), winslash = "/")
-helpers_path <- file.path(project_root, "Ausreplication", "R", "model_helpers.R")
+helpers_path <- file.path(project_root, "Australia", "R", "model_helpers.R")
 test_dir_path <- file.path(project_root, "tests", "testthat")
 
 source(helpers_path, local = FALSE)

@@ -1328,7 +1328,7 @@ Of 6 knots that survive when fitted to consumption alone (here using
 the Spec-1 aggregate-proxy specification on the back-extended sample;
 the canonical Spec-4 disaggregated specification on the same sample
 yields a different but overlapping survivor set, e.g. 1992Q1, 2007Q3,
-2009Q1, 2019Q1, 2020Q2 from the canonical Ausreplication pipeline),
+2009Q1, 2019Q1, 2020Q2 from the canonical Australia pipeline),
 only **1986 (financial deregulation) and 2017 (APRA macroprudential
 round II)** have signs consistent with their institutional priors
 across consumption, house prices and mortgage stock simultaneously.
@@ -2458,7 +2458,7 @@ back-extended Australian data made impossible to test.
 
 ## Appendix A: Data construction
 
-> [Reproduce or summarise `Ausreplication/docs/data.md`. The current
+> [Reproduce or summarise `Australia/docs/data.md`. The current
 > data.md is already at the right level of detail for an appendix —
 > probably a 50% trim retaining sections 1, 2.1–2.10, 5, 6, 8, plus the
 > coverage table from §7.]
@@ -2482,6 +2482,6 @@ back-extended Australian data made impossible to test.
 
 ---
 
-**Generated** by hand from `Ausreplication/docs/`. To refresh
+**Generated** by hand from `Australia/docs/`. To refresh
 data-bearing sections after re-estimation, regenerate the source CSVs
 and copy in the relevant blocks.

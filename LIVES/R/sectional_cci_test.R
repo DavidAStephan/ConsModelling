@@ -30,7 +30,7 @@ suppressPackageStartupMessages({
 options(stringsAsFactors = FALSE, scipen = 999)
 set.seed(20260508L)
 
-PROJ_AUS   <- "Ausreplication"
+PROJ_AUS   <- "Australia"
 PROJ_LIVES <- "LIVES"
 
 dat <- readRDS(file.path(PROJ_LIVES, "outputs", "lives_model_data.rds"))

@@ -30,7 +30,7 @@ Three classes of source:
 3. **Project-supplied CSVs** — pre-2003 house-price back-fill and a handful of
    reference files used by the Italy comparator.
 
-All ABS workbooks are cached as RDS in [`Ausreplication/.cache/`](../.cache/)
+All ABS workbooks are cached as RDS in [`Australia/.cache/`](../.cache/)
 after the first parse, so subsequent runs are fast.
 
 ---
@@ -735,7 +735,7 @@ In rough order of payoff:
 ## 10. Caching and reproducibility
 
 ### Cache location
-[`Ausreplication/.cache/`](../.cache/) holds RDS pickles of parsed ABS
+[`Australia/.cache/`](../.cache/) holds RDS pickles of parsed ABS
 workbooks (one per `read_abs_cached()` call). Cache is keyed by the `tag`
 argument, not by file mtime — **changing the workbook in `data_raw/` does
 NOT invalidate the cache**. To force a re-parse:
@@ -745,20 +745,20 @@ NOT invalidate the cache**. To force a re-parse:
 ### Three execution modes
 1. **Cold rebuild (downloads + estimates):**
    ```
-   Rscript Ausreplication/R/australia_consumption_model.R
+   Rscript Australia/R/australia_consumption_model.R
    ```
    Reads ABS workbooks (cached), fetches RBA series live, builds `master`,
    saves `australia_model_dataset.rds`, then runs estimation. Required if
    `data_raw/` workbooks change.
 2. **Fast re-estimate from RDS (no data work):**
    ```
-   Rscript Ausreplication/R/run_estimation_from_rds.R
+   Rscript Australia/R/run_estimation_from_rds.R
    ```
    Loads the pre-built RDS, runs only the estimation script. Used by CI and
    for quick iteration. **Bit-identical reproduction.**
 3. **Re-estimate from a portable CSV (no downloads, hand-editable):**
    ```
-   Rscript Ausreplication/R/load_master_from_csv.R
+   Rscript Australia/R/load_master_from_csv.R
    ```
    Loads `data_raw/master_data.csv`, reconstructs `master`, runs estimation.
    Useful when:
@@ -771,7 +771,7 @@ NOT invalidate the cache**. To force a re-parse:
 
 Generate the CSV from the current cached RDS:
 ```
-Rscript Ausreplication/R/export_master_csv.R
+Rscript Australia/R/export_master_csv.R
 ```
 This produces [`data_raw/master_data.csv`](../data_raw/master_data.csv) (180
 rows × 60 columns, ~159 KB) using base R `write.table` with 17 significant
@@ -786,7 +786,7 @@ dummies) so the CSV is self-contained.
 
 Then load and re-run with:
 ```
-Rscript Ausreplication/R/load_master_from_csv.R
+Rscript Australia/R/load_master_from_csv.R
 ```
 
 **Caveat: CSV vs RDS path can diverge on Chow-borderline selector flags.**
@@ -804,7 +804,7 @@ documented Spec 6, check whether you ran the CSV path; the substantive
 analysis is unchanged either way.
 
 ### Not in source control (but should be)
-- `Ausreplication/outputs/australia_model_dataset.rds` IS in source control
+- `Australia/outputs/australia_model_dataset.rds` IS in source control
   (small enough — ~50 KB) so CI can use it.
 - Cache directory `.cache/` is **not** in source control. CI rebuilds from
   the workbooks on first run.

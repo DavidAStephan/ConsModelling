@@ -1,7 +1,7 @@
 # Knot experiment — findings and interpretation
 
 A substantive empirical answer to the question "why four knots?", from
-the experiment in [`Ausreplication/R/knot_experiment.R`](../R/knot_experiment.R)
+the experiment in [`Australia/R/knot_experiment.R`](../R/knot_experiment.R)
 that tests seven variants of the Williams-style smoothed-step CCI
 spline. The auto-generated tabular output is at
 [`outputs/australia_knot_experiment.md`](../outputs/australia_knot_experiment.md);

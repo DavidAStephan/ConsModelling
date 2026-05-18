@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # Quick re-estimation using saved RDS (skips data download)
-# Run from project root: Rscript Ausreplication/R/run_estimation_from_rds.R
+# Run from project root: Rscript Australia/R/run_estimation_from_rds.R
 
 suppressPackageStartupMessages({
   library(readxl); library(readabs); library(dplyr); library(tidyr)
@@ -18,7 +18,7 @@ options(stringsAsFactors = FALSE, scipen = 999)
     args <- commandArgs(trailingOnly = FALSE)
     m    <- regmatches(args, regexpr("(?<=--file=).+", args, perl = TRUE))
     if (length(m) > 0L) normalizePath(m[1L], winslash = "/", mustWork = FALSE)
-    else normalizePath("Ausreplication/R/run_estimation_from_rds.R",
+    else normalizePath("Australia/R/run_estimation_from_rds.R",
                        winslash = "/", mustWork = FALSE)
   }
 )
