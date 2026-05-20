@@ -333,3 +333,106 @@ knot, FIML has very little cross-equation parameter space to
 share, and the months-of-work commitment may not deliver
 proportionate empirical leverage until the candidate knot set is
 strengthened or the HEW equation is reconstructed on better data.
+
+---
+
+## Next step — HEW reconstruction with dwelling investment
+
+**Status:** unblocked. The dwelling-investment series we need is
+available in the ABS National Accounts (Cat 5206.0) back to 1959Q3
+— deeper than every other series in the 4-equation common sample,
+so the splice never binds.
+
+### What is needed
+
+| Field | Requirement |
+|---|---|
+| Series           | Private Gross Fixed Capital Formation — Dwellings (residential investment) |
+| Frequency        | Quarterly |
+| Units            | Nominal AUD, current prices |
+| Coverage         | 1976Q3 → 2024Q4 minimum; through 1959Q3 is free upside |
+| Seasonality      | Original (NSA) preferred to match `fin_loans_proxy`; seasonally adjusted also workable |
+| Source           | ABS Cat 5206.0 — Table 2 (Expenditure on GDP, current prices) or Table 33 (Private GFCF by type of asset) |
+
+Drop the xlsx/csv into `Australia/data_raw/` (or wire the ABS file
+ID into `australia_data_download.R`) and the splice is mechanical
+from there.
+
+### What changes once it lands
+
+The HEW equation gets reconstructed from the proxy form
+
+```
+hew_proxy = Δ(fin_loans_proxy) / ydi_ann_nom
+```
+
+to Williams' literal definition
+
+```
+hew_proper = (Δ(housing_loans) + housing_grants − dwelling_investment) / ydi_ann_nom
+```
+
+(grants is small and can be omitted in a first pass). Williams
+pre-multiplies by `z = 1/(HA/y)` for heteroscedasticity; we already
+construct `hew_proxy_z` and the same logic carries over.
+
+The diagnostic test is the 4-equation residual correlation. The
+proxy HEW currently has ρ(ε_M, ε_W) = **+0.83** because the LHS is
+essentially the change-form of the mortgage-stock equation's
+dependent variable. Dwelling investment moves on a different cycle
+(planning permits, completions, housing supply) than mortgage credit
+(demand-side, lending standards). Subtracting it is what makes HEW
+a *net* equity-extraction measure rather than a gross-credit-flow
+measure.
+
+If the reconstructed ρ(ε_M, ε_W) lands in the 0.2–0.4 range, the
+companion paper's Reading A vs Reading B choice resolves toward
+Reading B — the LIVES framework *is* the right model for
+contemporary Australia, and our proxy HEW was the binding
+constraint. That would also re-open Phase B (custom FIML), because
+the joint-survival knot set may widen back out beyond the single
+1986 deregulation knot once HEW carries its proper signal.
+
+If the reconstructed correlation stays high (say > 0.6), Reading A
+holds: even with a properly constructed HEW the four-equation
+common-factor identification is empirically thin, and the
+companion paper's diagnosis stands as written.
+
+### Implementation steps when the data arrives
+
+1. **Splice into the master.** Add `dwelling_investment_nom` to
+   `australia_data_download.R` or load from a user-supplied CSV per
+   the existing `data_raw/*.csv` pattern. Master then carries it
+   from 1959Q3+ (or 1976Q3+, whichever the sourced series provides).
+2. **Reconstruct `hew_proper`** in `LIVES/R/lives_data_prep.R`:
+   ```r
+   hew_proper = (c(NA, diff(fin_loans_proxy)) - dwelling_investment_nom)
+                / ydi_ann_nom
+   hew_proper_z = hew_proper / ha_y_proxy
+   ```
+   Retain `hew_proxy` as a robustness column alongside the proper
+   measure.
+3. **Re-run** `joint_cci_identification.R` (which fits the HEW
+   equation as part of the 4-equation joint survival) and
+   `lives_sur_4eq.R` (which estimates the 4-equation SUR).
+4. **Report** the new ρ(ε_M, ε_W), the new 4-equation joint
+   survivor set, and the new 4-equation SUR coefficient table.
+   Update `companion_paper_draft.md` §6 and §8.2 with the
+   resolved interpretation.
+5. **Decide on Phase B item B1.** With the resolved HEW evidence
+   in hand, the months-of-work commitment to custom FIML becomes
+   a clean go/no-go decision: go if the joint-survivor set widens
+   meaningfully, no-go if Reading A holds.
+
+Estimated end-to-end effort once the data is in hand: half day for
+splice + rerun + report.
+
+---
+
+## Conversation thread — 2026-05-21
+
+Note from the project owner: the dwelling-investment series is
+available in Australia back to 1959Q3, so the data side of the
+above is unblocked. The companion paper draft and the multi-
+equation plan should both be updated once the splice is in place
+and the 4-equation SUR rerun is complete.
