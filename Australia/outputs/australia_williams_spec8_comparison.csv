@@ -1,4 +1,4 @@
 "williams_term","williams_estimate","ours_term","ours_estimate","ours_t","note"
-"alpha_c1 (r x CCI)",-0.871,"r_x_cci",0.00421461765180352,1.04270346560419,"Williams effect at CCI=1; we report structural coef on r_x_cci"
-"alpha_c4 (hp/y x (1-1.2*CCI))",-0.13,"hp_x_1_minus_cci",0.0121431439762979,0.395294889765165,"Williams at CCI=0; we report structural coef"
-"psi_1 (yp/y x CCI)",0.93,"yp_x_cci",-1.76448043114387,-1.66130904444017,"Williams calibrated; we estimate freely"
+"alpha_c1 (r x CCI)",-0.871,"r_x_cci",0.00431926367488283,1.8545544881946,"Williams effect at CCI=1; we report structural coef on r_x_cci"
+"alpha_c4 (hp/y x (1-1.2*CCI))",-0.13,"hp_x_1_minus_cci",0.0171936857964663,0.999786340274581,"Williams at CCI=0; we report structural coef"
+"psi_1 (yp/y x CCI)",0.93,"yp_x_cci",-1.37395979982029,-2.12219622924101,"Williams calibrated; we estimate freely"

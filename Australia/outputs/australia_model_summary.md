@@ -30,9 +30,9 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec6_Preferred | 0.807 | 2.18 | Y | Y | N | — | N | -493.8 | N | Y | Y | N |
 | Spec7_CohortBurden | 0.833 | 2.20 | Y | N | N | — | N | -499.8 | N | Y | N | N |
 | Spec7b_RBABurden | 0.869 | 2.16 | Y | N | N | — | N | -363.0 | N | Y | N | N |
-| Spec8_CCI_Interactions | 0.798 | 1.97 | Y | Y | N | — | N | -930.3 | Y | — | N | N |
+| Spec8_CCI_Interactions | 0.821 | 1.87 | Y | N | N | — | N | -948.5 | Y | — | N | N |
 | Spec9_KalmanCCI | 0.737 | 2.20 | Y | N | N | — | N | -895.9 | N | — | Y | N |
-| Spec10_WilliamsPrior | 0.773 | 2.14 | Y | Y | N | — | Y | -491.5 | Y | — | Y | N |
+| Spec10_WilliamsPrior | 0.778 | 2.17 | Y | Y | N | — | Y | -493.7 | Y | — | Y | N |
 
 ## Lambda comparison (full vs pre-COVID)
 
@@ -46,9 +46,9 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec6_Preferred | -0.1801 | -0.1228 | yes |
 | Spec7_CohortBurden | -0.3730 | -0.0518 | yes |
 | Spec7b_RBABurden | -0.3755 | -0.0614 | yes |
-| Spec8_CCI_Interactions | -0.3767 | -0.2457 | yes |
+| Spec8_CCI_Interactions | -0.4449 | -0.2470 | yes |
 | Spec9_KalmanCCI | -0.1994 | -0.1723 | yes |
-| Spec10_WilliamsPrior | -0.0472 | -0.0307 | yes |
+| Spec10_WilliamsPrior | -0.0480 | -0.0274 | yes |
 
 ## Italy vs Australia (preferred specs)
 
