@@ -1,7 +1,7 @@
 "a","b","n_overlap","rho"
-"Kalman_state_space","Williams_max_GETS",194,0.294357368779933
-"PCA_first_factor","Williams_max_GETS",146,-0.0852254688136998
-"Credit_to_income_gap","Williams_max_GETS",146,0.308860685030208
+"Kalman_state_space","Williams_max_GETS",194,0.0501865329063678
+"PCA_first_factor","Williams_max_GETS",146,-0.189751596654741
+"Credit_to_income_gap","Williams_max_GETS",146,0.33206109558193
 "Credit_to_income_gap","Kalman_state_space",146,0.304471609982352
 "Kalman_state_space","PCA_first_factor",146,0.764196704605186
 "Credit_to_income_gap","PCA_first_factor",146,0.238314541654332

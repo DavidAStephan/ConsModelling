@@ -1682,37 +1682,57 @@ run_all_specifications_with_dummies <- function(model_data, dummy_vars,
 fit_consumption_with_williams_cci <- function(model_data, lr_vars, sr_vars,
                                                dummy_vars,
                                                sample_end = as.Date("2024-10-01"),
-                                               basis_fn   = build_williams_cci_basis) {
+                                               basis_fn   = build_williams_cci_basis,
+                                               max_iter   = 10L) {
+  # Iterated knot-survival per Williams (Aust paper §5.1). At each
+  # iteration we re-fit the consumption ECM with the currently-surviving
+  # candidate knot set, drop any knot whose sign violates its
+  # institutional prior, and repeat. The loop terminates when the
+  # surviving set is stable across two consecutive iterations (typical:
+  # 1–3 iterations on the 1988+ sample).
   basis <- basis_fn(model_data$date)
   sign_priors <- attr(basis, "sign_priors")
   cci_terms   <- colnames(basis)
   for (j in seq_along(cci_terms)) {
     model_data[[cci_terms[j]]] <- basis[, j]
   }
+  names(sign_priors) <- cci_terms
 
-  full_lr <- c(lr_vars, cci_terms)
+  full_lr        <- c(lr_vars, cci_terms)
+  dropped_total  <- character(0)
+  iter_log       <- list()
+
   spec <- fit_ecm_spec(model_data, "Williams_CCI", full_lr, sr_vars,
                        dummy_vars, sample_end = sample_end)
 
-  cf <- coef(spec$fit)
-  violators <- character(0)
-  for (j in seq_along(cci_terms)) {
-    nm <- cci_terms[j]
-    if (nm %in% names(cf) && !is.na(cf[nm]) && cf[nm] != 0) {
-      if (sign(cf[nm]) != sign_priors[j]) {
-        violators <- c(violators, nm)
+  for (iter in seq_len(max_iter)) {
+    cf <- coef(spec$fit)
+    candidates <- intersect(cci_terms, full_lr)
+    new_violators <- character(0)
+    for (nm in candidates) {
+      if (nm %in% names(cf) && !is.na(cf[nm]) && cf[nm] != 0) {
+        if (sign(cf[nm]) != sign_priors[[nm]]) {
+          new_violators <- c(new_violators, nm)
+        }
       }
     }
-  }
+    iter_log[[iter]] <- list(
+      iter       = iter,
+      candidates = candidates,
+      violators  = new_violators
+    )
+    if (length(new_violators) == 0L) break
 
-  if (length(violators) > 0L) {
-    message("Williams CCI: dropping sign-violators: ",
-            paste(violators, collapse = ", "))
-    full_lr <- setdiff(full_lr, violators)
-    if (length(intersect(cci_terms, full_lr)) > 0L) {
-      spec <- fit_ecm_spec(model_data, "Williams_CCI", full_lr, sr_vars,
-                           dummy_vars, sample_end = sample_end)
+    message(sprintf("Williams CCI iter %d: dropping sign-violators: %s",
+                    iter, paste(new_violators, collapse = ", ")))
+    dropped_total <- c(dropped_total, new_violators)
+    full_lr       <- setdiff(full_lr, new_violators)
+
+    if (length(intersect(cci_terms, full_lr)) == 0L) {
+      break
     }
+    spec <- fit_ecm_spec(model_data, "Williams_CCI", full_lr, sr_vars,
+                         dummy_vars, sample_end = sample_end)
   }
 
   # A knot is "surviving" only if it (a) was not sign-violated and (b) was
@@ -1742,10 +1762,12 @@ fit_consumption_with_williams_cci <- function(model_data, lr_vars, sr_vars,
 
   list(spec = spec, model_data = model_data,
        surviving_knots = surviving,
-       dropped_knots = violators,
+       dropped_knots = dropped_total,
        aliased_knots = aliased_surv,
        sign_priors = sign_priors,
-       knot_names = cci_terms)
+       knot_names = cci_terms,
+       iter_log = iter_log,
+       n_iter   = length(iter_log))
 }
 
 build_lambda_robustness_table <- function(specs_full, specs_precovid,

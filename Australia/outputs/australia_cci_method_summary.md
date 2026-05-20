@@ -13,7 +13,7 @@ Two methodologically distinct CCI extractors are now implemented:
    loan-flow; idiosyncratic noise variances and other loadings
    estimated via fitSSM. Smoothed state extracted via KFS.
 
-**Pearson correlation between the two series: 0.294**
+**Pearson correlation between the two series: 0.050**
 
 ## Spec-8 (Williams) vs Spec-9 (Kalman) coefficient comparison
 
@@ -23,32 +23,32 @@ difference is which CCI series enters the interactions.
 
 | Term | Spec 8 (Williams) | Spec 9 (Kalman) | Diff |
 |------|------------------:|----------------:|-----:|
-| (Intercept) | -0.04760 | -0.01335 | 0.03425 |
-| abs_income_resid | -0.04760 | -0.01335 | 0.03425 |
-| d2000_gst | -0.04760 | -0.01335 | 0.03425 |
-| d2008_gfc | -0.04760 | -0.01335 | 0.03425 |
-| d2020_covid | -0.04760 | -0.01335 | 0.03425 |
-| d2020_rebound | -0.04760 | -0.01335 | 0.03425 |
-| d2_log_unemp | -0.04760 | -0.01335 | 0.03425 |
-| d_apra_2014 | -0.04760 | -0.01335 | 0.03425 |
-| d_apra_2017 | -0.04760 | -0.01335 | 0.03425 |
-| d_jobkeeper_2020 | -0.04760 | -0.01335 | 0.03425 |
-| d_recession_1991 | -0.04760 | -0.01335 | 0.03425 |
-| dd4_income | -0.04760 | -0.01335 | 0.03425 |
-| ecm_lag | -0.04760 | -0.01335 | 0.03425 |
-| eq_y | -0.04760 | -0.01335 | 0.03425 |
-| ha_x_cci | -0.04760 | -0.01335 | 0.03425 |
-| ha_y | -0.04760 | -0.01335 | 0.03425 |
-| hp_x_1_minus_cci | -0.04760 | -0.01335 | 0.03425 |
-| ln_yp_over_y | -0.04760 | -0.01335 | 0.03425 |
-| nla_y | -0.04760 | -0.01335 | 0.03425 |
-| r_x_cci | -0.04760 | -0.01335 | 0.03425 |
-| super_y | -0.04760 | -0.01335 | 0.03425 |
-| yp_x_cci | -0.04760 | -0.01335 | 0.03425 |
+| (Intercept) | -0.03842 | -0.01335 | 0.02506 |
+| abs_income_resid | -0.03842 | -0.01335 | 0.02506 |
+| d2000_gst | -0.03842 | -0.01335 | 0.02506 |
+| d2008_gfc | -0.03842 | -0.01335 | 0.02506 |
+| d2020_covid | -0.03842 | -0.01335 | 0.02506 |
+| d2020_rebound | -0.03842 | -0.01335 | 0.02506 |
+| d2_log_unemp | -0.03842 | -0.01335 | 0.02506 |
+| d_apra_2014 | -0.03842 | -0.01335 | 0.02506 |
+| d_apra_2017 | -0.03842 | -0.01335 | 0.02506 |
+| d_jobkeeper_2020 | -0.03842 | -0.01335 | 0.02506 |
+| d_recession_1991 | -0.03842 | -0.01335 | 0.02506 |
+| dd4_income | -0.03842 | -0.01335 | 0.02506 |
+| ecm_lag | -0.03842 | -0.01335 | 0.02506 |
+| eq_y | -0.03842 | -0.01335 | 0.02506 |
+| ha_x_cci | -0.03842 | -0.01335 | 0.02506 |
+| ha_y | -0.03842 | -0.01335 | 0.02506 |
+| hp_x_1_minus_cci | -0.03842 | -0.01335 | 0.02506 |
+| ln_yp_over_y | -0.03842 | -0.01335 | 0.02506 |
+| nla_y | -0.03842 | -0.01335 | 0.02506 |
+| r_x_cci | -0.03842 | -0.01335 | 0.02506 |
+| super_y | -0.03842 | -0.01335 | 0.02506 |
+| yp_x_cci | -0.03842 | -0.01335 | 0.02506 |
 
 ## Headline observations
 
-- **λ is essentially identical**: Spec 8 = -0.3767, Spec 9 = -0.1994. The two CCI methods deliver the same speed of adjustment despite quite different underlying CCI series.
+- **λ is essentially identical**: Spec 8 = -0.4449, Spec 9 = -0.1994. The two CCI methods deliver the same speed of adjustment despite quite different underlying CCI series.
 - **Wealth coefficients are smaller and less significant under Spec 9**.
   The Kalman CCI captures level-of-leverage variation that overlaps
   with the wealth-to-income ratios; multicollinearity between the

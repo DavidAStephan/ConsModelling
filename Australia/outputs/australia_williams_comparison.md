@@ -49,9 +49,9 @@ with our reduced-form 2-knot Williams CCI (1998 + 2007 only — the 1979 and
 
 | Williams term | Williams γ | Spec 8 OLS coef | Spec 8 implied γ | Note |
 |---|---:|---:|---:|---|
-| α_c1 (r × CCI) | -0.8710 | 0.0016 | 0.0042 | Sign FAIL on our sample (small +ve) |
-| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | 0.0046 | 0.0121 | Sign agrees; magnitude smaller |
-| ψ_1 (log(y^p/y) × CCI) | 0.9300 | -0.6647 | -1.7645 | Williams calibrates; we estimate freely (sign FAIL) |
+| α_c1 (r × CCI) | -0.8710 | 0.0019 | 0.0043 | Sign FAIL on our sample (small +ve) |
+| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | 0.0076 | 0.0172 | Sign agrees; magnitude smaller |
+| ψ_1 (log(y^p/y) × CCI) | 0.9300 | -0.6113 | -1.3740 | Williams calibrates; we estimate freely (sign FAIL) |
 
 ## Where we agree, where we differ
 

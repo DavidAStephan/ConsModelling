@@ -94,6 +94,18 @@ m_spec <- list(
   sr_vars  = c("dlog_hp_real", "d_real_rate"),
   dummies  = base_dummies
 )
+# HEW equation (Williams Aust eq 13). Sign priors per Williams' framework:
+# CCI loose → higher HEW (households extract more equity when credit eases).
+# Income positive (richer households extract more). Housing wealth positive
+# (more collateral to extract from). Real rate negative (lower rates make
+# extraction cheaper).
+w_spec <- list(
+  response = "hew_proxy",
+  lr_base  = c("lincome", "ha_y_proxy", "real_rate", "prime_age_share",
+               "ecm_lag_W"),
+  sr_vars  = c("dlog_hp_real", "d_real_rate"),
+  dummies  = setdiff(base_dummies, c("d2000_gst", "d_jobkeeper_2020"))
+)
 
 # ----------------------------------------------------------------------------
 # Fit each equation with full 15-knot basis; record sign of each knot's
@@ -128,10 +140,11 @@ fit_equation_with_basis <- function(spec, label) {
   )
 }
 
-cat("\n--- Fitting 3 equations with full 15-knot CCI basis ---\n")
+cat("\n--- Fitting 4 equations with full 15-knot CCI basis ---\n")
 fit_c <- fit_equation_with_basis(c_spec, "Cons_15knot")
 fit_h <- fit_equation_with_basis(h_spec, "HP_15knot")
 fit_m <- fit_equation_with_basis(m_spec, "M_15knot")
+fit_w <- fit_equation_with_basis(w_spec, "HEW_15knot")
 
 # ----------------------------------------------------------------------------
 # JOINT SURVIVAL: a knot survives iff its sign matches prior in ALL
@@ -144,19 +157,27 @@ survival_tbl <- tibble(
   c_sign            = fit_c$cci_signs,
   h_sign            = fit_h$cci_signs,
   m_sign            = fit_m$cci_signs,
+  w_sign            = if (!is.null(fit_w)) fit_w$cci_signs else NA_integer_,
   c_estimate        = fit_c$cci_estimates,
   h_estimate        = fit_h$cci_estimates,
-  m_estimate        = fit_m$cci_estimates
+  m_estimate        = fit_m$cci_estimates,
+  w_estimate        = if (!is.null(fit_w)) fit_w$cci_estimates else NA_real_
 ) %>%
   mutate(
     c_pass  = is.na(c_sign) | c_sign == sign_prior,
     h_pass  = is.na(h_sign) | h_sign == sign_prior,
     m_pass  = is.na(m_sign) | m_sign == sign_prior,
+    w_pass  = is.na(w_sign) | w_sign == sign_prior,
     # Don't count NA (aliased / collinear) as a failure — it just means the
     # knot couldn't be estimated. Survival requires non-NA in at least one
     # equation AND no failures where it WAS estimated.
-    n_estimated = (!is.na(c_sign)) + (!is.na(h_sign)) + (!is.na(m_sign)),
-    joint_pass  = c_pass & h_pass & m_pass & (n_estimated > 0L)
+    n_estimated   = (!is.na(c_sign)) + (!is.na(h_sign)) +
+                    (!is.na(m_sign)) + (!is.na(w_sign)),
+    # Three-equation survival (legacy diagnostic; was the phase 3 deliverable)
+    joint_pass_3eq = c_pass & h_pass & m_pass &
+                    ((!is.na(c_sign)) + (!is.na(h_sign)) + (!is.na(m_sign)) > 0L),
+    # Four-equation survival (new — A7 in the multi-equation plan)
+    joint_pass    = c_pass & h_pass & m_pass & w_pass & (n_estimated > 0L)
   )
 
 cat("\n--- Joint CCI knot survival table ---\n")
@@ -171,51 +192,86 @@ cat(sprintf("  %d knots survive consumption-only test: %s\n",
             length(survival_c_only),
             if (length(survival_c_only) > 0) paste(survival_c_only, collapse = ", ") else "(none)"))
 
-joint_survivors <- survival_tbl %>% filter(joint_pass) %>% pull(knot)
-cat(sprintf("\n--- Joint survival (consumption AND HP AND M) ---\n"))
-cat(sprintf("  %d knots survive joint test: %s\n",
+survivors_3eq    <- survival_tbl %>% filter(joint_pass_3eq) %>% pull(knot)
+joint_survivors  <- survival_tbl %>% filter(joint_pass)     %>% pull(knot)
+
+cat(sprintf("\n--- 3-equation joint survival (C ∩ H ∩ M) ---\n"))
+cat(sprintf("  %d knots survive 3-eq test: %s\n",
+            length(survivors_3eq),
+            if (length(survivors_3eq) > 0) paste(survivors_3eq, collapse = ", ") else "(none)"))
+
+cat(sprintf("\n--- 4-equation joint survival (C ∩ H ∩ M ∩ W) — Phase A item A7 ---\n"))
+cat(sprintf("  %d knots survive 4-eq test: %s\n",
             length(joint_survivors),
             if (length(joint_survivors) > 0) paste(joint_survivors, collapse = ", ") else "(none)"))
 
 # Knots that consumption alone would survive but joint test rejects
 cons_kept_joint_dropped <- setdiff(survival_c_only, joint_survivors)
 joint_kept_cons_dropped <- setdiff(joint_survivors, survival_c_only)
-cat(sprintf("\n  Knots kept by consumption-only but dropped by joint: %s\n",
+cat(sprintf("\n  Knots kept by consumption-only but dropped by 4-eq joint: %s\n",
             if (length(cons_kept_joint_dropped) > 0) paste(cons_kept_joint_dropped, collapse = ", ") else "(none)"))
-cat(sprintf("  Knots kept by joint but dropped by consumption-only: %s\n",
+cat(sprintf("  Knots kept by 4-eq joint but dropped by consumption-only: %s\n",
             if (length(joint_kept_cons_dropped) > 0) paste(joint_kept_cons_dropped, collapse = ", ") else "(none)"))
 
 # ----------------------------------------------------------------------------
-# Construct cci_williams_joint as a weighted sum of joint-surviving knots.
-# Weights: the consumption-equation coefficients on those surviving knots
-# (so the construction is comparable to the existing cci_williams which
-# uses consumption-equation coefficients).
+# Construct cci_williams_joint variants from joint-surviving knots.
+#
+# Williams (Aust paper §5.1) normalises ζ_h = 1 in the house-price equation
+# — i.e. the CCI is the linear combination whose loading in the HP equation
+# is unity. This is the cross-equation identification scheme that defines
+# the relative scaling ζ_c, ζ_m, ζ_w in the other equations.
+#
+# We provide three variants:
+#   cci_williams_joint     consumption-equation-weighted (legacy)
+#   cci_williams_joint_h   HP-equation-weighted (Williams' ζ_h = 1)
+#   cci_williams_joint_m   mortgage-equation-weighted
+#
+# All three are peak-normalised to unity. The HP-weighted variant is the
+# cleanest implementation of Williams' normalisation scheme; the others
+# are diagnostic alternatives.
 # ----------------------------------------------------------------------------
 if (length(joint_survivors) == 0L) {
   cat("\n  WARNING: no knots survive joint test. Falling back to consumption-only.\n")
   joint_survivors <- survival_c_only
 }
 
-X_surv <- as.matrix(dat[, joint_survivors, drop = FALSE])
-w_cons <- fit_c$cci_estimates[joint_survivors]
-raw_joint <- as.numeric(X_surv %*% w_cons)
-mx <- max(raw_joint, na.rm = TRUE)
-cci_williams_joint <- if (is.finite(mx) && mx > 0) {
-  raw_joint / mx
-} else if (is.finite(mx) && mx < 0) {
-  raw_joint / abs(mx)
-} else {
-  raw_joint
+peak_normalise <- function(x) {
+  mx <- max(x, na.rm = TRUE)
+  if (is.finite(mx) && mx > 0) {
+    x / mx
+  } else if (is.finite(mx) && mx < 0) {
+    x / abs(mx)
+  } else {
+    x
+  }
 }
 
-# Compare correlation with the existing consumption-fitted cci_williams
+X_surv <- as.matrix(dat[, joint_survivors, drop = FALSE])
+cci_williams_joint   <- peak_normalise(as.numeric(X_surv %*%
+                                                     fit_c$cci_estimates[joint_survivors]))
+cci_williams_joint_h <- peak_normalise(as.numeric(X_surv %*%
+                                                     fit_h$cci_estimates[joint_survivors]))
+cci_williams_joint_m <- peak_normalise(as.numeric(X_surv %*%
+                                                     fit_m$cci_estimates[joint_survivors]))
+
+# Compare correlations with the existing consumption-fitted cci_williams
 rho_joint_vs_cons <- cor(cci_williams_joint, dat$cci_williams,
                           use = "complete.obs")
-cat(sprintf("\n  cor(cci_williams_joint, cci_williams_cons-only) = %.4f\n",
+rho_h_vs_c        <- cor(cci_williams_joint_h, cci_williams_joint,
+                          use = "complete.obs")
+rho_m_vs_c        <- cor(cci_williams_joint_m, cci_williams_joint,
+                          use = "complete.obs")
+cat(sprintf("\n  cor(cci_williams_joint, cci_williams_cons-only)   = %.4f\n",
             rho_joint_vs_cons))
+cat(sprintf("  cor(cci_williams_joint_h, cci_williams_joint)    = %.4f\n",
+            rho_h_vs_c))
+cat(sprintf("  cor(cci_williams_joint_m, cci_williams_joint)    = %.4f\n",
+            rho_m_vs_c))
 
 # Save updated model data
-dat$cci_williams_joint <- cci_williams_joint
+dat$cci_williams_joint   <- cci_williams_joint
+dat$cci_williams_joint_h <- cci_williams_joint_h
+dat$cci_williams_joint_m <- cci_williams_joint_m
 saveRDS(dat, file.path(PROJ_LIVES, "outputs", "lives_model_data.rds"))
 
 # Save survival table

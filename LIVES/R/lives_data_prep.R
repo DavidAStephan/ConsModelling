@@ -163,7 +163,38 @@ model_data <- model_data %>%
     # this is the same Engle-Granger pattern as the HP equation. The data
     # identifies whatever long-run combination of (income, hp/y, rate, etc.)
     # is cointegrating with M_real. Sign prior on this regressor: < 0.
-    ecm_lag_M         = lag(log_M_real, 1L)
+    ecm_lag_M         = lag(log_M_real, 1L),
+
+    # ----- Home-equity-withdrawal (HEW) equation regressors (Williams eq 13)
+    # Williams' literal HEW definition: change in housing-secured debt PLUS
+    # housing-related government grants MINUS dwelling investment, divided
+    # by income. We do not have dwelling_investment in the master at the
+    # moment (would need ABS National Accounts GFCF on residential dwellings),
+    # so we construct a proxy that uses the credit-flow dimension only and
+    # documents the caveat. On the back-extended sample housing dominates
+    # total household debt (~85% in the modern period), so Δ(fin_loans_proxy)
+    # is a defensible stand-in for the change in housing-secured debt.
+    #
+    # `hew_proxy = Δ(fin_loans_proxy) / ydi_ann_nom`
+    # `hew_proxy_z = hew_proxy / (HA/y)`  -- Williams pre-multiplies by
+    #                                       z = 1/(HA/y) for heteroscedasticity
+    #
+    # Caveats vs Williams' definition:
+    #   (i)  dwelling_investment subtraction is missing; our HEW proxy is
+    #        therefore an over-statement of "true" home-equity withdrawal.
+    #   (ii) fin_loans_proxy is total household debt, not housing-specific;
+    #        on the modern sample housing-specific debt is ~85% of the total
+    #        so the approximation is close, but pre-1990 the housing share
+    #        was lower and the proxy will be noisier on the back-extended
+    #        portion of the sample.
+    hew_proxy         = c(NA_real_, diff(if ("fin_loans_proxy" %in% names(.))
+                                            fin_loans_proxy
+                                          else fin_loans)) / ydi_ann_nom,
+    hew_proxy_z       = if_else(is.na(ha_y_proxy) | ha_y_proxy <= 0,
+                                 NA_real_,
+                                 hew_proxy / ha_y_proxy),
+    # Lagged versions used in the HEW ECM
+    ecm_lag_W         = lag(hew_proxy, 1L)
   )
 
 # ----------------------------------------------------------------------------
@@ -176,7 +207,8 @@ for (v in c("dlcons", "lcons", "lincome", "ecm_lag",
             "cci_williams",
             "log_hp_real", "dlog_hp_real", "ln_hp_over_yd", "ecm_lag_H",
             "log_credit_y", "real_rate", "real_rate_x_cci",
-            "prime_age_share")) {
+            "prime_age_share",
+            "hew_proxy", "hew_proxy_z", "ecm_lag_W")) {
   if (v %in% names(model_data)) {
     nn <- sum(!is.na(model_data[[v]]))
     if (nn > 0) {
