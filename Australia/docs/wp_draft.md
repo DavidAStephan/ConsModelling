@@ -35,7 +35,7 @@ negative long-run coefficient on log(y^p/y) under a rolling AR(8)
 forecaster — flips to a positive +0.30 under Italy LP, matching
 Williams' calibrated +0.20 in sign and broad magnitude. Adding the
 time-varying housing-wealth m.p.c. interaction to the Williams CCI
-interactions specification yields λ = −0.383, exceeding Williams'
+interactions specification yields λ = −0.377, exceeding Williams'
 calibrated value in magnitude.
 
 We assemble a back-extended master dataset to 1976Q3 — using a TRYM
@@ -187,7 +187,7 @@ on the disaggregated wealth components — γ_HA = 0.049, γ_IFA = 0.030,
 γ_NLA = 0.196 — are within ±37 per cent of Williams' Table 1 values
 in every case, with γ_HA matching Williams almost exactly. Adding
 the time-varying housing-wealth m.p.c. interaction in the
-Williams CCI-interactions specification (Spec 8) yields λ = −0.383,
+Williams CCI-interactions specification (Spec 8) yields λ = −0.377,
 *exceeding* Williams' calibrated value in magnitude. The
 cross-equation restriction γ_LA + γ_LOANS = 0 is accepted in every
 disaggregated specification and sample window we estimate,
@@ -1238,7 +1238,7 @@ sign prior, so the spline is *empirically* identified rather than
 imposed; and (iii) the resulting λ on Spec 8 is materially closer to
 Williams' published −0.286 than the canonical 4-knot replication
 delivers. With the time-varying housing-wealth m.p.c. interaction
-added (§5.5), Spec 8 yields λ = −0.383, exceeding Williams in
+added (§5.5), Spec 8 yields λ = −0.377, exceeding Williams in
 magnitude. Williams' canonical 4-knot setup is retained as a
 robustness benchmark, and a sectional sign-prior alternative
 following Williams' Aust paper §5.1 specification is also implemented
@@ -1426,7 +1426,7 @@ peak to 0.0452 at the end of his sample, so the direction is not
 unambiguously inconsistent with the LIVES theory.
 
 The interaction does materially affect λ: Spec 8 with `ha_x_cci`
-included delivers λ = −0.383, *exceeding* Williams' calibrated
+included delivers λ = −0.377, *exceeding* Williams' calibrated
 −0.286 in magnitude. The time-varying housing-wealth interaction
 shifts the mean-reversion speed but does not significantly change
 the *level* of the housing-wealth m.p.c.
@@ -1737,9 +1737,9 @@ which joint estimation delivers ρ̂ ≈ 0 — corroborate this reading.
 
 Spec 8 with the full Williams CCI interaction set, including the
 time-varying housing-wealth m.p.c. interaction (§5.5), delivers
-**λ = −0.383**, overshooting Williams' −0.286 in magnitude on the
+**λ = −0.377**, overshooting Williams' −0.286 in magnitude on the
 1988Q4+ sample. The wealth coefficients shift relative to Spec 6 in
-both directions (γ_HA = 0.024, γ_IFA = 0.066, γ_NLA = 0.095) without
+both directions (γ_HA = 0.028, γ_IFA = 0.054, γ_NLA = 0.091) without
 moving systematically toward Williams' Table 1 — confirming that
 adding CCI interactions to a single-equation specification can
 re-allocate the long-run identification across wealth components,
@@ -1814,25 +1814,38 @@ break around 2008Q3, in line with the standard GFC narrative.
 
 Spec 8 incorporates the Williams CCI interactions into the
 disaggregated-wealth long-run on the 1988+ sample with the
-reduced-form `cci_williams`:
+reduced-form `cci_williams`. Following Williams (Aust paper §5.1)
+the variables interacted with CCI are de-meaned over the estimation
+sample before forming the interaction, so that each interaction
+term has a clean conditional interpretation rather than absorbing
+an implicit linear CCI level shift:
 
 | Williams interaction | Sign prior | Coefficient | t | Verdict |
 |---|---:|---:|---:|---|
-| `ha_y × CCI`                  | + | −0.0011 | −0.65 | wrong sign, insignificant |
-| `log(HP/y) × (1 − 1.2·CCI)`   | − | +0.0066 | +1.75 | wrong sign on composite, p = 0.082 |
-| `r × CCI`                     | − | +0.0018 | +1.33 | wrong sign, insignificant |
-| `log(y^p/y) × CCI`            | + | −0.6247 | −1.24 | wrong sign, insignificant |
+| `ha_y × CCI`                  | + | −0.0020 | −0.29 | wrong sign, insignificant |
+| `log(HP/y) × (1 − 1.2·CCI)`   | − | +0.0046 | +0.40 | wrong sign on composite, insignificant |
+| `r × CCI`                     | − | +0.0016 | +1.04 | wrong sign, insignificant |
+| `log(y^p/y) × CCI`            | + | −0.6647 | −1.66 | wrong sign, p = 0.10 |
 
-The interaction terms individually carry small and largely
-insignificant coefficients, with several wrong signs. The substantive
-effect of Spec 8 is to shift λ from −0.180 (Spec 6) to −0.383 — past
-Williams' value in magnitude — and to re-allocate the long-run
-identification across the wealth components without moving the γ
-profile systematically toward Williams' Table 1 values. We read
-this as evidence that the CCI interactions in a single-equation
-specification act primarily as flexible parameter-time-variation,
+The interaction terms individually carry small coefficients with
+several wrong signs and most close to insignificance. The
+substantive effect of Spec 8 is to shift λ from −0.180 (Spec 6) to
+−0.377 — past Williams' value in magnitude — and to re-allocate the
+long-run identification across the wealth components without moving
+the γ profile systematically toward Williams' Table 1 values. We
+read this as evidence that the CCI interactions in a single-equation
+specification act primarily as flexible parameter time-variation,
 rather than as the structurally identified common-factor channel
 that Williams' four-equation system delivers.
+
+The de-meaning convention is the literal reading of Williams' Aust
+paper §5.1 and was previously omitted from this paper's Spec 8
+construction. Updating to the de-meaned form reduces the magnitude
+of the wrong-signed interaction coefficients (`hp_x_1_minus_cci`
+moves from t = +1.75 to t = +0.40) but does not flip any of the
+four CCI interactions to their theoretically correct signs — the
+wealth-coefficient gap with Williams' Table 1 remains structural
+rather than a de-meaning artefact.
 
 ### 8.5 Cross-equation restriction γ_LA + γ_LOANS = 0
 
@@ -2103,9 +2116,9 @@ The path to a tighter reconciliation with Williams' published
 values runs through a full FIML build.
 
 Adding the Williams CCI interactions in Spec 8 produces
-**λ = −0.383**, exceeding Williams' value in magnitude on the
+**λ = −0.377**, exceeding Williams' value in magnitude on the
 1988Q4+ sample. The wealth coefficients shift relative to Spec 6
-(γ_HA = 0.024, γ_IFA = 0.066, γ_NLA = 0.095) without moving
+(γ_HA = 0.028, γ_IFA = 0.054, γ_NLA = 0.091) without moving
 systematically toward Williams' Table 1 — confirming that adding
 CCI interactions to a single-equation specification re-allocates
 the long-run identification across wealth components but does not
@@ -2267,7 +2280,7 @@ in sign and broad magnitude.
    methodology.
 
 Adding the Williams CCI interactions in Spec 8, including the
-time-varying housing-wealth m.p.c. interaction, produces λ = −0.383
+time-varying housing-wealth m.p.c. interaction, produces λ = −0.377
 — *exceeding* Williams' calibrated value in magnitude. The wealth
 coefficients shift relative to Spec 6 without moving systematically
 toward Williams' Table 1, indicating that the CCI interactions act
