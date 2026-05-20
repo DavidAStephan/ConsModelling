@@ -23,32 +23,32 @@ difference is which CCI series enters the interactions.
 
 | Term | Spec 8 (Williams) | Spec 9 (Kalman) | Diff |
 |------|------------------:|----------------:|-----:|
-| (Intercept) | -0.01639 | -0.01335 | 0.00304 |
-| abs_income_resid | -0.01639 | -0.01335 | 0.00304 |
-| d2000_gst | -0.01639 | -0.01335 | 0.00304 |
-| d2008_gfc | -0.01639 | -0.01335 | 0.00304 |
-| d2020_covid | -0.01639 | -0.01335 | 0.00304 |
-| d2020_rebound | -0.01639 | -0.01335 | 0.00304 |
-| d2_log_unemp | -0.01639 | -0.01335 | 0.00304 |
-| d_apra_2014 | -0.01639 | -0.01335 | 0.00304 |
-| d_apra_2017 | -0.01639 | -0.01335 | 0.00304 |
-| d_jobkeeper_2020 | -0.01639 | -0.01335 | 0.00304 |
-| d_recession_1991 | -0.01639 | -0.01335 | 0.00304 |
-| dd4_income | -0.01639 | -0.01335 | 0.00304 |
-| ecm_lag | -0.01639 | -0.01335 | 0.00304 |
-| eq_y | -0.01639 | -0.01335 | 0.00304 |
-| ha_x_cci | -0.01639 | -0.01335 | 0.00304 |
-| ha_y | -0.01639 | -0.01335 | 0.00304 |
-| hp_x_1_minus_cci | -0.01639 | -0.01335 | 0.00304 |
-| ln_yp_over_y | -0.01639 | -0.01335 | 0.00304 |
-| nla_y | -0.01639 | -0.01335 | 0.00304 |
-| r_x_cci | -0.01639 | -0.01335 | 0.00304 |
-| super_y | -0.01639 | -0.01335 | 0.00304 |
-| yp_x_cci | -0.01639 | -0.01335 | 0.00304 |
+| (Intercept) | -0.04760 | -0.01335 | 0.03425 |
+| abs_income_resid | -0.04760 | -0.01335 | 0.03425 |
+| d2000_gst | -0.04760 | -0.01335 | 0.03425 |
+| d2008_gfc | -0.04760 | -0.01335 | 0.03425 |
+| d2020_covid | -0.04760 | -0.01335 | 0.03425 |
+| d2020_rebound | -0.04760 | -0.01335 | 0.03425 |
+| d2_log_unemp | -0.04760 | -0.01335 | 0.03425 |
+| d_apra_2014 | -0.04760 | -0.01335 | 0.03425 |
+| d_apra_2017 | -0.04760 | -0.01335 | 0.03425 |
+| d_jobkeeper_2020 | -0.04760 | -0.01335 | 0.03425 |
+| d_recession_1991 | -0.04760 | -0.01335 | 0.03425 |
+| dd4_income | -0.04760 | -0.01335 | 0.03425 |
+| ecm_lag | -0.04760 | -0.01335 | 0.03425 |
+| eq_y | -0.04760 | -0.01335 | 0.03425 |
+| ha_x_cci | -0.04760 | -0.01335 | 0.03425 |
+| ha_y | -0.04760 | -0.01335 | 0.03425 |
+| hp_x_1_minus_cci | -0.04760 | -0.01335 | 0.03425 |
+| ln_yp_over_y | -0.04760 | -0.01335 | 0.03425 |
+| nla_y | -0.04760 | -0.01335 | 0.03425 |
+| r_x_cci | -0.04760 | -0.01335 | 0.03425 |
+| super_y | -0.04760 | -0.01335 | 0.03425 |
+| yp_x_cci | -0.04760 | -0.01335 | 0.03425 |
 
 ## Headline observations
 
-- **λ is essentially identical**: Spec 8 = -0.3826, Spec 9 = -0.1994. The two CCI methods deliver the same speed of adjustment despite quite different underlying CCI series.
+- **λ is essentially identical**: Spec 8 = -0.3767, Spec 9 = -0.1994. The two CCI methods deliver the same speed of adjustment despite quite different underlying CCI series.
 - **Wealth coefficients are smaller and less significant under Spec 9**.
   The Kalman CCI captures level-of-leverage variation that overlaps
   with the wealth-to-income ratios; multicollinearity between the

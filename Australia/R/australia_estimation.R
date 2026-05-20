@@ -1478,18 +1478,35 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   # ------------------------------------------------------------------
   if ("cci_williams" %in% names(model_data) &&
       any(!is.na(model_data$cci_williams))) {
+    # Williams Aust §5.1: CCI interacts with DE-MEANED key variables.
+    # Without de-meaning, each X·CCI interaction is collinear with an
+    # implicit linear CCI level term that Spec 8 does not include
+    # separately, biasing the interaction coefficient toward absorbing a
+    # constant CCI shift (Aiken-West 1991). The means are computed on
+    # the Spec 8 estimation window — the cases where cci_williams is
+    # observed within the sample bounds — so the interactions have
+    # mean zero at X = X̄ in-sample.
+    spec8_mask <- !is.na(model_data$cci_williams) &
+                  model_data$date >= as.Date("1980-01-01") &
+                  model_data$date <= sample_end
+    ha_mean <- mean(model_data$ha_y[spec8_mask],         na.rm = TRUE)
+    hp_mean <- mean(model_data$ln_hp_over_y[spec8_mask], na.rm = TRUE)
+    r_mean  <- mean(model_data$real_rate[spec8_mask],    na.rm = TRUE)
+    yp_mean <- mean(model_data$ln_yp_over_y[spec8_mask], na.rm = TRUE)
+
     md8 <- model_data %>%
       mutate(
-        r_x_cci          = real_rate * cci_williams,
-        hp_x_1_minus_cci = ln_hp_over_y * (1 - 1.2 * cci_williams),
-        yp_x_cci         = ln_yp_over_y * cci_williams,
+        r_x_cci          = (real_rate    - r_mean)  * cci_williams,
+        hp_x_1_minus_cci = (ln_hp_over_y - hp_mean) * (1 - 1.2 * cci_williams),
+        yp_x_cci         = (ln_yp_over_y - yp_mean) * cci_williams,
         # Time-varying housing-wealth m.p.c. (Williams Aust eq 7 γ_1t·HA;
         # Tobin Lives 2013 eq 5.2 (HLI_{t-1})·HA/y). Captures Williams'
         # central LIVES mechanism: housing wealth becomes more spendable
-        # as collateral when credit conditions ease. The total HA m.p.c.
-        # on consumption is γ_HA + γ_HA_cci · cci_williams. Sign prior:
-        # γ_HA_cci > 0 (m.p.c. rises with CCI).
-        ha_x_cci         = ha_y * cci_williams
+        # as collateral when credit conditions ease. With de-meaning the
+        # interaction coefficient is interpretable as the change in the
+        # housing-wealth m.p.c. as CCI moves by 1 unit, evaluated at
+        # ha_y = mean(ha_y). Sign prior: γ_HA_cci > 0.
+        ha_x_cci         = (ha_y        - ha_mean) * cci_williams
       )
     spec8 <- fit_ecm_spec(
       data       = md8,
