@@ -1,8 +1,8 @@
 # Australian Household Consumption, Wealth and Credit Conditions: An Updated Single-Equation LIVES Estimate
 
-**Working paper draft**
+**Working-paper draft — target venue: Reserve Bank of Australia Research Discussion Paper**
 
-**Authors:** *to be added*
+**Author:** David Stephan
 **JEL codes:** E21, E32, E51, D14
 **Keywords:** household consumption, wealth effects, credit conditions, error-correction model, LIVES system
 

@@ -20,11 +20,11 @@ The empirical content is complete. What's left is editorial.
 
 | #  | Item | Effort | Notes |
 |----|------|--------|-------|
-| A1 | **Counterfactuals (NS-012)** | 1–2 days | The §10 chart that's currently missing. Three exercises: no-APRA-2014/2017, no-JobKeeper, CCI=peak-vs-zero. Decomposition machinery already in `plot_longrun_decomposition()`. Decide whether to run on Spec 6 (1988+) or Spec 1 back-extended (1976+) or both. |
-| A2 | **Auto-fill table placeholders (NS-001)** | half day | The `[TABLE-FROM-DATA: ...]` markers in §7–§9. Build a small R helper that reads each CSV and emits a markdown table. |
-| A3 | **Verify the 9 [VERIFY] citation tags (NS-002)** | 1–2 hours each | All in §2 lit review. Confirm year, journal, page numbers via Google Scholar / RBA archive. |
-| A4 | **Polish abstract and tighten §1 / §11** | half day | Current versions are dense — fine for a working paper, but want one more editorial pass before submission. |
-| A5 | **Choose target venue (NS-102)** | decision | RBA RDP, Treasury TPRP, *Economic Record*, or SSRN preprint → journal. Affects format and length. RBA RDP for in-house route, *Economic Record* for journal route, *Review of Income and Wealth* for international LIVES audience. |
+| A1 | **Counterfactuals (NS-012)** | ✅ done | §10.2 in the WP; three counterfactuals on Spec 6 (no-APRA, no-COVID-support) and Spec 8 (CCI at peak vs zero); outputs `australia_counterfactuals*.csv/.png`. |
+| A2 | **Auto-fill table placeholders (NS-001)** | ✅ done | All `[TABLE-FROM-DATA: ...]` markers resolved in the May 2026 editorial pass. |
+| A3 | **Verify the 9 [VERIFY] citation tags (NS-002)** | ✅ done | Verified via WebFetch in the editorial pass. Tan/Voss year corrected 2003 → 2000; Dvornak/Kohler, Cusbert/Kendall, Ballantyne et al., Carroll/Slacalek/Tokuoka confirmed. |
+| A4 | **Polish abstract and tighten §1 / §11** | ✅ done | Heavy editorial pass landed; numbers refreshed against current CSVs. |
+| A5 | **Choose target venue (NS-102)** | ✅ **decided: RBA Research Discussion Paper** | Author and target venue now set at the top of `wp_draft.md`. Format conversion (markdown → RBA template) is the remaining submission-time step. |
 
 ---
 
@@ -86,10 +86,10 @@ more given custom likelihood code.
 
 ## Decision points the author should weigh in on
 
-- **Where does the headline paper go?** RBA RDP route shortens
-  publication path but shrinks readership; *Economic Record* is the
-  natural Australian journal home; *Review of Income and Wealth*
-  attracts the international LIVES audience.
+- **Where does the headline paper go?** ✅ **Decided: RBA Research
+  Discussion Paper** (May 2026). The in-house route shortens the
+  publication path; the Australian audience is the natural fit for
+  a paper anchored on Australian institutional history.
 - **Companion paper or Tier C extension of headline?** Recommend
   **separate companion paper** — keeps the headline paper crisp on
   the single-equation findings (which include the empirical

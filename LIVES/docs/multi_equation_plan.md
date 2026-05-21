@@ -199,11 +199,12 @@ uses.
   (ζ normalisation, iterated CCI, joint survival) demonstrably
   improves on the single-equation results.
 
-- **Venue.** RBA RDP, Treasury TPRP, *Economic Record*, or *Review
-  of Income and Wealth* — the same options as the headline paper.
-  The choice may differ between the two papers: the headline paper
-  is more accessible; the companion paper is more technical and
-  may suit a methodology-focused journal.
+- **Venue.** ✅ **Decided: RBA Research Discussion Paper** (May 2026)
+  — matching the headline paper's target venue. The companion paper
+  is the natural follow-on under the same imprint; submitting both
+  to the same RDP series simplifies cross-referencing and keeps the
+  multi-equation diagnosis in the same audience as the headline
+  single-equation finding.
 
 - **Paper scope.** Two reasonable framings: (i) "Williams' LIVES
   system applied to contemporary Australian data" — a replication
