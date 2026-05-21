@@ -75,5 +75,5 @@ _Italy comparison not available._
 - Run: `Rscript Australia/R/australia_consumption_model.R`
 - Fast re-estimation: `Rscript Australia/R/run_estimation_from_rds.R`
 - Random seed: not used (OLS is deterministic).
-- Date generated: 2026-05-20
+- Date generated: 2026-05-21
 
