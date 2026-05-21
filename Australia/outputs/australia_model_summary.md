@@ -28,6 +28,7 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec4_Disagg_NoCCI | 0.729 | 2.39 | N | N | N | — | N | -906.8 | N | Y | Y | N |
 | Spec5_FullDisagg | 0.798 | 2.31 | N | N | N | N | N | -493.0 | N | Y | Y | Y |
 | Spec6_Preferred | 0.807 | 2.18 | Y | Y | N | — | N | -493.8 | N | Y | Y | N |
+| Spec6b_LongHistSRCCI | 0.707 | 2.11 | Y | Y | N | — | N | -1116.3 | N | Y | Y | N |
 | Spec7_CohortBurden | 0.833 | 2.20 | Y | N | N | — | N | -499.8 | N | Y | N | N |
 | Spec7b_RBABurden | 0.869 | 2.16 | Y | N | N | — | N | -363.0 | N | Y | N | N |
 | Spec8_CCI_Interactions | 0.821 | 1.87 | Y | N | N | — | N | -948.5 | Y | — | N | N |
@@ -44,6 +45,7 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec4_Disagg_NoCCI | -0.1404 | -0.1069 | yes |
 | Spec5_FullDisagg | -0.1770 | -0.0970 | yes |
 | Spec6_Preferred | -0.1801 | -0.1228 | yes |
+| Spec6b_LongHistSRCCI | -0.2291 | -0.2397 | yes |
 | Spec7_CohortBurden | -0.3730 | -0.0518 | yes |
 | Spec7b_RBABurden | -0.3755 | -0.0614 | yes |
 | Spec8_CCI_Interactions | -0.4449 | -0.2470 | yes |
@@ -61,6 +63,7 @@ _Italy comparison not available._
 - Spec4_Disagg_NoCCI fails: sign, stability
 - Spec5_FullDisagg fails: sign
 - Spec6_Preferred fails: sign, stability
+- Spec6b_LongHistSRCCI fails: sign, stability
 - Spec7_CohortBurden fails: sign, λ range/sign, stability
 - Spec7b_RBABurden fails: sign, λ range/sign, stability
 - Spec8_CCI_Interactions fails: λ range/sign, stability

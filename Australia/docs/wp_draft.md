@@ -1492,6 +1492,7 @@ a four-screen rubric.
 | 4   | Disaggregated wealth                         | adds `nla_y, eq_y, super_y, ha_y`; drops aggregates |
 | 5   | Spec 4 + full short-run dynamics             | adds Δ²log CCI, ΔΔ₄income, Δ²log unemp, |ε̂| |
 | 6   | Spec 5 + post-2008 PI break (preferred)      | adds `ln_yp_over_y_post2008` |
+| 6b  | Spec 6 with back-extension-compatible SR CCI | replaces Δ²log CCI with Δ²log RBA D02 credit; uses disaggregated wealth proxies; fits on n = 190 |
 | 7   | Spec 6 + cohort terms + synthetic burden     | adds `prime_age_share, fhb_share` |
 | 7b  | Spec 7 with RBA E13 measured burden          | post-2009 sample only |
 | 8   | Williams CCI interactions                    | Spec 4 + `r×CCI`, `log(HP/y)×(1−1.2·CCI)`, `log(y^p/y)×CCI`, `ha_x_cci` |
@@ -1996,6 +1997,49 @@ smaller rather than larger. The exercise establishes that
 sample-length is not the binding constraint on whether Spec 4
 reproduces Williams' Table 1.
 
+### 8.15.1 Spec 6b — preferred specification on the back-extended sample
+
+Spec 6 is bounded at 2002Q3+ on the baseline sample by `cci_ratio`
+from ABS Cat 5601.0 housing-loan flow. Spec 6b retains the Spec 6
+long-run and short-run structure but replaces the short-run CCI
+regressor with the second-difference of log RBA D02 total credit
+(`d2_log_creditd02_lag2`), which is available from 1976Q3. The
+disaggregated wealth components also switch to their back-extended
+proxies (§3.13). This lets the preferred specification fit on the
+full back-extended sample (**n = 190** vs n = 86 for Spec 6).
+
+| LR coefficient | Spec 6 (n = 86) | Spec 6b (n = 190) | Williams Table 1 |
+|---|---:|---:|---:|
+| λ (ecm_lag)             | −0.180 (t = −1.76) | **−0.229 (t = −4.17)** | −0.286 |
+| ha_y / ha_y_proxy γ     | 0.049              | 0.038                  | 0.049  |
+| nla_y / nla_y_proxy γ   | 0.196              | 0.013                  | 0.159  |
+| eq_y / eq_y_proxy γ     | −0.035             | −0.081                 | (calibrated 0.011) |
+| super_y / super_y_proxy γ | 0.065            | 0.029                  | (calibrated 0.011) |
+| ln_hp_over_y γ          | −0.094             | −0.036                 | −0.130 |
+| ln_yp_over_y (CCI = 0)  | +0.200             | +1.234                 | +0.20 (calibrated) |
+| BIC                     | −493.8             | −1 116.3               | n/a    |
+
+Two patterns are notable. First, **the speed of adjustment moves
+substantially closer to Williams' published value** — λ = −0.229
+on the back-extended sample, 80 per cent of Williams' −0.286, vs
+63 per cent on Spec 6. Statistical significance also improves
+sharply (t-stat moves from −1.76 to −4.17). Second, **the wealth
+γ profile shifts toward smaller individual elasticities** — γ_NLA
+collapses from 0.196 to 0.013 and γ_EQ becomes more negative,
+mirroring the Spec 4 back-extension finding in §7.3. γ_HA stays
+positive (0.038 vs Williams' 0.049) but moves about 22 per cent
+below Williams rather than matching almost exactly.
+
+The Spec 6b evidence is consistent with the substantive reading
+elsewhere in the paper: on the back-extended sample the
+disaggregated wealth proxies do not separately identify with
+Williams-like precision, even when the canonical Spec 6
+short-run dynamics, post-2008 PI break, and long-history credit
+proxy are all available. The combination of (i) tighter |λ|
+estimate, (ii) γ_HA close-to-Williams, and (iii) smaller γ_NLA
+and γ_IFA is the cleanest single-equation OLS approximation to
+Williams' Table 1 the paper produces.
+
 ### 8.16 Maximal-GETS placebo on the back-extended sample
 
 The Williams maximal-GETS canonical CCI on the back-extended 1976Q3+
@@ -2393,13 +2437,7 @@ through a full FIML build — the territory of a companion paper.
    Williams. Custom likelihood code and a sourced HEW series are
    the binding obstacles.
 
-2. **Spec 6 back-extension.** Spec 6 is bounded at 2002Q3+ by the
-   `cci_ratio` short-run regressor. Replacing it with a longer-history
-   alternative (for example Δ²log of total credit from RBA D02,
-   which is available from 1976Q3) would let the preferred
-   specification fit on the back-extended sample.
-
-3. **Documentation of the TRYM house-price source.** A short
+2. **Documentation of the TRYM house-price source.** A short
    data-appendix note on the specific TRYM vintage, retrieval URL
    and any modifications since release would tighten reproducibility.
 
