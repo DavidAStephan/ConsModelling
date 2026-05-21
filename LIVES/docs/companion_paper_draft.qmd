@@ -1,0 +1,81 @@
+---
+title: |
+  A Multi-Equation LIVES System for Australia: Joint Identification of
+  Credit Conditions and Williams' Calibrations Tested
+author:
+  - name: David Stephan
+abstract: |
+  We extend the single-equation Australian LIVES consumption model in our
+  headline paper to a multi-equation system, following Williams' (2010,
+  2012) four-equation specification: consumption, house prices, mortgage
+  stock, and home equity withdrawal jointly estimated under
+  cross-equation sign restrictions. We implement the system in four
+  sequential stages: a two-equation SUR of consumption and house prices,
+  a three-equation joint sign-survival identification of the credit-
+  conditions index (CCI), a four-equation system that adds an HEW
+  equation, and a formal Wald test of Williams' Table~1 calibrations as
+  restrictions on the consumption equation.
+
+  Joint sign-survival of CCI knots collapses dramatically as more
+  equations are added: from 5 knots in the iterated consumption-only fit,
+  to 2 in the three-equation joint test, to **1 knot (1986 financial
+  deregulation)** once the HEW equation is added. Williams' ζ_h = 1
+  normalisation becomes inert with one surviving knot. **Williams' Table 1
+  wealth calibrations are formally rejected** on the contemporary
+  Australian data: $\chi^2(4) = 10.03$, $p = 0.040$ for the four wealth
+  restrictions jointly, $\chi^2(6) = 29.10$, $p < 0.001$ for the full
+  calibration set. The HEW equation we construct using a credit-flow proxy
+  yields residual correlation 0.83 with the mortgage-stock equation; a
+  proper HEW measure with the dwelling-investment subtraction Williams'
+  definition includes is the binding constraint on further multi-equation
+  work.
+keywords:
+  - household consumption
+  - LIVES system
+  - credit conditions
+  - joint identification
+  - cross-equation restrictions
+jel:
+  - E21
+  - E32
+  - E51
+  - D14
+
+format:
+  pdf:
+    documentclass: article
+    papersize: a4
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    linkcolor: NavyBlue
+    citecolor: NavyBlue
+    urlcolor: NavyBlue
+    number-sections: true
+    toc: true
+    toc-depth: 3
+    colorlinks: true
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    number-sections: true
+
+# Bibliography: companion paper inherits the headline paper's bib via
+# the shared Australia/docs/wp_references.bib, plus companion-specific
+# entries in companion_references.bib.
+bibliography:
+  - ../../Australia/docs/wp_references.bib
+  - companion_references.bib
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+{{< include _companion_body.md >}}

@@ -950,6 +950,30 @@ add_model_variables <- function(model_data) {
     ) %>%
     select(-d2_logcci)
 
+  # ---- Longer-history short-run CCI based on RBA D02 total credit --------
+  # cci_ratio above is bounded at 2002Q3+ by ABS 5601.0 housing loan flow,
+  # which truncates Spec 6 to n = 86 on the headline sample. RBA D02 total
+  # credit (`credit_total_d02`) is available from 1976Q3 and is a defensible
+  # alternative short-run credit-conditions proxy: its second difference of
+  # logs captures the same "acceleration in credit availability" dynamic
+  # without the housing-flow series start-date binding constraint. We
+  # construct it in parallel so Spec 6 keeps its housing-flow CCI as the
+  # canonical short-run regressor and Spec 6b swaps it for the longer-
+  # history alternative.
+  if ("credit_total_d02" %in% names(dat)) {
+    dat <- dat %>%
+      mutate(
+        log_creditd02_safe       = log(pmax(credit_total_d02, 1e-9)),
+        d2_log_creditd02         = log_creditd02_safe -
+                                   2 * lag(log_creditd02_safe, 1L) +
+                                   lag(log_creditd02_safe, 2L),
+        d2_log_creditd02_lag2    = lag(d2_log_creditd02, 2L)
+      ) %>%
+      select(-log_creditd02_safe, -d2_log_creditd02)
+  } else {
+    dat <- dat %>% mutate(d2_log_creditd02_lag2 = NA_real_)
+  }
+
   # ---- ΔΔ₄ income: diff(Δ₁ income, 4) -------------------------------------
   dat <- dat %>%
     mutate(
@@ -1413,6 +1437,33 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   )
 
   # ------------------------------------------------------------------
+  # Spec 6b: Spec 6 with the back-extension-compatible short-run CCI.
+  # Replaces d2_logcci_lag2 (bounded at 2002Q3+ by ABS 5601.0 housing loan
+  # flow) with d2_log_creditd02_lag2 (Δ²log of RBA D02 total credit, back
+  # to 1976Q3). Lets Spec 6 fit on n = 190 (1976Q3–2024Q4) instead of
+  # n = 86 (2002Q3+). Comparison with Spec 6 is the back-extension
+  # robustness column for the preferred specification.
+  # ------------------------------------------------------------------
+  if ("d2_log_creditd02_lag2" %in% names(model_data) &&
+      any(!is.na(model_data$d2_log_creditd02_lag2))) {
+    spec6b <- fit_ecm_spec(
+      data       = model_data,
+      spec_name  = "Spec6b_LongHistSRCCI",
+      lr_vars    = c("nla_y_proxy", "eq_y_proxy", "super_y_proxy",
+                     "ha_y_proxy", "ln_hp_over_y",
+                     "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008",
+                     "ecm_lag"),
+      sr_vars    = c("d2_log_creditd02_lag2", "dd4_income",
+                     "d2_log_unemp", "abs_income_resid"),
+      dummy_vars = base_dummies,
+      sample_end = sample_end
+    )
+  } else {
+    spec6b <- NULL
+    message("Spec 6b skipped: d2_log_creditd02_lag2 not available")
+  }
+
+  # ------------------------------------------------------------------
   # Spec 7: Spec 6 + life-cycle (prime_age_share) and credit-access
   # (fhb_share) terms. mortgage_burden was originally also included but
   # was insignificant (p ~ 0.34) and correlated -0.42 with nla_y (both
@@ -1589,6 +1640,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
 
   specs <- list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
                 spec4 = spec4, spec5 = spec5, spec6 = spec6,
+                spec6b = spec6b,
                 spec7 = spec7, spec7b = spec7b,
                 spec8 = spec8, spec9 = spec9, spec10 = spec10)
   Filter(Negate(is.null), specs)

@@ -1,0 +1,84 @@
+---
+title: |
+  Australian Household Consumption, Wealth and Credit Conditions:
+  An Updated Single-Equation LIVES Estimate
+author:
+  - name: David Stephan
+abstract: |
+  We estimate a single-equation Muellbauer--Williams LIVES consumption
+  model for Australia over 1988Q4--2024Q4, extending Williams (2010) and
+  Muellbauer and Williams (2012) by sixteen years of post-GFC data and
+  applying contemporary identification methods. Wealth is disaggregated
+  into housing, illiquid financial (equities plus superannuation), and net
+  liquid assets (deposits net of total household debt), and we adopt the
+  Jord\`a (2005) local-projection permanent-income forecaster used in the
+  Italian implementation of De Bonis, Marino and Muellbauer (2024).
+
+  The preferred specification delivers a speed of adjustment
+  $\lambda = -0.180$ (vs Williams' $-0.286$) and structural long-run
+  coefficients on individual wealth components that are broadly consistent
+  with Williams' Table~1 estimates. Refitting the same specification on a
+  back-extended 1976Q3--2024Q4 sample with a longer-history short-run CCI
+  ("Spec~6b") sharpens the speed of adjustment to $-0.229$ (80 per cent of
+  Williams') while reallocating wealth identification across components.
+  The Williams CCI placebo battery and the LIVES multi-equation companion
+  work both find the residual structural-coefficient gap is bounded by
+  single-equation framing rather than by sample length, knot count, or
+  sign-prior structure.
+keywords:
+  - household consumption
+  - wealth effects
+  - credit conditions
+  - error-correction model
+  - LIVES system
+jel:
+  - E21
+  - E32
+  - E51
+  - D14
+
+# Rendering setup. The headline target venue is the RBA Research
+# Discussion Paper series. Submission-time formatting (the RBA
+# .cls / .docx template substitution) is a downstream step; the
+# defaults below produce a clean academic PDF / docx / html from
+# the same source.
+
+format:
+  pdf:
+    documentclass: article
+    papersize: a4
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    linkcolor: NavyBlue
+    citecolor: NavyBlue
+    urlcolor: NavyBlue
+    number-sections: true
+    toc: true
+    toc-depth: 3
+    colorlinks: true
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    number-sections: true
+
+bibliography: wp_references.bib
+
+# Citations in the body are name-and-year style; Quarto's natbib /
+# citeproc machinery handles them via the .bib above. To convert the
+# inline natural-language citations (e.g. "Williams (2010)") into
+# Quarto's `[@williams_2010]` form, run the conversion pass documented
+# in RENDER.md.
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+{{< include _wp_body.md >}}
