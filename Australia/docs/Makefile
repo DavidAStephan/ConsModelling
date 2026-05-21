@@ -12,14 +12,21 @@
 #   a generic academic-style PDF / docx in the meantime.
 #
 # Targets:
-#   make pdf           Render wp_draft.qmd to wp_draft.pdf (Quarto + LaTeX required)
-#   make docx          Render wp_draft.qmd to wp_draft.docx (Quarto + pandoc)
+#   make pdf           Render wp_draft.md to wp_draft.pdf via pandoc + Typst
+#                       (single ~40 MB engine, ~10x faster than LaTeX; the
+#                       default PDF target — works on a fresh machine with
+#                       `brew install pandoc typst`)
+#   make pdf-quarto    Alternative: render wp_draft.qmd via Quarto + LaTeX
+#                       (needs quarto + tinytex/MacTeX; larger install
+#                       footprint; useful if you want the BibTeX auto-cite
+#                       pipeline)
+#   make docx          Render wp_draft.qmd to wp_draft.docx (Quarto)
 #   make html          Render wp_draft.qmd to wp_draft.html (Quarto)
-#   make docx-pandoc   Stopgap: produce wp_draft.docx via plain pandoc, no Quarto
-#                       (works on a fresh machine with only `brew install pandoc`)
+#   make docx-pandoc   Stopgap: produce wp_draft.docx via plain pandoc
+#                       (no Quarto needed)
 #   make clean         Remove generated artefacts
 #
-# See RENDER.md for prerequisites (Quarto, TinyTeX / MacTeX).
+# See RENDER.md for prerequisites.
 
 PANDOC ?= pandoc
 QUARTO ?= quarto
@@ -35,13 +42,19 @@ DOCX_OUT     = wp_draft.docx
 HTML_OUT     = wp_draft.html
 DOCX_PANDOC  = wp_draft_pandoc.docx
 
-.PHONY: pdf docx html docx-pandoc clean help body
+# Typst PDF metadata
+TITLE        = Australian Household Consumption, Wealth and Credit Conditions: An Updated Single-Equation LIVES Estimate
+AUTHOR       = David Stephan
+DATE         = May 2026
+
+.PHONY: pdf pdf-quarto docx html docx-pandoc clean help body
 
 help:
 	@echo "Targets:"
-	@echo "  make pdf            Render via Quarto to PDF (needs quarto + tinytex)"
-	@echo "  make docx           Render via Quarto to docx"
-	@echo "  make html           Render via Quarto to html"
+	@echo "  make pdf            Render to PDF via pandoc + Typst (default; needs pandoc + typst)"
+	@echo "  make pdf-quarto     Render to PDF via Quarto + LaTeX (needs quarto + tinytex)"
+	@echo "  make docx           Render to docx via Quarto"
+	@echo "  make html           Render to html via Quarto"
 	@echo "  make docx-pandoc    Render to docx via plain pandoc (no Quarto needed)"
 	@echo "  make clean          Remove generated files"
 	@echo ""
@@ -59,12 +72,32 @@ $(BODY_MD): $(SRC_MD)
 body: $(BODY_MD)
 
 # ----------------------------------------------------------------------------
-# Quarto rendering targets
+# Default PDF: pandoc + Typst (lightweight, fast, no LaTeX dependency)
 # ----------------------------------------------------------------------------
-$(PDF_OUT): $(QMD) $(BODY_MD) $(BIB)
-	$(QUARTO) render $(QMD) --to pdf
+$(PDF_OUT): $(SRC_MD)
+	$(PANDOC) $(SRC_MD) -o $(PDF_OUT) \
+	    --from gfm \
+	    --pdf-engine typst \
+	    --toc \
+	    --toc-depth 3 \
+	    --number-sections \
+	    -V title="$(TITLE)" \
+	    -V author="$(AUTHOR)" \
+	    -V date="$(DATE)" \
+	    -V papersize=a4 \
+	    -V margin-left=2cm \
+	    -V margin-right=2cm \
+	    -V margin-top=2.5cm \
+	    -V margin-bottom=2.5cm \
+	    -V fontsize=11pt
 
 pdf: $(PDF_OUT)
+
+# ----------------------------------------------------------------------------
+# Quarto rendering targets (alternative to default pandoc+Typst path)
+# ----------------------------------------------------------------------------
+pdf-quarto: $(QMD) $(BODY_MD) $(BIB)
+	$(QUARTO) render $(QMD) --to pdf
 
 $(DOCX_OUT): $(QMD) $(BODY_MD) $(BIB)
 	$(QUARTO) render $(QMD) --to docx
