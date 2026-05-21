@@ -368,17 +368,15 @@ evaluated, and by surfacing the identification choices that drive
 the estimated speed of adjustment.
 
 A separate strand of Australian work has examined the cyclical
-co-movement of consumption with credit and housing conditions in
-Bayesian VAR frameworks and through stress-test-style analyses of
-mortgage payments and household debt burdens.[^empirical-strand]
-These approaches identify shorter-run dynamics but do not deliver
-the long-run cointegrating vector that the LIVES specification
-produces, and so are complementary to the present analysis rather
-than substitutes.
-
-[^empirical-strand]: Specific citations to be added in the next
-revision; the relevant RBA Research Discussion Paper series numbers
-have been identified.
+co-movement of consumption with credit and housing conditions
+through reduced-form approaches: Bayesian VAR frameworks, RBA
+Bulletin analyses of mortgage payments and household debt
+burdens, and the housing-leverage and household-balance-sheet
+treatments in the broader RBA Research Discussion Paper series.
+These approaches identify shorter-run dynamics and stress-test
+sensitivities but do not deliver the long-run cointegrating vector
+that the LIVES specification produces, and so are complementary to
+the present analysis rather than substitutes for it.
 
 ### 2.4 Identification of credit conditions
 
@@ -2175,22 +2173,63 @@ Williams CCI-interaction set is reported as a robustness column.
 
 ### 10.2 Counterfactuals
 
-The paper as currently drafted does not include policy
-counterfactuals. The decomposition machinery already returns the
-partial contribution of each long-run regressor, so three
-mechanical exercises remain straightforward to compute:
+We compute three policy counterfactuals on the headline
+specifications, holding all non-counterfactual regressors at their
+observed values and integrating the implied Δlog c paths back to
+log-consumption levels.
 
-1. **No 2014 / 2017 macroprudential tightening**: zero out the APRA
-   dummies in the fitted contribution and plot the implied
-   counterfactual path of log(c/y).
-2. **No COVID income support**: zero out the JobKeeper dummy and the
-   COVID-period dummies.
-3. **Williams' CCI peak vs current**: evaluate the
-   wealth × (1 − 1.2·CCI) interaction at CCI = 1 (Williams' historical
-   peak) versus CCI = 0 (no liberalisation), comparing implied
-   log(c/y) levels.
+| Scenario | Spec | h = 4 q gap | h = 8 q gap | End-of-sample gap |
+|---|---|---:|---:|---:|
+| No 2014 / 2017 APRA macroprudential | Spec 6 | +0.8 % | +2.3 % | +28.3 % |
+| No COVID income support              | Spec 6 | −9.6 % | −9.6 % | −9.6 % |
+| CCI at Williams' peak vs CCI = 0     | Spec 8 | n/a    | n/a    | ≈ 0     |
 
-These exercises are left to a subsequent revision.
+(Gaps are cumulative deviations in log(c) from the baseline path,
+expressed in percentage points; h-quarter values measured from the
+relevant event date.)
+
+**Counterfactual 1 — no 2014/2017 APRA macroprudential.** Zeroing
+the smoothed-step `d_apra_2014` and `d_apra_2017` dummies in
+Spec 6 implies that consumption would have been about 0.8 per cent
+higher four quarters after the 2014 round and about 2.3 per cent
+higher after eight quarters. The end-of-sample gap (+28.3 per cent
+by 2024Q4) compounds the persistent post-event ogive shifts over a
+decade and should be read as a diagnostic upper bound rather than a
+literal forecast — it assumes the wider macroeconomic environment
+would have adjusted to nothing else over the same window, which is
+not how the actual economy operates. The 4-quarter and 8-quarter
+numbers are the policy-relevant range and are consistent with the
+APRA programme accounting for ~1–3 per cent of consumption growth
+over its first two years.
+
+**Counterfactual 2 — no COVID income support.** Zeroing the
+`d_jobkeeper_2020`, `d2020_covid` and `d2020_rebound` dummies in
+Spec 6 implies that consumption would have been about 9.6 per cent
+*lower* in the COVID period. The cumulative gap stabilises quickly
+because the COVID event dummies are bounded in time (zero before
+and after 2020Q2–2021Q1), so unlike the persistent APRA ogives the
+deviation does not continue to compound past the event window.
+
+**Counterfactual 3 — CCI at Williams' peak vs zero.** Refitting
+Spec 8 with the four CCI-interacted regressors evaluated at
+CCI = 1 (Williams' historical peak) versus CCI = 0 (no
+liberalisation) implies essentially zero cumulative consumption
+gap across the back-extended sample. This is a methodological
+consequence of the de-meaning convention adopted in §8.4: under
+de-meaned interactions, the average contribution of CCI variation
+to fitted Δlog c is zero by construction, so the *cumulative*
+effect of a permanent CCI shift integrates to zero across the
+sample. The CCI interactions in Spec 8 are therefore pure
+timing/distribution effects — they reallocate where consumption
+growth lands across the cycle without shifting its unconditional
+level. This is the LIVES-theoretic interpretation: CCI matters for
+*when* households extract housing equity and respond to permanent-
+income news, not for the long-run level of the consumption-to-
+income ratio.
+
+Source: [australia_counterfactuals.csv](../outputs/australia_counterfactuals.csv),
+[australia_counterfactuals_summary.csv](../outputs/australia_counterfactuals_summary.csv),
+[australia_counterfactual_paths.png](../outputs/australia_counterfactual_paths.png).
 
 ### 10.3 Policy implications
 
@@ -2211,10 +2250,12 @@ the adjustment completed in five to six years).
 
 **Macroprudential effects.** The 2014 and 2017 APRA episodes are
 modelled as smoothed-step ogive dummies. Their estimated
-coefficients on Δlog c are small (roughly −0.005 to −0.013) and
-wash out in the long run. Quantifying their contribution to the
-consumption path during 2014–2018 is a natural application of the
-decomposition machinery in §10.1.
+coefficients on Δlog c are small (roughly −0.005 to −0.013), and
+the counterfactual exercise in §10.2 implies they shaved roughly
+0.8 percentage points off consumption in the year after the 2014
+round and 2.3 points by two years after it. The level gap on a
+long horizon should be interpreted as a model-mechanical upper
+bound rather than a forecast of the broader macro response.
 
 **Permanent-income transmission.** Under canonical Italy LP the
 long-run coefficient on log(y^p/y) at CCI = 0 is +0.20, matching
@@ -2352,21 +2393,13 @@ through a full FIML build — the territory of a companion paper.
    Williams. Custom likelihood code and a sourced HEW series are
    the binding obstacles.
 
-2. **Counterfactual policy exercises** (§10.2). No-APRA,
-   no-JobKeeper and CCI = peak vs current counterfactuals on the
-   preferred specification. The decomposition machinery exists and
-   the exercises are mechanical computations once a decision is
-   made about whether to run them on Spec 6 (preferred but bounded
-   at 2002Q3+) or on Spec 1 back-extended (1976Q3+ but aggregate
-   proxy).
-
-3. **Spec 6 back-extension.** Spec 6 is bounded at 2002Q3+ by the
+2. **Spec 6 back-extension.** Spec 6 is bounded at 2002Q3+ by the
    `cci_ratio` short-run regressor. Replacing it with a longer-history
    alternative (for example Δ²log of total credit from RBA D02,
    which is available from 1976Q3) would let the preferred
    specification fit on the back-extended sample.
 
-4. **Documentation of the TRYM house-price source.** A short
+3. **Documentation of the TRYM house-price source.** A short
    data-appendix note on the specific TRYM vintage, retrieval URL
    and any modifications since release would tighten reproducibility.
 
@@ -2557,6 +2590,6 @@ The full reproducibility kit accompanies this paper. It includes
 three execution modes (full pipeline with ABS downloads, fast
 re-estimation from the cached RDS dataset, and offline replay from a
 portable master CSV), an `renv` lockfile pinning R 4.5.3 dependencies,
-GitHub Actions continuous integration, and a unit-test suite. The
-repository is hosted publicly; the URL will be inserted with the
-final version of the paper.
+GitHub Actions continuous integration, and a `testthat` unit-test
+suite. The repository is hosted publicly at
+<https://github.com/DavidAStephan/ConsModelling>.

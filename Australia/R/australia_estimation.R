@@ -3178,6 +3178,225 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
 # 200 dpi for slide-quality.
 # ==============================================================================
 
+run_counterfactuals <- function(specs_full, output_dir) {
+  # Three §10.2 NS-012 counterfactuals on the headline specifications:
+  #   CF1: no-APRA  — zero out d_apra_2014, d_apra_2017 in Spec 6.
+  #   CF2: no-COVID — zero out d_jobkeeper_2020, d2020_covid, d2020_rebound
+  #                   in Spec 6.
+  #   CF3: CCI peak vs zero — Spec 8 with the four CCI-interacted regressors
+  #                   re-evaluated at CCI = 1 (Williams' peak) and CCI = 0
+  #                   (no liberalisation), holding other regressors at their
+  #                   observed values.
+  # Outputs:
+  #   australia_counterfactuals.csv          long-format date × scenario × value
+  #   australia_counterfactual_paths.png     comparison chart
+
+  modify_X_and_refit <- function(spec, modifications) {
+    fit  <- spec$fit
+    est  <- spec$est_data
+    cf   <- coef(fit)
+    X    <- model.matrix(formula(fit), est)
+    X_cf <- X
+    for (nm in names(modifications)) {
+      if (nm %in% colnames(X_cf)) {
+        X_cf[, nm] <- modifications[[nm]]
+      }
+    }
+    fitted_cf       <- as.numeric(X_cf  %*% cf[colnames(X_cf)])
+    fitted_baseline <- as.numeric(X     %*% cf[colnames(X)])
+    list(date         = est$date,
+         baseline_dlc = fitted_baseline,
+         cf_dlc       = fitted_cf)
+  }
+
+  scenarios <- list()
+
+  # ---- Counterfactual 1: no-APRA on Spec 6 -----------------------------
+  spec6 <- specs_full$spec6
+  if (!is.null(spec6)) {
+    cf1 <- modify_X_and_refit(spec6,
+              list(d_apra_2014 = 0, d_apra_2017 = 0))
+    scenarios$no_apra <- tibble::tibble(
+      date     = cf1$date,
+      scenario = "no_apra_2014_2017",
+      dlog_c_baseline = cf1$baseline_dlc,
+      dlog_c_cf       = cf1$cf_dlc,
+      delta_dlog_c    = cf1$cf_dlc - cf1$baseline_dlc
+    ) %>% mutate(cum_delta_log_c = cumsum(delta_dlog_c))
+  }
+
+  # ---- Counterfactual 2: no-COVID-support on Spec 6 --------------------
+  if (!is.null(spec6)) {
+    cf2 <- modify_X_and_refit(spec6,
+              list(d_jobkeeper_2020 = 0,
+                   d2020_covid      = 0,
+                   d2020_rebound    = 0))
+    scenarios$no_covid_support <- tibble::tibble(
+      date     = cf2$date,
+      scenario = "no_covid_support",
+      dlog_c_baseline = cf2$baseline_dlc,
+      dlog_c_cf       = cf2$cf_dlc,
+      delta_dlog_c    = cf2$cf_dlc - cf2$baseline_dlc
+    ) %>% mutate(cum_delta_log_c = cumsum(delta_dlog_c))
+  }
+
+  # ---- Counterfactual 3: CCI peak vs zero on Spec 8 --------------------
+  # Spec 8's CCI interactions are constructed on de-meaned levels. The
+  # composite design therefore depends on the in-sample means of the
+  # interacted variables; we recover those from the est_data and rebuild
+  # the four interaction columns at the counterfactual CCI value.
+  spec8 <- specs_full$spec8
+  if (!is.null(spec8) && all(c("ha_x_cci", "hp_x_1_minus_cci",
+                                "r_x_cci", "yp_x_cci")
+                              %in% names(coef(spec8$fit)))) {
+    est <- spec8$est_data
+    ha_mean <- mean(est$ha_y,         na.rm = TRUE)
+    hp_mean <- mean(est$ln_hp_over_y, na.rm = TRUE)
+    r_mean  <- mean(est$real_rate,    na.rm = TRUE)
+    yp_mean <- mean(est$ln_yp_over_y, na.rm = TRUE)
+
+    make_cci_interactions <- function(cci_value) {
+      list(
+        ha_x_cci         = (est$ha_y         - ha_mean) * cci_value,
+        r_x_cci          = (est$real_rate    - r_mean)  * cci_value,
+        yp_x_cci         = (est$ln_yp_over_y - yp_mean) * cci_value,
+        hp_x_1_minus_cci = (est$ln_hp_over_y - hp_mean) *
+                           (1 - 1.2 * cci_value)
+      )
+    }
+
+    cf3_peak <- modify_X_and_refit(spec8, make_cci_interactions(1))
+    cf3_zero <- modify_X_and_refit(spec8, make_cci_interactions(0))
+
+    scenarios$cci_peak <- tibble::tibble(
+      date            = cf3_peak$date,
+      scenario        = "cci_at_peak",
+      dlog_c_baseline = cf3_peak$baseline_dlc,
+      dlog_c_cf       = cf3_peak$cf_dlc,
+      delta_dlog_c    = cf3_peak$cf_dlc - cf3_peak$baseline_dlc
+    ) %>% mutate(cum_delta_log_c = cumsum(delta_dlog_c))
+
+    scenarios$cci_zero <- tibble::tibble(
+      date            = cf3_zero$date,
+      scenario        = "cci_at_zero",
+      dlog_c_baseline = cf3_zero$baseline_dlc,
+      dlog_c_cf       = cf3_zero$cf_dlc,
+      delta_dlog_c    = cf3_zero$cf_dlc - cf3_zero$baseline_dlc
+    ) %>% mutate(cum_delta_log_c = cumsum(delta_dlog_c))
+  }
+
+  if (length(scenarios) == 0L) {
+    message("[run_counterfactuals] no scenarios computable — skipping outputs")
+    return(invisible(NULL))
+  }
+
+  scen_long <- bind_rows(scenarios)
+  csv_path <- file.path(output_dir, "australia_counterfactuals.csv")
+  write.csv(scen_long, csv_path, row.names = FALSE)
+  message(sprintf("[run_counterfactuals] CSV saved: %s (%d rows)",
+                  csv_path, nrow(scen_long)))
+
+  # Headline summary: cumulative consumption impact at +4 and +8 quarters
+  # post the relevant event quarter, and at end of sample.
+  fmt_pct <- function(x) sprintf("%+.2f%%", 100 * x)
+
+  pick_h <- function(df, event_date, h) {
+    target <- as.Date(event_date) + months(3 * h)
+    sub <- df %>% filter(date >= as.Date(event_date) & date <= target)
+    if (nrow(sub) < h) return(NA_real_)
+    sub$cum_delta_log_c[nrow(sub)] - sub$cum_delta_log_c[1]
+  }
+
+  summary_rows <- list()
+  if (!is.null(scenarios$no_apra)) {
+    df <- scenarios$no_apra
+    summary_rows[[length(summary_rows) + 1L]] <- tibble::tibble(
+      scenario = "no_apra_2014_2017",
+      event_date = "2014-12-01",
+      h4_log_c_gap  = pick_h(df, "2014-12-01", 4),
+      h8_log_c_gap  = pick_h(df, "2014-12-01", 8),
+      eos_log_c_gap = df$cum_delta_log_c[nrow(df)] -
+                      df$cum_delta_log_c[which(df$date >= as.Date("2014-12-01"))[1]]
+    )
+  }
+  if (!is.null(scenarios$no_covid_support)) {
+    df <- scenarios$no_covid_support
+    summary_rows[[length(summary_rows) + 1L]] <- tibble::tibble(
+      scenario = "no_covid_support",
+      event_date = "2020-03-01",
+      h4_log_c_gap  = pick_h(df, "2020-03-01", 4),
+      h8_log_c_gap  = pick_h(df, "2020-03-01", 8),
+      eos_log_c_gap = df$cum_delta_log_c[nrow(df)] -
+                      df$cum_delta_log_c[which(df$date >= as.Date("2020-03-01"))[1]]
+    )
+  }
+  if (!is.null(scenarios$cci_peak) && !is.null(scenarios$cci_zero)) {
+    df_peak <- scenarios$cci_peak
+    df_zero <- scenarios$cci_zero
+    summary_rows[[length(summary_rows) + 1L]] <- tibble::tibble(
+      scenario = "cci_peak_vs_zero",
+      event_date = "1988-12-01",
+      h4_log_c_gap  = NA_real_,
+      h8_log_c_gap  = NA_real_,
+      eos_log_c_gap = (df_peak$cum_delta_log_c[nrow(df_peak)]) -
+                      (df_zero$cum_delta_log_c[nrow(df_zero)])
+    )
+  }
+  if (length(summary_rows) > 0L) {
+    summary_tbl <- bind_rows(summary_rows)
+    csv2_path <- file.path(output_dir, "australia_counterfactuals_summary.csv")
+    write.csv(summary_tbl, csv2_path, row.names = FALSE)
+    message(sprintf("[run_counterfactuals] summary CSV saved: %s", csv2_path))
+  }
+
+  # Chart: cumulative consumption deviation (log points) for each scenario
+  scenarios_for_plot <- scen_long %>%
+    filter(scenario %in% c("no_apra_2014_2017",
+                            "no_covid_support",
+                            "cci_at_peak",
+                            "cci_at_zero")) %>%
+    mutate(scenario_label = factor(
+      scenario,
+      levels = c("no_apra_2014_2017", "no_covid_support",
+                  "cci_at_peak", "cci_at_zero"),
+      labels = c("No 2014/17 APRA macroprudential",
+                  "No COVID income support",
+                  "CCI at Williams' peak (=1)",
+                  "CCI at zero (no liberalisation)")
+    ))
+
+  p <- ggplot(scenarios_for_plot,
+              aes(x = date, y = 100 * cum_delta_log_c,
+                  colour = scenario_label)) +
+    geom_hline(yintercept = 0, colour = "black", linewidth = 0.3) +
+    geom_line(linewidth = 0.75) +
+    scale_colour_manual(
+      name = NULL,
+      values = c(
+        "No 2014/17 APRA macroprudential"   = "#1f78b4",
+        "No COVID income support"           = "#e31a1c",
+        "CCI at Williams' peak (=1)"        = "#33a02c",
+        "CCI at zero (no liberalisation)"   = "#fdae61"
+      )) +
+    scale_x_date(date_breaks = "5 years", date_labels = "%Y") +
+    labs(
+      title    = "Australia: policy counterfactuals on log(c) — cumulative deviation from baseline",
+      subtitle = "Counterfactuals 1–2 on Spec 6 (preferred); counterfactual 3 on Spec 8 (CCI interactions)",
+      x = NULL,
+      y = "Cumulative deviation from baseline (log points × 100)"
+    ) +
+    theme_minimal(base_size = 13) +
+    theme(legend.position = "bottom",
+          plot.title    = element_text(face = "bold"),
+          plot.subtitle = element_text(colour = "grey30"))
+
+  png_path <- file.path(output_dir, "australia_counterfactual_paths.png")
+  ggsave(png_path, p, width = 16, height = 9, dpi = 200)
+  message(sprintf("[run_counterfactuals] PNG saved: %s", png_path))
+
+  invisible(scen_long)
+}
+
 plot_longrun_decomposition <- function(preferred_spec, output_dir) {
 
   spec_name <- preferred_spec$spec_name
@@ -3695,6 +3914,14 @@ tryCatch(
   plot_longrun_decomposition(preferred_spec, output_dir),
   error = function(e)
     message(sprintf("  [Step 10] aborted: %s", conditionMessage(e)))
+)
+
+cat("[Step 11] Policy counterfactuals (NS-012)...\n")
+tryCatch(
+  run_counterfactuals(specs_full = specs_full,
+                      output_dir = output_dir),
+  error = function(e)
+    message(sprintf("  [Step 11] aborted: %s", conditionMessage(e)))
 )
 
 cat(rep("=", 70), "\n", sep = "")
