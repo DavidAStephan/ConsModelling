@@ -1,8 +1,8 @@
 # A Multi-Equation LIVES System for Australia: Joint Identification of Credit Conditions and Williams' Calibrations Tested
 
-**Companion paper draft**
+**Companion paper draft — target venue: Reserve Bank of Australia Research Discussion Paper**
 
-**Authors:** *to be added*
+**Author:** David Stephan
 **JEL codes:** E21, E32, E51, D14
 **Keywords:** household consumption, LIVES system, credit conditions, joint
 identification, cross-equation restrictions
