@@ -1,21 +1,33 @@
 # Rendering the working paper
 
 The headline paper is authored in markdown (`wp_draft.md`) and rendered
-to PDF / docx / html via Quarto for distribution. The companion paper
-in [`../../LIVES/docs/`](../../LIVES/docs/) uses the same setup.
+to PDF / docx / html via pandoc + Typst (default) or Quarto + LaTeX
+(alternative). The companion paper in
+[`../../LIVES/docs/`](../../LIVES/docs/) uses the same setup.
 
 ## Quick start
 
 ```bash
 cd Australia/docs/
 
-# Stopgap: docx from plain pandoc, no Quarto required
+# Default: PDF via pandoc + Typst (no LaTeX required)
+make pdf
+
+# Word document via plain pandoc (no Quarto)
 make docx-pandoc
 
-# Full pipeline: Quarto-rendered PDF / docx / html
-make pdf
+# Quarto pipeline (richer features; alternative)
+make pdf-quarto
 make docx
 make html
+```
+
+The default `make pdf` target requires only `pandoc` and `typst`
+on PATH. Both are small (~50 MB combined) and install in seconds
+on macOS via:
+
+```bash
+brew install pandoc typst
 ```
 
 ## What lives where
@@ -34,20 +46,38 @@ regenerates `_wp_body.md` automatically before each render.
 
 ## Prerequisites
 
-### For `make docx-pandoc` (the no-LaTeX path)
+### For `make pdf` (the default — pandoc + Typst)
 
 ```bash
-brew install pandoc   # macOS; see pandoc.org for other platforms
+brew install pandoc typst   # macOS
 ```
 
-Pandoc alone produces a reasonable Word document with a table of
-contents and numbered sections from the raw markdown. Useful as a
-first pass for shareable review copies before the Quarto setup is in
-place.
+Pandoc 3.0+ has built-in Typst output support. Typst is a single
+binary (~40 MB) that takes the place of a full TeX distribution.
+Rendering this paper takes ~1–2 seconds; the resulting PDF is a
+clean academic document with a numbered table of contents.
 
-### For `make pdf` / `make docx` / `make html`
+Verify with:
 
-You need **Quarto** and (for PDF only) a **TeX distribution**.
+```bash
+pandoc --list-output-formats | grep typst
+typst --version
+```
+
+### For `make docx-pandoc` (no-LaTeX docx)
+
+```bash
+brew install pandoc
+```
+
+Pandoc alone produces a Word document with a table of contents and
+numbered sections from the raw markdown.
+
+### For `make pdf-quarto` / `make docx` / `make html` (Quarto path)
+
+The Quarto pipeline is an alternative that lets you use BibTeX
+auto-citations and Quarto's `{{< include >}}` shortcode. It is
+**not** required for the default `make pdf` target.
 
 ```bash
 # Quarto: official installer

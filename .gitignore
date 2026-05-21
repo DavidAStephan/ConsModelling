@@ -25,17 +25,17 @@ renv/sandbox/
 renv/staging/
 .vscode/
 
-# Quarto / paper build artefacts (regenerated from wp_draft.md /
-# companion_paper_draft.md via the per-folder Makefiles).
+# Quarto / paper build artefacts. Rendered PDFs (.pdf) are kept in
+# git as deliverables — they're regenerated cleanly on each render
+# via `make pdf` (pandoc + Typst). Other formats and intermediates
+# are excluded.
 Australia/docs/_wp_body.md
-Australia/docs/wp_draft.pdf
 Australia/docs/wp_draft.docx
 Australia/docs/wp_draft.html
 Australia/docs/wp_draft_pandoc.docx
 Australia/docs/wp_draft_files/
 Australia/docs/.quarto/
 LIVES/docs/_companion_body.md
-LIVES/docs/companion_paper_draft.pdf
 LIVES/docs/companion_paper_draft.docx
 LIVES/docs/companion_paper_draft.html
 LIVES/docs/companion_paper_draft_pandoc.docx
