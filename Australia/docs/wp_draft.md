@@ -316,8 +316,8 @@ apply the framework to the global financial crisis, demonstrating that
 the abrupt tightening in CCI from 2007 quantitatively rationalises the
 sharp consumption pullback observed in heavy-MEW economies. Duca,
 Muellbauer and Tobin (2013), in *European Economy* Discussion Paper 14,
-formalise what they label the "LIVES" approach — the *l*ife-cycle
-*I*ntegration of *V*ariable *E*xpectations and *S*tructure — emphasising
+formalise what they label the "LIVES" approach — the *L*atent
+*I*nteractive *V*ariable *E*quation *S*ystem — emphasising
 the joint determination of consumption, house prices, mortgage debt
 and home equity withdrawal in a four-equation system identified by
 common factors and cross-equation sign restrictions.

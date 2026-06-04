@@ -1,5 +1,14 @@
 # Plan of action — Australia LIVES consumption model
 
+> ## ✅ Completion status (2026-06)
+> **All P0–P3 action items are implemented and merged to `main`; the pipeline cold-rebuilds reproducibly.** Done:
+> - **P0:** NS-120 (real-time PI built; full-sample LP reframed as a *measurement* per author decision), NS-121 (Engle–Granger MacKinnon cointegration CVs → no spec cointegrates), NS-122/123 (Spec 8 λ=−0.445, §8.4 table, 3-knot §5.1.1), NS-124 (OOS interaction bug), NS-125 (Wald sign → calibrations **not** rejected, χ²=2.24).
+> - **P1/P2:** NS-126/127/134 (delta-method + bootstrap CIs on structural γ; aggregate wealth CI; "matches Williams" reframed as consistency-not-confirmation), NS-128/129/130 (preferred-spec language, §7.2 diagnostics, placebo protocol), NS-131 (M3 $bn/$m unit fix — **now propagated reproducibly**), NS-132 (real-time OOS), NS-133 (companion B3 + abstract/Wald reversal), M10 (ρ̂=−0.0037).
+> - **P3:** NS-135 (MARTIN-nesting exercise — homogeneity **rejected**, net-wealth elasticity 0.115 vs MARTIN's 0.17).
+> - **Reproducibility:** decoupled the overloaded `USE_INSTITUTIONAL_CCI` flag (→ `USE_WILLIAMS_SDMMA_BASIS` + `USE_INSTITUTIONAL_CCI_OVERLAY`), so a cold rebuild reproduces the canonical headline **and** propagates the M3 fix; renv.lock completed (M18, car/systemfit); williams_comparison.R stale narrative refreshed (M13/M14); LIVES acronym fixed.
+>
+> **Genuinely remaining (need author input or are multi-week):** the companion-paper write-up (B5), a real HEW series with the dwelling-investment subtraction (B1, data), full shared-ϖ FIML (Tier C, months), the Quarto pipeline (P4), and a handful of reference-fidelity checks (the De Bonis 2024 author/year/venue and the "Duca, Muellbauer and Tobin (2013)" attribution — verify against the source before changing). Headline λ=−0.180 and Spec 8 λ=−0.445 are unchanged throughout; tests pass.
+
 **Audit verdict (independently confirmed):** an honest, dataset-rich, near-RDP-grade study whose headline "puzzle resolved / matches Williams" narrative rests on (a) a look-ahead-biased permanent-income regressor and (b) a string of paper-vs-CSV number mismatches. **Major revision required; not yet MARTIN-ready.** Every critical claim below was checked against the committed code and CSVs and is marked CONFIRMED with its evidence.
 
 This plan **extends the existing structure** in `Australia/docs/next_steps_plan_2026.md` (Tiers A–D) and the `next_steps.md` NS-### backlog rather than inventing a new scheme. The existing Tier A is marked "done / editorial only" — that judgement is now **wrong**: the audit shows the empirical content is *not* settled (look-ahead PI, wrong cointegration CVs, OOS bug) and the editorial numbers are *not* reconciled. P0/P1 below re-open Tier A and insert new NS-IDs (NS-120…NS-135) continuing the existing numbering.
