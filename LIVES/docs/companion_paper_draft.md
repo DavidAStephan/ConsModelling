@@ -35,18 +35,18 @@ knot** — the HP-weighted, M-weighted, and consumption-weighted CCI
 variants are mathematically identical after peak-normalisation, so
 the cross-equation rescaling has no traction.
 
-**Williams' Table 1 wealth γ are formally rejected on the
+**Williams' Table 1 wealth γ are *not* rejected on the
 contemporary Australian data.** A joint Wald test using the
-Newey–West covariance gives χ²(4) = 10.03 (p = 0.040) for the four
-wealth calibrations alone and χ²(6) = 29.10 (p < 0.001) for the
-full Williams calibration set. The individual rejection is the
-housing-wealth m.p.c. γ_HA = 0.0488 (χ²(1) = 7.18, p = 0.007),
-even though the *implied* structural γ_HA from our Spec 6 estimate
-is 0.049 — essentially equal to Williams' value. The reconciliation
-runs through λ: the OLS coefficient on `ha_y` (0.0088) sits 37 per
-cent below Williams' implied OLS at his published λ (0.0140), and
-that gap is what generates the rejection of the calibration as a
-parameter restriction.
+Newey–West covariance gives χ²(4) = 1.07 (p = 0.90) for the four
+wealth calibrations alone and χ²(6) = 2.24 (p = 0.90) for the
+full Williams calibration set; no individual restriction is rejected
+(γ_HA: χ²(1) = 0.05, p = 0.83). Williams' calibrated long-run
+coefficients are thus statistically consistent with the Australian
+Spec 6 estimates — the same conclusion the headline paper reaches
+from the *implied* structural γ profile (implied γ_HA = 0.049 vs
+Williams' 0.0488). The consistency is partly a low-power result: on
+n = 86 the Newey–West standard errors are wide, so the data fail to
+reject Williams' values rather than pinning them down.
 
 The HEW equation we construct using `Δ(housing-secured debt) /
 income` as a proxy (Williams' literal definition is unsourced for
@@ -105,15 +105,16 @@ identification questions left open by the single-equation paper.
    one surviving knot the three weighted variants are identical
    after peak-normalisation.
 
-3. **Williams' Table 1 calibrations are formally rejected.** A
+3. **Williams' Table 1 calibrations are not rejected.** A
    Wald test of the joint γ_HA = 0.0488, γ_IFA = 0.022,
    γ_NLA = 0.159, ψ_0 = 0.20, and ln(p^h/y) = −0.13 restrictions
-   gives χ²(6) = 29.10, p < 0.001. The wealth-only subset rejects
-   at 5 per cent, χ²(4) = 10.03, p = 0.040. The individual
-   rejection is γ_HA — and yet the *implied* γ_HA from our
-   Spec 6 estimate (0.049) is essentially equal to Williams'
-   value, so the rejection runs through the speed-of-adjustment
-   channel rather than the wealth-coefficient channel.
+   gives χ²(6) = 2.24, p = 0.90; the wealth-only subset gives
+   χ²(4) = 1.07, p = 0.90; and no individual restriction is
+   rejected (γ_HA: χ²(1) = 0.05, p = 0.83). The formal test thus
+   agrees with the headline paper's implied-γ reading — Williams'
+   calibrations are statistically consistent with the Australian
+   estimates — though on n = 86 with wide standard errors the test
+   has limited power.
 
 4. **The HEW residuals correlate 0.83 with mortgage-stock
    residuals** under the credit-flow proxy construction. The two
@@ -129,12 +130,13 @@ disaggregated specification with CCI short-run dynamics and the
 post-2008 PI break) reproduces Williams' Table 1 γ profile to a
 useful approximation. That finding stands: the present multi-
 equation paper does not overturn it. But the multi-equation
-analysis here clarifies *why* the positive single-equation reading
-coexists with the formal rejection of Williams' calibrations as
-parameter restrictions — the headline paper's γ are implied
-quantities from the ECM identity, while the calibration restrictions
-test the OLS coefficients directly, and our smaller |λ| breaks the
-correspondence between the two test forms.
+analysis here corroborates that reading from a second direction: a
+formal Wald test of Williams' Table 1 calibrations as restrictions on
+the consumption equation fails to reject them (§7), so both the
+implied-γ comparison and the direct restriction test find the
+Australian estimates consistent with Williams' values. The agreement
+is, however, partly a low-power result given the small (n = 86)
+estimation sample.
 
 ---
 
@@ -202,9 +204,9 @@ Williams reports six calibrated long-run γ in Table 1:
 0.20 (PI weight at CCI = 0), the wealth-CCI interaction ϖ = 1.2, and
 the speed of adjustment λ = −0.286.
 
-The ECM identity OLS_coef_i = λ × γ_i lets us cast each calibration
-as a linear restriction on the OLS coefficient vector of our Spec 6,
-conditional on λ. We test these restrictions individually, in
+The ECM identity OLS_coef_i = |λ| × γ_i (equivalently γ = OLS/|λ|,
+since λ < 0) lets us cast each calibration as a linear restriction on
+the OLS coefficient vector of our Spec 6, conditional on λ. We test these restrictions individually, in
 groups, and jointly using `car::linearHypothesis` with the Newey–West
 covariance.
 
@@ -420,14 +422,16 @@ vector, conditional on the estimated λ̂.
 
 | Coefficient        | Williams γ | Implied OLS at λ̂ |
 |---|---:|---:|
-| ha_y                | 0.0488   | −0.0096   |
-| eq_y                | 0.0110   | −0.0022   |
-| super_y             | 0.0110   | −0.0022   |
-| nla_y               | 0.1590   | −0.0314   |
-| ln_hp_over_y        | −0.1300  | +0.0257   |
-| ln_yp_over_y        | 0.2000   | −0.0395   |
+| ha_y                | 0.0488   | +0.0096   |
+| eq_y                | 0.0110   | +0.0022   |
+| super_y             | 0.0110   | +0.0022   |
+| nla_y               | 0.1590   | +0.0314   |
+| ln_hp_over_y        | −0.1300  | −0.0257   |
+| ln_yp_over_y        | 0.2000   | +0.0395   |
 
-The implied OLS values are computed at λ̂ = −0.197 (the version of
+The implied OLS target for each coefficient is γ × |λ̂| (the
+structural convention γ = OLS/|λ|), so it carries the same sign as
+Williams' γ. Values are computed at λ̂ = −0.197 (the version of
 Spec 6 estimated by the test script; this is a slight refit of the
 canonical −0.180 in the headline paper because the script
 re-derives the data flow rather than reusing the cached pipeline
@@ -435,45 +439,43 @@ outputs).
 
 ### 7.2 Wald test results
 
-| Restriction                          | χ²    | df | p-value | Reject at 5 % | Reject at 1 % |
+| Restriction (OLS = γ·\|λ̂\|)          | χ²    | df | p-value | Reject at 5 % | Reject at 1 % |
 |---|---:|---:|---:|:-:|:-:|
-| ha_y = 0.0488                        | 7.18  | 1  | 0.007   | ✓ | ✓ |
-| eq_y = 0.011                         | 0.02  | 1  | 0.896   | ✗ | ✗ |
-| super_y = 0.011                      | 2.26  | 1  | 0.133   | ✗ | ✗ |
-| nla_y = 0.159                        | 2.55  | 1  | 0.110   | ✗ | ✗ |
-| ln_hp_over_y = −0.130                | 2.20  | 1  | 0.138   | ✗ | ✗ |
-| ln_yp_over_y = 0.200                 | 1.23  | 1  | 0.268   | ✗ | ✗ |
-| **Joint wealth (4 restrictions)**    | **10.03** | **4** | **0.040** | **✓** | ✗ |
-| **Joint all (6 restrictions)**        | **29.10** | **6** | **<0.001** | **✓** | **✓** |
+| ha_y = +0.0096                       | 0.05  | 1  | 0.832   | ✗ | ✗ |
+| eq_y = +0.0022                       | 0.05  | 1  | 0.826   | ✗ | ✗ |
+| super_y = +0.0022                    | 0.87  | 1  | 0.352   | ✗ | ✗ |
+| nla_y = +0.0314                      | 0.00  | 1  | 0.962   | ✗ | ✗ |
+| ln_hp_over_y = −0.0257               | 0.07  | 1  | 0.793   | ✗ | ✗ |
+| ln_yp_over_y = +0.0395               | 0.64  | 1  | 0.424   | ✗ | ✗ |
+| **Joint wealth (4 restrictions)**    | **1.07**  | **4** | **0.898** | ✗ | ✗ |
+| **Joint all (6 restrictions)**        | **2.24**  | **6** | **0.896** | ✗ | ✗ |
 
-### 7.3 The reconciliation with the headline paper
+### 7.3 Consistency with the headline paper
 
-The single rejection at 1 per cent is the housing-wealth m.p.c.
-γ_HA = 0.0488. Yet the headline paper reports γ_HA = 0.049 as the
-*implied* γ from Spec 6 — essentially equal to Williams' value.
+No restriction is rejected, individually or jointly. The
+housing-wealth m.p.c. γ_HA = 0.0488 — the coefficient on which the
+headline comparison turns — is comfortably consistent with the
+Spec 6 OLS estimate (χ²(1) = 0.05, p = 0.83), as is the full
+calibration set (χ²(6) = 2.24, p = 0.90).
 
-The reconciliation runs through the ECM identity. Spec 6's
-OLS coefficient on `ha_y` is 0.0088; the implied γ = 0.0088 / 0.180
-= 0.049 in the headline paper. Williams' implied OLS at his λ is
-0.0488 × 0.286 = 0.0140. Our OLS is therefore 37 per cent below
-Williams' implied OLS, and our |λ| is also 37 per cent below
-Williams'; the two ratios cancel in the implied γ comparison but
-not in the Wald test of the OLS restriction.
+This corroborates the headline paper's reading from a second
+direction. The headline compares the *implied* structural
+γ = OLS/|λ| against Williams' Table 1 and finds a close match for
+housing wealth (0.049 vs 0.0488). The Wald test here asks the dual
+question — are the OLS coefficients consistent with Williams' γ
+scaled by the estimated |λ̂|? — and the answer is yes for every
+coefficient. The two test forms agree.
 
-The two tests answer different questions. The implied-γ comparison
-asks "does our structural γ profile match Williams' Table 1?" — the
-answer for housing wealth is yes, almost exactly. The Wald
-restriction test asks "is the joint hypothesis (γ_HA = 0.0488 *and*
-λ as estimated) consistent with our OLS coefficients?" — and the
-answer is no for housing wealth because the OLS coefficient is too
-small relative to what Williams' γ at our λ would imply.
-
-For the four wealth coefficients jointly, the joint Wald test
-rejects at 5 per cent (χ²(4) = 10.03, p = 0.040). For the full
-calibration set including the affordability and PI terms, the joint
-test rejects strongly (χ²(6) = 29.10, p < 0.001). Williams'
-calibrations are not consistent with a single set of OLS estimates
-under the Newey–West uncertainty bands.
+The consistency should be read with its statistical power in mind.
+The restrictions are tested on n = 86 with Newey–West standard
+errors that are wide relative to the coefficient magnitudes (every
+Spec 6 long-run wealth coefficient is individually insignificant).
+The data therefore *fail to reject* Williams' calibrations rather
+than precisely confirming them; the test has limited power to
+distinguish Williams' values from a range of nearby alternatives.
+Read together with the headline implied-γ match, the fair summary is
+that Williams' Table 1 calibrations remain a statistically admissible
+description of contemporary Australian consumption behaviour.
 
 ---
 
@@ -492,9 +494,10 @@ reaches a complementary conclusion *from a different direction*:
   treats as the structural identification are only weakly supported
   on contemporary Australian data. One institutional event (1986
   deregulation) carries the four-equation joint identification.
-- Williams' Table 1 calibrations are formally rejected as a system
-  of restrictions on the consumption equation, even though the
-  implied γ_HA matches Williams almost exactly.
+- Williams' Table 1 calibrations are *not* rejected as a system
+  of restrictions on the consumption equation (χ²(6) = 2.24,
+  p = 0.90), consistent with the implied γ_HA matching Williams
+  almost exactly — though the test has limited power on n = 86.
 - The proxy HEW equation does not deliver an additional identifying
   signal; its residuals correlate 0.83 with the mortgage equation,
   so the four-equation system effectively has three independent

@@ -261,6 +261,55 @@ run_adf_drift <- function(x, lags = 4L) {
 }
 
 
+# ------------------------------------------------------------------------------
+# Engle–Granger (residual-based) cointegration critical values.
+#
+# When an ADF/τ test is applied to the residuals of a *cointegrating
+# regression* with k regressors, the relevant null distribution is NOT the
+# univariate Dickey–Fuller distribution: it depends on the number of
+# variables in the regression. Using the plain DF τ critical value (≈ −2.86
+# with a constant) instead of the Engle–Granger value over-rejects the
+# no-cointegration null. This helper returns MacKinnon (1991, 2010)
+# asymptotic critical values for the Engle–Granger test, "with constant, no
+# trend" case (the case matching `lm(y ~ x1 + ... + xk)` followed by an
+# ADF-drift test on the residuals).
+#
+# `n_vars` is the TOTAL number of I(1) variables in the cointegrating
+# regression — i.e. the dependent plus the k regressors (n_vars = k + 1).
+# Counting every regressor is the conservative textbook convention; if some
+# regressors are demonstrably I(0) the appropriate n_vars is smaller. Values
+# are MacKinnon's response-surface asymptotic (β∞) figures; the exact decimals
+# at large n_vars do not change any pass/fail conclusion here because the
+# test statistics sit far from the critical values.
+# ------------------------------------------------------------------------------
+eg_mackinnon_cv <- function(n_vars, level = c("5pct", "1pct", "10pct")) {
+  level <- match.arg(level)
+  # rows indexed by n_vars = 1..12 (dependent + regressors), with constant.
+  tbl <- rbind(
+    c(n = 1,  `1pct` = -3.43, `5pct` = -2.86, `10pct` = -2.57),
+    c(n = 2,  `1pct` = -3.90, `5pct` = -3.34, `10pct` = -3.04),
+    c(n = 3,  `1pct` = -4.30, `5pct` = -3.74, `10pct` = -3.45),
+    c(n = 4,  `1pct` = -4.65, `5pct` = -4.10, `10pct` = -3.81),
+    c(n = 5,  `1pct` = -4.96, `5pct` = -4.42, `10pct` = -4.13),
+    c(n = 6,  `1pct` = -5.25, `5pct` = -4.71, `10pct` = -4.42),
+    c(n = 7,  `1pct` = -5.52, `5pct` = -4.98, `10pct` = -4.69),
+    c(n = 8,  `1pct` = -5.76, `5pct` = -5.23, `10pct` = -4.95),
+    c(n = 9,  `1pct` = -6.00, `5pct` = -5.47, `10pct` = -5.19),
+    c(n = 10, `1pct` = -6.23, `5pct` = -5.70, `10pct` = -5.42),
+    c(n = 11, `1pct` = -6.44, `5pct` = -5.92, `10pct` = -5.64),
+    c(n = 12, `1pct` = -6.65, `5pct` = -6.13, `10pct` = -5.85)
+  )
+  if (is.na(n_vars) || n_vars < 1L) return(NA_real_)
+  idx <- min(as.integer(round(n_vars)), 12L)
+  if (n_vars > 12L) {
+    warning(sprintf(
+      "eg_mackinnon_cv: n_vars=%d exceeds table; using n_vars=12 value (conservative).",
+      as.integer(n_vars)))
+  }
+  unname(tbl[idx, level])
+}
+
+
 fit_long_run_spec <- function(data, spec_name, rhs_vars, response_var = "lcons_income_ratio") {
   required_vars <- c(response_var, rhs_vars)
   sample <- data %>%

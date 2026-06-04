@@ -290,7 +290,17 @@ construct_permanent_income <- function(model_data, k = 40L, delta = 0.95) {
 
 construct_permanent_income_italy <- function(model_data, k = 40L,
                                              delta = 0.95,
-                                             gfc_ogive = TRUE) {
+                                             gfc_ogive = TRUE,
+                                             real_time = FALSE) {
+  # real_time = FALSE (default): the published Italy convention — ONE
+  #   full-sample LP fit, in-sample fitted values used as y^p for every t.
+  #   This is non-causal (y^p_t embeds coefficients estimated from data after
+  #   t) and is therefore NOT operational at MARTIN forecast time.
+  # real_time = TRUE: expanding-window LP. At each t the LP is re-fit using
+  #   only training observations whose full k-quarter target is realised by t
+  #   (s <= t - k), then t is predicted from its own date-t predictors. This
+  #   is causal/real-time and MARTIN-operational, at the cost of ~k+min_train
+  #   quarters of warm-up before the first y^p is available.
 
   delta_q  <- delta^(1 / 4)
   weights  <- delta_q^(seq_len(k) - 1L)
@@ -352,28 +362,60 @@ construct_permanent_income_italy <- function(model_data, k = 40L,
             n_train, "); leaving ln_yp_over_y unchanged")
     return(model_data)
   }
+  min_train <- 30L
+  pred_df   <- dat[, predictor_vars, drop = FALSE]
+  y_p_hat   <- rep(NA_real_, n)
 
-  fit_df <- dat[train_mask, c(predictor_vars), drop = FALSE]
-  fit_df$y_p_target <- y_p_target[train_mask]
-  fmla <- reformulate(predictor_vars, response = "y_p_target")
-  lp_fit <- lm(fmla, data = fit_df)
-
-  message(sprintf(
-    "[construct_permanent_income_italy] LP fit: n=%d, R^2=%.3f",
-    nobs(lp_fit), summary(lp_fit)$r.squared
-  ))
-
-  # ---- Predict y_p_hat for ALL t (including tail where target is NA)
-  pred_df <- dat[, predictor_vars, drop = FALSE]
-  cf      <- coef(lp_fit)
-  y_p_hat <- rep(NA_real_, n)
-  has_intercept <- "(Intercept)" %in% names(cf)
-  for (i in seq_len(n)) {
+  # Predict y_p_hat[i] from coefficient vector cf_i and the date-i predictors.
+  # NA coefficients (predictors dropped for collinearity in the training
+  # window, e.g. step2008 before 2008) contribute zero; a missing predictor
+  # value at i yields NA.
+  predict_row <- function(cf_i, i) {
     row_i <- as.list(pred_df[i, ])
-    if (any(vapply(row_i, function(x) is.na(x), logical(1L)))) next
-    val <- if (has_intercept) cf[["(Intercept)"]] else 0
-    for (v in predictor_vars) val <- val + cf[[v]] * row_i[[v]]
-    y_p_hat[i] <- val
+    val   <- if ("(Intercept)" %in% names(cf_i)) cf_i[["(Intercept)"]] else 0
+    for (v in predictor_vars) {
+      xi <- row_i[[v]]
+      if (is.na(xi)) return(NA_real_)
+      bi <- cf_i[[v]]
+      if (!is.na(bi)) val <- val + bi * xi
+    }
+    val
+  }
+
+  if (!real_time) {
+    # --- Published Italy convention: ONE full-sample fit, fitted for all t.
+    fit_df <- dat[train_mask, c(predictor_vars), drop = FALSE]
+    fit_df$y_p_target <- y_p_target[train_mask]
+    fmla <- reformulate(predictor_vars, response = "y_p_target")
+    lp_fit <- lm(fmla, data = fit_df)
+    message(sprintf(
+      "[construct_permanent_income_italy] full-sample LP fit: n=%d, R^2=%.3f",
+      nobs(lp_fit), summary(lp_fit)$r.squared
+    ))
+    cf <- coef(lp_fit)
+    for (i in seq_len(n)) y_p_hat[i] <- predict_row(cf, i)
+  } else {
+    # --- Real-time expanding-window LP: at each i, train only on observations
+    #     whose full k-horizon target is realised by i (s <= i - k).
+    n_pred <- 0L
+    for (i in seq_len(n)) {
+      train_idx <- which(seq_len(n) <= (i - k) & train_mask)
+      if (length(train_idx) < min_train) next
+      if (anyNA(pred_df[i, ])) next
+      fit_df <- dat[train_idx, predictor_vars, drop = FALSE]
+      fit_df$y_p_target <- y_p_target[train_idx]
+      lp_fit_i <- tryCatch(
+        lm(reformulate(predictor_vars, response = "y_p_target"), data = fit_df),
+        error = function(e) NULL
+      )
+      if (is.null(lp_fit_i)) next
+      y_p_hat[i] <- predict_row(coef(lp_fit_i), i)
+      if (!is.na(y_p_hat[i])) n_pred <- n_pred + 1L
+    }
+    message(sprintf(
+      "[construct_permanent_income_italy] real-time LP: %d of %d quarters predicted (k=%d warm-up)",
+      n_pred, n, k
+    ))
   }
 
   ln_yp_over_y <- y_p_hat - dat$lincome
@@ -1099,6 +1141,10 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
     sp <- specs[[sp_name]]
     lr_no_ecm <- setdiff(sp$lr_vars, "ecm_lag")
     req <- c("lcons", lr_no_ecm)
+    # Number of variables in the cointegrating regression (dependent + the k
+    # long-run regressors). Drives the Engle–Granger MacKinnon critical value
+    # below — a residual-based test, NOT a univariate Dickey–Fuller test.
+    n_lr_vars <- length(lr_no_ecm) + 1L
     # Some specs (e.g. Spec 8) build interaction columns inside their own
     # data scope rather than on model_data; skip cointegration if any
     # required regressor is missing from model_data.
@@ -1108,7 +1154,7 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
                       sp$spec_name, paste(missing, collapse = ", ")))
       rows[[sp_name]] <- tibble::tibble(
         specification = sp$spec_name,
-        period = NA_character_, n_obs = NA_integer_,
+        period = NA_character_, n_obs = NA_integer_, coint_n_vars = n_lr_vars,
         coint_adf_stat = NA_real_, coint_adf_5pct_cv = NA_real_,
         coint_adf_pass = NA, po_stat = NA_real_, po_pass = NA,
         johansen_r1_pass = NA
@@ -1125,7 +1171,7 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
       rows[[sp_name]] <- tibble::tibble(
         specification = sp$spec_name,
         period = format(range(coint_data$date), "%Y-%m"),
-        n_obs = n,
+        n_obs = n, coint_n_vars = n_lr_vars,
         coint_adf_stat = NA_real_, coint_adf_5pct_cv = NA_real_,
         coint_adf_pass = NA, po_stat = NA_real_, po_pass = NA,
         johansen_r1_pass = NA
@@ -1143,7 +1189,10 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
       adf_stat <- NA_real_; adf_cv <- NA_real_; adf_pass <- NA
     } else {
       adf_stat <- adf$adf_stat
-      adf_cv   <- adf$adf_5pct
+      # Engle–Granger residual test: compare the τ statistic to the MacKinnon
+      # critical value for n_lr_vars variables, NOT the univariate DF value
+      # (adf$adf_5pct ≈ −2.86) returned by run_adf_drift.
+      adf_cv   <- eg_mackinnon_cv(n_lr_vars, "5pct")
       adf_pass <- !is.na(adf_stat) && !is.na(adf_cv) && adf_stat < adf_cv
     }
 
@@ -1195,6 +1244,7 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
                                   format(min(coint_data$date), "%Y-%m"),
                                   format(max(coint_data$date), "%Y-%m")),
       n_obs             = n,
+      coint_n_vars      = n_lr_vars,
       coint_adf_stat    = adf_stat,
       coint_adf_5pct_cv = adf_cv,
       coint_adf_pass    = adf_pass,

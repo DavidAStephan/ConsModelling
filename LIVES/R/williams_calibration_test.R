@@ -14,7 +14,9 @@
 #
 # We refit Spec 6 (the preferred disaggregated specification) and conduct a
 # Wald test using car::linearHypothesis with the Newey–West covariance.
-# Each γ_i restriction is OLS_coef_i + γ_i × λ = 0  (since OLS = λ × γ).
+# The pipeline's structural convention is  γ = OLS / |λ|  (equivalently
+# γ = −OLS/λ, since λ < 0), so each γ_i restriction is
+#   OLS_coef_i = γ_i × |λ̂| .
 # We test individually, in groups, and jointly.
 #
 # Output:
@@ -89,7 +91,12 @@ cat(sprintf("Spec 6 λ̂ = %.4f\n", lambda_hat))
 # Williams Table 1 calibrations.
 # Restriction format for linearHypothesis: each row is one linear restriction
 # on the OLS coefficient vector, encoded as
-#     OLS_coef_i  ==  γ_target_i × λ_hat
+#     OLS_coef_i  ==  γ_target_i × |λ̂|
+# Using |λ̂| (not the signed λ̂) matches the pipeline's structural convention
+# γ = OLS/|λ| and keeps the implied OLS target on the same sign as γ_target —
+# e.g. for ha_y the implied target is +0.0488×|λ| (a positive OLS coefficient),
+# not −0.0488×|λ|. The genuinely negative structural sign on ln_hp_over_y is
+# carried by γ_target itself, so the same |λ̂| scaling is correct for all six.
 # We treat λ as fixed at its estimated value to make the restriction linear
 # in the remaining OLS coefficients. (A joint restriction including λ would
 # be non-linear in OLS_coef_i / λ, requiring a delta-method Wald.)
@@ -103,7 +110,7 @@ williams <- tibble::tribble(
   "ln_hp_over_y",         -0.1300, "log(p^h/y) at CCI=0 (Williams)",
   "ln_yp_over_y",          0.2000, "ψ_0 (Williams calibrated)"
 ) %>%
-  mutate(implied_ols  = gamma_target * lambda_hat,
+  mutate(implied_ols  = gamma_target * abs(lambda_hat),
          restriction  = sprintf("%s = %.6f", term, implied_ols))
 
 # Per-coefficient Wald tests
