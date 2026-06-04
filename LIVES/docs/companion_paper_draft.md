@@ -277,7 +277,7 @@ stock, and home-equity withdrawal).
 The two-equation SUR of consumption and house prices on the back-
 extended sample (n = 189, 1977Q4–2024Q4) is the foundation result.
 The residual correlation between the two equations is
-ρ̂(ε_C, ε_H) = −0.0045 — essentially zero — under the full
+ρ̂(ε_C, ε_H) = −0.0037 — essentially zero — under the full
 specification with `cci_williams` and event dummies. The finding is
 robust across variants: removing CCI gives ρ̂ = −0.083, removing
 event dummies gives ρ̂ = +0.043, and the minimal LR + SR

@@ -1,6 +1,6 @@
 metric,value
-"OLS rho(eps_C, eps_H)",-0.0038
-"SUR rho(eps_C, eps_H)",-0.0045
+"OLS rho(eps_C, eps_H)",-0.0031
+"SUR rho(eps_C, eps_H)",-0.0037
 SUR sigma_CC,0.000072
 SUR sigma_HH,0.000321
 SUR sigma_CH,-0.000001

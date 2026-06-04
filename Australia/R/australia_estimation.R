@@ -1626,7 +1626,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   } else {
     spec8 <- NULL
     message("Spec 8 skipped: cci_williams not present in model_data ",
-            "(USE_INSTITUTIONAL_CCI may be FALSE or Williams fit failed)")
+            "(USE_WILLIAMS_SDMMA_BASIS may be FALSE or Williams fit failed)")
   }
 
   # ------------------------------------------------------------------
@@ -3750,7 +3750,7 @@ if (any(grepl("^sdmma_", names(model_data)))) {
   }
 } else {
   message("[Williams CCI] No SDMMA basis columns on model_data — skipping ",
-          "(USE_INSTITUTIONAL_CCI may be FALSE)")
+          "(USE_WILLIAMS_SDMMA_BASIS may be FALSE)")
   WILLIAMS_FALLBACK <- TRUE
 }
 

@@ -67,21 +67,22 @@ dir.create(cache_dir,  recursive = TRUE, showWarnings = FALSE)
 
 source(file.path(project_root, "R", "model_helpers.R"), local = TRUE)
 
-# Set TRUE to overlay the Muellbauer-style regime+indicator institutional CCI
-# (see construct_institutional_cci in model_helpers.R) on top of the post-2002
-# housing-loan-flow series. Default FALSE: spec 2/5 effective sample starts
-# 2002Q3 (after lagging) using the housing-flow CCI alone.
+# Two independent credit-conditions switches (decoupled 2026-06, NS-131).
+# Previously a single overloaded `USE_INSTITUTIONAL_CCI` flag gated both of the
+# following, which made the canonical configuration (basis ON, overlay OFF)
+# impossible to reproduce from a cold rebuild.
 #
-# REPRODUCIBILITY CAVEAT (NS-131, 2026-06): this flag is overloaded — it gates
-# BOTH the SDMMA Williams basis (needed for Specs 8/9/10) AND an overlay on
-# `cci_ratio` that shifts the Spec 6 short-run CCI term (and hence λ, −0.180 →
-# −0.188). The committed cached RDS was built with the SDMMA basis attached but
-# WITHOUT the cci_ratio overlay — a state not reproducible from a cold rebuild
-# under either flag value (FALSE drops Specs 8/9/10; TRUE moves Spec 6's λ).
-# Warm replays (run_estimation_from_rds.R) reproduce the headline because the
-# cached RDS already carries the basis. Decoupling the basis from the overlay
-# is an open task before the dataset can be cold-rebuilt reproducibly.
-USE_INSTITUTIONAL_CCI <- FALSE
+# USE_WILLIAMS_SDMMA_BASIS — attach the 15-knot Williams SDMMA candidate basis
+#   to `master` so the iterated fit_consumption_with_williams_cci() can build
+#   `cci_williams` and Specs 8/9/10 estimate. CANONICAL = TRUE.
+USE_WILLIAMS_SDMMA_BASIS <- TRUE
+#
+# USE_INSTITUTIONAL_CCI_OVERLAY — backfill `cci_ratio` pre-2002 with the
+#   Muellbauer-style regime+indicator blend (construct_institutional_cci). This
+#   changes the Spec 2/5/6 short-run CCI term and shifts Spec 6 λ (−0.180 with
+#   the overlay OFF → −0.188 with it ON). CANONICAL = FALSE: the specs that use
+#   cci_ratio start at the 2002Q3 housing-flow anchor.
+USE_INSTITUTIONAL_CCI_OVERLAY <- FALSE
 
 # ==============================================================================
 # HELPERS
@@ -1469,8 +1470,8 @@ if (length(lf_obs) > 0L) {
 # domain calibration: the previous spread-normalisation backfill (mortgage
 # rate minus cash rate) conflates funding costs and risk premia with credit
 # availability and is theoretically suspect for an LIVES adaptation.
-# Option A is wired in but disabled behind USE_INSTITUTIONAL_CCI (see top of
-# file); flip the flag to overlay the institutional CCI back to 1980Q1.
+# Option A is wired in but disabled behind USE_INSTITUTIONAL_CCI_OVERLAY (see
+# top of file); flip that flag to overlay the institutional CCI back to 1980Q1.
 # ------------------------------------------------------------------------------
 
 # CCI proxy: log(housing credit flow / 8q moving average GDP proxy)
@@ -1564,13 +1565,10 @@ if (file.exists(e13_path)) {
   message("  e13-data.csv NOT FOUND — RBA-measured burden ratios unavailable")
 }
 
-# Institutional CCI overlay (USE_INSTITUTIONAL_CCI flag set near top of file).
-# When TRUE, two things happen:
-#   1. construct_institutional_cci backfills cci_ratio pre-2002 from a
-#      regime+indicator blend (preserving the post-2002 housing-flow anchor).
-#   2. The Williams (2010) 4-knot SDMMA basis (1979Q1/1992Q1/1998Q1/2007Q1)
-#      is attached so the estimation step can fit Spec 8 (CCI interactions).
-if (USE_INSTITUTIONAL_CCI) {
+# (1) Institutional CCI overlay — backfill cci_ratio pre-2002 from a
+#     regime+indicator blend (preserving the post-2002 housing-flow anchor).
+#     CANONICAL = OFF (shifts Spec 6 λ; see flag comment at top of file).
+if (USE_INSTITUTIONAL_CCI_OVERLAY) {
   basis <- build_credit_regime_basis(master$date)
   cci_input <- master %>%
     transmute(
@@ -1590,7 +1588,11 @@ if (USE_INSTITUTIONAL_CCI) {
     select(-cci_institutional_raw)
   message("  Using institutional CCI (Muellbauer-style regime+indicator blend) ",
           "to backfill pre-2002 cci_ratio.")
+}
 
+# (2) Williams SDMMA candidate basis — attached so the estimation step can fit
+#     Specs 8/9/10 (CCI interactions). CANONICAL = ON. Independent of (1).
+if (USE_WILLIAMS_SDMMA_BASIS) {
   williams_basis <- build_williams_cci_basis(master$date)
   for (j in seq_len(ncol(williams_basis))) {
     master[[colnames(williams_basis)[j]]] <- williams_basis[, j]
