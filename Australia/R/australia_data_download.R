@@ -1233,8 +1233,13 @@ master <- master %>%
     }
   ) %>%
   mutate(
-    # Raw proxy ratio: (M3-allocated + housing_wealth_proxy) / ydi_ann_nom
-    networth_y_raw_proxy = (m3_household_proxy + housing_wealth_proxy) /
+    # Raw proxy ratio: (M3-allocated + housing_wealth_proxy) / ydi_ann_nom.
+    # m3_household_proxy is in $ BILLION (RBA D03 DMAM3N, never rescaled),
+    # whereas housing_wealth_proxy and ydi_ann_nom are in $ MILLION — so the
+    # M3 term must be ×1000 before the sum, otherwise it contributes ~0.01%
+    # of the numerator instead of its intended ~12% and the aggregate proxy
+    # collapses to a housing-only back-cast (NS-131 / M15).
+    networth_y_raw_proxy = (m3_household_proxy * 1000 + housing_wealth_proxy) /
                            ydi_ann_nom
   )
 # Growth-rate splice raw_proxy onto official networth_y at 1988Q3.

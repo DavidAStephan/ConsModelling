@@ -1818,6 +1818,61 @@ adding CCI interactions to a single-equation specification can
 re-allocate the long-run identification across wealth components,
 but does not close the residual gap with the joint FIML estimates.
 
+### 7.3.1 How precisely is the structural profile identified?
+
+The implied structural coefficients γ_i = β_i/|λ| are ratios of two
+imprecisely estimated quantities on n = 86, so they inherit wide
+sampling uncertainty that the point-estimate comparison above conceals.
+Computing delta-method standard errors from the Newey–West covariance
+of (β_i, λ) — which carries the correlation between each numerator and
+the speed of adjustment — gives
+([`australia_gamma_inference.csv`](../outputs/australia_gamma_inference.csv)):
+
+| Term | Implied γ | 95% CI (delta) | Williams Table 1 | Williams in CI? |
+|---|---:|---:|---:|:-:|
+| Housing `ha_y`           | 0.042  | [−0.050, 0.133] | 0.0488 | ✓ |
+| Net liquid `nla_y`       | 0.150  | [−0.317, 0.617] | 0.159  | ✓ |
+| Equities `eq_y`          | −0.044 | [−0.506, 0.419] | 0.011  | ✓ |
+| Super `super_y`          | 0.047  | [−0.027, 0.121] | 0.011  | ✓ |
+| log(HP/y)                | −0.091 | [−0.447, 0.265] | −0.130 | ✓ |
+| Permanent income         | 1.237  | [−0.337, 2.811] | 0.200  | ✓ |
+| **Wealth aggregate (Σ)** | **0.194** | **[−0.768, 1.157]** | 0.230 | ✓ |
+
+A moving-block residual bootstrap (block length 8, B = 1000) gives a
+near-identical picture, with λ centred on −0.21 and a 95-percentile
+interval of [−0.33, +0.01] that includes zero (consistent with the
+headline t = −1.76, p = 0.084).
+
+Two things follow, and they qualify the §7.3 reading. First, **Williams'
+Table 1 value lies inside the 95 per cent confidence interval for every
+coefficient** — so the data are statistically consistent with his
+calibrations, the same conclusion the formal Wald test reaches (§9;
+companion §7). Second, and equally true, the intervals are so wide that
+they also contain zero (for the aggregate wealth effect, for equities,
+and for housing at the lower bound) and values far from Williams. The
+close numerical agreement of the point estimates is therefore a
+non-rejection driven by imprecision, not positive evidence that the
+Australian structural coefficients *equal* Williams': on this sample the
+single-equation estimates cannot distinguish his values from a broad
+range of alternatives. We accordingly read §7.3's "broadly consistent
+with Williams' Table 1" as the honest ceiling on the claim —
+consistency, not confirmation.
+
+For use in a calibrated model (MARTIN, §10.3), the policy-relevant
+summary is the aggregate long-run wealth elasticity γ_W = 0.19
+(95% CI [−0.77, 1.16]); the point estimate is close to MARTIN's
+calibrated net-wealth elasticity of ≈0.17, but the interval is too wide
+for the free estimate to discipline the calibration — it neither
+confirms nor rejects it. The disaggregated split into four components
+is even less precisely identified and should be treated as indicative.
+
+(Caveat: both the delta method and the residual bootstrap hold the
+right-hand side fixed, so they propagate sampling uncertainty in the
+ECM coefficients but **not** the first-stage uncertainty in the
+generated permanent-income and CCI regressors; the true intervals are
+therefore at least this wide. The real-time permanent-income
+sensitivity of §8.9 gives a partial read on the first-stage component.)
+
 ### 7.4 The Italy / AR comparison and the real-time check
 
 The permanent-income measure matters materially for two coefficients —
@@ -2051,20 +2106,35 @@ benchmark forecasters.
 |---|---:|---:|---:|
 | Benchmark RW drift           | 0.0309 | 0.0309 | 0.0328 |
 | Benchmark AR(1)              | 0.0370 | 0.0310 | 0.0328 |
-| Spec 4 (disagg, no CCI)      | 0.0319 | 0.0325 | —      |
+| Spec 4 (disagg, no CCI)      | 0.0319 | 0.0325 | 0.0503 |
 | Spec 6 (preferred)           | 0.0322 | 0.0332 | 0.0416 |
-| Spec 7 (cohort-burden)       | 0.0308 | 0.0346 | —      |
+| Spec 7 (cohort-burden)       | 0.0308 | 0.0346 | 0.0443 |
 | Spec 8 (Williams CCI)        | 0.0324 | 0.0315 | 0.0366 |
-| Spec 9 (Kalman CCI)          | 0.0324 | 0.0315 | 0.0366 |
+| Spec 9 (Kalman CCI)          | 0.0320 | 0.0322 | 0.0386 |
 
 At h = 1 the structural specifications are competitive with the
-random-walk benchmark (Spec 7 narrowly beats RW-drift). At h = 4
-and h = 8 the random-walk dominates every structural specification
-by 5–15 per cent in RMSE. This is the standard "macro forecasting
+random-walk benchmark (Spec 7 narrowly beats RW-drift, 0.0308 vs
+0.0309). At h = 4 and h = 8 the random-walk dominates every structural
+specification (the best structural performer at h = 8 is Spec 8 at
+0.0366 vs RW-drift 0.0328). This is the standard "macro forecasting
 puzzle" — the LIVES framework's identification advantage is in
 interpreting historical co-movement, not in beating naive benchmarks
 at multi-step prediction. We record this honestly rather than
 overstating the forecast performance.
+
+Two caveats on the CCI specifications (Spec 8, Spec 9). An earlier
+version of the validator silently dropped their CCI-interaction
+regressors — which are constructed on local copies inside the
+estimation routine rather than attached to the validation dataset —
+so the two specs collapsed to a common base form and produced
+identical forecasts; this is now fixed (the interaction columns are
+reconstructed for the validator), and Spec 8 and Spec 9 are distinct
+in the table above. The credit-conditions series and its de-mean
+constants are, however, full-sample objects, so the Spec 8/9 columns
+are conditional on a full-sample-constructed CCI and are an upper
+bound on what a fully real-time credit-conditions forecaster would
+deliver; the permanent-income input to the validator is the leak-free
+rolling AR forecaster.
 
 ### 8.14 Back-extension robustness — Spec 1 on the 1976Q3+ sample
 
