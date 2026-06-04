@@ -24,12 +24,16 @@ restrictions on the consumption equation.
 
 The empirical results are sharper than the single-equation evidence
 in the headline paper. **Joint sign-survival of CCI knots collapses
-dramatically as more equations are added.** From the 5 knots that
-survive the iterated consumption-equation maximal-GETS reduction
-(2009Q1, 2019Q1, 2020Q2, and two others), only 2 survive a
-three-equation joint test (1986 financial deregulation; 2017 APRA
+dramatically as more equations are added.** Of the candidate knots
+that pass single-equation consumption fitting, only 2 survive a
+three-equation joint sign test (1986 financial deregulation; 2017 APRA
 macroprudential round II), and only **1** survives the four-equation
-test once the HEW equation is added (1986 deregulation alone).
+test once the HEW equation is added (1986 deregulation alone). (This
+single-pass joint-identification reduction is distinct from the
+*iterated* consumption-only reduction that defines the deployed CCI
+series, which retains a different set of three knots — 2009Q1, 2019Q1,
+2020Q2 — on the 1988+ sample; the two procedures answer different
+questions, as the headline paper's §5.3.1 explains.)
 **Williams' ζ_h = 1 normalisation becomes inert with one surviving
 knot** — the HP-weighted, M-weighted, and consumption-weighted CCI
 variants are mathematically identical after peak-normalisation, so
@@ -60,8 +64,9 @@ the binding constraint on further multi-equation work.
 The Phase A multi-equation system therefore complements rather than
 overturns the headline paper's positive finding: Spec 6 reproduces
 Williams' structural γ profile to a useful approximation, and the
-multi-equation extension formally tests *and rejects* the calibrated
-values as a system of parameter restrictions. The four-equation
+multi-equation extension formally tests the calibrated values as a
+system of parameter restrictions and fails to reject them. The
+four-equation
 common-factor hypothesis — that a single CCI series enters all four
 LIVES equations with sign-consistent loadings — is only weakly
 supported on contemporary Australian data, with one institutional
@@ -91,11 +96,14 @@ identification questions left open by the single-equation paper.
 ### 1.1 Headline findings
 
 1. **Cross-equation joint sign-survival of the CCI knots collapses
-   as equations are added.** Three knots survive iterated
-   consumption-equation fitting (2009Q1, 2019Q1, 2020Q2); two
-   survive the three-equation joint test (1986, 2017); one
-   survives the four-equation test once the HEW equation is added
-   (1986 alone).
+   as equations are added.** Two distinct reductions operate. The
+   *iterated* consumption-only reduction that defines the deployed
+   CCI retains three knots (2009Q1, 2019Q1, 2020Q2). The separate
+   *joint* sign-survival reduction across equations retains a
+   different and smaller set — two knots in the three-equation system
+   (1986, 2017) and one in the four-equation system (1986 alone) —
+   because requiring sign consistency across equations is far more
+   demanding than consumption-equation fit alone.
 
 2. **ζ_h = 1 normalisation has no empirical traction with one
    surviving knot.** Williams' identification scheme — pinning the
@@ -269,7 +277,7 @@ stock, and home-equity withdrawal).
 The two-equation SUR of consumption and house prices on the back-
 extended sample (n = 189, 1977Q4–2024Q4) is the foundation result.
 The residual correlation between the two equations is
-ρ̂(ε_C, ε_H) = 0.0007 — essentially zero — under the full
+ρ̂(ε_C, ε_H) = −0.0045 — essentially zero — under the full
 specification with `cci_williams` and event dummies. The finding is
 robust across variants: removing CCI gives ρ̂ = −0.083, removing
 event dummies gives ρ̂ = +0.043, and the minimal LR + SR
@@ -566,6 +574,19 @@ appeared before Phase A: the structural identification machinery
 operates on a thin empirical basis. Expanding the candidate knot
 set (e.g. with additional Australian institutional events such as
 specific RBA policy episodes) is a logically prior step.
+
+**Implementation status (2026-06).** Two of the planned refinements are
+done: the CCI interactions in Spec 8 are de-meaned over the estimation
+sample (item B3 — this makes `ha_x_cci` right-signed, +0.0016), and the
+Wald calibration test now uses the correct |λ̂| scaling (which reverses
+the earlier rejection — Williams' Table 1 is *not* rejected; §7). The
+two genuinely open items are unchanged by this pass: (i) a properly
+constructed home-equity-withdrawal series with Williams' dwelling-
+investment subtraction (the current proxy is a credit-flow series whose
+residuals correlate 0.83 with the mortgage-stock equation), which
+requires sourcing the dwelling-investment component; and (ii) the
+shared-ϖ FIML build itself. Both remain multi-week, data- or
+likelihood-code-dependent tasks beyond an editorial pass.
 
 ---
 

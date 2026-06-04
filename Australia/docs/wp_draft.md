@@ -22,8 +22,9 @@ used in the Italian implementation of De Bonis, Marino and Muellbauer
 in every disaggregated specification and sample window we estimate,
 validating the Italian convention.
 
-The preferred specification delivers a speed of adjustment
-λ = −0.180 (vs Williams' published −0.286) and structural long-run
+The narrative-preferred specification (Spec 6; the automated
+four-screen selector instead returns Spec 2 — §6.3) delivers a speed
+of adjustment λ = −0.180 (vs Williams' published −0.286) and structural long-run
 coefficients on individual wealth components that are broadly
 consistent with Williams' Table 1 estimates: γ_HA = 0.049 (Williams:
 0.049), γ_IFA = 0.030 (Williams: 0.022), γ_NLA = 0.196 (Williams:
@@ -59,7 +60,7 @@ deteriorates from the 34th adjusted-R² percentile on the 1988+ sample
 to the 19th on the back-extended sample, the maximal-GETS reduction
 sits at the 64th percentile, and the sectional-period specification
 sits at the 36th. A two-equation SUR of consumption and house prices
-on the back-extended sample finds residual correlation ρ̂ ≈ 0.0007,
+on the back-extended sample finds residual correlation ρ̂ ≈ −0.0045,
 so joint estimation delivers no efficiency gain at the quarterly
 frequency. A three-equation joint cross-equation CCI identification
 retains only two of six single-equation knot survivors. We read these
@@ -189,8 +190,9 @@ post-deregulation Australian data.
 
 ### 1.3 Headline result
 
-Under the Italy local-projection PI forecaster the preferred Spec 6
-delivers a speed of adjustment **λ = −0.180** on a non-overlapping
+Under the Italy local-projection PI forecaster the narrative-preferred
+Spec 6 (the automated selector returns Spec 2; see §6.3) delivers a
+speed of adjustment **λ = −0.180** on a non-overlapping
 sample (1988Q4–2024Q4 vs Williams' 1978Q1–2008Q2), about 63 per cent
 of Williams' published −0.286. The structural long-run coefficients
 on the disaggregated wealth components — γ_HA = 0.049, γ_IFA = 0.030,
@@ -515,7 +517,7 @@ suggests that single-equation OLS produces consumption-equation
 coefficients "only a whisker away" from joint SUR estimation, and we
 replicate that finding (§8.2). On our back-extended sample a
 two-equation consumption + house-prices SUR finds residual
-correlation ρ̂ ≈ 0.0007 — joint estimation gives no efficiency gain
+correlation ρ̂ ≈ −0.0045 — joint estimation gives no efficiency gain
 at the quarterly frequency — so the case for the full multi-equation
 build rests on cross-equation parameter restrictions rather than on
 efficiency. The full multi-equation extension is left to a companion
@@ -1287,12 +1289,20 @@ Whether the Williams spline is identifying genuine credit-conditions
 turning points (rather than acting as flexible detrending of the
 consumption-equation residual) is empirically testable. We construct
 a random-knot placebo: 200 draws of 4 knots uniformly distributed in
-the 1979–2007 window (Williams' candidate window), each fitted via
-the same drop-on-violation reduction protocol. The canonical Williams
-result's percentile rank in this placebo distribution measures
-whether his specific knot choice is identifying something the data
-genuinely flags vs whatever a flexible 4-knot smoothed-step series
-could fit by chance.
+the 1979–2007 window (Williams' candidate window). For the
+literal-Williams comparison all four drawn knots are entered
+**unconditionally** — testing pure fit, with no sign-prior reduction —
+so the canonical 4-knot series is compared like-for-like against
+random 4-knot series; for the maximal-GETS comparison each draw of 15
+candidate knots is passed through a single sign-prior reduction pass.
+(The *deployed* `cci_williams` series uses the iterated reduction of
+§5.1.1, which retains three knots; the maximal-GETS placebo applies a
+single reduction pass, so its percentile benchmark is indicative of
+the canonical procedure rather than an exact match to the deployed
+series.) The canonical result's percentile rank in this placebo
+distribution measures whether the specific knot choice is identifying
+something the data genuinely flags vs whatever a flexible
+smoothed-step series could fit by chance.
 
 #### 5.2.1 Three placebo runs
 
@@ -1415,7 +1425,7 @@ A complementary test of the multi-equation framework's value is
 whether SUR or FIML deliver efficiency gains over equation-by-equation
 OLS. A two-equation SUR (consumption + house prices, on the extended
 1976Q3+ sample using Spec 1 with the aggregate net-worth proxy) finds
-residual correlation **ρ̂(ε_C, ε_H) ≈ 0.0007** — essentially zero.
+residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0045** — essentially zero.
 SUR coefficients are within 0.1 per cent of OLS for nearly every
 term. The finding is robust across specification variants: with no
 CCI spline and no event dummies, ρ̂ ≈ −0.025.
@@ -1680,8 +1690,10 @@ In summary:
   Williams' calibrated +0.20 in sign and broad magnitude; the
   positive break is consistent with a post-GFC tightening of the
   consumption response to expected income.
-- **Diagnostics.** adj-R² = 0.81, Durbin–Watson 2.18, AR(1) p = 0.30,
-  AR(4) p = 0.20, RESET p < 0.01. λ is sign-stable across all four
+- **Diagnostics.** adj-R² = 0.81, Durbin–Watson 2.18, AR(1) p = 0.26,
+  AR(4) p = 0.14 (no serial correlation), RESET p < 0.01
+  (functional-form misspecification remains), heteroskedasticity
+  structural (NW HAC SEs throughout). λ is sign-stable across all four
   sample variants (full −0.180, pre-COVID −0.123).
 
 ### 7.2 Diagnostics summary
@@ -1691,24 +1703,34 @@ below; full per-spec output is in [australia_full_diagnostics.csv](../outputs/au
 
 | Spec | adj R² | DW | AR(1) | AR(4) | Het | RESET | BIC |
 |---|---:|---:|:-:|:-:|:-:|:-:|---:|
-| 1   | 0.731 | 2.34 | OK | OK | OK | OK | −919.2 |
-| 2   | 0.769 | 2.40 | OK | rej | OK | OK | −500.8 |
-| 3   | 0.732 | 2.35 | OK | OK | OK | OK | −919.8 |
-| 4   | 0.729 | 2.39 | OK | OK | OK | OK | −906.8 |
-| 5   | 0.798 | 2.31 | OK | OK | OK | OK | −493.0 |
-| 6   | 0.807 | 2.18 | rej | rej | OK | OK | −493.8 |
-| 7   | 0.833 | 2.20 | rej | OK | OK | OK | −499.8 |
-| 7b  | 0.869 | 2.16 | rej | OK | OK | OK | −363.0 |
-| 8   | 0.821 | 1.87 | rej | rej | OK | OK | −948.5 |
-| 9   | 0.737 | 2.20 | rej | OK | OK | OK | −895.9 |
-| 10  | 0.778 | 2.17 | rej | rej | OK | rej| −493.7 |
+| 1   | 0.731 | 2.34 | rej | rej | struct | rej | −919.2 |
+| 2   | 0.769 | 2.40 | rej | OK  | struct | rej | −500.8 |
+| 3   | 0.732 | 2.35 | rej | rej | struct | rej | −919.8 |
+| 4   | 0.729 | 2.39 | rej | rej | struct | rej | −906.8 |
+| 5   | 0.798 | 2.31 | rej | rej | struct | rej | −493.0 |
+| 6   | 0.807 | 2.18 | OK  | OK  | struct | rej | −493.8 |
+| 7   | 0.833 | 2.20 | OK  | rej | struct | rej | −499.8 |
+| 7b  | 0.869 | 2.16 | OK  | rej | struct | rej | −363.0 |
+| 8   | 0.821 | 1.87 | OK  | rej | struct | rej | −948.5 |
+| 9   | 0.737 | 2.20 | OK  | rej | struct | rej | −895.9 |
+| 10  | 0.778 | 2.17 | OK  | OK  | struct | OK  | −493.7 |
 
-The heteroscedasticity diagnostic distinguishes event-driven cases
-(BP rejection vanishes when the four event quarters are dropped)
-from structural cases. Spec 6 carries a structural classification on
-the full sample, indicating the Newey–West HAC standard errors used
-throughout are appropriate but that some residual misspecification
-remains.
+(Table regenerated from `australia_full_diagnostics.csv`; "OK"/"rej"
+are the 5 per cent verdicts of the Breusch–Godfrey AR(1)/AR(4) and
+RESET tests, and "Het" is the `het_diagnosis` field.)
+
+Three diagnostic patterns are worth noting. First, **heteroskedasticity
+is structural in every full-sample specification** — the Breusch–Pagan
+rejection survives dropping the four event quarters in every case — so
+the Newey–West HAC standard errors used throughout are necessary rather
+than a precaution. Second, **RESET rejects in every specification bar
+the Williams-prior Spec 10**, indicating functional-form misspecification
+that the single-equation framing does not fully resolve (consistent with
+§5.3/§7.3/§9). Third, **low-order serial correlation is concentrated in
+the aggregated forms**: the Breusch–Godfrey AR(1) test rejects for
+Specs 1–5 but not for the preferred Spec 6 or the CCI-augmented Specs
+7–10, so the disaggregated dynamics absorb the serial dependence the
+aggregated specifications leave in the residual.
 
 ### 7.3 Comparison with Williams (2010, 2012)
 
@@ -1795,6 +1817,61 @@ moving systematically toward Williams' Table 1 — confirming that
 adding CCI interactions to a single-equation specification can
 re-allocate the long-run identification across wealth components,
 but does not close the residual gap with the joint FIML estimates.
+
+### 7.3.1 How precisely is the structural profile identified?
+
+The implied structural coefficients γ_i = β_i/|λ| are ratios of two
+imprecisely estimated quantities on n = 86, so they inherit wide
+sampling uncertainty that the point-estimate comparison above conceals.
+Computing delta-method standard errors from the Newey–West covariance
+of (β_i, λ) — which carries the correlation between each numerator and
+the speed of adjustment — gives
+([`australia_gamma_inference.csv`](../outputs/australia_gamma_inference.csv)):
+
+| Term | Implied γ | 95% CI (delta) | Williams Table 1 | Williams in CI? |
+|---|---:|---:|---:|:-:|
+| Housing `ha_y`           | 0.042  | [−0.050, 0.133] | 0.0488 | ✓ |
+| Net liquid `nla_y`       | 0.150  | [−0.317, 0.617] | 0.159  | ✓ |
+| Equities `eq_y`          | −0.044 | [−0.506, 0.419] | 0.011  | ✓ |
+| Super `super_y`          | 0.047  | [−0.027, 0.121] | 0.011  | ✓ |
+| log(HP/y)                | −0.091 | [−0.447, 0.265] | −0.130 | ✓ |
+| Permanent income         | 1.237  | [−0.337, 2.811] | 0.200  | ✓ |
+| **Wealth aggregate (Σ)** | **0.194** | **[−0.768, 1.157]** | 0.230 | ✓ |
+
+A moving-block residual bootstrap (block length 8, B = 1000) gives a
+near-identical picture, with λ centred on −0.21 and a 95-percentile
+interval of [−0.33, +0.01] that includes zero (consistent with the
+headline t = −1.76, p = 0.084).
+
+Two things follow, and they qualify the §7.3 reading. First, **Williams'
+Table 1 value lies inside the 95 per cent confidence interval for every
+coefficient** — so the data are statistically consistent with his
+calibrations, the same conclusion the formal Wald test reaches (§9;
+companion §7). Second, and equally true, the intervals are so wide that
+they also contain zero (for the aggregate wealth effect, for equities,
+and for housing at the lower bound) and values far from Williams. The
+close numerical agreement of the point estimates is therefore a
+non-rejection driven by imprecision, not positive evidence that the
+Australian structural coefficients *equal* Williams': on this sample the
+single-equation estimates cannot distinguish his values from a broad
+range of alternatives. We accordingly read §7.3's "broadly consistent
+with Williams' Table 1" as the honest ceiling on the claim —
+consistency, not confirmation.
+
+For use in a calibrated model (MARTIN, §10.3), the policy-relevant
+summary is the aggregate long-run wealth elasticity γ_W = 0.19
+(95% CI [−0.77, 1.16]); the point estimate is close to MARTIN's
+calibrated net-wealth elasticity of ≈0.17, but the interval is too wide
+for the free estimate to discipline the calibration — it neither
+confirms nor rejects it. The disaggregated split into four components
+is even less precisely identified and should be treated as indicative.
+
+(Caveat: both the delta method and the residual bootstrap hold the
+right-hand side fixed, so they propagate sampling uncertainty in the
+ECM coefficients but **not** the first-stage uncertainty in the
+generated permanent-income and CCI regressors; the true intervals are
+therefore at least this wide. The real-time permanent-income
+sensitivity of §8.9 gives a partial read on the first-stage component.)
 
 ### 7.4 The Italy / AR comparison and the real-time check
 
@@ -2029,20 +2106,35 @@ benchmark forecasters.
 |---|---:|---:|---:|
 | Benchmark RW drift           | 0.0309 | 0.0309 | 0.0328 |
 | Benchmark AR(1)              | 0.0370 | 0.0310 | 0.0328 |
-| Spec 4 (disagg, no CCI)      | 0.0319 | 0.0325 | —      |
+| Spec 4 (disagg, no CCI)      | 0.0319 | 0.0325 | 0.0503 |
 | Spec 6 (preferred)           | 0.0322 | 0.0332 | 0.0416 |
-| Spec 7 (cohort-burden)       | 0.0308 | 0.0346 | —      |
+| Spec 7 (cohort-burden)       | 0.0308 | 0.0346 | 0.0443 |
 | Spec 8 (Williams CCI)        | 0.0324 | 0.0315 | 0.0366 |
-| Spec 9 (Kalman CCI)          | 0.0324 | 0.0315 | 0.0366 |
+| Spec 9 (Kalman CCI)          | 0.0320 | 0.0322 | 0.0386 |
 
 At h = 1 the structural specifications are competitive with the
-random-walk benchmark (Spec 7 narrowly beats RW-drift). At h = 4
-and h = 8 the random-walk dominates every structural specification
-by 5–15 per cent in RMSE. This is the standard "macro forecasting
+random-walk benchmark (Spec 7 narrowly beats RW-drift, 0.0308 vs
+0.0309). At h = 4 and h = 8 the random-walk dominates every structural
+specification (the best structural performer at h = 8 is Spec 8 at
+0.0366 vs RW-drift 0.0328). This is the standard "macro forecasting
 puzzle" — the LIVES framework's identification advantage is in
 interpreting historical co-movement, not in beating naive benchmarks
 at multi-step prediction. We record this honestly rather than
 overstating the forecast performance.
+
+Two caveats on the CCI specifications (Spec 8, Spec 9). An earlier
+version of the validator silently dropped their CCI-interaction
+regressors — which are constructed on local copies inside the
+estimation routine rather than attached to the validation dataset —
+so the two specs collapsed to a common base form and produced
+identical forecasts; this is now fixed (the interaction columns are
+reconstructed for the validator), and Spec 8 and Spec 9 are distinct
+in the table above. The credit-conditions series and its de-mean
+constants are, however, full-sample objects, so the Spec 8/9 columns
+are conditional on a full-sample-constructed CCI and are an upper
+bound on what a fully real-time credit-conditions forecaster would
+deliver; the permanent-income input to the validator is the leak-free
+rolling AR forecaster.
 
 ### 8.14 Back-extension robustness — Spec 1 on the 1976Q3+ sample
 
@@ -2056,6 +2148,17 @@ using `ln_networth_y_proxy`:
 | ln_hp_over_y   | −0.0151 | −0.0038 | −74.8 |
 | real_rate      | −0.00137| +0.00090| −165  |
 | ln_yp_over_y   | +0.961  | +0.971  | +1.0  |
+
+(Caveat: the aggregate net-worth proxy carries a unit bug — the
+household M3 liquid component enters the back-cast at ~0.01 per cent
+rather than its intended ~12 per cent, so the figures above reflect an
+effectively housing-only back-cast. The fix is committed in
+`australia_data_download.R` (NS-131) but, because of a separate
+cold-rebuild reproducibility issue with the credit-conditions flag
+(documented at that flag), is not yet propagated to these outputs.
+With the corrected proxy the extended estimates shift only slightly —
+λ to −0.202, ln_networth_y to +0.106, ln_hp_over_y to −0.0033 —
+leaving the qualitative reading unchanged.)
 
 The wealth elasticity is essentially stable across samples
 (0.112 → 0.107, a 4 per cent change) — a positive validation of the
@@ -2152,7 +2255,7 @@ back-extended sample.
 
 Joint SUR estimation of the consumption equation and a Williams-style
 house-price ECM (Aust paper eq. 11) on the back-extended 1976Q3+
-sample yields residual correlation **ρ̂(ε_C, ε_H) ≈ 0.0007**, with
+sample yields residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0045**, with
 SUR coefficients within 0.1 per cent of equation-by-equation OLS
 for nearly every term. The finding is robust across specification
 variants (no CCI: ρ̂ = −0.083; no event dummies: ρ̂ = +0.043;
@@ -2411,6 +2514,54 @@ choices. The maximal-GETS canonical and the Kalman CCI deliver
 nearly identical λ and very similar wealth-coefficient shifts; they
 can be used as cross-checks of one another.
 
+### 10.4 Nesting in MARTIN
+
+A natural use of this freely-estimated equation is to discipline the
+calibrated consumption block of the RBA's MARTIN model (Ballantyne et
+al. 2019), whose long run is homogeneous of degree one in real income
+and real net wealth — log c = w·log y + (1 − w)·log NW + (rate term) —
+with a calibrated net-wealth elasticity (1 − w) ≈ 0.17. We test that
+structure directly
+([`australia_martin_nesting.csv`](../outputs/australia_martin_nesting.csv))
+by fitting the static long run
+log c = β₀ + β_y·log y + β_NW·log(NW/y) + β_r·r. Because
+log(NW_real_pc) = log(NW/y) + log y + log 4, the coefficient on log
+income equals the sum of MARTIN's income and wealth weights (which
+homogeneity sets to one) and the coefficient on the net-worth ratio is
+the net-wealth elasticity:
+
+| Quantity | Estimate | MARTIN |
+|---|---:|---:|
+| Net-wealth elasticity (β_NW)    | 0.115 (t = 1.9)  | 0.17 |
+| Income + wealth weight (β_y)    | 0.720 (t = 10.4) | 1.00 (imposed) |
+| Real-rate semi-elasticity (β_r) | −0.0086 (t = −2.6) | small, calibrated |
+
+Three findings bear on integration. First, the unrestricted net-wealth
+elasticity, 0.115, is below MARTIN's calibrated 0.17 but of the same
+order and marginally significant. Second, **MARTIN's long-run
+homogeneity restriction is rejected** on the Australian data: the
+income-plus-wealth weight is 0.72, and the test β_y = 1 gives
+χ²(1) = 16.4 (p < 0.001). Imposing homogeneity by force does not help —
+the restricted net-wealth elasticity flips to −0.083 (insignificant),
+so the data resist the balanced-growth parameterisation in this simple
+form. Third, the static long run does not cointegrate under
+Engle–Granger MacKinnon critical values (ADF −2.38 vs −4.10), echoing
+§6.2.
+
+The reading for MARTIN is that the freely-estimated single-equation
+long run does **not** nest MARTIN's calibrated balanced-growth block:
+the homogeneity restriction would have to be imposed rather than
+tested-and-accepted, and the unrestricted wealth elasticity (0.12, or
+0.19 from the disaggregated aggregate of §7.3.1 with a 95% CI of
+[−0.77, 1.16]) is too imprecise to discipline MARTIN's 0.17
+calibration. A productive integration path is therefore to import the
+*qualitative* structure (disaggregated wealth channels, a
+credit-conditions interaction) and the sign and rough magnitude of the
+channels, while retaining MARTIN's calibrated long-run weights — using
+this paper as a freely-estimated benchmark the calibration is
+consistent with, rather than as a source of point estimates precise
+enough to replace it.
+
 ---
 
 ## 11. Conclusion
@@ -2499,7 +2650,7 @@ specification, which implements Williams' Aust paper §5.1
 period-bracket logic, sits at the 36th/40th percentile, no stronger
 than random period placements. **The two-equation SUR** of
 consumption and house prices on the back-extended sample finds
-residual correlation ρ̂ ≈ 0.0007 — essentially zero — so joint
+residual correlation ρ̂ ≈ −0.0045 — essentially zero — so joint
 estimation gives no efficiency gain at the quarterly frequency.
 **The three-equation joint cross-equation identification** retains
 only two of six single-equation knot survivors (1986 financial

@@ -90,6 +90,14 @@ forecast_at_window <- function(spec_template, model_data, window_end,
   }
   rhs_terms <- c(spec_template$lr_vars, spec_template$sr_vars,
                  spec_template$dummy_vars)
+  # Surface (do not silently drop) any declared regressor missing from
+  # model_data — the failure mode that previously collapsed Spec 8/9 to
+  # their base form when the CCI interaction columns were not attached.
+  missing_rhs <- setdiff(rhs_terms, names(train))
+  if (length(missing_rhs) > 0L)
+    warning(sprintf(
+      "[forecast_at_window] %s: declared regressors absent from model_data and dropped: %s",
+      spec_template$spec_name, paste(missing_rhs, collapse = ", ")))
   rhs_terms <- intersect(rhs_terms, names(train))
   req <- c("dlcons", rhs_terms)
   cc <- complete.cases(train[, req, drop = FALSE])
@@ -205,6 +213,46 @@ rolling_forecast <- function(spec_template, model_data,
     if (nrow(fc) > 0L) rows[[length(rows) + 1L]] <- fc
   }
   bind_rows(rows)
+}
+
+
+# ==============================================================================
+# Attach the Spec 8 / Spec 9 CCI interaction columns to model_data.
+#
+# These columns are built only on local md8/md9 copies inside
+# run_all_specifications, so the OOS harness never sees them and the CCI
+# specs silently collapse to their base form. Replicate the md8/md9
+# construction here (matching australia_estimation.R) so the OOS refit
+# includes them. NOTE: cci_williams and the de-mean constants are
+# full-sample objects, so the OOS for Spec 8/9 is conditional on a
+# full-sample-constructed CCI — i.e. it is NOT real-time for the
+# credit-conditions channel (the AR permanent-income input IS real-time).
+# This is disclosed in WP §8.13.
+# ==============================================================================
+attach_cci_oos_interactions <- function(md, sample_end = NA) {
+  if (is.na(sample_end)) sample_end <- max(md$date, na.rm = TRUE)
+  if ("cci_williams" %in% names(md) && any(!is.na(md$cci_williams))) {
+    m <- !is.na(md$cci_williams) &
+         md$date >= as.Date("1980-01-01") & md$date <= sample_end
+    ha_mean <- mean(md$ha_y[m],         na.rm = TRUE)
+    hp_mean <- mean(md$ln_hp_over_y[m], na.rm = TRUE)
+    r_mean  <- mean(md$real_rate[m],    na.rm = TRUE)
+    yp_mean <- mean(md$ln_yp_over_y[m], na.rm = TRUE)
+    md <- md %>% mutate(
+      r_x_cci          = (real_rate    - r_mean)  * cci_williams,
+      hp_x_1_minus_cci = (ln_hp_over_y - hp_mean) * (1 - 1.2 * cci_williams),
+      yp_x_cci         = (ln_yp_over_y - yp_mean) * cci_williams,
+      ha_x_cci         = (ha_y         - ha_mean) * cci_williams
+    )
+  }
+  if ("cci_kalman" %in% names(md) && any(!is.na(md$cci_kalman))) {
+    md <- md %>% mutate(
+      r_x_cci_k          = real_rate    * cci_kalman,
+      hp_x_1_minus_cci_k = ln_hp_over_y * (1 - 1.2 * cci_kalman),
+      yp_x_cci_k         = ln_yp_over_y * cci_kalman
+    )
+  }
+  md
 }
 
 
@@ -467,6 +515,10 @@ if (interactive()) {
   # Validate the headline specs: preferred (Spec 6) first, then 4 / 7 / 8 / 9.
   # Spec 7b (sample-restricted) and Spec 10 (calibrated) excluded for now —
   # they need special handling.
+  # Attach the CCI interaction columns so Spec 8/9 are actually evaluated
+  # (otherwise they collapse to base — see attach_cci_oos_interactions).
+  model_data_local <- attach_cci_oos_interactions(model_data_local)
+
   validate_keys <- intersect(c("spec6", "spec4", "spec7", "spec8", "spec9"),
                               names(specs_full_local))
   specs_for_oos <- specs_full_local[validate_keys]

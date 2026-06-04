@@ -71,6 +71,16 @@ source(file.path(project_root, "R", "model_helpers.R"), local = TRUE)
 # (see construct_institutional_cci in model_helpers.R) on top of the post-2002
 # housing-loan-flow series. Default FALSE: spec 2/5 effective sample starts
 # 2002Q3 (after lagging) using the housing-flow CCI alone.
+#
+# REPRODUCIBILITY CAVEAT (NS-131, 2026-06): this flag is overloaded — it gates
+# BOTH the SDMMA Williams basis (needed for Specs 8/9/10) AND an overlay on
+# `cci_ratio` that shifts the Spec 6 short-run CCI term (and hence λ, −0.180 →
+# −0.188). The committed cached RDS was built with the SDMMA basis attached but
+# WITHOUT the cci_ratio overlay — a state not reproducible from a cold rebuild
+# under either flag value (FALSE drops Specs 8/9/10; TRUE moves Spec 6's λ).
+# Warm replays (run_estimation_from_rds.R) reproduce the headline because the
+# cached RDS already carries the basis. Decoupling the basis from the overlay
+# is an open task before the dataset can be cold-rebuilt reproducibly.
 USE_INSTITUTIONAL_CCI <- FALSE
 
 # ==============================================================================
@@ -1233,8 +1243,13 @@ master <- master %>%
     }
   ) %>%
   mutate(
-    # Raw proxy ratio: (M3-allocated + housing_wealth_proxy) / ydi_ann_nom
-    networth_y_raw_proxy = (m3_household_proxy + housing_wealth_proxy) /
+    # Raw proxy ratio: (M3-allocated + housing_wealth_proxy) / ydi_ann_nom.
+    # m3_household_proxy is in $ BILLION (RBA D03 DMAM3N, never rescaled),
+    # whereas housing_wealth_proxy and ydi_ann_nom are in $ MILLION — so the
+    # M3 term must be ×1000 before the sum, otherwise it contributes ~0.01%
+    # of the numerator instead of its intended ~12% and the aggregate proxy
+    # collapses to a housing-only back-cast (NS-131 / M15).
+    networth_y_raw_proxy = (m3_household_proxy * 1000 + housing_wealth_proxy) /
                            ydi_ann_nom
   )
 # Growth-rate splice raw_proxy onto official networth_y at 1988Q3.
