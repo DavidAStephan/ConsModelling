@@ -666,16 +666,17 @@ restrictions on the OLS coefficient vector using
 
 **Output:** `LIVES/outputs/williams_calibration_wald.csv`.
 
-**Headline result:** Williams' Table 1 calibrations are formally
-**rejected** as a system of restrictions: joint Wald χ²(6) = 29.1,
-p < 0.001 across all six; χ²(4) = 10.0, p = 0.040 for the four
-wealth restrictions alone. The single individual rejection is
-γ_HA = 0.0488 — even though our *implied* γ_HA from Spec 6 is 0.049,
-essentially equal to Williams. The two readings are simultaneously
-true because the implied-γ test divides OLS by |λ| (and our OLS and
-|λ| are both ~37 % short of Williams, so they cancel), while the
-Wald restriction tests the OLS coefficient directly at the
-Williams-implied point. Reconciliation in
+**Headline result:** Williams' Table 1 calibrations are **not
+rejected** as a system of restrictions: joint Wald χ²(6) = 2.24,
+p = 0.90 across all six; χ²(4) = 1.07, p = 0.90 for the four wealth
+restrictions alone; no individual restriction rejects (γ_HA:
+χ²(1) = 0.05, p = 0.83). This agrees with our *implied* γ_HA from
+Spec 6 (0.049 vs Williams' 0.0488). The implied-OLS target for each
+restriction is γ × |λ̂| (the structural convention γ = OLS/|λ|); an
+earlier version compared against γ × λ̂ (signed), which flipped the
+target sign and spuriously produced χ²(6) = 29.1 — fixed 2026-06
+([NS-125](next_steps_plan_2026.md)). The non-rejection is partly a
+low-power result (n = 86, wide NW bands). Discussion in
 [`companion_paper_draft.md §7`](../../LIVES/docs/companion_paper_draft.md).
 
 ---

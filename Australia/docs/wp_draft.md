@@ -29,13 +29,19 @@ consistent with Williams' Table 1 estimates: γ_HA = 0.049 (Williams:
 0.049), γ_IFA = 0.030 (Williams: 0.022), γ_NLA = 0.196 (Williams:
 0.159). The OLS coefficients are 14–37 per cent below Williams'
 implied OLS values, but our smaller |λ| scales them up to a
-structural γ profile in line with the FIML estimates. The
-often-noted "Australian permanent-income puzzle" — a significantly
-negative long-run coefficient on log(y^p/y) under a rolling AR(8)
-forecaster — flips to a positive +0.30 under Italy LP, matching
-Williams' calibrated +0.20 in sign and broad magnitude. Adding the
+structural γ profile in line with the FIML estimates. The long-run
+coefficient on log(y^p/y) is significantly negative (−0.22) under a
+rolling AR(8) forecaster — the often-noted "Australian
+permanent-income puzzle" — and turns positive (+0.24) under a
+full-sample Italy local-projection *measure* of permanent income. We
+show this sign reversal is a property of the measure's full-sample,
+non-causal construction: under a causal real-time projection the
+coefficient stays modestly negative (−0.11) and the speed of
+adjustment falls from −0.18 to ≈−0.12. We report the full-sample
+measure as the headline and the real-time variant as its operational
+robustness column. Adding the
 time-varying housing-wealth m.p.c. interaction to the Williams CCI
-interactions specification yields λ = −0.377, exceeding Williams'
+interactions specification yields λ = −0.445, exceeding Williams'
 calibrated value in magnitude.
 
 We assemble a back-extended master dataset to 1976Q3 — using a TRYM
@@ -130,13 +136,17 @@ available data, with the permanent-income forecaster shifted from a
 rolling AR(8) — the implementation in earlier Australian work — to
 the Jordà (2005) local projection with a labour-force-share predictor,
 following the Italian implementation of De Bonis, Marino and
-Muellbauer (2024). Under Italy LP the speed of adjustment is within
-40 per cent of Williams' published value, and the structural γ
-profile on the disaggregated wealth components is broadly consistent
-with Williams' Table 1. The often-noted "Australian permanent-income
-puzzle" — a significantly negative long-run coefficient on log(y^p/y)
-under the AR forecaster — flips to positive under Italy LP, matching
-Williams' calibrated value in sign and broad magnitude.
+Muellbauer (2024). Under the full-sample Italy measure the speed of
+adjustment is within 40 per cent of Williams' published value, and
+the structural γ profile on the disaggregated wealth components is
+broadly consistent with Williams' Table 1. The long-run coefficient
+on log(y^p/y), significantly negative under the AR forecaster (the
+"Australian permanent-income puzzle"), turns positive under the
+full-sample Italy measure. We document that both the positive
+permanent-income sign and roughly half the speed-of-adjustment gain
+are properties of the full-sample, non-causal measure: under a causal
+real-time projection the permanent-income coefficient stays modestly
+negative and λ ≈ −0.12 (§8.9).
 
 **A back-extended master dataset** (1976Q3–2024Q4, n = 194 quarters)
 with documented growth-rate splices for house prices (Treasury TRYM
@@ -187,14 +197,19 @@ on the disaggregated wealth components — γ_HA = 0.049, γ_IFA = 0.030,
 γ_NLA = 0.196 — are within ±37 per cent of Williams' Table 1 values
 in every case, with γ_HA matching Williams almost exactly. Adding
 the time-varying housing-wealth m.p.c. interaction in the
-Williams CCI-interactions specification (Spec 8) yields λ = −0.377,
+Williams CCI-interactions specification (Spec 8) yields λ = −0.445,
 *exceeding* Williams' calibrated value in magnitude. The
 cross-equation restriction γ_LA + γ_LOANS = 0 is accepted in every
 disaggregated specification and sample window we estimate,
-validating the Italian convention. The "Australian permanent-income
-puzzle" is resolved by the methodology shift from AR to Italy LP:
-the long-run coefficient on log(y^p/y) flips from −0.20 to +0.30,
-matching Williams' calibrated +0.20 in sign and broad magnitude.
+validating the Italian convention. Under the full-sample Italy
+measure the long-run coefficient on log(y^p/y) turns positive
+(+0.24), against the significantly negative −0.22 under the AR
+forecaster (the "Australian permanent-income puzzle"). This positive
+sign is a property of the full-sample, two-sided measure: under a
+causal real-time projection the coefficient remains modestly negative
+(−0.11) and λ falls to ≈−0.12 (§8.9), so we frame the positive-PI
+result as a permanent-income *measurement* rather than a real-time
+resolution of the puzzle.
 
 The CCI placebo evidence is sharper. The literal Williams 4-knot
 specification sits at the 34th adjusted-R² percentile on the 1988+
@@ -465,9 +480,11 @@ forecasting. We adopt the same predictor in our Italy-style PI helper
 (§4.3) and find a quantitatively similar role: the PI series implied by
 local projection in Australia diverges materially from the AR-based PI
 series in the early 1990s and after the 2008 GFC. Substantively, the
-implied long-run coefficient on log(y^p/y) flips from significantly
-negative under the AR forecaster to significantly positive under the
-local-projection forecaster, matching Williams' calibrated value.
+implied long-run coefficient on log(y^p/y) moves from significantly
+negative under the AR forecaster to positive under the full-sample
+local-projection *measure* — though, as §8.9 shows, this reversal
+reflects the measure's full-sample (non-causal) construction and does
+not survive a causal real-time projection.
 
 ### 2.6 Where this paper sits
 
@@ -1100,15 +1117,26 @@ We implement two forecasting methods. The canonical method for the
 WP results below is **Italy LP**; **AR** is reported as a methodology
 robustness column in §8.9.
 
-- **Method 'Italy' (canonical)**: Jordà (2005) local projection. For
-  each `t` where the future horizon is observable, the discounted
-  weighted average is computed directly as the dependent variable in a
-  single regression on a richer predictor set including `log(lf_share)`
-  (the Italian innovation, capturing slow-moving demographic effects on
-  trend income), trend, post-2008 split-trend, 4-quarter-MA log income,
-  unemployment rate, and 4-quarter-difference dynamics. Forecast values
-  are then constructed as fitted values of this single regression for
-  every t.
+- **Method 'Italy' (canonical)**: a full-sample income projection in
+  the Italian style. For each `t` where the k-quarter-ahead horizon is
+  observable, the discounted weighted average of future log income is
+  computed and regressed, in a single equation, on a richer predictor
+  set including `log(lf_share)` (the Italian innovation, capturing
+  slow-moving demographic effects on trend income), trend, post-2008
+  split-trend, 4-quarter-MA log income, unemployment rate, and
+  4-quarter-difference dynamics. The permanent-income series is the
+  **in-sample fitted value** of this single full-sample regression for
+  every `t`. This is therefore a *measurement* of permanent income — a
+  two-sided, full-sample smoother — rather than a real-time forecast:
+  because the coefficients are estimated over the whole sample, `y^p_t`
+  embeds information dated after `t`, so the series is non-causal. We
+  carry it as the headline permanent-income *measure* but report a
+  causal, expanding-window variant (`real_time = TRUE`, re-fitting at
+  each `t` only on observations whose full horizon is realised by `t`)
+  as an operational robustness column (§8.9). Any forecasting use of
+  the equation — embedding it in MARTIN, in particular — requires the
+  real-time variant or the AR forecaster below, not this full-sample
+  measure.
 
 - **Method 'AR' (robustness)**: rolling AR(8) regression of log income
   on eight own lags plus a linear trend, post-2008Q3 step dummy, and
@@ -1118,12 +1146,17 @@ robustness column in §8.9.
   ogive learning weight smoothly attenuates the term over 15 quarters
   to a steady-state weight of 0.5.
 
-The two methods differ materially on two coefficients in the
-consumption equation (see §8.9): the speed of adjustment and the
-long-run permanent-income coefficient. Canonical Italy LP delivers
+The methods differ materially on two coefficients in the consumption
+equation (see §8.9): the speed of adjustment and the long-run
+permanent-income coefficient. The full-sample Italy measure delivers
 λ = −0.180 in the preferred specification, against approximately
-−0.05 under AR. We report both, with Italy LP carrying the headline
-narrative.
+−0.05 under the (real-time) AR forecaster; the causal real-time Italy
+variant sits between them at λ ≈ −0.12. We carry the full-sample
+Italy measure as the headline, with the AR and real-time-Italy
+forecasters as robustness columns, and flag explicitly wherever a
+headline result (the positive permanent-income sign, the λ magnitude,
+the γ_HA match with Williams) depends on the full-sample, non-causal
+construction.
 
 ### 4.4 Wealth definition
 
@@ -1209,34 +1242,38 @@ macroprudential rounds of '14 and '17, the Hayne Royal Commission of
 '19, the APRA cap removal and buffer reduction of '19Q3, the
 COVID/JobKeeper episode of '20, and the APRA buffer hike of '21.
 
-On the 1988Q4-2024Q4 sample this candidate set yields six surviving
-knots:
+On the 1988Q4-2024Q4 sample this candidate set reduces to **three
+surviving knots** under the iterated drop-on-violation reduction
+(`australia_williams_cci_knots.csv`):
 
 | Knot | Sign prior | Coef (OLS) | Reading |
 |---|---:|---:|---|
-| 1992Q1 | − | −0.020 | Banking distress / Aussie Home Loans |
-| 2007Q3 | − | −0.007 | GFC tightening |
-| 2009Q1 | + | +0.006 | First Home Buyer Boost |
-| 2019Q1 | − | −0.027 | Hayne Royal Commission lending crackdown |
-| 2020Q2 | + | +0.077 | COVID/JobKeeper income support |
-| 2021Q4 | − | +0.005 | APRA serviceability buffer hike |
+| 2009Q1 | + | +0.012 | First Home Buyer Boost |
+| 2019Q1 | − | −0.034 | Hayne Royal Commission lending crackdown |
+| 2020Q2 | + | +0.005 | COVID/JobKeeper income support |
 
-(The 1990Q3, 1993Q1, 1998Q3, 2008Q4, 2014Q4, 2017Q1 and 2019Q3 knots
-violate their sign priors and are dropped; 1979Q1 and 1986Q1 are
-aliased.)
+(Ten candidate knots — 1990Q3, 1992Q1, 1993Q1, 1998Q3, 2007Q3,
+2008Q4, 2014Q4, 2017Q1, 2019Q3 and 2021Q4 — violate their
+institutional sign priors and are dropped; 1979Q1 and 1986Q1 are
+aliased, their smoothed step being constant within the estimation
+window.)
 
 The `cci_williams` series we use throughout the rest of the paper is
-constructed from these six surviving knots, peak-normalised to unity.
+constructed from these three surviving knots, peak-normalised to
+unity. That only three of fifteen candidate knots survive — all of
+them post-2008 — is itself part of the identification story (§5.3):
+the post-1988 sample carries usable sign-identifying variation only
+around the recent macroprudential and pandemic episodes.
 
 This approach is methodologically defensible on three grounds:
 (i) the candidate set comes from documented Australian institutional
 history, not authorial choice of specific dates; (ii) the surviving
 knots are those whose data signal aligns with their institutional
 sign prior, so the spline is *empirically* identified rather than
-imposed; and (iii) the resulting λ on Spec 8 is materially closer to
-Williams' published −0.286 than the canonical 4-knot replication
-delivers. With the time-varying housing-wealth m.p.c. interaction
-added (§5.5), Spec 8 yields λ = −0.377, exceeding Williams in
+imposed; and (iii) the resulting λ on Spec 8 is materially larger in
+magnitude than the canonical 4-knot replication delivers. With the
+time-varying housing-wealth m.p.c. interaction added (§5.5), Spec 8
+yields λ = −0.445, exceeding Williams' published −0.286 in
 magnitude. Williams' canonical 4-knot setup is retained as a
 robustness benchmark, and a sectional sign-prior alternative
 following Williams' Aust paper §5.1 specification is also implemented
@@ -1333,18 +1370,19 @@ institutional sign prior in **all three** equations to be retained.
 | Consumption equation only (Spec 1 with `ln_networth_y_proxy` on extended sample) | 1979, 1986, 1992, 2007, 2017, 2020 | 6 |
 | **Joint (C ∩ H ∩ M)**                  | **1986, 2017**                         | **2** |
 
-Of 6 knots that survive when fitted to consumption alone (here using
-the Spec-1 aggregate-proxy specification on the back-extended sample;
-the canonical Spec-4 disaggregated specification on the same sample
-yields a different but overlapping survivor set, e.g. 1992Q1, 2007Q3,
-2009Q1, 2019Q1, 2020Q2 from the canonical Australia pipeline),
-only **1986 (financial deregulation) and 2017 (APRA macroprudential
-round II)** have signs consistent with their institutional priors
-across consumption, house prices and mortgage stock simultaneously.
-The other surviving knots (whichever set) sign-violate in HP or
-mortgage-stock equations.
+Of 6 knots that survive when fitted to consumption alone (this is the
+single-pass reduction in `joint_cci_identification.R`, using the
+Spec-1 aggregate-proxy specification on the back-extended sample —
+distinct from the *iterated* reduction the canonical consumption
+pipeline applies in §5.1.1, which retains only three knots, 2009Q1,
+2019Q1 and 2020Q2, on the 1988+ sample; the two reductions give
+different but overlapping survivor sets), only **1986 (financial
+deregulation) and 2017 (APRA macroprudential round II)** have signs
+consistent with their institutional priors across consumption, house
+prices and mortgage stock simultaneously. The other surviving knots
+sign-violate in the HP or mortgage-stock equations.
 
-The maximal-GETS protocol's identification of 6 knots was therefore
+The single-pass protocol's identification of 6 knots was therefore
 overstated — 4 of them were consumption-equation-specific and would
 not survive a true cross-equation common-factor restriction. This is
 the empirical content of the placebo failures in §5.2: without
@@ -1416,15 +1454,16 @@ The total housing-wealth m.p.c. is then `γ_HA + γ_HA_cci · CCI`,
 time-varying with credit conditions. Williams' theory predicts
 γ_HA_cci > 0 (the m.p.c. rises with CCI as collateral becomes
 spendable when credit conditions ease). Empirically we find
-γ_HA_cci = −0.003 with t = −0.65 and p = 0.52 — wrong-signed but
-insignificant. The total housing-wealth m.p.c. at the CCI peak is
-roughly 0.021 versus 0.024 at CCI = 0, a slight decrease. Williams'
-own estimates show a similar small decrease from 0.0488 at his CCI
-peak to 0.0452 at the end of his sample, so the direction is not
-unambiguously inconsistent with the LIVES theory.
+γ_HA_cci = +0.0016 (OLS) with t = 0.32 and p = 0.75 — **right-signed**,
+consistent with Williams' prediction, but statistically
+insignificant. The implied total housing-wealth m.p.c. accordingly
+rises slightly with credit ease, from a structural γ_HA ≈ 0.022 at
+CCI = 0 to ≈ 0.025 at the CCI peak — the direction the LIVES
+framework predicts, though the interaction is not separately
+identified on the single-equation Australian data.
 
 The interaction does materially affect λ: Spec 8 with `ha_x_cci`
-included delivers λ = −0.377, *exceeding* Williams' calibrated
+included delivers λ = −0.445, *exceeding* Williams' calibrated
 −0.286 in magnitude. The time-varying housing-wealth interaction
 shifts the mean-reversion speed but does not significantly change
 the *level* of the housing-wealth m.p.c.
@@ -1507,10 +1546,13 @@ screens, with BIC tiebreaker:
 
 1. **Sign screen**: every long-run coefficient with a non-ambiguous
    theoretical prior carries the right sign (§4.2).
-2. **Cointegration screen**: ADF on the long-run residual rejects the
-   unit root null at 5 per cent (Engle-Granger). Phillips-Ouliaris and
-   single-equation Johansen results are reported alongside but the
-   ADF is the binding screen.
+2. **Cointegration screen**: an Engle–Granger residual test — ADF
+   (with drift) on the residual of the static long-run regression —
+   rejects the no-cointegration null at 5 per cent, evaluated against
+   MacKinnon (1991, 2010) critical values keyed to the number of
+   variables in the cointegrating regression, *not* the univariate
+   Dickey–Fuller value. Phillips-Ouliaris and single-equation
+   Johansen results are reported alongside.
 3. **Speed-of-adjustment screen**: λ has the correct sign (negative)
    and `|λ| ∈ (0.02, 0.30)`.
 4. **Stability screen**: Chow at 2008Q3 not rejected at the 1 per cent
@@ -1530,21 +1572,31 @@ best BIC:
 | 1                       | ✓ | ✗ | ✓ | ✗ | −919.2 |
 | **2** (selector-best)   | **✓** | ✗ | **✓** | **✓** | **−500.8** |
 | 3                       | ✓ | ✗ | ✓ | ✗ | −919.8 |
-| 4                       | ✗ | ✓ | ✓ | ✗ | −906.8 |
-| 5                       | ✗ | ✓ | ✓ | ✓ | −493.0 |
-| 6                       | ✗ | ✓ | ✓ | ✗ | −493.8 |
-| 7                       | ✗ | ✓ | ✗ | ✗ | −499.8 |
-| 7b                      | ✗ | ✓ | ✗ | ✗ | −363.0 |
-| 8                       | ✓ | NA | ✗ | ✗ | −930.6 |
+| 4                       | ✗ | ✗ | ✓ | ✗ | −906.8 |
+| 5                       | ✗ | ✗ | ✓ | ✓ | −493.0 |
+| 6                       | ✗ | ✗ | ✓ | ✗ | −493.8 |
+| 7                       | ✗ | ✗ | ✗ | ✗ | −499.8 |
+| 7b                      | ✗ | ✗ | ✗ | ✗ | −363.0 |
+| 8                       | ✓ | NA | ✗ | ✗ | −948.5 |
 | 9                       | ✗ | NA | ✓ | ✗ | −895.9 |
-| 10                      | ✓ | NA | ✓ | ✗ | −491.5 |
+| 10                      | ✓ | NA | ✓ | ✗ | −493.7 |
 
 Two patterns emerge once Italy LP is the canonical PI forecaster.
-First, **the cointegration screen separates aggregated from
-disaggregated forms.** Specs 1–3 (aggregated wealth) fail
-Engle–Granger; Specs 4–6 pass it. The aggregated forms have lower
-long-run R² in the cointegrating regression because they conflate
-three economically distinct wealth components. Second, **the sign
+First, **no single-equation specification clears the cointegration
+screen once correct Engle–Granger critical values are used.**
+Evaluated against MacKinnon critical values keyed to the regressor
+count (≈ −4.4 to −5.5 for these specifications), the disaggregated
+forms come closest — Specs 4–6 reach ADF ≈ −3.2 on the long-run
+residual — but none reject the no-cointegration null; the aggregated
+Specs 1–3 fall far short (ADF ≈ −0.6 to −1.1). A static
+single-equation long run between consumption and its wealth/income
+determinants is therefore not formally established on this sample,
+reinforcing the paper's recurring theme (§5.3, §7.3, §9) that the
+structural long-run identification Williams obtains comes from his
+cross-equation system rather than from any single equation. Because
+the screen no longer discriminates across specifications, selection
+falls to the sign, speed-of-adjustment, and stability screens with
+the BIC tiebreak. Second, **the sign
 screen tightens on the disaggregated forms.** Under Italy LP the
 implied γ on each disaggregated wealth term is smaller than under
 AR (because |λ| roughly quadruples), and modest negative
@@ -1647,9 +1699,9 @@ below; full per-spec output is in [australia_full_diagnostics.csv](../outputs/au
 | 6   | 0.807 | 2.18 | rej | rej | OK | OK | −493.8 |
 | 7   | 0.833 | 2.20 | rej | OK | OK | OK | −499.8 |
 | 7b  | 0.869 | 2.16 | rej | OK | OK | OK | −363.0 |
-| 8   | 0.798 | 1.99 | rej | rej | OK | OK | −930.6 |
+| 8   | 0.821 | 1.87 | rej | rej | OK | OK | −948.5 |
 | 9   | 0.737 | 2.20 | rej | OK | OK | OK | −895.9 |
-| 10  | 0.773 | 2.14 | rej | rej | OK | rej| −491.5 |
+| 10  | 0.778 | 2.17 | rej | rej | OK | rej| −493.7 |
 
 The heteroscedasticity diagnostic distinguishes event-driven cases
 (BP rejection vanishes when the four event quarters are dropped)
@@ -1736,44 +1788,55 @@ which joint estimation delivers ρ̂ ≈ 0 — corroborate this reading.
 
 Spec 8 with the full Williams CCI interaction set, including the
 time-varying housing-wealth m.p.c. interaction (§5.5), delivers
-**λ = −0.377**, overshooting Williams' −0.286 in magnitude on the
+**λ = −0.445**, overshooting Williams' −0.286 in magnitude on the
 1988Q4+ sample. The wealth coefficients shift relative to Spec 6 in
-both directions (γ_HA = 0.028, γ_IFA = 0.054, γ_NLA = 0.091) without
+both directions (γ_HA = 0.022, γ_IFA = 0.053, γ_NLA = 0.098) without
 moving systematically toward Williams' Table 1 — confirming that
 adding CCI interactions to a single-equation specification can
 re-allocate the long-run identification across wealth components,
 but does not close the residual gap with the joint FIML estimates.
 
-### 7.4 The Italy LP / AR comparison
+### 7.4 The Italy / AR comparison and the real-time check
 
-The two permanent-income forecasters differ materially on two
-coefficients in the consumption equation:
+The permanent-income measure matters materially for two coefficients —
+the speed of adjustment and the long-run permanent-income coefficient.
+Refitting Spec 6 (n = 86) under each measure on a common data flow
+([`australia_pi_realtime_robustness.csv`](../outputs/australia_pi_realtime_robustness.csv)):
 
-| Term | AR estimate | Italy LP (canonical) | Williams |
-|---|---:|---:|---:|
-| `ecm_lag` (λ)  | −0.083 | **−0.193** | **−0.286** |
-| `ln_yp_over_y` | −0.003 | **+0.240** | (calibrated 0.20) |
+| Term | AR (real-time) | Italy full-sample (headline measure) | Italy real-time | Williams |
+|---|---:|---:|---:|---:|
+| `ecm_lag` (λ)   | −0.051 | **−0.197** | **−0.118** | **−0.286** |
+| `ln_yp_over_y`  | −0.222 | **+0.244** | **−0.105** | (calib. 0.20) |
+| implied γ_HA    | 0.37   | 0.042      | 0.100      | 0.049 |
 
-(These are reported on the Spec 1 long-run regression — the simplest
-specification that has both AR and Italy LP variants on the same
-sample.)
+(Common-refit values; the canonical pipeline's Spec 6 λ under the
+full-sample measure is −0.180, marginally different from the −0.197
+refit here because the diagnostic re-derives the data flow rather than
+reusing the cached pipeline outputs.)
 
-Italy LP roughly doubles |λ| relative to the AR forecaster (bringing
-it about 68 per cent of the way to Williams' published value on
-Spec 1) and flips the sign of the long-run permanent-income
-coefficient from approximately zero — the AR equivalent of the
-"Australian permanent-income puzzle" — to a positive +0.24 in
-agreement with theory and with Williams' calibrated value. On Spec 6
-the AR vs Italy LP shift in |λ| is even larger (from roughly −0.05
-to −0.18). We interpret the puzzle as a methodology artefact: the
-rolling AR(8) forecaster (i) lacks the labour-force-share predictor
+Two readings follow. First, the full-sample Italy measure roughly
+quadruples |λ| relative to AR (−0.05 → −0.20) and flips the long-run
+permanent-income coefficient from significantly negative (−0.22 — the
+"Australian permanent-income puzzle") to positive (+0.24, in agreement
+with theory and Williams' calibrated value). Second — the operational
+caveat — **neither move fully survives a causal real-time projection.**
+The real-time Italy variant keeps about half the |λ| gain (−0.118) but
+the permanent-income coefficient returns to modestly negative (−0.105),
+and the implied γ_HA rises to ≈0.10 (about twice Williams') rather than
+matching him at 0.049. The positive-PI sign and the close γ_HA match
+are therefore properties of the full-sample, two-sided measure, not of
+the real-time forecaster a model like MARTIN would use.
+
+We retain the structural reasons the AR and Italy measures diverge —
+the rolling AR(8) forecaster lacks the labour-force-share predictor
 that captures Australia's slow-moving demographic effects on trend
-income; (ii) compounds short-run AR misspecification across 40
-horizons; and (iii) is structurally biased toward forecasts that
-over-estimate persistence after large income shocks. The Jordà
-(2005) one-step direct projection avoids all three. We adopt Italy
-LP as the canonical forecaster and report AR results as a
-methodology robustness column in §8.9.
+income, compounds short-run AR misspecification across 40 horizons,
+and over-estimates persistence after large income shocks, all of which
+the one-step direct projection avoids — but we now read the puzzle's
+reversal as a feature of full-sample permanent-income *measurement*
+rather than a clean real-time resolution. We carry the full-sample
+measure as the headline and the real-time and AR variants as
+robustness columns (§8.9).
 
 ---
 
@@ -1821,15 +1884,16 @@ an implicit linear CCI level shift:
 
 | Williams interaction | Sign prior | Coefficient | t | Verdict |
 |---|---:|---:|---:|---|
-| `ha_y × CCI`                  | + | −0.0020 | −0.29 | wrong sign, insignificant |
-| `log(HP/y) × (1 − 1.2·CCI)`   | − | +0.0046 | +0.40 | wrong sign on composite, insignificant |
-| `r × CCI`                     | − | +0.0016 | +1.04 | wrong sign, insignificant |
-| `log(y^p/y) × CCI`            | + | −0.6647 | −1.66 | wrong sign, p = 0.10 |
+| `ha_y × CCI`                  | + | +0.0016 | +0.32 | right sign, insignificant |
+| `log(HP/y) × (1 − 1.2·CCI)`   | − | +0.0076 | +1.00 | wrong sign on composite, insignificant |
+| `r × CCI`                     | − | +0.0019 | +1.85 | wrong sign, marginally significant (p = 0.07) |
+| `log(y^p/y) × CCI`            | + | −0.6113 | −2.12 | wrong sign, significant (p = 0.04) |
 
-The interaction terms individually carry small coefficients with
-several wrong signs and most close to insignificance. The
+The interaction terms individually carry small coefficients, three of
+the four wrong-signed and only the down-payment composite and the
+housing-wealth interaction insignificant. The
 substantive effect of Spec 8 is to shift λ from −0.180 (Spec 6) to
-−0.377 — past Williams' value in magnitude — and to re-allocate the
+−0.445 — past Williams' value in magnitude — and to re-allocate the
 long-run identification across the wealth components without moving
 the γ profile systematically toward Williams' Table 1 values. We
 read this as evidence that the CCI interactions in a single-equation
@@ -1839,12 +1903,13 @@ that Williams' four-equation system delivers.
 
 The de-meaning convention is the literal reading of Williams' Aust
 paper §5.1 and was previously omitted from this paper's Spec 8
-construction. Updating to the de-meaned form reduces the magnitude
-of the wrong-signed interaction coefficients (`hp_x_1_minus_cci`
-moves from t = +1.75 to t = +0.40) but does not flip any of the
-four CCI interactions to their theoretically correct signs — the
-wealth-coefficient gap with Williams' Table 1 remains structural
-rather than a de-meaning artefact.
+construction. Under the de-meaned form the housing-wealth interaction
+`ha_y × CCI` carries its theoretically correct positive sign
+(+0.0016) but is far from significant (t = 0.32); the remaining
+three interactions stay wrong-signed (the down-payment composite
+insignificantly, `r × CCI` marginally, and `log(y^p/y) × CCI`
+significantly). The wealth-coefficient gap with Williams' Table 1
+therefore remains structural rather than a de-meaning artefact.
 
 ### 8.5 Cross-equation restriction γ_LA + γ_LOANS = 0
 
@@ -1898,16 +1963,32 @@ with labour-plus-transfer income. We treat NPY as the closer
 methodological match to Williams. The NPY substitution shifts λ by
 roughly 18 per cent toward Williams' published value.
 
-### 8.9 PI method comparison (AR vs Italy LP)
+### 8.9 PI method comparison (AR, full-sample Italy, real-time Italy)
 
-Already discussed in §7.4. Under canonical Italy LP, λ = −0.180 in
-Spec 6 and the long-run permanent-income coefficient is +0.20. The
-AR robustness column gives λ ≈ −0.05 and a near-zero
-permanent-income coefficient (the "Australian PI puzzle"). The
-difference is identification, not noise: see the more general
-Carroll, Slacalek and Tokuoka (2014) discussion of why AR(p)
-forecasters and local projections diverge at structural-break
-episodes.
+§7.4 reports the headline three-way comparison; the committed column
+([`australia_pi_realtime_robustness.csv`](../outputs/australia_pi_realtime_robustness.csv),
+Spec 6, n = 86) refits under all three permanent-income measures:
+
+- **AR (real-time):** λ = −0.051, ln(y^p/y) = −0.222 (t = −2.2) — the
+  significantly negative "Australian PI puzzle".
+- **Italy full-sample (headline measure):** λ = −0.197,
+  ln(y^p/y) = +0.244 (t = 1.0).
+- **Italy real-time (causal):** λ = −0.118, ln(y^p/y) = −0.105
+  (t = −1.5).
+
+The real-time Italy variant is the operationally honest benchmark: it
+is causal (`real_time = TRUE` in `construct_permanent_income_italy`,
+re-fitting the projection at each *t* on data whose full k-quarter
+horizon is realised by *t*), so it is usable at forecast time. It
+shows that about half the speed-of-adjustment gain from AR to the
+full-sample Italy measure is genuine, but that the positive
+permanent-income sign is **not** — it reverses to −0.11 once the
+look-ahead embedded in the full-sample fit is removed. The divergence
+between the AR and Italy measures at structural-break episodes is
+identification, not noise (Carroll, Slacalek and Tokuoka 2014). We
+carry the full-sample measure as the headline (framed as a
+*measurement*, §4.3) and disclose that its positive-PI sign and λ
+magnitude are full-sample, non-causal properties.
 
 ### 8.10 Permanent-income filter sensitivity
 
@@ -2158,9 +2239,9 @@ The path to a tighter reconciliation with Williams' published
 values runs through a full FIML build.
 
 Adding the Williams CCI interactions in Spec 8 produces
-**λ = −0.377**, exceeding Williams' value in magnitude on the
+**λ = −0.445**, exceeding Williams' value in magnitude on the
 1988Q4+ sample. The wealth coefficients shift relative to Spec 6
-(γ_HA = 0.028, γ_IFA = 0.054, γ_NLA = 0.091) without moving
+(γ_HA = 0.022, γ_IFA = 0.053, γ_NLA = 0.098) without moving
 systematically toward Williams' Table 1 — confirming that adding
 CCI interactions to a single-equation specification re-allocates
 the long-run identification across wealth components but does not
@@ -2180,18 +2261,23 @@ restrictions) and the Duca, Muellbauer and Murphy (2013) state-space
 implementation in which the latent factor is identified jointly
 across equations.
 
-**The Australian permanent-income puzzle resolved.** Under the
-AR-method robustness column we replicate the often-noted "Australian
-PI puzzle": the long-run coefficient on log(y^p/y) is approximately
-zero on Spec 1 (−0.003 under AR vs +0.24 under Italy LP). Under
-canonical Italy LP it is positive (+0.20 in Spec 6 at CCI = 0),
-matching Williams' calibrated value in sign and broad magnitude.
-We read the puzzle as a methodology artefact of the rolling-AR
-forecaster — three-fold: it lacks the labour-force-share predictor
-that captures slow-moving demographic effects; it compounds
-short-run AR misspecification across 40 horizons; and it is
-structurally biased toward forecasts that over-estimate persistence
-after large income shocks.
+**The Australian permanent-income puzzle and the permanent-income
+measure.** Under the AR-method (real-time) robustness column we
+replicate the often-noted "Australian PI puzzle": the long-run
+coefficient on log(y^p/y) is negative — significantly so on Spec 6
+(−0.22) and near-zero on Spec 1 (−0.003). Under the full-sample Italy
+*measure* it is positive (+0.24 in Spec 6). The structural reasons
+the measures diverge are real: the rolling-AR forecaster lacks the
+labour-force-share predictor that captures slow-moving demographic
+effects, compounds short-run AR misspecification across 40 horizons,
+and over-estimates persistence after large income shocks, all of
+which the one-step direct projection avoids. But the positive sign
+is a property of the full-sample, non-causal construction of the
+measure: under a causal real-time projection the coefficient returns
+to modestly negative (−0.11, §8.9). We therefore read the positive
+permanent-income coefficient as a feature of full-sample
+permanent-income *measurement* rather than a resolved structural
+property of Australian consumption.
 
 ---
 
@@ -2350,13 +2436,15 @@ in sign and broad magnitude.
    scales them up to a structural γ profile in line with Williams'
    Table 1.
 
-2. **Permanent-income transmission resolved.** The often-noted
-   "Australian permanent-income puzzle" — a significantly negative
-   long-run coefficient on log(y^p/y) under a rolling AR(8)
-   forecaster — flips to a positive +0.20 under Italy LP, matching
-   Williams' calibrated value in sign and magnitude. We read the
-   puzzle as a methodology artefact of the rolling-AR forecaster
-   rather than a structural feature of Australian consumption.
+2. **Permanent-income transmission — a measurement caveat.** The
+   long-run coefficient on log(y^p/y) is significantly negative under
+   a rolling AR(8) forecaster (the "Australian permanent-income
+   puzzle") and positive (+0.24) under the full-sample Italy
+   *measure*. We show this reversal is a property of the measure's
+   full-sample, non-causal construction: under a causal real-time
+   projection the coefficient remains modestly negative and λ ≈ −0.12
+   (§8.9). The positive permanent-income result is reported as a
+   measurement, not a real-time resolution of the puzzle.
 
 3. **NLA cross-equation restriction accepted.** The Italian
    convention γ_LA + γ_LOANS = 0 is accepted at the 5 per cent level
@@ -2365,7 +2453,7 @@ in sign and broad magnitude.
    methodology.
 
 Adding the Williams CCI interactions in Spec 8, including the
-time-varying housing-wealth m.p.c. interaction, produces λ = −0.377
+time-varying housing-wealth m.p.c. interaction, produces λ = −0.445
 — *exceeding* Williams' calibrated value in magnitude. The wealth
 coefficients shift relative to Spec 6 without moving systematically
 toward Williams' Table 1, indicating that the CCI interactions act

@@ -45,6 +45,14 @@ CCI moves by 1 unit, evaluated at `X = X̄` in-sample.
 
 ### Headline result — the predicted sign flip does *not* happen
 
+> **Superseded (2026-06):** the figures in this sub-section are the
+> intermediate post-A4 state, *before* the A3 iterated-CCI reduction.
+> In the deployed Spec 8 (iterated 3-knot `cci_williams`) λ = −0.445
+> and `ha_x_cci` = **+0.0016 (t = 0.32)** — right-signed but
+> insignificant, i.e. the sign flip *does* occur once the iterated CCI
+> is used. See the "Downstream effect on Spec 8" note below and the
+> Summary.
+
 | Coefficient | Pre-demeaning | Post-demeaning | Williams sign prior |
 |---|---:|---:|:-:|
 | λ (`ecm_lag`)         | −0.383 | −0.377 | − |
@@ -274,29 +282,29 @@ Newey–West vcov.
 
 ### Headline result
 
-**Williams' Table 1 calibrations are formally rejected** as
-parameter restrictions on the contemporary Australian data:
+**Williams' Table 1 calibrations are NOT rejected** as parameter
+restrictions on the contemporary Australian data (corrected 2026-06,
+NS-125 — an earlier run compared OLS against γ × λ̂ with signed λ̂,
+flipping the target sign; the correct target is γ × |λ̂|):
 
-| Restriction                       | χ²    | df | p-value | Reject 5% | Reject 1% |
+| Restriction (OLS = γ·\|λ̂\|)       | χ²    | df | p-value | Reject 5% | Reject 1% |
 |---|---:|---:|---:|:-:|:-:|
-| ha_y = 0.0488                     | 7.18  | 1  | 0.007   | ✓ | ✓ |
-| eq_y = 0.011                      | 0.02  | 1  | 0.896   | ✗ | ✗ |
-| super_y = 0.011                   | 2.26  | 1  | 0.133   | ✗ | ✗ |
-| nla_y = 0.159                     | 2.55  | 1  | 0.110   | ✗ | ✗ |
-| ln_hp_over_y = −0.130             | 2.20  | 1  | 0.138   | ✗ | ✗ |
-| ln_yp_over_y = 0.200              | 1.23  | 1  | 0.268   | ✗ | ✗ |
-| **Joint wealth (4 restrictions)** | 10.03 | 4  | 0.040   | ✓ | ✗ |
-| **Joint all (6 restrictions)**    | 29.10 | 6  | <0.001  | ✓ | ✓ |
+| ha_y = +0.0096                    | 0.05  | 1  | 0.832   | ✗ | ✗ |
+| eq_y = +0.0022                    | 0.05  | 1  | 0.826   | ✗ | ✗ |
+| super_y = +0.0022                 | 0.87  | 1  | 0.352   | ✗ | ✗ |
+| nla_y = +0.0314                   | 0.00  | 1  | 0.962   | ✗ | ✗ |
+| ln_hp_over_y = −0.0257            | 0.07  | 1  | 0.793   | ✗ | ✗ |
+| ln_yp_over_y = +0.0395            | 0.64  | 1  | 0.424   | ✗ | ✗ |
+| **Joint wealth (4 restrictions)** | 1.07  | 4  | 0.898   | ✗ | ✗ |
+| **Joint all (6 restrictions)**    | 2.24  | 6  | 0.896   | ✗ | ✗ |
 
-The single individual rejection is the housing-wealth m.p.c.
-γ_HA = 0.0488. Yet the *implied* γ_HA from Spec 6 is 0.049 —
-essentially equal to Williams' value. The two statements are
-simultaneously true because the implied-γ test divides OLS by |λ|
-(and our OLS is 37 % short and our |λ| is also 37 % short, so they
-cancel), while the Wald restriction tests the OLS coefficient
-directly at the Williams γ × λ̂ point. See
-[`companion_paper_draft.md` §7](companion_paper_draft.md) for the
-reconciliation.
+No restriction rejects, individually or jointly. This *agrees* with
+the headline paper's *implied* γ_HA from Spec 6 (0.049 vs Williams'
+0.0488): both the implied-γ comparison and the direct Wald
+restriction test find the Australian estimates consistent with
+Williams' Table 1. The non-rejection is partly a low-power result
+(n = 86, wide NW bands). See
+[`companion_paper_draft.md` §7](companion_paper_draft.md).
 
 ---
 
@@ -305,8 +313,9 @@ reconciliation.
 The full chain A1 → A2 → A3 → A4 → A6 → A7 → B2 is implemented and
 documented. The substantive findings:
 
-1. **A4 (de-meaning)** — does not flip ha_x_cci's wrong sign;
-   reduces magnitude of wrong-signed `hp_x_1_minus_cci`.
+1. **A4 (de-meaning)** — `ha_x_cci` is right-signed (+0.0016) but
+   insignificant (t = 0.32); the down-payment composite
+   `hp_x_1_minus_cci` stays wrong-signed.
 2. **A3 (iterated CCI)** — reduces surviving knots from 5 to 3;
    Spec 8 λ moves to −0.445.
 3. **A7 (4-eq joint survival)** — reduces survivors from 2 to 1
@@ -316,8 +325,8 @@ documented. The substantive findings:
    with mortgage residuals; the proxy HEW is not a separately
    identifying signal.
 6. **B2 (Williams calibration Wald)** — Williams' six Table 1
-   calibrations are jointly rejected χ²(6) = 29.1, p < 0.001;
-   wealth-only subset rejects at 5 % (χ²(4) = 10.03, p = 0.040).
+   calibrations are NOT rejected: χ²(6) = 2.24, p = 0.90;
+   wealth-only χ²(4) = 1.07, p = 0.90 (corrected 2026-06, NS-125).
 
 The next-step decision is in §8.2 of the
 [companion paper draft](companion_paper_draft.md): is the

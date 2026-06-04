@@ -123,6 +123,7 @@ All series are public.
 - Heteroskedasticity is structural in every full-sample spec. Newey-West HAC standard errors are reported.
 - The joint SUR consumption-plus-PI block currently fails on a CHOLMOD singular-matrix error under the new Italy LP sample; not a binding gap for the WP narrative.
 - Out-of-sample forecasting at h ≥ 4 quarters does not systematically beat random-walk-with-drift — a standard "macro forecasting puzzle" finding the WP records honestly.
+- The canonical permanent-income series (`PI_METHOD = "italy"`) is a full-sample, two-sided *measurement* (in-sample fitted values of one full-sample projection), not a real-time forecast; its positive long-run PI coefficient and λ magnitude are full-sample properties. A causal expanding-window variant (`construct_permanent_income_italy(..., real_time = TRUE)`) is reported as a robustness column ([australia_pi_realtime_robustness.csv](Australia/outputs/australia_pi_realtime_robustness.csv)) and is the version any forecasting use (e.g. MARTIN) must adopt; under it the long-run PI coefficient is modestly negative and λ ≈ −0.12 (Spec 6).
 
 ## Scoping decision required — LIVES extension
 

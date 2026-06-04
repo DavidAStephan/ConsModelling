@@ -25,12 +25,12 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec1_LogNetWorth | 0.731 | 2.34 | N | N | N | — | N | -919.2 | Y | N | Y | N |
 | Spec2_LogNetWorth_CCI | 0.769 | 2.40 | N | Y | N | N | N | -500.8 | Y | N | Y | Y |
 | Spec3_LevelNetWorth | 0.732 | 2.35 | N | N | N | — | N | -919.8 | Y | N | Y | N |
-| Spec4_Disagg_NoCCI | 0.729 | 2.39 | N | N | N | — | N | -906.8 | N | Y | Y | N |
-| Spec5_FullDisagg | 0.798 | 2.31 | N | N | N | N | N | -493.0 | N | Y | Y | Y |
-| Spec6_Preferred | 0.807 | 2.18 | Y | Y | N | — | N | -493.8 | N | Y | Y | N |
-| Spec6b_LongHistSRCCI | 0.707 | 2.11 | Y | Y | N | — | N | -1116.3 | N | Y | Y | N |
-| Spec7_CohortBurden | 0.833 | 2.20 | Y | N | N | — | N | -499.8 | N | Y | N | N |
-| Spec7b_RBABurden | 0.869 | 2.16 | Y | N | N | — | N | -363.0 | N | Y | N | N |
+| Spec4_Disagg_NoCCI | 0.729 | 2.39 | N | N | N | — | N | -906.8 | N | N | Y | N |
+| Spec5_FullDisagg | 0.798 | 2.31 | N | N | N | N | N | -493.0 | N | N | Y | Y |
+| Spec6_Preferred | 0.807 | 2.18 | Y | Y | N | — | N | -493.8 | N | N | Y | N |
+| Spec6b_LongHistSRCCI | 0.707 | 2.11 | Y | Y | N | — | N | -1116.3 | N | N | Y | N |
+| Spec7_CohortBurden | 0.833 | 2.20 | Y | N | N | — | N | -499.8 | N | N | N | N |
+| Spec7b_RBABurden | 0.869 | 2.16 | Y | N | N | — | N | -363.0 | N | N | N | N |
 | Spec8_CCI_Interactions | 0.821 | 1.87 | Y | N | N | — | N | -948.5 | Y | — | N | N |
 | Spec9_KalmanCCI | 0.737 | 2.20 | Y | N | N | — | N | -895.9 | N | — | Y | N |
 | Spec10_WilliamsPrior | 0.778 | 2.17 | Y | Y | N | — | Y | -493.7 | Y | — | Y | N |
@@ -60,12 +60,12 @@ _Italy comparison not available._
 - Spec1_LogNetWorth fails: cointegration, stability
 - Spec2_LogNetWorth_CCI fails: cointegration
 - Spec3_LevelNetWorth fails: cointegration, stability
-- Spec4_Disagg_NoCCI fails: sign, stability
-- Spec5_FullDisagg fails: sign
-- Spec6_Preferred fails: sign, stability
-- Spec6b_LongHistSRCCI fails: sign, stability
-- Spec7_CohortBurden fails: sign, λ range/sign, stability
-- Spec7b_RBABurden fails: sign, λ range/sign, stability
+- Spec4_Disagg_NoCCI fails: sign, cointegration, stability
+- Spec5_FullDisagg fails: sign, cointegration
+- Spec6_Preferred fails: sign, cointegration, stability
+- Spec6b_LongHistSRCCI fails: sign, cointegration, stability
+- Spec7_CohortBurden fails: sign, cointegration, λ range/sign, stability
+- Spec7b_RBABurden fails: sign, cointegration, λ range/sign, stability
 - Spec8_CCI_Interactions fails: λ range/sign, stability
 - Spec9_KalmanCCI fails: sign, stability
 - Spec10_WilliamsPrior fails: stability
@@ -78,5 +78,5 @@ _Italy comparison not available._
 - Run: `Rscript Australia/R/australia_consumption_model.R`
 - Fast re-estimation: `Rscript Australia/R/run_estimation_from_rds.R`
 - Random seed: not used (OLS is deterministic).
-- Date generated: 2026-05-21
+- Date generated: 2026-06-04
 
