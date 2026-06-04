@@ -2149,6 +2149,17 @@ using `ln_networth_y_proxy`:
 | real_rate      | −0.00137| +0.00090| −165  |
 | ln_yp_over_y   | +0.961  | +0.971  | +1.0  |
 
+(Caveat: the aggregate net-worth proxy carries a unit bug — the
+household M3 liquid component enters the back-cast at ~0.01 per cent
+rather than its intended ~12 per cent, so the figures above reflect an
+effectively housing-only back-cast. The fix is committed in
+`australia_data_download.R` (NS-131) but, because of a separate
+cold-rebuild reproducibility issue with the credit-conditions flag
+(documented at that flag), is not yet propagated to these outputs.
+With the corrected proxy the extended estimates shift only slightly —
+λ to −0.202, ln_networth_y to +0.106, ln_hp_over_y to −0.0033 —
+leaving the qualitative reading unchanged.)
+
 The wealth elasticity is essentially stable across samples
 (0.112 → 0.107, a 4 per cent change) — a positive validation of the
 aggregate-net-worth proxy. Doubling the sample length and adding the
