@@ -22,8 +22,9 @@ used in the Italian implementation of De Bonis, Marino and Muellbauer
 in every disaggregated specification and sample window we estimate,
 validating the Italian convention.
 
-The preferred specification delivers a speed of adjustment
-λ = −0.180 (vs Williams' published −0.286) and structural long-run
+The narrative-preferred specification (Spec 6; the automated
+four-screen selector instead returns Spec 2 — §6.3) delivers a speed
+of adjustment λ = −0.180 (vs Williams' published −0.286) and structural long-run
 coefficients on individual wealth components that are broadly
 consistent with Williams' Table 1 estimates: γ_HA = 0.049 (Williams:
 0.049), γ_IFA = 0.030 (Williams: 0.022), γ_NLA = 0.196 (Williams:
@@ -59,7 +60,7 @@ deteriorates from the 34th adjusted-R² percentile on the 1988+ sample
 to the 19th on the back-extended sample, the maximal-GETS reduction
 sits at the 64th percentile, and the sectional-period specification
 sits at the 36th. A two-equation SUR of consumption and house prices
-on the back-extended sample finds residual correlation ρ̂ ≈ 0.0007,
+on the back-extended sample finds residual correlation ρ̂ ≈ −0.0045,
 so joint estimation delivers no efficiency gain at the quarterly
 frequency. A three-equation joint cross-equation CCI identification
 retains only two of six single-equation knot survivors. We read these
@@ -189,8 +190,9 @@ post-deregulation Australian data.
 
 ### 1.3 Headline result
 
-Under the Italy local-projection PI forecaster the preferred Spec 6
-delivers a speed of adjustment **λ = −0.180** on a non-overlapping
+Under the Italy local-projection PI forecaster the narrative-preferred
+Spec 6 (the automated selector returns Spec 2; see §6.3) delivers a
+speed of adjustment **λ = −0.180** on a non-overlapping
 sample (1988Q4–2024Q4 vs Williams' 1978Q1–2008Q2), about 63 per cent
 of Williams' published −0.286. The structural long-run coefficients
 on the disaggregated wealth components — γ_HA = 0.049, γ_IFA = 0.030,
@@ -515,7 +517,7 @@ suggests that single-equation OLS produces consumption-equation
 coefficients "only a whisker away" from joint SUR estimation, and we
 replicate that finding (§8.2). On our back-extended sample a
 two-equation consumption + house-prices SUR finds residual
-correlation ρ̂ ≈ 0.0007 — joint estimation gives no efficiency gain
+correlation ρ̂ ≈ −0.0045 — joint estimation gives no efficiency gain
 at the quarterly frequency — so the case for the full multi-equation
 build rests on cross-equation parameter restrictions rather than on
 efficiency. The full multi-equation extension is left to a companion
@@ -1287,12 +1289,20 @@ Whether the Williams spline is identifying genuine credit-conditions
 turning points (rather than acting as flexible detrending of the
 consumption-equation residual) is empirically testable. We construct
 a random-knot placebo: 200 draws of 4 knots uniformly distributed in
-the 1979–2007 window (Williams' candidate window), each fitted via
-the same drop-on-violation reduction protocol. The canonical Williams
-result's percentile rank in this placebo distribution measures
-whether his specific knot choice is identifying something the data
-genuinely flags vs whatever a flexible 4-knot smoothed-step series
-could fit by chance.
+the 1979–2007 window (Williams' candidate window). For the
+literal-Williams comparison all four drawn knots are entered
+**unconditionally** — testing pure fit, with no sign-prior reduction —
+so the canonical 4-knot series is compared like-for-like against
+random 4-knot series; for the maximal-GETS comparison each draw of 15
+candidate knots is passed through a single sign-prior reduction pass.
+(The *deployed* `cci_williams` series uses the iterated reduction of
+§5.1.1, which retains three knots; the maximal-GETS placebo applies a
+single reduction pass, so its percentile benchmark is indicative of
+the canonical procedure rather than an exact match to the deployed
+series.) The canonical result's percentile rank in this placebo
+distribution measures whether the specific knot choice is identifying
+something the data genuinely flags vs whatever a flexible
+smoothed-step series could fit by chance.
 
 #### 5.2.1 Three placebo runs
 
@@ -1415,7 +1425,7 @@ A complementary test of the multi-equation framework's value is
 whether SUR or FIML deliver efficiency gains over equation-by-equation
 OLS. A two-equation SUR (consumption + house prices, on the extended
 1976Q3+ sample using Spec 1 with the aggregate net-worth proxy) finds
-residual correlation **ρ̂(ε_C, ε_H) ≈ 0.0007** — essentially zero.
+residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0045** — essentially zero.
 SUR coefficients are within 0.1 per cent of OLS for nearly every
 term. The finding is robust across specification variants: with no
 CCI spline and no event dummies, ρ̂ ≈ −0.025.
@@ -1680,8 +1690,10 @@ In summary:
   Williams' calibrated +0.20 in sign and broad magnitude; the
   positive break is consistent with a post-GFC tightening of the
   consumption response to expected income.
-- **Diagnostics.** adj-R² = 0.81, Durbin–Watson 2.18, AR(1) p = 0.30,
-  AR(4) p = 0.20, RESET p < 0.01. λ is sign-stable across all four
+- **Diagnostics.** adj-R² = 0.81, Durbin–Watson 2.18, AR(1) p = 0.26,
+  AR(4) p = 0.14 (no serial correlation), RESET p < 0.01
+  (functional-form misspecification remains), heteroskedasticity
+  structural (NW HAC SEs throughout). λ is sign-stable across all four
   sample variants (full −0.180, pre-COVID −0.123).
 
 ### 7.2 Diagnostics summary
@@ -1691,24 +1703,34 @@ below; full per-spec output is in [australia_full_diagnostics.csv](../outputs/au
 
 | Spec | adj R² | DW | AR(1) | AR(4) | Het | RESET | BIC |
 |---|---:|---:|:-:|:-:|:-:|:-:|---:|
-| 1   | 0.731 | 2.34 | OK | OK | OK | OK | −919.2 |
-| 2   | 0.769 | 2.40 | OK | rej | OK | OK | −500.8 |
-| 3   | 0.732 | 2.35 | OK | OK | OK | OK | −919.8 |
-| 4   | 0.729 | 2.39 | OK | OK | OK | OK | −906.8 |
-| 5   | 0.798 | 2.31 | OK | OK | OK | OK | −493.0 |
-| 6   | 0.807 | 2.18 | rej | rej | OK | OK | −493.8 |
-| 7   | 0.833 | 2.20 | rej | OK | OK | OK | −499.8 |
-| 7b  | 0.869 | 2.16 | rej | OK | OK | OK | −363.0 |
-| 8   | 0.821 | 1.87 | rej | rej | OK | OK | −948.5 |
-| 9   | 0.737 | 2.20 | rej | OK | OK | OK | −895.9 |
-| 10  | 0.778 | 2.17 | rej | rej | OK | rej| −493.7 |
+| 1   | 0.731 | 2.34 | rej | rej | struct | rej | −919.2 |
+| 2   | 0.769 | 2.40 | rej | OK  | struct | rej | −500.8 |
+| 3   | 0.732 | 2.35 | rej | rej | struct | rej | −919.8 |
+| 4   | 0.729 | 2.39 | rej | rej | struct | rej | −906.8 |
+| 5   | 0.798 | 2.31 | rej | rej | struct | rej | −493.0 |
+| 6   | 0.807 | 2.18 | OK  | OK  | struct | rej | −493.8 |
+| 7   | 0.833 | 2.20 | OK  | rej | struct | rej | −499.8 |
+| 7b  | 0.869 | 2.16 | OK  | rej | struct | rej | −363.0 |
+| 8   | 0.821 | 1.87 | OK  | rej | struct | rej | −948.5 |
+| 9   | 0.737 | 2.20 | OK  | rej | struct | rej | −895.9 |
+| 10  | 0.778 | 2.17 | OK  | OK  | struct | OK  | −493.7 |
 
-The heteroscedasticity diagnostic distinguishes event-driven cases
-(BP rejection vanishes when the four event quarters are dropped)
-from structural cases. Spec 6 carries a structural classification on
-the full sample, indicating the Newey–West HAC standard errors used
-throughout are appropriate but that some residual misspecification
-remains.
+(Table regenerated from `australia_full_diagnostics.csv`; "OK"/"rej"
+are the 5 per cent verdicts of the Breusch–Godfrey AR(1)/AR(4) and
+RESET tests, and "Het" is the `het_diagnosis` field.)
+
+Three diagnostic patterns are worth noting. First, **heteroskedasticity
+is structural in every full-sample specification** — the Breusch–Pagan
+rejection survives dropping the four event quarters in every case — so
+the Newey–West HAC standard errors used throughout are necessary rather
+than a precaution. Second, **RESET rejects in every specification bar
+the Williams-prior Spec 10**, indicating functional-form misspecification
+that the single-equation framing does not fully resolve (consistent with
+§5.3/§7.3/§9). Third, **low-order serial correlation is concentrated in
+the aggregated forms**: the Breusch–Godfrey AR(1) test rejects for
+Specs 1–5 but not for the preferred Spec 6 or the CCI-augmented Specs
+7–10, so the disaggregated dynamics absorb the serial dependence the
+aggregated specifications leave in the residual.
 
 ### 7.3 Comparison with Williams (2010, 2012)
 
@@ -2152,7 +2174,7 @@ back-extended sample.
 
 Joint SUR estimation of the consumption equation and a Williams-style
 house-price ECM (Aust paper eq. 11) on the back-extended 1976Q3+
-sample yields residual correlation **ρ̂(ε_C, ε_H) ≈ 0.0007**, with
+sample yields residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0045**, with
 SUR coefficients within 0.1 per cent of equation-by-equation OLS
 for nearly every term. The finding is robust across specification
 variants (no CCI: ρ̂ = −0.083; no event dummies: ρ̂ = +0.043;
@@ -2499,7 +2521,7 @@ specification, which implements Williams' Aust paper §5.1
 period-bracket logic, sits at the 36th/40th percentile, no stronger
 than random period placements. **The two-equation SUR** of
 consumption and house prices on the back-extended sample finds
-residual correlation ρ̂ ≈ 0.0007 — essentially zero — so joint
+residual correlation ρ̂ ≈ −0.0045 — essentially zero — so joint
 estimation gives no efficiency gain at the quarterly frequency.
 **The three-equation joint cross-equation identification** retains
 only two of six single-equation knot survivors (1986 financial
