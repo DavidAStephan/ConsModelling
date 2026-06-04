@@ -615,7 +615,7 @@ on the back-extended sample.
 `lives_sur_2eq_compare.csv` (OLS vs SUR side-by-side),
 `lives_sur_2eq_resid_corr.csv`.
 
-**Headline result:** ρ̂(ε_C, ε_H) ≈ −0.0045. Joint estimation gives
+**Headline result:** ρ̂(ε_C, ε_H) ≈ −0.0037. Joint estimation gives
 no efficiency gain at the quarterly frequency. The case for
 multi-equation LIVES therefore rests on cross-equation parameter
 restrictions, not on residual covariance.

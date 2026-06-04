@@ -57,13 +57,13 @@ individual wealth coefficients become smaller rather than larger, and
 the net-liquid coefficient collapses toward zero. The CCI placebo
 battery fails on both samples: the literal Williams 4-knot
 deteriorates from the 34th adjusted-R² percentile on the 1988+ sample
-to the 19th on the back-extended sample, the maximal-GETS reduction
+to the 18th on the back-extended sample, the maximal-GETS reduction
 sits at the 64th percentile, and the sectional-period specification
 sits at the 36th. A two-equation SUR of consumption and house prices
-on the back-extended sample finds residual correlation ρ̂ ≈ −0.0045,
+on the back-extended sample finds residual correlation ρ̂ ≈ −0.0037,
 so joint estimation delivers no efficiency gain at the quarterly
 frequency. A three-equation joint cross-equation CCI identification
-retains only two of six single-equation knot survivors. We read these
+retains only two of seven single-equation knot survivors. We read these
 findings as indicating that the structural identification Williams
 (2010) delivers comes from cross-equation parameter restrictions in
 his four-equation FIML system rather than from sample length, knot
@@ -167,7 +167,7 @@ near zero and γ_EQ retains a wrong sign. Triangulating with random-knot
 placebo tests on both samples, with a Zellner SUR of consumption and
 house prices showing essentially zero residual correlation, and with
 a three-equation joint cross-equation CCI identification that retains
-only two of six single-equation knot survivors, we read the binding
+only two of seven single-equation knot survivors, we read the binding
 constraint on tighter agreement with Williams as the single-equation
 framing itself rather than the post-1988 sample window. The
 multi-equation framework is laid out in a separate companion
@@ -215,18 +215,18 @@ resolution of the puzzle.
 
 The CCI placebo evidence is sharper. The literal Williams 4-knot
 specification sits at the 34th adjusted-R² percentile on the 1988+
-sample and deteriorates to the 19th percentile on the back-extended
-1976Q3+ sample. The maximal-GETS canonical sits at the 64th/36th
+sample and deteriorates to the 18th percentile on the back-extended
+1976Q3+ sample. The maximal-GETS canonical sits at the 64th/37th
 percentile on the extended sample. The sectional sign-prior
 specification — Williams' Aust paper §5.1 implementation — sits at
 the 36th/40th, no stronger than random period placements. The
 three-equation joint cross-equation identification explains the
 single-equation placebo weakness: when knots are required to satisfy
 sign priors *jointly* across consumption, house prices and mortgage
-stock, only two of six single-equation survivors pass — 1986
+stock, only two of seven single-equation survivors pass — 1986
 financial deregulation and 2017 APRA macroprudential round II. The
-consumption-fitted CCI is therefore not a true common factor; four
-of its six surviving knots are consumption-equation specific. The
+consumption-fitted CCI is therefore not a true common factor; five
+of its seven surviving knots are consumption-equation specific. The
 path to closing the residual gap with Williams' system estimates
 runs through a full FIML build with cross-equation parameter
 restrictions, which the single-equation framework adopted here
@@ -517,7 +517,7 @@ suggests that single-equation OLS produces consumption-equation
 coefficients "only a whisker away" from joint SUR estimation, and we
 replicate that finding (§8.2). On our back-extended sample a
 two-equation consumption + house-prices SUR finds residual
-correlation ρ̂ ≈ −0.0045 — joint estimation gives no efficiency gain
+correlation ρ̂ ≈ −0.0037 — joint estimation gives no efficiency gain
 at the quarterly frequency — so the case for the full multi-equation
 build rests on cross-equation parameter restrictions rather than on
 efficiency. The full multi-equation extension is left to a companion
@@ -1310,12 +1310,12 @@ smoothed-step series could fit by chance.
 |---|---|---:|---:|---|
 | Literal Williams 4-knot               | 1988Q4+ (n=146) | 34 | 58 | Below R² median |
 | Literal Williams 4-knot               | 1976Q3+ (n=190) | **19** | **10** | Fails — below median on both |
-| Maximal-GETS canonical (15-knot reduce) | 1976Q3+ (n=190) | **64** | 36 | Weakly above median |
+| Maximal-GETS canonical (15-knot reduce) | 1976Q3+ (n=190) | **64** | 37 | Weakly above median |
 
 The literal Williams 4-knot specification fails the placebo on both
 samples, and the R² failure *deepens* on the extended sample (34th
-→ 19th percentile). The maximal-GETS reduction partially rescues
-identification (64th percentile on R², 36th on |λ|) but does not
+→ 18th percentile). The maximal-GETS reduction partially rescues
+identification (64th percentile on R², 37th on |λ|) but does not
 deliver strong support: random combinations of 15 candidate knots
 under the same reduction protocol produce *faster* mean reversion
 than the canonical institutional choice in 64 per cent of draws.
@@ -1377,10 +1377,10 @@ institutional sign prior in **all three** equations to be retained.
 
 | Survival regime | Surviving knots | n |
 |---|---|---:|
-| Consumption equation only (Spec 1 with `ln_networth_y_proxy` on extended sample) | 1979, 1986, 1992, 2007, 2017, 2020 | 6 |
+| Consumption equation only (Spec 1 with `ln_networth_y_proxy` on extended sample) | 1979, 1986, 1992, 2007, 2009, 2017, 2020 | 7 |
 | **Joint (C ∩ H ∩ M)**                  | **1986, 2017**                         | **2** |
 
-Of 6 knots that survive when fitted to consumption alone (this is the
+Of 7 knots that survive when fitted to consumption alone (this is the
 single-pass reduction in `joint_cci_identification.R`, using the
 Spec-1 aggregate-proxy specification on the back-extended sample —
 distinct from the *iterated* reduction the canonical consumption
@@ -1392,8 +1392,8 @@ consistent with their institutional priors across consumption, house
 prices and mortgage stock simultaneously. The other surviving knots
 sign-violate in the HP or mortgage-stock equations.
 
-The single-pass protocol's identification of 6 knots was therefore
-overstated — 4 of them were consumption-equation-specific and would
+The single-pass protocol's identification of 7 knots was therefore
+overstated — 5 of them were consumption-equation-specific and would
 not survive a true cross-equation common-factor restriction. This is
 the empirical content of the placebo failures in §5.2: without
 imposing cross-equation sign consistency, the consumption-equation
@@ -1425,7 +1425,7 @@ A complementary test of the multi-equation framework's value is
 whether SUR or FIML deliver efficiency gains over equation-by-equation
 OLS. A two-equation SUR (consumption + house prices, on the extended
 1976Q3+ sample using Spec 1 with the aggregate net-worth proxy) finds
-residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0045** — essentially zero.
+residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0037** — essentially zero.
 SUR coefficients are within 0.1 per cent of OLS for nearly every
 term. The finding is robust across specification variants: with no
 CCI spline and no event dummies, ρ̂ ≈ −0.025.
@@ -2143,25 +2143,23 @@ using `ln_networth_y_proxy`:
 
 | LR coefficient | 1988+ baseline (n=146) | 1976+ extended (n=190) | % change |
 |---|---:|---:|---:|
-| λ (ecm_lag)    | −0.177  | −0.202  | +14.2 |
-| ln_networth_y  | +0.112  | +0.107  | −4.0  |
-| ln_hp_over_y   | −0.0151 | −0.0038 | −74.8 |
-| real_rate      | −0.00137| +0.00090| −165  |
-| ln_yp_over_y   | +0.961  | +0.971  | +1.0  |
+| λ (ecm_lag)    | −0.177  | −0.202  | +14.0 |
+| ln_networth_y  | +0.112  | +0.106  | −5.1  |
+| ln_hp_over_y   | −0.0151 | −0.0033 | −78.1 |
+| real_rate      | −0.00137| +0.00086| −163  |
+| ln_yp_over_y   | +0.961  | +0.973  | +1.2  |
 
-(Caveat: the aggregate net-worth proxy carries a unit bug — the
-household M3 liquid component enters the back-cast at ~0.01 per cent
-rather than its intended ~12 per cent, so the figures above reflect an
-effectively housing-only back-cast. The fix is committed in
-`australia_data_download.R` (NS-131) but, because of a separate
-cold-rebuild reproducibility issue with the credit-conditions flag
-(documented at that flag), is not yet propagated to these outputs.
-With the corrected proxy the extended estimates shift only slightly —
-λ to −0.202, ln_networth_y to +0.106, ln_hp_over_y to −0.0033 —
-leaving the qualitative reading unchanged.)
+(The aggregate net-worth proxy correctly includes the household M3
+liquid component at ~12 per cent of the back-cast. An earlier
+`$bn`/`$m` unit bug — NS-131 — had made the M3 term numerically inert
+(~0.01 per cent of the back-cast), leaving an effectively housing-only
+proxy; the fix is now wired in and propagated through a reproducible
+cold rebuild after decoupling the credit-conditions flag — see
+`USE_WILLIAMS_SDMMA_BASIS` / `USE_INSTITUTIONAL_CCI_OVERLAY` in
+`australia_data_download.R`.)
 
 The wealth elasticity is essentially stable across samples
-(0.112 → 0.107, a 4 per cent change) — a positive validation of the
+(0.112 → 0.106, a 5 per cent change) — a positive validation of the
 aggregate-net-worth proxy. Doubling the sample length and adding the
 deregulation-era regime does not shift the structural wealth-to-
 consumption coefficient. The permanent-income elasticity is also
@@ -2228,9 +2226,9 @@ Williams' Table 1 the paper produces.
 
 The Williams maximal-GETS canonical CCI on the back-extended 1976Q3+
 sample (Spec 1 with the aggregate proxy) sits at the **64th adjusted
-R² percentile and 36th |λ| percentile** in 200 random 15-knot,
+R² percentile and 37th |λ| percentile** in 200 random 15-knot,
 15-prior placebo draws. This is a meaningful improvement on the
-literal Williams 4-knot result (19th/10th on the same sample) but
+literal Williams 4-knot result (18th/10th on the same sample) but
 does not reach a strong-support threshold of, say, 90th on both
 metrics. Random combinations of 15 candidate knots and priors under
 the same sign-survival protocol produce *faster* mean reversion than
@@ -2255,7 +2253,7 @@ back-extended sample.
 
 Joint SUR estimation of the consumption equation and a Williams-style
 house-price ECM (Aust paper eq. 11) on the back-extended 1976Q3+
-sample yields residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0045**, with
+sample yields residual correlation **ρ̂(ε_C, ε_H) ≈ −0.0037**, with
 SUR coefficients within 0.1 per cent of equation-by-equation OLS
 for nearly every term. The finding is robust across specification
 variants (no CCI: ρ̂ = −0.083; no event dummies: ρ̂ = +0.043;
@@ -2273,7 +2271,7 @@ consumption-only fitting, only **two** pass the joint test:
 
 | Survival regime | Surviving knots |
 |---|---|
-| Consumption only       | 1979, 1986, 1992, 2007, 2017, 2020 |
+| Consumption only       | 1979, 1986, 1992, 2007, 2009, 2017, 2020 |
 | Joint (C ∩ H ∩ M)      | **1986, 2017** |
 
 The joint-identified `cci_williams_joint` flips the house-price
@@ -2353,7 +2351,7 @@ close the residual gap with the joint FIML estimates.
 **The joint cross-equation identification finding** (§5.3, §8.19)
 provides the substantive diagnosis. When knots are required to
 satisfy sign priors *jointly* across three equations (consumption,
-house prices, mortgage stock), only two of six single-equation
+house prices, mortgage stock), only two of seven single-equation
 survivors pass: 1986 (financial deregulation) and 2017 (APRA
 macroprudential round II). The maximal-GETS identification of six
 knots was therefore overstated in the single-equation pipeline; four
@@ -2643,20 +2641,20 @@ generates the divergence between Spec 4 and Williams' Table 1.
 Three lines of evidence converge on the same diagnosis. **The
 placebo battery** finds that the literal Williams 4-knot
 specification fails on both samples, deteriorating from the 34th
-adjusted-R² percentile on the 1988+ sample to the 19th on the
+adjusted-R² percentile on the 1988+ sample to the 18th on the
 back-extended sample. The maximal-GETS reduction rescues
-identification only weakly (64th/36th); the sectional sign-prior
+identification only weakly (64th/37th); the sectional sign-prior
 specification, which implements Williams' Aust paper §5.1
 period-bracket logic, sits at the 36th/40th percentile, no stronger
 than random period placements. **The two-equation SUR** of
 consumption and house prices on the back-extended sample finds
-residual correlation ρ̂ ≈ −0.0045 — essentially zero — so joint
+residual correlation ρ̂ ≈ −0.0037 — essentially zero — so joint
 estimation gives no efficiency gain at the quarterly frequency.
 **The three-equation joint cross-equation identification** retains
-only two of six single-equation knot survivors (1986 financial
+only two of seven single-equation knot survivors (1986 financial
 deregulation and 2017 APRA macroprudential round II); the
-consumption-fitted CCI is therefore not a true common factor, four
-of its six surviving knots being consumption-equation specific.
+consumption-fitted CCI is therefore not a true common factor, five
+of its seven surviving knots being consumption-equation specific.
 
 We read these findings as indicating that the structural
 identification Williams (2010) delivers comes from cross-equation

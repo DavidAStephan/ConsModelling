@@ -36,8 +36,8 @@ cat(sprintf("Loaded: %d rows, %d cols\n", nrow(master), ncol(master)))
 
 # Source helpers and (re-)attach Williams 4-knot CCI basis if not already present
 source(file.path(script_dir, "model_helpers.R"), local = TRUE)
-USE_INSTITUTIONAL_CCI <- TRUE
-if (USE_INSTITUTIONAL_CCI &&
+USE_WILLIAMS_SDMMA_BASIS <- TRUE
+if (USE_WILLIAMS_SDMMA_BASIS &&
     !any(grepl("^sdmma_", names(master)))) {
   williams_basis <- build_williams_cci_basis(master$date)
   for (j in seq_len(ncol(williams_basis))) {
