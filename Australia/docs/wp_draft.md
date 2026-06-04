@@ -2503,6 +2503,54 @@ choices. The maximal-GETS canonical and the Kalman CCI deliver
 nearly identical λ and very similar wealth-coefficient shifts; they
 can be used as cross-checks of one another.
 
+### 10.4 Nesting in MARTIN
+
+A natural use of this freely-estimated equation is to discipline the
+calibrated consumption block of the RBA's MARTIN model (Ballantyne et
+al. 2019), whose long run is homogeneous of degree one in real income
+and real net wealth — log c = w·log y + (1 − w)·log NW + (rate term) —
+with a calibrated net-wealth elasticity (1 − w) ≈ 0.17. We test that
+structure directly
+([`australia_martin_nesting.csv`](../outputs/australia_martin_nesting.csv))
+by fitting the static long run
+log c = β₀ + β_y·log y + β_NW·log(NW/y) + β_r·r. Because
+log(NW_real_pc) = log(NW/y) + log y + log 4, the coefficient on log
+income equals the sum of MARTIN's income and wealth weights (which
+homogeneity sets to one) and the coefficient on the net-worth ratio is
+the net-wealth elasticity:
+
+| Quantity | Estimate | MARTIN |
+|---|---:|---:|
+| Net-wealth elasticity (β_NW)    | 0.115 (t = 1.9)  | 0.17 |
+| Income + wealth weight (β_y)    | 0.720 (t = 10.4) | 1.00 (imposed) |
+| Real-rate semi-elasticity (β_r) | −0.0086 (t = −2.6) | small, calibrated |
+
+Three findings bear on integration. First, the unrestricted net-wealth
+elasticity, 0.115, is below MARTIN's calibrated 0.17 but of the same
+order and marginally significant. Second, **MARTIN's long-run
+homogeneity restriction is rejected** on the Australian data: the
+income-plus-wealth weight is 0.72, and the test β_y = 1 gives
+χ²(1) = 16.4 (p < 0.001). Imposing homogeneity by force does not help —
+the restricted net-wealth elasticity flips to −0.083 (insignificant),
+so the data resist the balanced-growth parameterisation in this simple
+form. Third, the static long run does not cointegrate under
+Engle–Granger MacKinnon critical values (ADF −2.38 vs −4.10), echoing
+§6.2.
+
+The reading for MARTIN is that the freely-estimated single-equation
+long run does **not** nest MARTIN's calibrated balanced-growth block:
+the homogeneity restriction would have to be imposed rather than
+tested-and-accepted, and the unrestricted wealth elasticity (0.12, or
+0.19 from the disaggregated aggregate of §7.3.1 with a 95% CI of
+[−0.77, 1.16]) is too imprecise to discipline MARTIN's 0.17
+calibration. A productive integration path is therefore to import the
+*qualitative* structure (disaggregated wealth channels, a
+credit-conditions interaction) and the sign and rough magnitude of the
+channels, while retaining MARTIN's calibrated long-run weights — using
+this paper as a freely-estimated benchmark the calibration is
+consistent with, rather than as a source of point estimates precise
+enough to replace it.
+
 ---
 
 ## 11. Conclusion

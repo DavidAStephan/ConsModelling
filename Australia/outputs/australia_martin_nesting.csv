@@ -1,0 +1,11 @@
+"quantity","value"
+"coef_lincome (income+wealth sum)",0.7198
+"coef_log_nw_y (net-wealth elasticity)",0.1155
+"coef_real_rate",-0.0086
+"homogeneity chi2 (coef_lincome=1)",16.4063
+"homogeneity p_value",0.0001
+"restricted net-wealth elasticity",-0.0832
+"restricted real_rate",-0.0038
+"EG ADF stat on residual",-2.3828
+"EG 5% CV (n_vars=4)",-4.1
+"MARTIN calibrated net-wealth elasticity (ref)",0.17

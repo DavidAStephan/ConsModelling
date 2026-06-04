@@ -567,6 +567,19 @@ operates on a thin empirical basis. Expanding the candidate knot
 set (e.g. with additional Australian institutional events such as
 specific RBA policy episodes) is a logically prior step.
 
+**Implementation status (2026-06).** Two of the planned refinements are
+done: the CCI interactions in Spec 8 are de-meaned over the estimation
+sample (item B3 — this makes `ha_x_cci` right-signed, +0.0016), and the
+Wald calibration test now uses the correct |λ̂| scaling (which reverses
+the earlier rejection — Williams' Table 1 is *not* rejected; §7). The
+two genuinely open items are unchanged by this pass: (i) a properly
+constructed home-equity-withdrawal series with Williams' dwelling-
+investment subtraction (the current proxy is a credit-flow series whose
+residuals correlate 0.83 with the mortgage-stock equation), which
+requires sourcing the dwelling-investment component; and (ii) the
+shared-ϖ FIML build itself. Both remain multi-week, data- or
+likelihood-code-dependent tasks beyond an editorial pass.
+
 ---
 
 ## References
