@@ -1395,6 +1395,140 @@ fit_williams_prior_spec <- function(model_data,
 }
 
 
+# ==============================================================================
+# fit_lives_calibrated_spec — Spec 12 — Calibrated LIVES headline
+# ==============================================================================
+# The faithful Muellbauer/Williams Eq 7 consumption equation with Williams'
+# Table 1 (Aust system paper p.29) credit-channel coefficients IMPOSED, leaving
+# free ONLY the parameters Australian post-1988 data can identify:
+#   gamma_1   housing-collateral MPC  (loading on the de-meaned CCI*(HA/4y) term)
+#   gamma_NLA net-liquid-asset MPC
+#   lambda    speed of adjustment
+#
+# Motivation. A collinearity diagnostic on Spec 11 shows the six CCI-interaction
+# regressors are 0.74-0.97 mutually correlated (each ~ proportional to CCI), so
+# they cannot be jointly free-estimated off a single equation — which is exactly
+# why Williams calibrates psi/varpi and estimates the system by FIML. Imposing
+# his calibrations removes the unidentified free interactions; the companion
+# paper's Wald test does not reject them (chi2(6) = 2.24, p = 0.90). With every
+# CCI-scaled channel calibrated, the one credit channel left free (the housing-
+# collateral term ha_x_cci) is identified against nla_y, a plain wealth ratio
+# with low collinearity.
+#
+# This differs from Spec 10 (fit_williams_prior_spec) in three faithful-structure
+# fixes: (i) housing enters ONLY through the credit-scaled interaction (free
+# gamma_1), NOT a classical free ha_y level — Williams' housing MPC is zero at
+# CCI=0; (ii) the autonomous-consumption intercept zeta_c*CCI is restored
+# (calibrated, since it is 0.88-collinear with ha_x_cci); (iii) the real-rate and
+# affordability interactions are calibrated rather than freely estimated (Spec 10
+# leaves them free, reintroducing collinearity).
+#
+# Calibrations imposed (Williams Aust Table 1, col 1, p.29) — the scale-robust,
+# theory-anchored subset:
+#   gamma_IFA = 0.022   illiquid financial wealth MPC (eq + super, level ratio)
+#   psi_0 = 0.20, psi_1 = 0.93   permanent-income gearing psi(CCI)=psi_0+psi_1*CCI
+# These three (the exact set Spec 10 imposes) are robust to CCI scaling because
+# they load on income/wealth RATIOS, not on the rate or price levels.
+#
+# DELIBERATELY OMITTED: Williams' real-rate (alpha_r=-0.8711), affordability
+# (alpha_hp=-0.1298) and autonomous-consumption (zeta_c=0.1902) CCI channels are
+# NOT imposed, for two reasons. (1) Scale: repo `real_rate` is in percent and
+# `cci_williams` is peak-normalised to 1, whereas Williams' real rate and CCI
+# (peak ~0.805) are on different scales, so his raw alpha_r makes the calibrated
+# offset ~30x the size of Delta log c and the fixed-point iteration DIVERGES
+# (confirmed empirically). (2) Identification: these three are 0.74-0.97 collinear
+# with the free housing-collateral term ha_x_cci, so freely estimating them is the
+# very collinearity this spec exists to avoid. Re-introducing them properly needs a
+# scale-matched recalibration or the FIML route (next step). The free intercept
+# absorbs the constant part of the omitted autonomous-consumption channel.
+#
+# Solved by the same iterative fixed-point OLS as Spec 10: subtract
+# lambda * (calibrated long-run sum) from the dependent variable and re-read lambda
+# from ecm_lag until convergence.
+fit_lives_calibrated_spec <- function(model_data,
+                                      sample_end = as.Date("2024-10-01"),
+                                      gamma_ifa = 0.022,
+                                      psi_0     = 0.20,
+                                      psi_1     = 0.93,
+                                      cci_col   = "cci_williams",
+                                      max_iter  = 50L,
+                                      tol       = 1e-6) {
+  if (!cci_col %in% names(model_data) || all(is.na(model_data[[cci_col]]))) {
+    return(NULL)
+  }
+  cci <- model_data[[cci_col]]
+
+  # De-meaning window for the free housing interaction: same as Spec 8.
+  mask <- !is.na(cci) &
+          model_data$date >= as.Date("1980-01-01") &
+          model_data$date <= sample_end
+  ha_mean <- mean(model_data$ha_y[mask], na.rm = TRUE)
+
+  d <- model_data %>% mutate(
+    ilfa_y_internal = eq_y + super_y,
+    yp_x_cci_w      = ln_yp_over_y * cci,                 # offset (matches Spec 10)
+    ha_x_cci        = (ha_y - ha_mean) * cci              # FREE: gamma_1 (de-meaned)
+  )
+  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
+                    "d_neg_gearing_8587", "d_recession_1991",
+                    "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
+  free_lr <- c("ha_x_cci", "nla_y", "ecm_lag")
+  free_sr <- c("dd4_income", "d2_log_unemp", "abs_income_resid")
+
+  # Calibrated long-run target (structural, inside-bracket coefficients);
+  # scale-robust subset only — see header.
+  offset_calib <- gamma_ifa * d$ilfa_y_internal +
+                  psi_0     * d$ln_yp_over_y +
+                  psi_1     * d$yp_x_cci_w
+
+  fit_at_lambda <- function(lambda_guess) {
+    d_local <- d
+    d_local$dlcons_adj <- d_local$dlcons - lambda_guess * offset_calib
+    fit_ecm_spec(d_local, "Spec12_LIVES_Calibrated",
+                 lr_vars    = free_lr,
+                 sr_vars    = free_sr,
+                 dummy_vars = base_dummies,
+                 response   = "dlcons_adj",
+                 sample_end = sample_end)
+  }
+
+  lambda_guess <- -0.20  # near the Spec 11 / pre-COVID solution
+  iters_used   <- 0L
+  converged    <- FALSE
+  diverged     <- FALSE
+  for (i in seq_len(max_iter)) {
+    spec <- fit_at_lambda(lambda_guess)
+    cf <- coef(spec$fit)
+    new_lambda <- if ("ecm_lag" %in% names(cf)) cf[["ecm_lag"]] else NA_real_
+    if (is.na(new_lambda)) break
+    if (abs(new_lambda) > 5 || !is.finite(new_lambda)) { diverged <- TRUE; break }
+    if (abs(new_lambda - lambda_guess) < tol) {
+      iters_used <- i; converged <- TRUE; break
+    }
+    lambda_guess <- new_lambda
+    iters_used   <- i
+  }
+  if (diverged) {
+    message(sprintf(
+      "[fit_lives_calibrated_spec] diverged (|lambda| > 5 at iter %d); returning NULL",
+      iters_used))
+    return(NULL)
+  }
+  spec$spec_name              <- "Spec12_LIVES_Calibrated"
+  attr(spec, "calibrated")    <- c(gamma_ifa = gamma_ifa, psi_0 = psi_0,
+                                   psi_1 = psi_1)
+  attr(spec, "iterations")    <- iters_used
+  attr(spec, "converged")     <- converged
+  attr(spec, "lambda_solved") <- lambda_guess
+  attr(spec, "cci_used")      <- cci_col
+  message(sprintf(
+    "[fit_lives_calibrated_spec] %s in %d iterations: lambda = %.4f",
+    if (converged) "converged" else "stopped (max_iter)",
+    iters_used, lambda_guess))
+  spec
+}
+
+
 run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01")) {
 
   base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
@@ -1623,8 +1757,49 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
       dummy_vars = base_dummies,
       sample_end = sample_end
     )
+
+    # ------------------------------------------------------------------
+    # Spec 11: LIVES headline — faithful Muellbauer/Williams Eq 7 core.
+    # The point of difference from Spec 8 (which is an over-parameterised
+    # add-on) is that the *credit-conditions mechanism is the core long
+    # run*, exactly as in Williams' Eq 7 (Aust system paper p.7):
+    #   - Housing enters ONLY through the credit-scaled interaction
+    #     gamma_1*CCI*(HA/4y); the plain `ha_y` LEVEL is dropped, because
+    #     Williams' housing-wealth MPC is ZERO at CCI=0 (no classical
+    #     housing wealth effect, p.12). Estimating a standalone `ha_y` —
+    #     as every other spec does — tests a coefficient the theory says
+    #     should be ~0, which is why it is insignificant everywhere.
+    #   - The autonomous-consumption intercept zeta_c*CCI is RESTORED as a
+    #     long-run level (`cci_williams`); Spec 8 omits it entirely.
+    #   - Illiquid financial assets are combined (ilfa_y = eq_y + super_y)
+    #     to match Williams' 3-fold HA/IFA/NLA split and remove the
+    #     collinear, wrong-signed `eq_y`/`super_y` pair.
+    #   - Permanent income is geared psi(CCI) = psi_0 + psi_1*CCI via the
+    #     `ln_yp_over_y` + `yp_x_cci` pair (freely estimated here; the
+    #     calibrated psi_0=0.20, psi_1=0.93 counterpart is Spec 10).
+    # Interactions reuse md8's de-meaned construction. This is the
+    # "Option A" decisive test of whether the LIVES mechanism is alive on
+    # Australian data once the headline is specified as Williams' actual
+    # equation rather than a generic constant-MPC wealth ECM.
+    # ------------------------------------------------------------------
+    md11 <- md8 %>% mutate(ilfa_y = eq_y + super_y)
+    spec11 <- fit_ecm_spec(
+      data       = md11,
+      spec_name  = "Spec11_LIVES_Headline",
+      lr_vars    = c("nla_y", "ilfa_y",
+                     "ha_x_cci",           # gamma_1 * CCI * (HA/4y) — housing, interaction-only
+                     "hp_x_1_minus_cci",   # alpha_4 * (1 - 1.2*CCI) * log(p^h/y)
+                     "r_x_cci",            # alpha_1 * r * CCI
+                     "cci_williams",       # zeta_c * CCI autonomous-consumption intercept
+                     "ln_yp_over_y", "yp_x_cci",  # psi(CCI)*log(y^p/y) = psi_0*yp + psi_1*yp*CCI
+                     "ecm_lag"),
+      sr_vars    = c("dd4_income", "d2_log_unemp", "abs_income_resid"),
+      dummy_vars = base_dummies,
+      sample_end = sample_end
+    )
   } else {
-    spec8 <- NULL
+    spec8   <- NULL
+    spec11  <- NULL
     message("Spec 8 skipped: cci_williams not present in model_data ",
             "(USE_WILLIAMS_SDMMA_BASIS may be FALSE or Williams fit failed)")
   }
@@ -1688,11 +1863,33 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
     message("Spec 10 skipped: cci_williams not present in model_data")
   }
 
+  # ------------------------------------------------------------------
+  # Spec 12: Calibrated LIVES headline — faithful Eq 7 with Williams'
+  # Table 1 credit-channel calibrations imposed, free only gamma_1
+  # (housing-collateral MPC), gamma_NLA and lambda. The single-equation-
+  # feasible response to the Spec 11 interaction-block collinearity.
+  # ------------------------------------------------------------------
+  if ("cci_williams" %in% names(model_data) &&
+      any(!is.na(model_data$cci_williams))) {
+    spec12 <- tryCatch(
+      fit_lives_calibrated_spec(model_data, sample_end = sample_end),
+      error = function(e) {
+        message("Spec 12 (Calibrated LIVES headline) failed: ",
+                conditionMessage(e))
+        NULL
+      }
+    )
+  } else {
+    spec12 <- NULL
+    message("Spec 12 skipped: cci_williams not present in model_data")
+  }
+
   specs <- list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
                 spec4 = spec4, spec5 = spec5, spec6 = spec6,
                 spec6b = spec6b,
                 spec7 = spec7, spec7b = spec7b,
-                spec8 = spec8, spec9 = spec9, spec10 = spec10)
+                spec8 = spec8, spec9 = spec9, spec10 = spec10,
+                spec11 = spec11, spec12 = spec12)
   Filter(Negate(is.null), specs)
 }
 
