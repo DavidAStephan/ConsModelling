@@ -45,7 +45,7 @@ DOCX_PANDOC  = wp_draft_pandoc.docx
 # Typst PDF metadata
 TITLE        = Australian Household Consumption, Wealth and Credit Conditions: An Updated Single-Equation LIVES Estimate
 AUTHOR       = David Stephan
-DATE         = May 2026
+DATE         = June 2026
 
 .PHONY: pdf pdf-quarto docx html docx-pandoc clean help body
 
