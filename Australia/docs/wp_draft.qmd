@@ -5,26 +5,39 @@ title: |
 author:
   - name: David Stephan
 abstract: |
-  We estimate a single-equation Muellbauer--Williams LIVES consumption
-  model for Australia over 1988Q4--2024Q4, extending Williams (2010) and
-  Muellbauer and Williams (2012) by sixteen years of post-GFC data and
-  applying contemporary identification methods. Wealth is disaggregated
-  into housing, illiquid financial (equities plus superannuation), and net
-  liquid assets (deposits net of total household debt), and we adopt the
-  Jord\`a (2005) local-projection permanent-income forecaster used in the
-  Italian implementation of De Bonis, Marino and Muellbauer (2024).
+  We estimate the Muellbauer--Williams LIVES consumption model for
+  Australia over 1988Q3--2024Q4, extending Williams (2010) and Muellbauer
+  and Williams (2012) by sixteen years of post-GFC data. Wealth is
+  disaggregated into housing, illiquid financial (equities plus
+  superannuation) and net liquid assets (deposits net of total household
+  debt), with permanent income from the local-projection forecaster of De
+  Bonis, Liberati, Muellbauer and Rondinelli (2020).
 
-  The preferred specification delivers a speed of adjustment
-  $\lambda = -0.180$ (vs Williams' $-0.286$) and structural long-run
-  coefficients on individual wealth components that are broadly consistent
-  with Williams' Table~1 estimates. Refitting the same specification on a
-  back-extended 1976Q3--2024Q4 sample with a longer-history short-run CCI
-  ("Spec~6b") sharpens the speed of adjustment to $-0.229$ (80 per cent of
-  Williams') while reallocating wealth identification across components.
-  The Williams CCI placebo battery and the LIVES multi-equation companion
-  work both find the residual structural-coefficient gap is bounded by
-  single-equation framing rather than by sample length, knot count, or
-  sign-prior structure.
+  Our central finding is that the *form* of the equation is decisive. A
+  conventional disaggregated error-correction model that enters wealth as
+  constant-marginal-propensity levels is not the LIVES equation: in
+  Williams' framework credit conditions *scale* the housing-wealth effect,
+  which is zero when credit is tight. Specifying the equation faithfully
+  --- housing wealth entering only through its credit-conditions
+  interaction, the autonomous-consumption intercept restored, and illiquid
+  financial assets combined --- yields a strongly identified
+  error-correction structure: a pre-COVID speed of adjustment
+  $\lambda = -0.245$ ($t = -4.8$), close to Williams' $-0.286$, with
+  significant, correctly signed marginal propensities on net liquid and
+  illiquid financial wealth, against an insignificant $\lambda = -0.18$
+  for the constant-MPC specification.
+
+  The LIVES *structure* transfers to Australia, but Williams' Australian
+  *calibrations* do not: imposing his calibrated permanent-income gearing
+  collapses the error-correction to $\lambda \approx 0$. The
+  credit-conditions interactions are only weakly identified on a single
+  equation because each is near-collinear with the latent index, so
+  sharpening them requires the four-equation FIML system or a pre-1988
+  back-extension. A CCI placebo battery, a two-equation SUR with near-zero
+  residual correlation, and out-of-sample forecasts that do not beat a
+  random walk are reported throughout as honest constraints on the
+  single-equation approach.
+
 keywords:
   - household consumption
   - wealth effects

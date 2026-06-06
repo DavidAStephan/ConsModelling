@@ -4586,9 +4586,9 @@ back-extended programme as the way forward.
   between consumers' expenditure and income in the United Kingdom.
   *Economic Journal*, 88(352), 661–692.
 - Deaton, A. (1992). *Understanding Consumption*. Oxford: Clarendon Press.
-- De Bonis, R., Liberati, D., Muellbauer, J., & Rondinelli, C. (2020). Consumption, wealth
-  and credit conditions in Italy: a Muellbauer-style error-correction
-  model. *Banca d'Italia Temi di Discussione (Working Paper) No. 1304*. (Cited throughout as the
+- De Bonis, R., Liberati, D., Muellbauer, J., & Rondinelli, C. (2020). Consumption and wealth: new
+  evidence from Italy. *Banca d'Italia Temi di Discussione (Working Paper)
+  No. 1304* (November 2020). (Cited throughout as the
   Italian implementation / companion single-equation study.)
 - Doornik, J. A. (2009). Autometrics. In J. L. Castle & N. Shephard
   (eds.), *The methodology and practice of econometrics: a festschrift
@@ -4726,7 +4726,7 @@ Rather than retype the full coefficient matrix, Table B.1 reports the two
 specifications that carry the paper's central message — the faithful LIVES
 headline (Spec 11) and the Williams-calibration-imposed specification
 (Spec 12) — across both samples. The remaining specifications are tabulated
-in §6 (the specification ladder) and §7 (results), and in full in the
+in §6 (the specification ladder) and §7 (results), and in full in Tables B.2–B.3 below and the
 committed CSVs.
 
 **Table B.1 — Faithful LIVES (Spec 11) vs Williams-calibration-imposed
@@ -4760,6 +4760,46 @@ value is inflated by the COVID quarters and fails the $|\lambda|$
 upper-bound screen. The headline numbers depend on the full-sample
 (look-ahead) permanent-income measure; see §7.4 and the real-time
 robustness column.
+
+**Table B.2 — Speed of adjustment $\lambda$ (the `ecm_lag` coefficient) across all fourteen specifications, full and pre-COVID samples (Newey–West HAC).** Source: `australia_all_results.csv`. *** sig 1%, ** sig 5%, * sig 10%.
+
+| Specification | $\lambda$ full ($n=146$) | $\lambda$ pre-COVID ($n=126$) |
+|---|---|---|
+| Spec 1 | −0.177 (t=−2.34)** | −0.100 (t=−1.71)* |
+| Spec 2 | −0.193 (t=−1.93)* | −0.085 (t=−0.84) |
+| Spec 3 | −0.166 (t=−2.23)** | −0.101 (t=−1.70)* |
+| Spec 4 | −0.140 (t=−2.05)** | −0.107 (t=−1.79)* |
+| Spec 5 | −0.177 (t=−1.56) | −0.097 (t=−1.01) |
+| Spec 6 | −0.180 (t=−1.76)* | −0.123 (t=−1.09) |
+| Spec 6b | −0.229 (t=−4.18)*** | −0.240 (t=−4.75)*** |
+| Spec 7 | −0.373 (t=−2.78)*** | −0.052 (t=−0.40) |
+| Spec 7b | −0.375 (t=−2.40)** | −0.061 (t=−0.94) |
+| Spec 8 | −0.445 (t=−3.30)*** | −0.247 (t=−5.03)*** |
+| Spec 9 | −0.199 (t=−3.30)*** | −0.172 (t=−3.32)*** |
+| Spec 10 | −0.048 (t=−0.76) | −0.027 (t=−0.62) |
+| Spec 11 | −0.480 (t=−3.59)*** | −0.245 (t=−4.80)*** |
+| Spec 12 | −0.029 (t=−0.68) | +0.030 (t=+1.49) |
+
+**Table B.3 — Long-run coefficient matrix for the disaggregated specifications (full sample): OLS estimate ($t$-statistic).** Source: `australia_all_results.csv`. "—" = term not in that specification; the implied structural parameter is $\gamma=\mathrm{OLS}/|\lambda|$ (Table B.2). *** sig 1%, ** sig 5%, * sig 10%.
+
+| Term | Spec 4 | Spec 5 | Spec 6 | Spec 8 | Spec 11 |
+|---|---|---|---|---|---|
+| `nla_y` | +0.0049 (+0.52) | +0.0084 (+0.22) | +0.0354 (+0.96) | +0.0435 (+3.74)*** | +0.0370 (+3.39)*** |
+| `eq_y` | −0.0168 (−1.10) | −0.0268 (−0.51) | −0.0063 (−0.13) | +0.0097 (+0.69) | — |
+| `super_y` | +0.0057 (+0.85) | +0.0045 (+0.48) | +0.0117 (+1.48) | +0.0139 (+2.15)** | — |
+| `ilfa_y` | — | — | — | — | +0.0178 (+3.03)*** |
+| `ha_y` | +0.0095 (+2.46)** | +0.0067 (+1.18) | +0.0088 (+1.52) | +0.0097 (+2.49)** | — |
+| `ha_x_cci` | — | — | — | +0.0016 (+0.32) | +0.0049 (+1.03) |
+| `ln_hp_over_y` | −0.0101 (−1.40) | −0.0024 (−0.11) | −0.0170 (−0.85) | — | — |
+| `hp_x_1_minus_cci` | — | — | — | +0.0076 (+1.00) | +0.0142 (+2.69)*** |
+| `real_rate` | −0.0004 (−0.62) | −0.0009 (−0.67) | −0.0002 (−0.17) | — | — |
+| `r_x_cci` | — | — | — | +0.0019 (+1.85)* | +0.0027 (+3.57)*** |
+| `cci_williams` | — | — | — | — | +0.0046 (+0.47) |
+| `ln_yp_over_y` | +0.1509 (+1.71)* | +0.2484 (+0.80) | +0.1999 (+0.76) | +0.4677 (+3.44)*** | +0.5043 (+4.00)*** |
+| `ln_yp_over_y_post2008` | — | — | +0.2360 (+1.16) | — | — |
+| `yp_x_cci` | — | — | — | −0.6113 (−2.12)** | −0.5897 (−1.58) |
+| `ecm_lag` | −0.1404 (−2.05)** | −0.1770 (−1.56) | −0.1801 (−1.76)* | −0.4449 (−3.30)*** | −0.4801 (−3.59)*** |
+
 
 The contrast between the two columns is the structure-transfers-but-
 calibrations-do-not result: imposing Williams' Australian calibrations
