@@ -73,7 +73,6 @@ model_data <- compute_income_volatility(model_data)
 model_data <- construct_permanent_income_italy(model_data)
 model_data <- model_data %>%
   mutate(ecm_lag = lag(lcons, 1L) - lincome,
-         ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)),
          ln_networth_y_official = ln_networth_y,
          ln_networth_y          = ln_networth_y_proxy)
 

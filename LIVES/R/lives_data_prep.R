@@ -56,9 +56,11 @@ fit_consumption_with_williams_cci <- helpers_env$fit_consumption_with_williams_c
 model_data <- add_model_variables(model_data)
 model_data <- compute_income_volatility(model_data)
 model_data <- construct_permanent_income_italy(model_data)
+# ln_hp_over_y comes from the master dataset (nominal hp / nominal income pc
+# = real/real); a previous local re-derivation used a deflator-contaminated
+# formula and is deliberately removed.
 model_data <- model_data %>%
-  mutate(ecm_lag      = lag(lcons, 1L) - lincome,
-         ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+  mutate(ecm_lag = lag(lcons, 1L) - lincome)
 
 # ----------------------------------------------------------------------------
 # Williams maximal-GETS CCI: fit consumption block first to get cci_williams

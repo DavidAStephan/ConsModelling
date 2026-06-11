@@ -670,9 +670,22 @@ fin_equities_q   <- pick_abs_bs("shares and other equity") %>% rename(fin_equiti
 fin_super_q      <- pick_abs_bs("superannuation") %>% rename(fin_super = value)
 fin_other_fin_q  <- pick_abs_bs("other financial assets|other accounts receivable") %>%
   rename(fin_other = value)
-# Liabilities
-fin_loans_q      <- pick_abs_bs("liabilities.*loans|loans and placements") %>%
-  rename(fin_loans = value)
+# Liabilities. Pinned to A83722644R ("Liabilities - Loans and placements"):
+# the name regex also matches the ASSET-side series A83722665A ("Financial
+# assets - Loans and placements"), and the previous regex selection rested on
+# a count() tie-break. Falls back to the regex if the pinned ID disappears
+# from a future ABS vintage.
+fin_loans_pinned <- hh_bs_raw %>%
+  filter(series_id == "A83722644R") %>%
+  mutate(date = abs_to_qstart(date)) %>%
+  arrange(date) %>% distinct(date, .keep_all = TRUE)
+fin_loans_q <- if (nrow(fin_loans_pinned) > 0L) {
+  rescale_abs(fin_loans_pinned) %>% rename(fin_loans = value)
+} else {
+  warning("Pinned household-liabilities series A83722644R not found; ",
+          "falling back to name-pattern selection")
+  pick_abs_bs("^liabilities.*loans") %>% rename(fin_loans = value)
+}
 # Non-financial: residential land & dwellings
 housing_wealth_q <- pick_abs_bs("residential land and dwellings") %>%
   rename(housing_wealth = value)
@@ -1420,8 +1433,12 @@ master <- master %>%
     ln_hpi          = log(hpi),
     # log(y/c): ECM adjustment speed target
     ln_y_over_c     = ln_ydi_real_pc - ln_cons_real_pc,
-    # log(HP / y): house price relative to income
-    ln_hp_over_y    = log(hpi / (ydi_ann_nom / pop_millions / (cons_deflator_norm/100))),
+    # log(HP / y): house price relative to income per capita. Both sides
+    # nominal so the deflator cancels exactly: real hp / real income pc
+    # = (hpi/defl) / (ydi_ann_nom/pop/defl) = hpi * pop_millions / ydi_ann_nom.
+    # (A previous version divided the NOMINAL hpi by REAL income, leaving the
+    # price level in the ratio — corr 0.98 with the deflator. Fixed 2026-06.)
+    ln_hp_over_y    = log(hpi * pop_millions / ydi_ann_nom),
     ln_networth_y   = log(pmax(networth_y, 1e-6)),
     # First differences
     d_ln_cons_pc    = c(NA_real_, diff(ln_cons_real_pc)),
@@ -1435,10 +1452,11 @@ master <- master %>%
     real_rate    = mortgage_rate - hicp_4q_ann
   )
 
-# Labour-force participation share. Both labour_force and the pop_millions
-# column are reported here in thousands of persons (the column name predates
-# the unit clarification), so lf_share is the dimensionless ratio. Used by
-# the Italy-style PI predictor when that path is enabled in estimation.
+# Labour-force participation ratio. labour_force is in THOUSANDS of persons
+# while pop_millions is in MILLIONS, so lf_share ≈ 1000 × the participation
+# rate (~600–670 over the sample). The 1000× scale is harmless in its only
+# use — log(lf_share) as an Italy-style PI predictor, where it shifts the
+# regression intercept — but do NOT treat lf_share as a [0,1] share.
 master <- master %>%
   mutate(lf_share = labour_force / pop_millions)
 lf_obs <- master$lf_share[!is.na(master$lf_share)]

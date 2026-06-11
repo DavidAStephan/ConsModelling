@@ -1,0 +1,5 @@
+"specification","diagnostic","df1","df2","statistic","p-value"
+"Spec3_LevelNetWorth","Weak instruments (ln_yp_over_y)",6,128,73.5586127542125,0.00000000000000000000000000000000000000427750216522134
+"Spec3_LevelNetWorth","Weak instruments (ecm_lag)",6,128,28.9374120542378,0.00000000000000000000108928677917384
+"Spec3_LevelNetWorth","Wu-Hausman",2,130,2.39672619660303,0.09502680056137
+"Spec3_LevelNetWorth","Sargan",4,NA,8.54090620440176,0.0736569507062496

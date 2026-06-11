@@ -1,8 +1,8 @@
 metric,value
-Sectional canonical adj R^2,0.6807
-Sectional canonical |lambda|,-0.2077
-Sectional adj R^2 percentile rank,36th
-Sectional |lambda| percentile rank,40th
+Sectional canonical adj R^2,0.6805
+Sectional canonical |lambda|,-0.2244
+Sectional adj R^2 percentile rank,37th
+Sectional |lambda| percentile rank,60th
 Maximal-GETS adj R^2 percentile (prior result),64th
 Maximal-GETS |lambda| percentile (prior result),36th
 Literal 4-knot adj R^2 percentile (prior result),19th

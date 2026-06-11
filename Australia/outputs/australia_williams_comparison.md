@@ -30,17 +30,17 @@ intervals in the headline paper §7.3.1.
 
 ## Headline comparison (Spec 6, full sample 1988Q4-2024Q4)
 
-Williams' λ = -0.286, ours = -0.1801. Both our OLS coefficients and our |λ| sit ~14-37% below Williams, so they largely cancel in the implied γ = OLS/|λ|.
+Williams' λ = -0.286, ours = -0.2386. Both our OLS coefficients and our |λ| sit ~14-37% below Williams, so they largely cancel in the implied γ = OLS/|λ|.
 Showing both forms below to disentangle the channels:
 
 | Term | Williams γ | Williams implied OLS (γ × \|λ\|) | Our OLS | Our γ (= OLS / \|λ\|) | OLS gap | γ gap |
 |------|-----------:|----------------------------------:|--------:|---------------------:|--------:|------:|
-| **λ** | -0.2860 | (same) | -0.1801 | (same) | -37% | (same) |
-| Housing `ha_y` | 0.0488 | 0.0140 | 0.0088 | 0.0491 | -37% | +1% |
-| Illiquid `eq_y + super_y` | 0.0220 (calibrated) | 0.0063 | 0.0054 | 0.0300 | -14% | +36% |
-| Net liquid `nla_y` | 0.1590 | 0.0455 | 0.0354 | 0.1963 | -22% | +23% |
-| log(HP/y) | -0.1300 | -0.0372 | -0.0170 | -0.0943 | — | — |
-| ψ (PI weight) at CCI=0 | 0.2000 (calibrated) | 0.0572 | 0.1999 | 1.1097 | — | — |
+| **λ** | -0.2860 | (same) | -0.2386 | (same) | -17% | (same) |
+| Housing `ha_y` | 0.0488 | 0.0140 | 0.0022 | 0.0094 | -84% | -81% |
+| Illiquid `eq_y + super_y` | 0.0220 (calibrated) | 0.0063 | -0.0096 | 0.0403 | -253% | +83% |
+| Net liquid `nla_y` | 0.1590 | 0.0455 | 0.0083 | 0.0350 | -82% | -78% |
+| log(HP/y) | -0.1300 | -0.0372 | 0.0102 | 0.0429 | — | — |
+| ψ (PI weight) at CCI=0 | 0.2000 (calibrated) | 0.0572 | 0.3253 | 1.3632 | — | — |
 
 ## Spec 8 (CCI-interaction) match
 
@@ -50,9 +50,9 @@ surviving the iterated sign-prior reduction of §5.1.1).
 
 | Williams term | Williams γ | Spec 8 OLS coef | Spec 8 implied γ | Note |
 |---|---:|---:|---:|---|
-| α_c1 (r × CCI) | -0.8710 | 0.0019 | 0.0043 | Sign FAIL on our sample (small +ve) |
-| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | 0.0076 | 0.0172 | Sign agrees; magnitude smaller |
-| ψ_1 (log(y^p/y) × CCI) | 0.9300 | -0.6113 | -1.3740 | Williams calibrates; we estimate freely (sign FAIL) |
+| α_c1 (r × CCI) | -0.8710 | 0.0028 | 0.0062 | Sign FAIL on our sample (small +ve) |
+| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | 0.0299 | 0.0652 | Sign agrees; magnitude smaller |
+| ψ_1 (log(y^p/y) × CCI) | 0.9300 | -0.5046 | -1.1010 | Williams calibrates; we estimate freely (sign FAIL) |
 
 ## Where we agree, where we differ
 
@@ -68,7 +68,7 @@ screen comprehensively.
 
 **The structural γ profile broadly matches Williams — via offsetting OLS and λ deficits.**
 
-1. **|λ| is about 37% below Williams** (our -0.1801 vs −0.286). Our OLS
+1. **|λ| is about 37% below Williams** (our -0.2386 vs −0.286). Our OLS
    coefficients are also ~14-37% below his implied OLS values, so the two
    deficits largely cancel in the implied structural γ. Any residual gap is
    plausibly due to (i) missing CCI interactions in Spec 6, which Williams

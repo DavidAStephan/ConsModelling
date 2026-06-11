@@ -700,47 +700,46 @@ enters with a credit-conditions-dependent gearing, ψ(CCI) = ψ_0 +
 ψ_1 = 0.93); §4 and §7 take up whether that calibration transfers to
 Australia.
 
-Two recent methodological developments have improved on the AR(p)
-recipe. Jordà (2005), originally proposed for impulse-response
-identification, estimates the discounted weighted average of income over
-the relevant horizon directly as the dependent variable in a single
-regression, with predictors observable at time *t*. The local-projection
-approach sidesteps the compounding of AR misspecification across forecast
-horizons to which the standard recipe is vulnerable, and admits a
-richer predictor set than is feasible in a parsimonious AR(p).
-Carroll, Slacalek and Tokuoka (2014), in ECB Working Paper 1648,
-document substantial differences between the permanent-income series
-implied by AR(p) forecasting and by direct local-projection
-forecasting in the consumer-expenditure context. The differences are
-concentrated at structural-break episodes, where AR(p) forecasts
-inherit the slow adjustment of the estimated AR coefficients while
-local projections can incorporate predictors capturing the regime
-change.
+An alternative to the AR(p) recipe is to forecast the discounted
+aggregate *directly*: compute, for each quarter whose forecast horizon
+is observable, the discounted weighted average of realised future log
+income, and regress that pre-aggregated target on predictors observable
+at time *t* in a single equation. This *direct forecast* of the
+horizon-aggregate — the method of De Bonis, Liberati, Muellbauer and
+Rondinelli (2020, Appendix A.2), and related in spirit to (though
+distinct from) Jordà's (2005) direct multi-horizon projections, which
+fit one regression per horizon — sidesteps the compounding of AR
+misspecification across forecast horizons to which the standard recipe
+is vulnerable, and admits a richer predictor set than is feasible in a
+parsimonious AR(p). (An earlier draft of this paper labelled the method
+a "Jordà local projection"; we retain the De Bonis et al. attribution
+throughout, since the implementation is a single full-sample regression
+of the pre-aggregated discounted target, not a per-horizon projection.)
 
-De Bonis et al. (2020) explicitly adopt the Jordà local-projection
-approach for their Italian permanent-income series, reporting that the
+De Bonis et al. (2020) adopt this direct-forecast approach for their
+Italian permanent-income series, reporting that the
 choice "captures much of the slow-down of permanent income growth in
 the early 1990s" — a structural feature of Italian growth that the
-AR-based forecaster missed. The Italian local projection includes a
-`log(labour_force / population)` predictor, which slowly trends with
+AR-based forecaster missed. The Italian forecasting regression includes
+a `log(labour_force / population)` predictor, which slowly trends with
 demographic change and is a natural input to long-horizon income
 forecasting. We adopt the same predictor in our Italy-style
 permanent-income helper, with a discounted (η = 0.05, k = 40 quarters)
 weighted average of expected future income (§3, §4), and find a
 quantitatively similar role: the permanent-income series implied by
-local projection in Australia diverges materially from the AR-based
+the direct forecast in Australia diverges materially from the AR-based
 series in the early 1990s and after the 2008 GFC. Substantively, the
-implied long-run coefficient on log(y^p/y) moves from significantly
-negative under the AR forecaster — the "Australian permanent-income
-puzzle" — to positive under the full-sample local-projection *measure*.
+implied long-run coefficient on log(y^p/y) moves from slightly negative
+and economically negligible under the AR forecaster — the "Australian
+permanent-income puzzle" — to positive under the full-sample
+direct-forecast *measure*.
 As §8 documents, this reversal reflects the measure's full-sample
 (non-causal, look-ahead) construction and does not survive a causal
 real-time projection, which sharply shrinks the speed of adjustment
-(real-time AR λ = −0.051, ns; real-time Italy λ = −0.118 against the
-full-sample −0.197; pi_realtime_robustness.csv). The look-ahead versus
-real-time distinction is therefore flagged as a measurement caveat
-throughout: the full-sample permanent-income measure is the headline
-input, with the real-time variant reported as the operational
+(see §7.4 and australia_pi_realtime_robustness.csv). The look-ahead
+versus real-time distinction is therefore flagged as a measurement
+caveat throughout: the full-sample permanent-income measure is the
+headline input, with the real-time variant reported as the operational
 robustness column.
 
 ### 2.6 Where this paper sits

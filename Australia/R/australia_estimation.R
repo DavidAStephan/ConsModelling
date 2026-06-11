@@ -111,7 +111,8 @@ format_yq <- function(d) {
 # min_train = 40 (paper standard; feasible since income runs from 1959).
 # ==============================================================================
 
-construct_permanent_income <- function(model_data, k = 40L, delta = 0.95) {
+construct_permanent_income <- function(model_data, k = 40L, delta = 0.95,
+                                       gfc_ogive = TRUE) {
 
   delta_q      <- delta^(1 / 4)
   disc_weights <- delta_q^(seq_len(k) - 1L)
@@ -235,14 +236,16 @@ construct_permanent_income <- function(model_data, k = 40L, delta = 0.95) {
 
   dat$ln_yp_over_y <- ln_yp_over_y
 
-  # GFC learning adjustment (same ogive as Italy)
+  # GFC learning adjustment (same ogive as Italy). Toggleable via gfc_ogive so
+  # the sensitivity grid can test a genuinely ogive-free variant (previously
+  # the gfc=FALSE grid cells were a no-op).
   gfc_start  <- as.Date("2008-07-01")
   adj_end    <- as.Date("2012-04-01")
   n_adj_qtrs <- 15L
 
   dat <- dat %>%
     mutate(
-      learning_weight = case_when(
+      learning_weight = if (gfc_ogive) case_when(
         date < gfc_start ~ 1.0,
         date >= adj_end  ~ 0.5,
         TRUE ~ {
@@ -251,7 +254,7 @@ construct_permanent_income <- function(model_data, k = 40L, delta = 0.95) {
           )
           1.0 - 0.5 * (pmin(q_since, n_adj_qtrs) / n_adj_qtrs)
         }
-      ),
+      ) else 1.0,
       ln_yp_over_y          = ln_yp_over_y * learning_weight,
       ln_yp_over_y_post2008 = ln_yp_over_y * step2008
     ) %>%
@@ -461,9 +464,11 @@ compare_pi_methods <- function(model_data, preferred_spec_template,
     select(-any_of(c("ln_yp_over_y", "ln_yp_over_y_post2008")))
 
   refit_under <- function(method_name, pi_dat) {
+    # ln_hp_over_y comes from the master dataset; do NOT re-derive it here
+    # (a previous local re-derivation used a different, deflator-contaminated
+    # formula, so this block was estimated on a different regressor).
     pi_dat <- pi_dat %>%
-      mutate(ecm_lag      = lag(lcons, 1L) - lincome,
-             ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+      mutate(ecm_lag = lag(lcons, 1L) - lincome)
     sp <- tryCatch(
       fit_ecm_spec(
         data       = pi_dat,
@@ -563,7 +568,8 @@ run_pi_sensitivity <- function(model_data, preferred_spec_template,
   for (i in seq_len(nrow(grid))) {
     cfg <- grid[i, ]
     pi_dat <- tryCatch(
-      construct_permanent_income(base_data, k = cfg$k, delta = cfg$delta),
+      construct_permanent_income(base_data, k = cfg$k, delta = cfg$delta,
+                                 gfc_ogive = cfg$gfc),
       error = function(e) NULL
     )
     if (is.null(pi_dat)) {
@@ -577,21 +583,8 @@ run_pi_sensitivity <- function(model_data, preferred_spec_template,
       )
       next
     }
-    if (!cfg$gfc) {
-      # Undo learning-weight ogive: recompute raw ln_yp_over_y. Easiest: re-call
-      # construct without ogive — but the function bakes the ogive in. Skip:
-      # we set learning weight = 1 by re-multiplying.
-      pi_dat <- pi_dat %>%
-        mutate(
-          # recover raw ln_yp_over_y by undoing the ogive (multiplicative)
-          # learning_weight is not retained; approximate by leaving as-is and
-          # also dropping the post2008 interaction term used in spec 6.
-          ln_yp_over_y_post2008 = 0
-        )
-    }
     pi_dat <- pi_dat %>%
-      mutate(ecm_lag = lag(lcons, 1L) - lincome,
-             ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+      mutate(ecm_lag = lag(lcons, 1L) - lincome)
 
     # Refit the preferred spec template
     sp <- tryCatch(
@@ -645,8 +638,7 @@ run_pi_sensitivity <- function(model_data, preferred_spec_template,
         hp_dat$ln_yp_over_y[valid] <- trend - li_v
         hp_dat$ln_yp_over_y_post2008 <- 0
         hp_dat <- hp_dat %>%
-          mutate(ecm_lag = lag(lcons, 1L) - lincome,
-                 ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+          mutate(ecm_lag = lag(lcons, 1L) - lincome)
         sp <- tryCatch(
           fit_ecm_spec(
             data       = hp_dat,
@@ -733,11 +725,49 @@ model_diagnostics <- function(fit, data, break_date = "2008-07-01") {
                        error = function(e) NA_real_)
   ar4_pval <- tryCatch(lmtest::bgtest(fit, order = 4L)$p.value,
                        error = function(e) NA_real_)
+  # Chow stability test at break_date. strucchange::sctest fails (returns NA)
+  # whenever a subsample design matrix is singular — e.g. COVID dummies that
+  # are all-zero pre-2008 — which previously made 12 of 14 specs "fail" the
+  # selector's stability screen by incomputability rather than by evidence.
+  # Fallback: a manual Chow F-test on the coefficients estimable in BOTH
+  # subsamples (columns with within-subsample variance), labelled as such.
+  chow_method <- NA_character_
+  bp_idx <- sum(data$date <= as.Date(break_date), na.rm = TRUE)
   chow_pval <- tryCatch({
-    bp_idx <- sum(data$date <= as.Date(break_date), na.rm = TRUE)
     if (bp_idx < 5L || bp_idx > (n - 5L)) NA_real_
-    else as.numeric(strucchange::sctest(fit, type = "Chow", point = bp_idx)$p.value)
+    else {
+      chow_method <- "sctest"
+      as.numeric(strucchange::sctest(fit, type = "Chow", point = bp_idx)$p.value)
+    }
   }, error = function(e) NA_real_)
+  if (is.na(chow_pval) && bp_idx >= 5L && bp_idx <= (n - 5L)) {
+    chow_pval <- tryCatch({
+      X <- model.matrix(fit)
+      y <- model.response(model.frame(fit))
+      pre  <- seq_len(bp_idx)
+      post <- (bp_idx + 1L):n
+      # keep columns with variation in BOTH subsamples (intercept always kept)
+      keep <- vapply(seq_len(ncol(X)), function(j) {
+        colnames(X)[j] == "(Intercept)" ||
+          (stats::sd(X[pre, j]) > 0 && stats::sd(X[post, j]) > 0)
+      }, logical(1L))
+      Xk <- X[, keep, drop = FALSE]
+      k  <- ncol(Xk)
+      if (bp_idx <= k + 1L || (n - bp_idx) <= k + 1L) NA_real_
+      else {
+        ssr_pool <- sum(stats::lsfit(Xk, y, intercept = FALSE)$residuals^2)
+        ssr_pre  <- sum(stats::lsfit(Xk[pre, , drop = FALSE],  y[pre],
+                                     intercept = FALSE)$residuals^2)
+        ssr_post <- sum(stats::lsfit(Xk[post, , drop = FALSE], y[post],
+                                     intercept = FALSE)$residuals^2)
+        f_stat <- ((ssr_pool - ssr_pre - ssr_post) / k) /
+                  ((ssr_pre + ssr_post) / (n - 2L * k))
+        chow_method <- "manual_common_coef"
+        stats::pf(f_stat, k, n - 2L * k, lower.tail = FALSE)
+      }
+    }, error = function(e) NA_real_)
+  }
+  if (is.na(chow_pval)) chow_method <- NA_character_
   reset_pval <- tryCatch(
     lmtest::resettest(fit, power = 2L, type = "fitted")$p.value,
     error = function(e) NA_real_
@@ -773,7 +803,7 @@ model_diagnostics <- function(fit, data, break_date = "2008-07-01") {
     lm_het_pval_no_events = het_pval_no_events,
     het_diagnosis = het_diagnosis,
     ar1_pval = ar1_pval,
-    ar4_pval = ar4_pval, chow_pval = chow_pval,
+    ar4_pval = ar4_pval, chow_pval = chow_pval, chow_method = chow_method,
     reset_pval = reset_pval, schwarz = BIC(fit), loglik = as.numeric(logLik(fit))
   )
 }
@@ -1145,9 +1175,25 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
     # long-run regressors). Drives the Engle–Granger MacKinnon critical value
     # below — a residual-based test, NOT a univariate Dickey–Fuller test.
     n_lr_vars <- length(lr_no_ecm) + 1L
-    # Some specs (e.g. Spec 8) build interaction columns inside their own
-    # data scope rather than on model_data; skip cointegration if any
-    # required regressor is missing from model_data.
+    # Specs 10/12 impose part of the long run through a calibrated OFFSET;
+    # their free lr_vars are not their long-run relation, so a static EG
+    # regression on those columns would test the wrong object. Skip with an
+    # explicit note rather than silently.
+    if (sp_name %in% c("spec10", "spec12")) {
+      rows[[sp_name]] <- tibble::tibble(
+        specification = sp$spec_name,
+        period = NA_character_, n_obs = NA_integer_, coint_n_vars = n_lr_vars,
+        coint_adf_stat = NA_real_, coint_adf_5pct_cv = NA_real_,
+        coint_adf_pass = NA, po_stat = NA_real_, po_pass = NA,
+        johansen_r1_pass = NA,
+        note = "calibrated-offset long run; static EG regression not applicable"
+      )
+      next
+    }
+    # Skip cointegration if any required regressor is missing from
+    # model_data. (The Spec 8/11 interaction columns are now attached to the
+    # global model_data at Step 4a-ii, so the headline spec IS screened; a
+    # previous version skipped Spec 11 here as an implementation accident.)
     missing <- setdiff(req, names(model_data))
     if (length(missing) > 0L) {
       message(sprintf("[run_cointegration_battery] %s: skipping (missing %s)",
@@ -1157,7 +1203,8 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
         period = NA_character_, n_obs = NA_integer_, coint_n_vars = n_lr_vars,
         coint_adf_stat = NA_real_, coint_adf_5pct_cv = NA_real_,
         coint_adf_pass = NA, po_stat = NA_real_, po_pass = NA,
-        johansen_r1_pass = NA
+        johansen_r1_pass = NA,
+        note = sprintf("skipped: missing %s", paste(missing, collapse = ", "))
       )
       next
     }
@@ -1174,7 +1221,8 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
         n_obs = n, coint_n_vars = n_lr_vars,
         coint_adf_stat = NA_real_, coint_adf_5pct_cv = NA_real_,
         coint_adf_pass = NA, po_stat = NA_real_, po_pass = NA,
-        johansen_r1_pass = NA
+        johansen_r1_pass = NA,
+        note = "skipped: fewer than 30 complete observations"
       )
       next
     }
@@ -1250,7 +1298,8 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
       coint_adf_pass    = adf_pass,
       po_stat           = po_stat,
       po_pass           = po_pass,
-      johansen_r1_pass  = johansen_pass
+      johansen_r1_pass  = johansen_pass,
+      note              = ""
     )
   }
 
@@ -1317,7 +1366,8 @@ fit_williams_prior_spec <- function(model_data,
                                      varpi     = 1.2,
                                      cci_col   = "cci_williams",
                                      max_iter  = 50L,
-                                     tol       = 1e-6) {
+                                     tol       = 1e-6,
+                                     dummy_vars = NULL) {
   if (!cci_col %in% names(model_data) || all(is.na(model_data[[cci_col]]))) {
     return(NULL)
   }
@@ -1329,9 +1379,10 @@ fit_williams_prior_spec <- function(model_data,
     r_x_cci_w          = real_rate    * cci,
     yp_x_cci_w         = ln_yp_over_y * cci
   )
-  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
-                    "d_neg_gearing_8587", "d_recession_1991",
-                    "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
+  base_dummies <- if (!is.null(dummy_vars)) dummy_vars else
+    c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
+      "d_neg_gearing_8587", "d_recession_1991",
+      "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
   free_lr <- c("ha_y", "nla_y", "hp_x_1_minus_cci_w", "r_x_cci_w", "ecm_lag")
   free_sr <- c("d2_logcci_lag2", "dd4_income", "d2_log_unemp", "abs_income_resid")
 
@@ -1452,7 +1503,8 @@ fit_lives_calibrated_spec <- function(model_data,
                                       psi_1     = 0.93,
                                       cci_col   = "cci_williams",
                                       max_iter  = 50L,
-                                      tol       = 1e-6) {
+                                      tol       = 1e-6,
+                                      dummy_vars = NULL) {
   if (!cci_col %in% names(model_data) || all(is.na(model_data[[cci_col]]))) {
     return(NULL)
   }
@@ -1469,9 +1521,10 @@ fit_lives_calibrated_spec <- function(model_data,
     yp_x_cci_w      = ln_yp_over_y * cci,                 # offset (matches Spec 10)
     ha_x_cci        = (ha_y - ha_mean) * cci              # FREE: gamma_1 (de-meaned)
   )
-  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
-                    "d_neg_gearing_8587", "d_recession_1991",
-                    "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
+  base_dummies <- if (!is.null(dummy_vars)) dummy_vars else
+    c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
+      "d_neg_gearing_8587", "d_recession_1991",
+      "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
   free_lr <- c("ha_x_cci", "nla_y", "ecm_lag")
   free_sr <- c("dd4_income", "d2_log_unemp", "abs_income_resid")
 
@@ -1529,11 +1582,17 @@ fit_lives_calibrated_spec <- function(model_data,
 }
 
 
-run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01")) {
+run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"),
+                                   dummy_vars = NULL) {
 
-  base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
-                    "d_neg_gearing_8587", "d_recession_1991",
-                    "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
+  # dummy_vars override lets the COVID-rich variant run ALL fourteen specs
+  # with quarterly 2020-21 dummies (a previous run_all_specifications_with_dummies
+  # duplicate covered only Specs 1-6, so the WP's "sign-stable across all four
+  # sample variants" claim had no committed evidence for Specs 7-12).
+  base_dummies <- if (!is.null(dummy_vars)) dummy_vars else
+    c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
+      "d_neg_gearing_8587", "d_recession_1991",
+      "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
 
   # ------------------------------------------------------------------
   # Spec 1: Log net worth (conventional baseline)
@@ -1814,16 +1873,30 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   # ------------------------------------------------------------------
   if ("cci_kalman" %in% names(model_data) &&
       any(!is.na(model_data$cci_kalman))) {
+    # Mirror Spec 8's construction exactly — de-meaned interactions including
+    # the housing-collateral channel — so the Spec 8 vs Spec 9 comparison
+    # isolates the CCI *series* (spline vs Kalman). A previous version used
+    # un-de-meaned interactions and omitted ha_x_cci_k, so the two specs
+    # differed in structure as well as in CCI measure.
+    spec9_mask <- !is.na(model_data$cci_kalman) &
+                  model_data$date >= as.Date("1980-01-01") &
+                  model_data$date <= sample_end
+    ha_mean_k <- mean(model_data$ha_y[spec9_mask],         na.rm = TRUE)
+    hp_mean_k <- mean(model_data$ln_hp_over_y[spec9_mask], na.rm = TRUE)
+    r_mean_k  <- mean(model_data$real_rate[spec9_mask],    na.rm = TRUE)
+    yp_mean_k <- mean(model_data$ln_yp_over_y[spec9_mask], na.rm = TRUE)
     md9 <- model_data %>%
       mutate(
-        r_x_cci_k          = real_rate * cci_kalman,
-        hp_x_1_minus_cci_k = ln_hp_over_y * (1 - 1.2 * cci_kalman),
-        yp_x_cci_k         = ln_yp_over_y * cci_kalman
+        r_x_cci_k          = (real_rate    - r_mean_k)  * cci_kalman,
+        hp_x_1_minus_cci_k = (ln_hp_over_y - hp_mean_k) * (1 - 1.2 * cci_kalman),
+        yp_x_cci_k         = (ln_yp_over_y - yp_mean_k) * cci_kalman,
+        ha_x_cci_k         = (ha_y         - ha_mean_k) * cci_kalman
       )
     spec9 <- fit_ecm_spec(
       data       = md9,
       spec_name  = "Spec9_KalmanCCI",
       lr_vars    = c("nla_y", "eq_y", "super_y", "ha_y",
+                     "ha_x_cci_k",
                      "hp_x_1_minus_cci_k",
                      "r_x_cci_k",
                      "ln_yp_over_y",
@@ -1851,7 +1924,8 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   if ("cci_williams" %in% names(model_data) &&
       any(!is.na(model_data$cci_williams))) {
     spec10 <- tryCatch(
-      fit_williams_prior_spec(model_data, sample_end = sample_end),
+      fit_williams_prior_spec(model_data, sample_end = sample_end,
+                              dummy_vars = base_dummies),
       error = function(e) {
         message("Spec 10 (Williams-prior calibrated) failed: ",
                 conditionMessage(e))
@@ -1872,7 +1946,8 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   if ("cci_williams" %in% names(model_data) &&
       any(!is.na(model_data$cci_williams))) {
     spec12 <- tryCatch(
-      fit_lives_calibrated_spec(model_data, sample_end = sample_end),
+      fit_lives_calibrated_spec(model_data, sample_end = sample_end,
+                                dummy_vars = base_dummies),
       error = function(e) {
         message("Spec 12 (Calibrated LIVES headline) failed: ",
                 conditionMessage(e))
@@ -1918,60 +1993,20 @@ run_specifications_covid_robust <- function(model_data,
     rich_dummy_names <- c(rich_dummy_names, nm)
   }
   base_keep <- c("d2000_gst", "d2008_gfc")
-  specs_rich <- run_all_specifications_with_dummies(
-    rich_dat, dummy_vars = c(base_keep, rich_dummy_names),
-    sample_end = sample_end
+  specs_rich <- run_all_specifications(
+    rich_dat, sample_end = sample_end,
+    dummy_vars = c(base_keep, rich_dummy_names)
   )
 
   list(covid_dropped = specs_dropped, covid_rich = specs_rich)
-}
-
-# Helper: run_all_specifications but allow custom dummy_vars
-run_all_specifications_with_dummies <- function(model_data, dummy_vars,
-                                                sample_end = as.Date("2024-10-01")) {
-  spec1 <- fit_ecm_spec(
-    data = model_data, spec_name = "Spec1_LogNetWorth",
-    lr_vars = c("ln_networth_y", "ln_hp_over_y", "real_rate",
-                "ln_yp_over_y", "ecm_lag"),
-    sr_vars = character(0), dummy_vars = dummy_vars, sample_end = sample_end)
-  spec2 <- fit_ecm_spec(
-    data = model_data, spec_name = "Spec2_LogNetWorth_CCI",
-    lr_vars = c("ln_networth_y", "ln_hp_over_y", "real_rate",
-                "ln_yp_over_y", "ecm_lag"),
-    sr_vars = "d2_logcci_lag2", dummy_vars = dummy_vars, sample_end = sample_end)
-  spec3 <- fit_ecm_spec(
-    data = model_data, spec_name = "Spec3_LevelNetWorth",
-    lr_vars = c("networth_y", "ln_hp_over_y", "real_rate",
-                "ln_yp_over_y", "ecm_lag"),
-    sr_vars = character(0), dummy_vars = dummy_vars, sample_end = sample_end)
-  spec4 <- fit_ecm_spec(
-    data = model_data, spec_name = "Spec4_Disagg_NoCCI",
-    lr_vars = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
-                "real_rate", "ln_yp_over_y", "ecm_lag"),
-    sr_vars = character(0), dummy_vars = dummy_vars, sample_end = sample_end)
-  spec5 <- fit_ecm_spec(
-    data = model_data, spec_name = "Spec5_FullDisagg",
-    lr_vars = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
-                "real_rate", "ln_yp_over_y", "ecm_lag"),
-    sr_vars = c("d2_logcci_lag2", "dd4_income", "d2_log_unemp",
-                "abs_income_resid"),
-    dummy_vars = dummy_vars, sample_end = sample_end)
-  spec6 <- fit_ecm_spec(
-    data = model_data, spec_name = "Spec6_Preferred",
-    lr_vars = c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
-                "real_rate", "ln_yp_over_y", "ln_yp_over_y_post2008", "ecm_lag"),
-    sr_vars = c("d2_logcci_lag2", "dd4_income", "d2_log_unemp",
-                "abs_income_resid"),
-    dummy_vars = dummy_vars, sample_end = sample_end)
-  list(spec1 = spec1, spec2 = spec2, spec3 = spec3,
-       spec4 = spec4, spec5 = spec5, spec6 = spec6)
 }
 
 
 # ==============================================================================
 # SECTION F2: Williams (2010) reduced-form CCI fit
 # ==============================================================================
-# Estimates the 4 spline coefficients of the Williams 4-knot SDMMA basis
+# Estimates the spline coefficients of the maximal SDMMA candidate basis
+# (15 knots by default; Williams’ literal 4-knot set is a robustness variant)
 # inside the Spec-4 disaggregated long-run consumption equation. Sign priors
 # are enforced by general-to-specific drop-on-violation (Hendry/Krolzig 2005),
 # matching the Aust paper Section 3 (p.4-5). Surviving knots are then
@@ -2267,7 +2302,7 @@ build_results_table <- function(specs, output_dir = "outputs", period_label = "f
         dw = NA_real_, lm_het_pval = NA_real_,
         lm_het_pval_no_events = NA_real_, het_diagnosis = NA_character_,
         ar1_pval = NA_real_,
-        ar4_pval = NA_real_, chow_pval = NA_real_,
+        ar4_pval = NA_real_, chow_pval = NA_real_, chow_method = NA_character_,
         reset_pval = NA_real_, schwarz = NA_real_, loglik = NA_real_
       )
     )
@@ -2407,8 +2442,12 @@ select_preferred_spec <- function(coef_combined, diag_combined, coint_results,
     lam <- cf$lambda[1L]
     pass_lambda <- !is.na(lam) && lam < 0 && abs(lam) > 0.02 && abs(lam) < 0.30
 
-    # 4) Stability screen — Chow not rejected at 1% AND λ sign-stable
-    chow_ok  <- !is.na(dg$chow_pval) && dg$chow_pval > 0.01
+    # 4) Stability screen — Chow not rejected at 1% AND λ sign-stable.
+    # An incomputable Chow (NA even after the manual fallback) is treated as
+    # NEUTRAL, not as a failure: a previous version required a non-NA p-value,
+    # so 12 of 14 specs "failed" stability purely because sctest could not run
+    # on subsamples with all-zero COVID dummies.
+    chow_ok  <- is.na(dg$chow_pval) || dg$chow_pval > 0.01
     sign_stable <- if (!is.null(lambda_robust)) {
       r <- lambda_robust %>% filter(specification == sp)
       if (nrow(r) == 0L) NA else all(r$lambda_sign_stable_across_samples,
@@ -2994,7 +3033,15 @@ pick_preferred_spec_object <- function(specs, preferred_name = NULL) {
 # Each block is wrapped in tryCatch — a failure in one does not break the rest.
 # ==============================================================================
 
-run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
+run_italy_style_robustness <- function(preferred_spec, model_data, output_dir,
+                                       file_suffix = "") {
+
+  # file_suffix lets the suite run for more than one specification without
+  # overwriting (MAIN runs it for the selector-preferred spec and, with
+  # suffix "_spec11", for the LIVES headline Spec 11).
+  suffixed <- function(fname) {
+    file.path(output_dir, sub("\\.csv$", paste0(file_suffix, ".csv"), fname))
+  }
 
   spec_name <- preferred_spec$spec_name
   est_data  <- preferred_spec$est_data
@@ -3013,7 +3060,7 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
   # ----------------------------------------------------------------------
   # (1) OLS vs IV-on-current-income
   # ----------------------------------------------------------------------
-  iv_path <- file.path(output_dir, "australia_iv_robustness.csv")
+  iv_path <- suffixed("australia_iv_robustness.csv")
   tryCatch({
     if (!requireNamespace("AER", quietly = TRUE))
       stop("AER package not installed — install.packages('AER')")
@@ -3036,11 +3083,12 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
     instruments <- c("lincome_l1", "lincome_l2", "lincome_l4",
                      "unemp_l1", "unemp_l2", "mortgage_l1")
 
-    # Identify endogenous regressors: anything that contains current lincome
-    # (lincome enters via ln_y_over_c = lincome - lag(lcons,1) and via
-    #  ln_yp_over_y = ln_yp - lincome path).  The cleanest test treats
-    #  ln_y_over_c as the endogenous regressor.
-    endog <- intersect(c("ln_y_over_c", "ln_yp_over_y"), rhs_terms)
+    # Identify endogenous regressors: anything that contains CURRENT lincome.
+    # That is the legacy ln_y_over_c, the canonical ecm_lag
+    # (= lag(lcons,1) - lincome_t), and ln_yp_over_y (= y^p_hat - lincome_t).
+    # A previous version omitted ecm_lag, so the Hall-endogeneity term itself
+    # was treated as exogenous and only the PI gap was instrumented.
+    endog <- intersect(c("ln_y_over_c", "ecm_lag", "ln_yp_over_y"), rhs_terms)
     if (length(endog) == 0L) endog <- intersect("ln_y_over_c", rhs_terms)
     exog  <- setdiff(rhs_terms, endog)
 
@@ -3065,23 +3113,52 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
 
     cf_ols <- coef(ols_fit_same)
     cf_iv  <- coef(iv_fit)
-    se_ols <- sqrt(diag(vcov(ols_fit_same)))
-    se_iv  <- sqrt(diag(vcov(iv_fit)))
+    # HAC (Newey-West) SEs for both fits, matching the headline convention;
+    # plain ivreg/lm vcov understates SEs under the serial correlation the
+    # diagnostics document.
+    nw_lag <- floor(4 * (nrow(iv_data_full) / 100)^(2 / 9))
+    se_ols <- sqrt(diag(tryCatch(
+      sandwich::NeweyWest(ols_fit_same, lag = nw_lag, prewhite = FALSE,
+                          adjust = TRUE),
+      error = function(e) vcov(ols_fit_same))))
+    se_iv  <- sqrt(diag(tryCatch(
+      sandwich::NeweyWest(iv_fit, lag = nw_lag, prewhite = FALSE,
+                          adjust = TRUE),
+      error = function(e) vcov(iv_fit))))
 
     iv_tbl <- tibble::tibble(
       specification    = spec_name,
       term             = names(cf_ols),
       ols_estimate     = unname(cf_ols),
-      ols_se           = unname(se_ols),
+      ols_se           = unname(se_ols[names(cf_ols)]),
       iv_estimate      = unname(cf_iv[names(cf_ols)]),
       iv_se            = unname(se_iv [names(cf_ols)]),
       delta_iv_minus_ols = iv_estimate - ols_estimate,
       pct_change       = 100 * (iv_estimate - ols_estimate) / ols_estimate,
       n_obs            = nrow(iv_data_full),
-      n_instruments    = length(instruments)
+      n_instruments    = length(instruments),
+      endogenous_terms = paste(endog, collapse = ", ")
     )
     write.csv(iv_tbl, iv_path, row.names = FALSE)
     message(sprintf("[run_italy_style_robustness] IV table saved: %s", iv_path))
+
+    # First-stage strength + standard IV diagnostics (weak instruments,
+    # Wu-Hausman, Sargan) — previously not computed anywhere.
+    iv_diag <- tryCatch({
+      sm <- summary(iv_fit, diagnostics = TRUE)
+      dg <- as.data.frame(sm$diagnostics)
+      dg$diagnostic <- rownames(sm$diagnostics)
+      tibble::as_tibble(dg) %>%
+        mutate(specification = spec_name) %>%
+        select(specification, diagnostic, dplyr::everything())
+    }, error = function(e) {
+      tibble::tibble(specification = spec_name, diagnostic = "FAILED",
+                     error = conditionMessage(e))
+    })
+    iv_diag_path <- suffixed("australia_iv_diagnostics.csv")
+    write.csv(iv_diag, iv_diag_path, row.names = FALSE)
+    message(sprintf("[run_italy_style_robustness] IV diagnostics saved: %s",
+                    iv_diag_path))
   }, error = function(e) {
     message(sprintf("  [IV block] FAILED: %s", conditionMessage(e)))
     write.csv(tibble::tibble(
@@ -3093,7 +3170,7 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
   # ----------------------------------------------------------------------
   # (2) Joint PI + consumption FIML (SUR)
   # ----------------------------------------------------------------------
-  joint_path <- file.path(output_dir, "australia_joint_pi_robustness.csv")
+  joint_path <- suffixed("australia_joint_pi_robustness.csv")
   tryCatch({
     if (!requireNamespace("systemfit", quietly = TRUE))
       stop("systemfit package not installed — install.packages('systemfit')")
@@ -3170,7 +3247,7 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
   # ----------------------------------------------------------------------
   # (3) Chow battery at multiple sample cuts
   # ----------------------------------------------------------------------
-  chow_path <- file.path(output_dir, "australia_chow_battery.csv")
+  chow_path <- suffixed("australia_chow_battery.csv")
   tryCatch({
     break_dates <- as.Date(c("1995-01-01", "2000-01-01",
                              "2008-07-01", "2020-01-01"))
@@ -3230,7 +3307,7 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
   # ----------------------------------------------------------------------
   # (4) Scaled-income alternative
   # ----------------------------------------------------------------------
-  scaled_path <- file.path(output_dir, "australia_scaled_income_robustness.csv")
+  scaled_path <- suffixed("australia_scaled_income_robustness.csv")
   tryCatch({
     labour_col <- intersect(
       c("labour_transfer_income_real_pc",
@@ -3325,7 +3402,7 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
   # disposable income. This is a different choice from Italy's scaled
   # income (which is a 50/50 average); Williams uses NPY directly.
   # ----------------------------------------------------------------------
-  npy_path <- file.path(output_dir, "australia_williams_income_robustness.csv")
+  npy_path <- suffixed("australia_williams_income_robustness.csv")
   tryCatch({
     if (!"npy_real_pc" %in% names(model_data)) {
       message("  [Williams-income block] npy_real_pc not in model_data; ",
@@ -3393,7 +3470,7 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir) {
   # (5) Drehmann amortising-mortgage-adjusted real rate
   # adjR = R / (1 - (1+R)^-N), with N = 100 quarters (25 years for Australia)
   # ----------------------------------------------------------------------
-  drehmann_path <- file.path(output_dir, "australia_drehmann_robustness.csv")
+  drehmann_path <- suffixed("australia_drehmann_robustness.csv")
   tryCatch({
     if (!"mortgage_rate" %in% names(model_data) ||
         !"hicp_4q_ann"   %in% names(model_data))
@@ -3859,9 +3936,10 @@ model_data <- if (identical(PI_METHOD, "italy")) {
 model_data <- model_data %>%
   mutate(
     # Re-assert canonical negative-restoration ECM term post-PI construction.
-    ecm_lag = lag(lcons, 1L) - lincome,
-    # ln(HP/y): log real house price relative to real income per capita
-    ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100))
+    # ln_hp_over_y is taken from the master dataset (nominal hp / nominal
+    # income pc = real/real); the previous overwrite here used a
+    # deflator-contaminated formula and is deliberately removed.
+    ecm_lag = lag(lcons, 1L) - lincome
   )
 
 n_pi <- sum(!is.na(model_data$ln_yp_over_y))
@@ -3870,7 +3948,7 @@ message(sprintf("[construct_permanent_income] ln_yp_over_y: %d non-NA obs", n_pi
 cat("[Step 4] Estimating specifications across four sample variants...\n")
 # Order-of-execution note (Williams CCI iteration):
 #   (i)   Specs 1-6 are independent of cci_williams; Spec 8 needs it.
-#   (ii)  Fit the Williams 4-knot SDMMA spline inside the Spec-4 disaggregated
+#   (ii)  Fit the maximal (15-knot) SDMMA spline inside the Spec-4 disaggregated
 #         long-run on the FULL sample. Sign-prior reduction (Hendry/Krolzig
 #         2005) drops knots whose OLS coefficient violates its institutional
 #         sign prior; the surviving combination defines cci_williams.
@@ -3879,7 +3957,7 @@ cat("[Step 4] Estimating specifications across four sample variants...\n")
 WILLIAMS_FALLBACK <- FALSE
 williams_fit_info <- NULL
 if (any(grepl("^sdmma_", names(model_data)))) {
-  cat("  [4a-i] Fitting Williams 4-knot CCI spline (Spec-4 long-run)\n")
+  cat("  [4a-i] Fitting Williams-style maximal (15-knot) CCI spline (Spec-4 long-run)\n")
   base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
                     "d_neg_gearing_8587", "d_recession_1991",
                     "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
@@ -3941,6 +4019,51 @@ if (any(grepl("^sdmma_", names(model_data)))) {
                   sum(!is.na(model_data$cci_williams)),
                   as.character(min(model_data$date[!is.na(model_data$cci_williams)])),
                   as.character(max(model_data$date[!is.na(model_data$cci_williams)]))))
+
+      # [4a-ii] Attach the de-meaned CCI interaction columns (and the combined
+      # illiquid-financial ratio) to the GLOBAL model_data, using exactly the
+      # Spec-8 construction. This makes Spec 8/11's long-run regressors
+      # visible to every downstream consumer — the cointegration battery
+      # (which previously skipped Spec 11 as "missing regressors"), the OOS
+      # validator, gamma inference, and the counterfactual engine.
+      cci_attach_end  <- as.Date("2024-10-01")
+      cci_attach_mask <- !is.na(model_data$cci_williams) &
+                         model_data$date >= as.Date("1980-01-01") &
+                         model_data$date <= cci_attach_end
+      ha_mean_g <- mean(model_data$ha_y[cci_attach_mask],         na.rm = TRUE)
+      hp_mean_g <- mean(model_data$ln_hp_over_y[cci_attach_mask], na.rm = TRUE)
+      r_mean_g  <- mean(model_data$real_rate[cci_attach_mask],    na.rm = TRUE)
+      yp_mean_g <- mean(model_data$ln_yp_over_y[cci_attach_mask], na.rm = TRUE)
+      model_data <- model_data %>%
+        mutate(
+          r_x_cci          = (real_rate    - r_mean_g)  * cci_williams,
+          hp_x_1_minus_cci = (ln_hp_over_y - hp_mean_g) * (1 - 1.2 * cci_williams),
+          yp_x_cci         = (ln_yp_over_y - yp_mean_g) * cci_williams,
+          ha_x_cci         = (ha_y         - ha_mean_g) * cci_williams,
+          ilfa_y           = eq_y + super_y
+        )
+
+      # [4a-iii] Persist the deployed CCI series + interactions so the index
+      # path (zero pre-2009, negative post-2019) and the interaction
+      # correlation matrix are reproducible from a committed artefact —
+      # previously cci_williams existed in no committed dataset and the WP's
+      # pointer for the collinearity claim was unactionable.
+      cci_series_csv <- model_data %>%
+        select(date, cci_williams, ha_x_cci, hp_x_1_minus_cci,
+               r_x_cci, yp_x_cci)
+      write.csv(cci_series_csv,
+                file.path(output_dir, "australia_cci_williams_series.csv"),
+                row.names = FALSE)
+      cci_int_cols <- c("cci_williams", "ha_x_cci", "hp_x_1_minus_cci",
+                        "r_x_cci", "yp_x_cci")
+      cci_cor <- cor(model_data[cci_attach_mask, cci_int_cols],
+                     use = "pairwise.complete.obs")
+      write.csv(round(cci_cor, 4),
+                file.path(output_dir, "australia_cci_interaction_corr.csv"),
+                row.names = TRUE)
+      cat(sprintf("  [4a-iii] cci_williams series + interaction correlations saved (range %.2f to %.2f)\n",
+                  min(model_data$cci_williams, na.rm = TRUE),
+                  max(model_data$cci_williams, na.rm = TRUE)))
     }
   } else {
     WILLIAMS_FALLBACK <- TRUE
@@ -4043,6 +4166,98 @@ lambda_robust <- tryCatch(
     message("[build_lambda_robustness_table] Error: ", e$message); NULL
   }
 )
+
+cat("[Step 7b] Spec 11 full coefficient vector across the four sample variants...\n")
+# The headline's wealth-significance claim must be checkable against the
+# COVID-robust variants, not just lambda: a review found the full-sample
+# nla_y/ilfa_y significance does not survive dropping 2020Q1-2021Q4, while
+# the paper only committed lambda per variant.
+tryCatch({
+  spec11_variant_rows <- list()
+  spec11_sources <- list(
+    full          = specs_full$spec11,
+    precovid      = specs_precovid$spec11,
+    covid_dropped = covid_specs$covid_dropped$spec11,
+    covid_rich    = covid_specs$covid_rich$spec11
+  )
+  for (vn in names(spec11_sources)) {
+    sp <- spec11_sources[[vn]]
+    if (is.null(sp)) next
+    cf <- coef(sp$fit)
+    vc <- sp$nw_vcov
+    se <- sqrt(diag(vc))[match(names(cf), colnames(vc))]
+    lam <- if ("ecm_lag" %in% names(cf)) cf[["ecm_lag"]] else NA_real_
+    spec11_variant_rows[[vn]] <- tibble::tibble(
+      sample_variant = vn,
+      term           = names(cf),
+      ols_estimate   = unname(cf),
+      nw_se          = unname(se),
+      t_stat         = unname(cf) / unname(se),
+      lambda         = lam,
+      structural_param = ifelse(names(cf) == "ecm_lag", -1,
+                                unname(cf) / abs(lam)),
+      n_obs          = nobs(sp$fit)
+    )
+  }
+  spec11_variants <- bind_rows(spec11_variant_rows)
+  write.csv(spec11_variants,
+            file.path(output_dir, "australia_spec11_variants.csv"),
+            row.names = FALSE)
+  cat(sprintf("  Saved australia_spec11_variants.csv (%d variants)\n",
+              length(spec11_variant_rows)))
+}, error = function(e) message("[spec11_variants] Error: ", e$message))
+
+cat("[Step 7c] Spec 11 ogive sensitivity (Italy PI with / without the GFC learning weight)...\n")
+# The headline Italy-LP permanent-income series is multiplied by a learning
+# ogive that halves it after 2012 (gfc_ogive = TRUE default) — previously
+# undisclosed for the headline measure and untested. Refit Spec 11 with the
+# raw (no-ogive) series; the interactions that involve ln_yp_over_y are
+# rebuilt so the comparison is internally consistent.
+tryCatch({
+  if (!is.null(specs_full$spec11) && "cci_williams" %in% names(model_data)) {
+    base_noog <- model_data %>%
+      select(-any_of(c("ln_yp_over_y", "ln_yp_over_y_post2008")))
+    noog <- construct_permanent_income_italy(base_noog, gfc_ogive = FALSE)
+    noog <- noog %>% mutate(ecm_lag = lag(lcons, 1L) - lincome)
+    mask_no <- !is.na(noog$cci_williams) &
+               noog$date >= as.Date("1980-01-01") &
+               noog$date <= as.Date("2024-10-01")
+    yp_mean_no <- mean(noog$ln_yp_over_y[mask_no], na.rm = TRUE)
+    noog <- noog %>%
+      mutate(yp_x_cci = (ln_yp_over_y - yp_mean_no) * cci_williams)
+    sp11_noog <- fit_ecm_spec(
+      data       = noog,
+      spec_name  = "Spec11_LIVES_Headline_NoOgive",
+      lr_vars    = specs_full$spec11$lr_vars,
+      sr_vars    = specs_full$spec11$sr_vars,
+      dummy_vars = specs_full$spec11$dummy_vars,
+      sample_end = as.Date("2024-10-01")
+    )
+    grab <- function(sp, label) {
+      cf <- coef(sp$fit); vc <- sp$nw_vcov
+      se <- sqrt(diag(vc))[match(names(cf), colnames(vc))]
+      lam <- cf[["ecm_lag"]]
+      tibble::tibble(variant = label, term = names(cf),
+                     ols_estimate = unname(cf), nw_se = unname(se),
+                     t_stat = unname(cf) / unname(se), lambda = lam,
+                     structural_param = ifelse(names(cf) == "ecm_lag", -1,
+                                               unname(cf) / abs(lam)),
+                     n_obs = nobs(sp$fit))
+    }
+    ogive_tbl <- bind_rows(grab(specs_full$spec11, "ogive (headline)"),
+                           grab(sp11_noog,        "no ogive"))
+    write.csv(ogive_tbl,
+              file.path(output_dir, "australia_spec11_ogive_robustness.csv"),
+              row.names = FALSE)
+    lam_no <- ogive_tbl$lambda[ogive_tbl$variant == "no ogive"][1L]
+    yp_no  <- ogive_tbl$ols_estimate[ogive_tbl$variant == "no ogive" &
+                                     ogive_tbl$term == "ln_yp_over_y"]
+    cat(sprintf("  No-ogive Spec 11: lambda = %.3f, ln_yp_over_y = %.3f\n",
+                lam_no, yp_no))
+  } else {
+    message("[spec11_ogive] Spec 11 or cci_williams unavailable; skipped")
+  }
+}, error = function(e) message("[spec11_ogive] Error: ", e$message))
 
 cat("[Step 8] Selecting preferred specification...\n")
 selection <- select_preferred_spec(
@@ -4151,45 +4366,57 @@ cat("[Step 15] Generating plots — preferred spec + spec 1...\n")
 plot_actual_vs_fitted(preferred_spec, output_dir = output_dir)
 plot_actual_vs_fitted(specs_full$spec1, output_dir = output_dir)
 
+# Sub-scripts are sourced into an ISOLATED child environment. They can READ
+# pipeline state (model_data, specs_full, ...) through the parent chain, but
+# their own assignments stay local — a previous version sourced them with
+# local = TRUE at top level, so knot_experiment.R / cci_placebo_test.R
+# REASSIGNED the global model_data (rebuilt with the AR permanent-income
+# constructor), silently contaminating every later step including the IV and
+# SUR robustness blocks. Do not revert to local = TRUE.
+source_isolated <- function(fname) {
+  source(file.path(dirname(.this_file), fname),
+         local = new.env(parent = globalenv()))
+}
+
 cat("[Step 16] Building Williams structural-parameter comparison table...\n")
 tryCatch(
-  source(file.path(dirname(.this_file), "williams_comparison.R"), local = TRUE),
+  source_isolated("williams_comparison.R"),
   error = function(e) message("[williams_comparison] Error: ", e$message)
 )
 
 cat("[Step 17] Knot-experiment: testing 7 CCI spline variants...\n")
 tryCatch(
-  source(file.path(dirname(.this_file), "knot_experiment.R"), local = TRUE),
+  source_isolated("knot_experiment.R"),
   error = function(e) message("[knot_experiment] Error: ", e$message)
 )
 
 cat("[Step 18] CCI method comparison (Williams maximal-GETS vs Kalman)...\n")
 tryCatch(
-  source(file.path(dirname(.this_file), "cci_method_comparison.R"), local = TRUE),
+  source_isolated("cci_method_comparison.R"),
   error = function(e) message("[cci_method_comparison] Error: ", e$message)
 )
 
 cat("[Step 19] CCI alternatives (PCA, credit-to-GDP gap, macropru intensity)...\n")
 tryCatch(
-  source(file.path(dirname(.this_file), "cci_alternatives.R"), local = TRUE),
+  source_isolated("cci_alternatives.R"),
   error = function(e) message("[cci_alternatives] Error: ", e$message)
 )
 
-cat("[Step 20] Random-knot placebo test for Williams' canonical 4-knot...\n")
+cat("[Step 20] Random-knot placebo tests (literal 4-knot + deployed protocol)...\n")
 tryCatch(
-  source(file.path(dirname(.this_file), "cci_placebo_test.R"), local = TRUE),
+  source_isolated("cci_placebo_test.R"),
   error = function(e) message("[cci_placebo_test] Error: ", e$message)
 )
 
 cat("[Step 21] CCI fit-improvement decomposition (detrending vs identification)...\n")
 tryCatch(
-  source(file.path(dirname(.this_file), "cci_fit_decomposition.R"), local = TRUE),
+  source_isolated("cci_fit_decomposition.R"),
   error = function(e) message("[cci_fit_decomposition] Error: ", e$message)
 )
 
 cat("[Step 22] Out-of-sample forecast validation (NS-033)...\n")
 tryCatch(
-  source(file.path(dirname(.this_file), "oos_forecast.R"), local = TRUE),
+  source_isolated("oos_forecast.R"),
   error = function(e) message("[oos_forecast] Error: ", e$message)
 )
 
@@ -4206,6 +4433,21 @@ tryCatch(
   run_italy_style_robustness(preferred_spec, model_data, output_dir),
   error = function(e)
     message(sprintf("  [Step 9] aborted: %s", conditionMessage(e)))
+)
+
+cat("[Step 9b] Italy-style robustness suite for the LIVES headline (Spec 11)...\n")
+# The suite previously ran only for the selector-preferred spec, so the IV /
+# SUR / Chow / income-measure robustness conclusions were never demonstrated
+# on the paper's actual headline equation.
+tryCatch({
+  if (!is.null(specs_full$spec11)) {
+    run_italy_style_robustness(specs_full$spec11, model_data, output_dir,
+                               file_suffix = "_spec11")
+  } else {
+    message("  [Step 9b] skipped: Spec 11 not available")
+  }
+}, error = function(e)
+    message(sprintf("  [Step 9b] aborted: %s", conditionMessage(e)))
 )
 
 cat("[Step 10] Long-run decomposition plot (headline output)...\n")

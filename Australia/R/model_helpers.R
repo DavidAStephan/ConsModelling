@@ -898,10 +898,18 @@ smoothed_step <- function(date_vec, knot_date) {
 # that on the 1988+ sample only one of Williams' four knots survives sign-
 # prior reduction (2007Q1; 1979Q1 is aliased; 1992Q1 and 1998Q1 are sign-
 # violators). The maximal set lets the surviving knots emerge from the data
-# rather than from authorial choice; on our sample it identifies five
-# surviving knots: 1992Q1 (banking distress), 2007Q3 (GFC), 2019Q1 (Hayne
-# Royal Commission), 2020Q2 (COVID/JobKeeper), 2021Q4 (APRA buffer hike).
+# rather than from authorial choice. The surviving set is RUN-DEPENDENT —
+# always read it from outputs/australia_williams_cci_knots.csv rather than
+# from any hand-written list (a previous comment here listed five survivors
+# while the committed CSV had three: 2009Q1, 2019Q1, 2020Q2).
 # See Australia/docs/knot_experiment_findings.md for details.
+#
+# NOTE on the 1993-01-01 prior: this basis codes 1993Q1 as -1 (tail of the
+# early-1990s credit crunch / bank retrenchment), while the SECTIONAL basis
+# below codes the same date +1 ("new_entrants_1993", Aussie Home Loans /
+# mortgage-originator entry). Both institutional readings are defensible for
+# different events at the same date; the conflict is disclosed in WP Section 5
+# rather than silently resolved here.
 #
 # Williams' original 4-knot set is retained as a robustness benchmark via the
 # explicit knots/sign_priors arguments.

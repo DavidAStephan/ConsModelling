@@ -43,8 +43,7 @@ model_data <- add_model_variables(model_data)
 model_data <- compute_income_volatility(model_data)
 model_data <- construct_permanent_income_italy(model_data)
 model_data <- model_data %>%
-  mutate(ecm_lag      = lag(lcons, 1L) - lincome,
-         ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+  mutate(ecm_lag      = lag(lcons, 1L) - lincome)
 
 cat(sprintf("\nmodel_data: %d rows\n", nrow(model_data)))
 for (v in c("nla_y", "eq_y", "super_y", "ha_y",
