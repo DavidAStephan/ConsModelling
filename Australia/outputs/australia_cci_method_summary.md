@@ -13,51 +13,46 @@ Two methodologically distinct CCI extractors are now implemented:
    loan-flow; idiosyncratic noise variances and other loadings
    estimated via fitSSM. Smoothed state extracted via KFS.
 
-**Pearson correlation between the two series: 0.050**
+**Pearson correlation between the two series: -0.004**
 
 ## Spec-8 (Williams) vs Spec-9 (Kalman) coefficient comparison
 
-Both specs have identical structure (Spec-4 long-run + 3 multiplicative
-CCI interactions + standard short-run dynamics + dummies). The only
+Both specs share the same structure (Spec-4 long-run core + four
+DE-MEANED multiplicative CCI interactions including the housing-
+collateral channel + standard short-run dynamics + dummies); the only
 difference is which CCI series enters the interactions.
 
 | Term | Spec 8 (Williams) | Spec 9 (Kalman) | Diff |
 |------|------------------:|----------------:|-----:|
-| (Intercept) | -0.03842 | -0.01335 | 0.02506 |
-| abs_income_resid | -0.03842 | -0.01335 | 0.02506 |
-| d2000_gst | -0.03842 | -0.01335 | 0.02506 |
-| d2008_gfc | -0.03842 | -0.01335 | 0.02506 |
-| d2020_covid | -0.03842 | -0.01335 | 0.02506 |
-| d2020_rebound | -0.03842 | -0.01335 | 0.02506 |
-| d2_log_unemp | -0.03842 | -0.01335 | 0.02506 |
-| d_apra_2014 | -0.03842 | -0.01335 | 0.02506 |
-| d_apra_2017 | -0.03842 | -0.01335 | 0.02506 |
-| d_jobkeeper_2020 | -0.03842 | -0.01335 | 0.02506 |
-| d_recession_1991 | -0.03842 | -0.01335 | 0.02506 |
-| dd4_income | -0.03842 | -0.01335 | 0.02506 |
-| ecm_lag | -0.03842 | -0.01335 | 0.02506 |
-| eq_y | -0.03842 | -0.01335 | 0.02506 |
-| ha_x_cci | -0.03842 | -0.01335 | 0.02506 |
-| ha_y | -0.03842 | -0.01335 | 0.02506 |
-| hp_x_1_minus_cci | -0.03842 | -0.01335 | 0.02506 |
-| ln_yp_over_y | -0.03842 | -0.01335 | 0.02506 |
-| nla_y | -0.03842 | -0.01335 | 0.02506 |
-| r_x_cci | -0.03842 | -0.01335 | 0.02506 |
-| super_y | -0.03842 | -0.01335 | 0.02506 |
-| yp_x_cci | -0.03842 | -0.01335 | 0.02506 |
+| (Intercept) | -0.02013 | 0.00080 | 0.02094 |
+| abs_income_resid | -0.18365 | -0.21557 | -0.03192 |
+| d2000_gst | 0.01010 | 0.01079 | 0.00069 |
+| d2008_gfc | -0.00603 | -0.01366 | -0.00763 |
+| d2020_covid | -0.15518 | -0.15702 | -0.00184 |
+| d2020_rebound | 0.01787 | 0.02764 | 0.00977 |
+| d2_log_unemp | 0.00349 | 0.01044 | 0.00695 |
+| d_apra_2014 | -0.01569 | 0.00480 | 0.02049 |
+| d_apra_2017 | 0.00998 | -0.00801 | -0.01799 |
+| d_jobkeeper_2020 | 0.03174 | 0.01423 | -0.01751 |
+| d_recession_1991 | -0.00457 | -0.00453 | 0.00004 |
+| dd4_income | 0.02770 | -0.00432 | -0.03202 |
+| ecm_lag | -0.45832 | -0.20878 | 0.24954 |
+| eq_y | -0.00136 | -0.00950 | -0.00814 |
+| ha_x_cci | 0.00426 | 0.00323 | -0.00103 |
+| ha_y | 0.00299 | 0.00219 | -0.00080 |
+| hp_x_1_minus_cci | 0.02987 | 0.01041 | -0.01946 |
+| ln_yp_over_y | 0.49212 | 0.22224 | -0.26988 |
+| nla_y | 0.03366 | 0.00282 | -0.03084 |
+| r_x_cci | 0.00283 | 0.00073 | -0.00209 |
+| super_y | 0.02152 | 0.00266 | -0.01886 |
+| yp_x_cci | -0.50462 | 0.04285 | 0.54747 |
 
 ## Headline observations
 
-- **λ is essentially identical**: Spec 8 = -0.4449, Spec 9 = -0.1994. The two CCI methods deliver the same speed of adjustment despite quite different underlying CCI series.
-- **Wealth coefficients are smaller and less significant under Spec 9**.
-  The Kalman CCI captures level-of-leverage variation that overlaps
-  with the wealth-to-income ratios; multicollinearity between the
-  Kalman factor and the explicit wealth terms reduces wealth t-stats.
-- **Interaction-term sign priors split**: Spec 8's `hp_x_1_minus_cci`
-  is +0.0009 (sign-violator); Spec 9's `hp_x_1_minus_cci_k` is
-  −0.0024 (sign matches Williams' published negative prior).
-  The Kalman CCI delivers correct sign on the housing-affordability
-  interaction; the Williams spline does not.
+- **Speed of adjustment**: Spec 8 lambda = -0.4583, Spec 9 lambda = -0.2088.
+- Wealth and interaction coefficients are method-dependent; read the
+  table above (regenerated from the live fits each run) rather than any
+  hand-written narrative for the current values.
 
 ## What this means for the WP §5 narrative
 
@@ -73,7 +68,7 @@ The two CCI methods are **complementary** rather than competing:
   identifies *level-of-leverage* variation — the smooth gradient
   from tight 1980s credit to loose post-2010s credit.
 
-Both deliver the same speed of adjustment. The choice between them
+The choice between them
 depends on which credit-conditions concept is closer to what the
 research question asks about. For the WP, both should be reported
 side-by-side in §8 (Robustness) with the headline finding being that

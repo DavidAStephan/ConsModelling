@@ -51,35 +51,51 @@ data_raw_dir <- file.path(project_root, "data_raw")
 
 source(file.path(project_root, "R", "model_helpers.R"))
 
-# Load the master from RDS, build model_data the same way the
-# orchestrator does.
-master <- readRDS(file.path(output_dir, "australia_model_dataset.rds"))
-model_data <- master %>%
-  rename(
-    dlcons   = d_ln_cons_pc,
-    lincome  = ln_ydi_real_pc,
-    lcons    = ln_cons_real_pc
-  ) %>%
-  mutate(
-    ecm_lag = lag(lcons, 1L) - lincome
-  )
+# Use pipeline state when sourced from australia_estimation.R MAIN (the
+# orchestrator sources this script into an isolated child environment, so the
+# canonical model_data — including the canonical permanent-income method — is
+# readable here and assignments stay local). Rebuild from the RDS only when
+# running standalone. A previous version rebuilt unconditionally with the AR
+# permanent-income constructor AND assigned into the caller's environment,
+# clobbering the canonical model_data for every later pipeline step.
+if (exists("model_data") && exists("fit_ecm_spec") &&
+    exists("construct_permanent_income_italy")) {
+  message("[knot_experiment] using pipeline model_data (canonical PI method)")
+  model_data <- model_data  # local working copy in this script's environment
+} else {
+  master <- readRDS(file.path(output_dir, "australia_model_dataset.rds"))
+  model_data <- master %>%
+    rename(
+      dlcons   = d_ln_cons_pc,
+      lincome  = ln_ydi_real_pc,
+      lcons    = ln_cons_real_pc
+    ) %>%
+    mutate(
+      ecm_lag = lag(lcons, 1L) - lincome
+    )
 
-# Source enough of australia_estimation.R to get add_model_variables(),
-# compute_income_volatility(), construct_permanent_income(),
-# fit_ecm_spec(), fit_consumption_with_williams_cci()
-src <- readLines(file.path(project_root, "R", "australia_estimation.R"))
-main_start <- grep("^cat..\\[Step 1", src)[1L]
-eval(parse(text = paste(src[1:(main_start - 1L)], collapse = "\n")))
+  # Source enough of australia_estimation.R to get add_model_variables(),
+  # compute_income_volatility(), the PI constructors, fit_ecm_spec(),
+  # fit_consumption_with_williams_cci()
+  src <- readLines(file.path(project_root, "R", "australia_estimation.R"))
+  main_start <- grep("^cat..\\[Step 1", src)[1L]
+  eval(parse(text = paste(src[1:(main_start - 1L)], collapse = "\n")))
 
-# Build derived columns in the same order as the live pipeline
-model_data <- add_model_variables(model_data)
-model_data <- compute_income_volatility(model_data)
-model_data <- construct_permanent_income(model_data)
-model_data <- model_data %>%
-  mutate(
-    ecm_lag      = lag(lcons, 1L) - lincome,
-    ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100))
-  )
+  # Build derived columns in the same order as the live pipeline, using the
+  # CANONICAL permanent-income method (PI_METHOD is set in the sourced
+  # preamble) so standalone runs test the same equation as the pipeline.
+  model_data <- add_model_variables(model_data)
+  model_data <- compute_income_volatility(model_data)
+  model_data <- if (identical(PI_METHOD, "italy")) {
+    construct_permanent_income_italy(model_data)
+  } else {
+    construct_permanent_income(model_data)
+  }
+  model_data <- model_data %>%
+    mutate(
+      ecm_lag = lag(lcons, 1L) - lincome
+    )
+}
 
 # ==============================================================================
 # CANDIDATE KNOT VARIANTS

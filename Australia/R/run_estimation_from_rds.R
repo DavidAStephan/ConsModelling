@@ -34,7 +34,7 @@ if (!file.exists(rds_path)) stop("RDS not found: ", rds_path)
 master <- readRDS(rds_path)
 cat(sprintf("Loaded: %d rows, %d cols\n", nrow(master), ncol(master)))
 
-# Source helpers and (re-)attach Williams 4-knot CCI basis if not already present
+# Source helpers and (re-)attach the maximal (15-knot) SDMMA CCI basis if not already present
 source(file.path(script_dir, "model_helpers.R"), local = TRUE)
 USE_WILLIAMS_SDMMA_BASIS <- TRUE
 if (USE_WILLIAMS_SDMMA_BASIS &&
@@ -43,7 +43,7 @@ if (USE_WILLIAMS_SDMMA_BASIS &&
   for (j in seq_len(ncol(williams_basis))) {
     master[[colnames(williams_basis)[j]]] <- williams_basis[, j]
   }
-  cat("Attached Williams 4-knot CCI basis to master (",
+  cat("Attached maximal (15-knot) SDMMA CCI basis to master (",
       paste(colnames(williams_basis), collapse = ", "), ")\n", sep = "")
 }
 

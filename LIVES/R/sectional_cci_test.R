@@ -69,10 +69,15 @@ build_and_fit <- function(model_data, basis_fn, label) {
   spec4_lr <- c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
                 "real_rate", "ln_yp_over_y", "ecm_lag")
 
+  # Pass basis_fn through: fit_consumption_with_williams_cci rebuilds the
+  # basis internally, and a previous version let it default to the MAXIMAL
+  # basis — so the "sectional" comparison fit was actually the maximal fit
+  # (byte-identical coefficient blocks in sectional_cci_comparison.csv).
   fit <- fit_consumption_with_williams_cci(
     md, lr_vars = spec4_lr, sr_vars = character(0),
     dummy_vars = base_dummies,
-    sample_end = max(md$date)
+    sample_end = max(md$date),
+    basis_fn   = basis_fn
   )
   cat(sprintf("  surviving knots: %s\n",
               paste(fit$surviving_knots, collapse = ", ")))
@@ -278,19 +283,13 @@ write_csv(tibble(
              "Sectional canonical |lambda|",
              "Sectional adj R^2 percentile rank",
              "Sectional |lambda| percentile rank",
-             "Maximal-GETS adj R^2 percentile (prior result)",
-             "Maximal-GETS |lambda| percentile (prior result)",
-             "Literal 4-knot adj R^2 percentile (prior result)",
-             "Literal 4-knot |lambda| percentile (prior result)",
+             "Comparator note",
              "Verdict"),
   value = c(sprintf("%.4f", canonical_sec$adj_r2),
             sprintf("%.4f", canonical_sec$lambda),
             sprintf("%.0fth", 100 * w_r2_pct),
             sprintf("%.0fth", 100 * w_la_pct),
-            "64th",
-            "36th",
-            "19th",
-            "10th",
+            "see australia_williams_knot_placebo*_summary.csv",
             verdict)
 ), file.path(PROJ_LIVES, "outputs", "sectional_placebo_summary.csv"))
 

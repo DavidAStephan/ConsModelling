@@ -224,10 +224,13 @@ rolling_forecast <- function(spec_template, model_data,
 # specs silently collapse to their base form. Replicate the md8/md9
 # construction here (matching australia_estimation.R) so the OOS refit
 # includes them. NOTE: cci_williams and the de-mean constants are
-# full-sample objects, so the OOS for Spec 8/9 is conditional on a
-# full-sample-constructed CCI — i.e. it is NOT real-time for the
-# credit-conditions channel (the AR permanent-income input IS real-time).
-# This is disclosed in WP §8.13.
+# full-sample objects, so the OOS for the CCI specs is conditional on a
+# full-sample-constructed CCI — NOT real-time for the credit channel. The
+# permanent-income input is real-time ONLY in the standalone path (which
+# rebuilds with the expanding-window AR constructor); when sourced from the
+# pipeline, model_data carries the canonical FULL-SAMPLE Italy LP measure,
+# so the committed OOS embeds a non-causal PI as well. Both caveats must be
+# disclosed in WP §8.13.
 # ==============================================================================
 attach_cci_oos_interactions <- function(md, sample_end = NA) {
   if (is.na(sample_end)) sample_end <- max(md$date, na.rm = TRUE)
@@ -507,19 +510,24 @@ if (interactive()) {
     model_data_local <- compute_income_volatility(model_data_local)
     model_data_local <- construct_permanent_income(model_data_local)
     model_data_local <- model_data_local %>%
-      mutate(ecm_lag = lag(lcons, 1L) - lincome,
-             ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+      mutate(ecm_lag = lag(lcons, 1L) - lincome)
     specs_full_local <- run_all_specifications(model_data_local)
   }
 
-  # Validate the headline specs: preferred (Spec 6) first, then 4 / 7 / 8 / 9.
-  # Spec 7b (sample-restricted) and Spec 10 (calibrated) excluded for now —
-  # they need special handling.
-  # Attach the CCI interaction columns so Spec 8/9 are actually evaluated
-  # (otherwise they collapse to base — see attach_cci_oos_interactions).
+  # Validate the headline specs: the LIVES headline Spec 11, the conventional
+  # baseline Spec 6, then 4 / 7 / 8 / 9. Spec 7b (sample-restricted) and
+  # Spec 10/12 (calibrated offsets) excluded — they need special handling.
+  # Attach the CCI interaction columns (and the combined illiquid-financial
+  # ratio Spec 11 uses) so the CCI specs are actually evaluated (otherwise
+  # they collapse to base — see attach_cci_oos_interactions).
   model_data_local <- attach_cci_oos_interactions(model_data_local)
+  if (!"ilfa_y" %in% names(model_data_local) &&
+      all(c("eq_y", "super_y") %in% names(model_data_local))) {
+    model_data_local$ilfa_y <- model_data_local$eq_y + model_data_local$super_y
+  }
 
-  validate_keys <- intersect(c("spec6", "spec4", "spec7", "spec8", "spec9"),
+  validate_keys <- intersect(c("spec11", "spec6", "spec4", "spec7", "spec8",
+                               "spec9"),
                               names(specs_full_local))
   specs_for_oos <- specs_full_local[validate_keys]
   cat(sprintf("[oos_forecast] validating %d specs: %s\n",

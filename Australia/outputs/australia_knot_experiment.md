@@ -14,25 +14,25 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 
 | Variant | Cand. | Aliased | Violators | Surviving | λ | adj R² |
 |---|---:|---:|---:|---:|---:|---:|
-| williams_2009 | 3 | 1 | 2 | 0 | -0.0497 | 0.721 |
-| williams_2010 | 4 | 1 | 2 | 1 | -0.0753 | 0.723 |
-| six_with_macropru | 6 | 1 | 3 | 2 | -0.0785 | 0.721 |
-| eight_full_australia | 8 | 2 | 5 | 1 | -0.0753 | 0.723 |
-| australia_within_sample | 5 | 0 | 3 | 2 | -0.0785 | 0.721 |
-| australia_within_sample_plus | 7 | 0 | 5 | 2 | -0.0832 | 0.722 |
-| maximal_gets | 15 | 3 | 8 | 4 | -0.1116 | 0.733 |
+| williams_2009 | 3 | 1 | 2 | 0 | -0.1824 | 0.726 |
+| williams_2010 | 4 | 1 | 2 | 1 | -0.1866 | 0.727 |
+| six_with_macropru | 6 | 1 | 3 | 2 | -0.2018 | 0.728 |
+| eight_full_australia | 8 | 2 | 5 | 1 | -0.1866 | 0.727 |
+| australia_within_sample | 5 | 0 | 3 | 2 | -0.2018 | 0.728 |
+| australia_within_sample_plus | 7 | 0 | 5 | 2 | -0.1867 | 0.725 |
+| maximal_gets | 15 | 3 | 7 | 5 | -0.2516 | 0.753 |
 
 ## Robustness — which knots survive across multiple variants
 
 | Knot | Variants where it survives | Mean OLS coefficient |
 |---|---:|---:|
-| 2007_01 | 5 | -0.007321 |
-| 2017_03 | 2 | -0.002797 |
-| 1990_09 | 1 | -0.001144 |
-| 1992_01 | 1 | -0.017412 |
-| 2007_09 | 1 | -0.005130 |
-| 2019_01 | 1 | -0.003242 |
-| 2020_04 | 1 | 0.081324 |
+| 2007_01 | 5 | -0.008080 |
+| 2017_03 | 3 | -0.012805 |
+| 1990_09 | 1 | -0.001499 |
+| 1992_01 | 1 | -0.015392 |
+| 2007_09 | 1 | -0.007153 |
+| 2019_01 | 1 | -0.002934 |
+| 2020_04 | 1 | 0.102928 |
 
 ## Per-variant knot detail
 
@@ -43,8 +43,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01
 - **Sign-violators (dropped):** 1992_01, 1998_01
 - **Surviving:** **none — variant fails**
-- **λ (consumption equation):** -0.0497
-- **Adjusted R²:** 0.721
+- **λ (consumption equation):** -0.1824
+- **Adjusted R²:** 0.726
 
 
 ### williams_2010
@@ -53,8 +53,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01
 - **Sign-violators (dropped):** 1992_01, 1998_01
 - **Surviving:** 2007_01
-- **λ (consumption equation):** -0.0753
-- **Adjusted R²:** 0.723
+- **λ (consumption equation):** -0.1866
+- **Adjusted R²:** 0.727
 
 
 ### six_with_macropru
@@ -63,8 +63,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12
 - **Surviving:** 2007_01, 2017_03
-- **λ (consumption equation):** -0.0785
-- **Adjusted R²:** 0.721
+- **λ (consumption equation):** -0.2018
+- **Adjusted R²:** 0.728
 
 
 ### eight_full_australia
@@ -73,8 +73,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01, 1986_01
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12, 2017_03, 2019_09
 - **Surviving:** 2007_01
-- **λ (consumption equation):** -0.0753
-- **Adjusted R²:** 0.723
+- **λ (consumption equation):** -0.1866
+- **Adjusted R²:** 0.727
 
 
 ### australia_within_sample
@@ -83,8 +83,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** none
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12
 - **Surviving:** 2007_01, 2017_03
-- **λ (consumption equation):** -0.0785
-- **Adjusted R²:** 0.721
+- **λ (consumption equation):** -0.2018
+- **Adjusted R²:** 0.728
 
 
 ### australia_within_sample_plus
@@ -93,18 +93,18 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** none
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12, 2017_03, 2019_09
 - **Surviving:** 1990_09, 2007_01
-- **λ (consumption equation):** -0.0832
-- **Adjusted R²:** 0.722
+- **λ (consumption equation):** -0.1867
+- **Adjusted R²:** 0.725
 
 
 ### maximal_gets
 **Description:** Maximal 15-knot Australian candidate set (Campbell '79, housing dereg '86, banking distress '90/'92/'93, Wallis/APRA '98, GFC '07, govt guarantee '08, FHB boost '09, macropru '14/'17, Hayne RC '19, APRA relax '19Q3, COVID '20, buffer hike '21). Let drop-on-violation prune.
 - **Candidate knots:** 15 (1979-Q, 1986-Q, 1990-Q, 1992-Q, 1993-Q, 1998-Q, 2007-Q, 2008-Q, 2009-Q, 2014-Q, 2017-Q, 2019-Q, 2019-Q, 2020-Q, 2021-Q)
 - **Aliased (constant within window):** 1979_01, 1986_01, 2009_01
-- **Sign-violators (dropped):** 1990_09, 1993_01, 1998_09, 2008_12, 2014_12, 2017_03, 2019_09, 2021_12
-- **Surviving:** 1992_01, 2007_09, 2019_01, 2020_04
-- **λ (consumption equation):** -0.1116
-- **Adjusted R²:** 0.733
+- **Sign-violators (dropped):** 1990_09, 1993_01, 1998_09, 2008_12, 2014_12, 2019_09, 2021_12
+- **Surviving:** 1992_01, 2007_09, 2017_03, 2019_01, 2020_04
+- **λ (consumption equation):** -0.2516
+- **Adjusted R²:** 0.753
 
 
 ## Interpretation

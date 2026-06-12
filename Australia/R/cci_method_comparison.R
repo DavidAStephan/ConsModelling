@@ -133,11 +133,14 @@ ggsave(out_png, p, width = 10, height = 5, dpi = 200)
 cat(sprintf("Saved: %s\n", out_png))
 
 # ---------- Markdown summary ----------
+# fmt is VECTORISED: a previous scalar version (x <- x[1L]) silently recycled
+# the first value (the intercept) down the whole coefficient table.
 fmt <- function(x, d = 4) {
-  if (length(x) == 0L) return("—")
-  if (length(x) > 1L) x <- x[1L]
-  if (is.na(x)) "—" else sprintf(paste0("%.", d, "f"), x)
+  if (length(x) == 0L) return("\u2014")
+  out <- ifelse(is.na(x), "\u2014", sprintf(paste0("%.", d, "f"), x))
+  out
 }
+fmt1 <- function(x, d = 4) fmt(if (length(x) >= 1L) x[1L] else NA_real_, d)
 
 md_lines <- c(
   "# CCI method comparison — Williams maximal-GETS vs Kalman state-space",
@@ -161,8 +164,9 @@ md_lines <- c(
   "",
   "## Spec-8 (Williams) vs Spec-9 (Kalman) coefficient comparison",
   "",
-  "Both specs have identical structure (Spec-4 long-run + 3 multiplicative",
-  "CCI interactions + standard short-run dynamics + dummies). The only",
+  "Both specs share the same structure (Spec-4 long-run core + four",
+  "DE-MEANED multiplicative CCI interactions including the housing-",
+  "collateral channel + standard short-run dynamics + dummies); the only",
   "difference is which CCI series enters the interactions.",
   "",
   "| Term | Spec 8 (Williams) | Spec 9 (Kalman) | Diff |",
@@ -174,20 +178,12 @@ md_lines <- c(
   "",
   "## Headline observations",
   "",
-  paste0(sprintf("- **λ is essentially identical**: Spec 8 = %s, Spec 9 = %s.",
-                 fmt(comp$ols_williams[comp$term == "ecm_lag"]),
-                 fmt(comp$ols_kalman[comp$term == "ecm_lag"])),
-         " The two CCI methods deliver the same speed of adjustment despite",
-         " quite different underlying CCI series."),
-  "- **Wealth coefficients are smaller and less significant under Spec 9**.",
-  "  The Kalman CCI captures level-of-leverage variation that overlaps",
-  "  with the wealth-to-income ratios; multicollinearity between the",
-  "  Kalman factor and the explicit wealth terms reduces wealth t-stats.",
-  "- **Interaction-term sign priors split**: Spec 8's `hp_x_1_minus_cci`",
-  "  is +0.0009 (sign-violator); Spec 9's `hp_x_1_minus_cci_k` is",
-  "  −0.0024 (sign matches Williams' published negative prior).",
-  "  The Kalman CCI delivers correct sign on the housing-affordability",
-  "  interaction; the Williams spline does not.",
+  sprintf("- **Speed of adjustment**: Spec 8 lambda = %s, Spec 9 lambda = %s.",
+          fmt1(comp$ols_williams[comp$term == "ecm_lag"]),
+          fmt1(comp$ols_kalman[comp$term == "ecm_lag"])),
+  "- Wealth and interaction coefficients are method-dependent; read the",
+  "  table above (regenerated from the live fits each run) rather than any",
+  "  hand-written narrative for the current values.",
   "",
   "## What this means for the WP §5 narrative",
   "",
@@ -203,7 +199,7 @@ md_lines <- c(
   "  identifies *level-of-leverage* variation — the smooth gradient",
   "  from tight 1980s credit to loose post-2010s credit.",
   "",
-  "Both deliver the same speed of adjustment. The choice between them",
+  "The choice between them",
   "depends on which credit-conditions concept is closer to what the",
   "research question asks about. For the WP, both should be reported",
   "side-by-side in §8 (Robustness) with the headline finding being that",

@@ -16,12 +16,13 @@ Muellbauer and Williams (2012) by sixteen years of post-GFC data and
 applying contemporary identification methods. Wealth is disaggregated
 into housing, illiquid financial (equities plus superannuation), and
 net liquid assets (deposits net of total household debt), each entered
-as an asset/annualised-income ratio, and we adopt the Jordà (2005)
-local-projection permanent-income forecaster used in the Italian
-implementation of De Bonis, Liberati, Muellbauer and Rondinelli (2020). The
-cross-equation restriction γ_LA + γ_LOANS = 0 is accepted in every
-disaggregated specification and sample window we estimate, validating
-the net-liquid aggregation used in that Italian convention.
+as an asset/annualised-income ratio, and we adopt the direct
+(single-regression) forecast of the discounted future-income aggregate
+used in the Italian implementation of De Bonis, Liberati, Muellbauer
+and Rondinelli (2020). The cross-equation restriction
+γ_LA + γ_LOANS = 0 is accepted in every disaggregated specification
+and sample window we estimate, validating the net-liquid aggregation
+used in that Italian convention.
 
 Our central methodological finding is that the *form* of the equation
 is decisive. A conventional disaggregated error-correction model that
@@ -33,52 +34,88 @@ housing-wealth effect: there is no classical housing wealth effect,
 and the marginal propensity is unlocked only as the credit-conditions
 index (CCI) rises. Estimating a standalone housing-wealth coefficient
 therefore tests a parameter the theory predicts to be approximately
-zero, and duly finds it insignificant; reading that as a failed
-housing-wealth effect is a category error. When the equation is
-instead specified faithfully — housing wealth entering only through its
-CCI interaction, the autonomous-consumption CCI intercept restored,
-and illiquid financial assets combined — the error-correction and core
-wealth structure come alive (the faithful LIVES specification, Spec
-11), estimated on n = 146 rather than the n = 86 to which the
-conventional credit term binds the model. On the pre-COVID sample the
-speed of adjustment is λ = −0.245 (t = −4.8;
-australia_lambda_robustness.csv), within reach of Williams' published
-−0.286 (about 14 per cent below it). On the full sample it carries
-significant, correctly signed marginal propensities on net liquid
-(implied 0.077; OLS +0.037, t = 3.4) and illiquid financial (implied
-0.037; OLS +0.018, t = 3.0) wealth and a strong permanent-income
-response (OLS +0.50, t = 4.0). The implied housing-collateral
-propensity γ₁ is right-signed but insignificant (implied 0.010,
-t = 1.0), consistent
-with — but not confirmation of — Williams' calibrated 0.0488. The
-conventional constant-MPC specification (Spec 6), by contrast,
-delivers an insignificant λ = −0.18 (t = −1.8). Much of the apparent
-weakness of single-equation LIVES estimates for Australia is thus a
-specification artefact, not an economic result. (Permanent income is
-the full-sample Italy local-projection measure; its non-causal
-construction and a causal real-time robustness variant, which shrinks
-λ further, are discussed in §7.4.)
+zero; reading its insignificance as a failed housing-wealth effect is
+a category error. When the equation is instead specified faithfully —
+housing wealth entering only through its CCI interaction, the
+autonomous-consumption CCI intercept restored, and illiquid financial
+assets combined — the error-correction and core wealth structure come
+alive (the faithful LIVES specification, Spec 11), estimated on
+n = 146 rather than the n = 86 to which the conventional credit term
+binds the model. We anchor the headline on the COVID-controlled
+estimates: the speed of adjustment is λ ≈ −0.25 and tightly clustered
+across the pre-COVID, COVID-excluded and COVID-rich-dummy variants
+(−0.266, −0.248 and −0.242, with t-ratios of −4.8 to −6.7;
+australia_spec11_variants.csv), within about 13 per cent of Williams'
+published −0.286; the full-sample λ = −0.448 (t = −3.6) is inflated by
+the COVID quarters and we do not headline it. The credit-invariant
+wealth structure is right-signed and significant, and remains so under
+every COVID treatment: the structural net-liquid MPC is 0.060 (95 per
+cent CI [0.022, 0.098]) and the illiquid financial MPC 0.035
+([0.012, 0.057]), the latter spanning Williams' calibrated 0.022. The
+estimates are now precise enough to *reject* parts of Williams'
+profile rather than merely fail to distinguish them: his net-liquid
+MPC of 0.159 and his peak housing-collateral MPC of 0.0488 lie outside
+our intervals, while the housing-collateral channel itself is
+right-signed but insignificant (structural 0.0055, CI [−0.010,
+0.021]). The permanent-income response is strong (OLS +0.30 to +0.46,
+t ≈ 4–6), but its structural value of 1.0–1.1 exceeds the
+theoretical admissibility bound ψ ≤ 1 − η ≈ 0.95, a tension we
+disclose and show is not an artefact of the GFC learning-weight
+applied to the series. The conventional constant-MPC specification
+(Spec 6) delivers λ = −0.239 (t = −2.6) on a sample less than
+two-thirds the length. Much of the apparent weakness of
+single-equation LIVES estimates for Australia is thus a specification
+artefact, not an economic result. (Permanent income is the full-sample
+Italian direct-forecast measure; its non-causal construction and a
+causal real-time variant — λ = −0.159, with the permanent-income
+coefficient reversing sign — are discussed in §7.4.)
 
 The LIVES *structure* transfers to Australia, but Williams' Australian
 *calibrations* do not. Imposing his calibrated permanent-income
 gearing (ψ₀ = 0.20, ψ₁ = 0.93) collapses the error-correction to
 λ = −0.029 (t = −0.7; the Williams-calibration-imposed specification,
-Spec 12), independently reproduced by Spec 10 (λ = −0.048): the
-Australian data freely estimates a permanent-income response roughly
-two-and-a-half times Williams', and forcing his smaller value destroys
-the equilibrium. This reconciles a puzzle in our companion work, where
-a Wald test fails to reject Williams' joint calibration (χ² = 2.24) —
-the free estimates are too imprecise to reject his values, yet imposing
-them still ruins the fit; low power is not the same as good fit. The
-credit-conditions *interactions* are themselves only weakly identified:
-the six CCI-interacted regressors are 0.74–0.97 mutually correlated on
-this sample because each is approximately proportional to the latent
-index, so they cannot be separately estimated from a single equation.
-This is exactly why Williams calibrates and estimates a four-equation
-FIML system; on contemporary Australian data the single-equation
-calibration shortcut is empirically closed, leaving joint estimation
-and pre-1988 back-extension as the only routes to sharpen the credit
-channels.
+Spec 12, which flips sign pre-COVID), independently reproduced by
+Spec 10 (λ = −0.057): the Australian data freely estimate a
+permanent-income gearing several times Williams', and forcing his
+smaller value destroys the equilibrium. This reconciles a puzzle in
+our companion work, where a Wald test fails to reject Williams' joint
+calibration (χ²(6) = 7.55, p = 0.27) — the free estimates are too
+imprecise to reject his values jointly, yet imposing them still ruins
+the fit; low power is not the same as good fit. The credit-conditions
+*interactions* are themselves only weakly identified: the CCI-scaled
+regressors are 0.66–0.97 mutually correlated in absolute value on this
+sample (australia_cci_interaction_corr.csv) because each is
+approximately proportional to the latent index, so they cannot be
+separately estimated from a single equation. This is exactly why
+Williams calibrates and estimates a four-equation FIML system; on
+contemporary Australian data the single-equation calibration shortcut
+is empirically closed, leaving joint estimation and pre-1988
+back-extension as the only routes to sharpen the credit channels.
+
+The deployed CCI itself is disclosed in full rather than implied: only
+four of fifteen candidate knots survive the sign-prior reduction, all
+post-2007 (2007Q3, 2009Q1, 2019Q1, 2020Q2), so the index is identically
+zero from 1988 to mid-2007, plateaus at its peak over 2010–2018, and
+turns negative after 2019 (range −2.1 to 1;
+australia_cci_williams_path.png). The credit channels are therefore
+identified off roughly seventy post-2007 quarters, not the full
+n = 146, and the housing-collateral MPC implied by γ₁·CCI is negative
+in the post-2019 regime — a property Williams' [0, 0.8] index cannot
+produce and a caveat on any structural reading of the interactions.
+Placebo evidence is split and reported both ways: the literal Williams
+4-knot spline sits at the placebo median (45th adjusted-R² percentile
+over 200 random-knot draws), but the *deployed* construction — the
+maximal candidate set under the same iterated sign-prior reduction used
+in estimation — beats 84 per cent of random draws
+(australia_williams_knot_placebo_deployed_verdict.csv), moderate
+support for institutional knot placement. A two-equation SUR of
+consumption and house prices delivers negligible cross-equation
+residual correlation (ρ̂ = −0.013) and essentially no efficiency gain,
+and a joint cross-equation CCI identification retains only one knot
+across all four equations. We read these findings as indicating that
+the structural identification Williams (2010) delivers comes from
+cross-equation parameter restrictions in his four-equation FIML system
+rather than from sample length, knot count, or sign-prior structure.
 
 We assemble a back-extended master dataset to 1976Q3 — using a TRYM
 long-run house-price series, RBA D03 monetary aggregates, RBA D02
@@ -87,56 +124,29 @@ aggregate and disaggregated wealth proxies anchored at 1988Q3, when
 ABS sectoral balance-sheet data begin — to test whether sample length
 is the binding constraint on tighter agreement with Williams.
 Refitting the disaggregated no-CCI specification (Spec 4) on the
-back-extended 1976Q3–2024Q4 sample (n = 190 in the cointegration
-window), λ moves about 37 per cent closer to Williams (−0.140 →
-−0.193) but individual wealth coefficients become smaller rather than
-larger, and the net-liquid coefficient collapses toward zero — sample
-length is not the binding constraint. The CCI placebo battery is weak
-on both samples: the literal Williams 4-knot deteriorates from the
-34th adjusted-R² percentile on the 1988+ sample to the 18th on the
-back-extended sample (200 placebo draws;
-australia_williams_knot_placebo_verdict.csv and
-…_extended_summary.csv), the maximal-GETS reduction sits at the 64th
-percentile and the sectional-period variant near the median. A
-two-equation SUR of consumption and house prices delivers negligible
-cross-equation residual correlation and essentially no efficiency
-gain — the SUR and single-equation coefficients differ only within
-sampling noise (australia_joint_pi_robustness.csv). A joint
-cross-equation CCI identification retains only two of seven
-single-equation knot survivors. We read these findings as indicating
-that the structural identification Williams (2010) delivers comes from
-cross-equation parameter restrictions in his four-equation FIML system
-rather than from sample length, knot count, or sign-prior structure.
-The calibration-collapse and interaction-collinearity results
-independently confirm this: the faithful single-equation LIVES form
-recovers Williams' error-correction speed and wealth structure, but
-the separate identification of the credit interactions — and the
-transferability of his credit-channel calibrations — require his joint
-system.
-
-We report the honest negative results throughout, not as caveats but
-as substantive findings that a freely-estimated single-equation
-framework permits and an imposed-restriction framework would hide: the
-CCI placebo failure, the negligible SUR efficiency gain, the loss to a
-random-walk-with-drift benchmark out of sample at horizons of four and
-eight quarters, the divergence of model-selection criteria (the
-automated screen favours a net-worth specification, the
-Bayesian-information criterion the free-interaction specification, and
-LIVES theory the faithful Spec 11), and the partial reversal of the
-permanent-income response under a real-time, causal forecaster. Each
-points to the same conclusion as the calibration and collinearity
-diagnostics: four-equation FIML and pre-1988 back-extension are the
-routes needed to sharpen the credit channels. The paper includes a
-structured robustness suite covering instrumental variables, joint SUR
-estimation, Chow tests at multiple break dates, the Drehmann (2017)
-amortising-mortgage adjustment, the Williams smoothed-step
-credit-conditions spline with maximal-GETS reduction, a Kalman
-state-space credit factor, sectional sign-prior alternatives,
+back-extended sample moves λ about 12 per cent toward Williams
+(−0.182 → −0.203) but the net-liquid coefficient collapses toward
+zero — sample length is not the binding constraint. The remaining
+honest negatives are reported as substantive findings: the structural
+specifications beat a random walk with drift out of sample at the
+one-quarter horizon but lose at four and eight quarters; the automated
+selection screen (which caps |λ| at 0.30) prefers a net-worth
+specification while the Bayesian information criterion and LIVES
+theory now both point to Spec 11; no specification passes the
+Engle–Granger cointegration screen at MacKinnon critical values; and
+the full-sample permanent-income measure partially reverses under a
+causal real-time forecaster. The paper includes a structured
+robustness suite covering instrumental variables with first-stage
+diagnostics, joint SUR estimation, Chow tests at multiple break dates,
+the Drehmann (2017) amortising-mortgage adjustment, the Williams
+smoothed-step credit-conditions spline with maximal-GETS reduction, a
+Kalman state-space credit factor, sectional sign-prior alternatives,
 rolling-window estimation, out-of-sample forecast validation against
 random-walk and AR(1) benchmarks, and back-extension robustness on
-Spec 1 and Spec 4. A full reproducibility kit accompanies the paper,
-along with a multi-equation LIVES scaffold that lays the foundations
-for a companion paper.
+Spec 1 and Spec 4 — with the headline Spec 11 included in every
+exercise. A full reproducibility kit accompanies the paper, along with
+a multi-equation LIVES scaffold that lays the foundations for a
+companion paper.
 
 ---
 
@@ -232,22 +242,27 @@ permanent-income gearing (psi_0 = 0.20, psi_1 = 0.93) and his illiquid
 financial MPC (gamma_IFA = 0.022) — the Williams-calibration-imposed
 specification, Spec 12 — *collapses* the equilibrium: the speed of
 adjustment falls to lambda = −0.029 (t = −0.68, full sample), statistically
-indistinguishable from zero. An independent calibration route (Spec 10,
-Williams-prior) reproduces the collapse (lambda = −0.048, t = −0.76). The
-reason is that Australia freely estimates a permanent-income weight of order
-0.50, around two and a half times Williams' 0.20, so forcing his value
-breaks the long-run fixed point. This reconciles the companion paper's Wald
-non-rejection of Williams' joint calibration: the free single-equation
-estimates are too imprecise to *reject* Williams' values — every one of his
-Table 1 values lies inside our gamma-inference 95 per cent intervals, but so
-does zero in every case — yet imposing those values nonetheless wrecks the
-fit. Low power is not the same as good fit.
+indistinguishable from zero, and flips sign pre-COVID. An independent
+calibration route (Spec 10, Williams-prior) reproduces the collapse
+(lambda = −0.057, t = −0.87). The reason is that Australia freely
+estimates a structural permanent-income gearing of order one — several
+times Williams' 0.20 — so forcing his value breaks the long-run fixed
+point. This reconciles the companion paper's Wald non-rejection of
+Williams' joint calibration (chi-squared(6) = 7.55, p = 0.27): the free
+Spec 6 estimates are too imprecise to *reject* Williams' values
+jointly — although the sharper Spec 11 intervals now reject his
+net-liquid and peak-housing magnitudes individually (§7.3.1) — yet
+imposing his calibration nonetheless wrecks the fit. Low power is not
+the same as good fit.
 
 **(iii) An interaction-collinearity diagnosis explaining why Williams needs
-FIML.** The six CCI-interacted regressors that constitute the credit
-channels are between roughly 0.74 and 0.97 mutually correlated on the
-post-1988 Australian sample, because each is approximately proportional to
-the same latent CCI. They cannot, therefore, be separately free-estimated
+FIML.** The CCI-interacted regressors that constitute the credit
+channels have absolute pairwise correlations between roughly 0.66 and
+0.97 on the post-1988 Australian sample
+(australia_cci_interaction_corr.csv), because each is approximately
+proportional to the same latent CCI — which itself has no variation
+before 2007Q3 (§5.1.1), so the credit channels are identified off
+roughly seventy quarters. They cannot, therefore, be separately free-estimated
 off a single equation. This is the structural reason Williams identifies the
 credit channels through cross-equation FIML restrictions rather than within
 the consumption equation alone. The corollary is that single-equation
@@ -264,105 +279,145 @@ sectoral household balance-sheet data begin. Because the
 financial-liberalisation episode that identifies the credit channels largely
 predates 1988Q3, this back-extension is the natural route to longer credit
 variation. Refitting the disaggregated no-CCI specification (Spec 4) on the
-extended sample moves lambda about 37 per cent closer to Williams (−0.140 to
-−0.193), but individual wealth coefficients shrink rather than strengthen
-and the net liquid MPC collapses — so sample length is *not* the binding
-constraint on tighter agreement with Williams.
+extended sample moves lambda about 12 per cent toward Williams (−0.182
+to −0.203), but individual wealth coefficients shrink rather than
+strengthen and the net liquid MPC collapses — so sample length is *not*
+the binding constraint on tighter agreement with Williams.
 
 **(v) A structured robustness and placebo suite, and a set of honest
 negative results reported as substantive findings.** Mirroring the De Bonis,
 Liberati, Muellbauer and Rondinelli (2020) Italian methodology, we run instrumental
 variables, a Zellner SUR, multi-window Chow and Bai–Perron break tests, the
-Drehmann amortisation adjustment, an AR/Italy local-projection
+Drehmann amortisation adjustment, an AR/Italy direct-forecast
 permanent-income comparison with a real-time column, a permanent-income
 filter sensitivity grid, rolling-window estimation, and out-of-sample
 validation against random-walk and AR(1) benchmarks. We retain — and report
 prominently, without apology — the negative results that a freely estimated
-single-equation framework permits: the credit-conditions spline does not
-strongly outperform random-knot placebos (it sits in the 18th–34th
-adjusted-R² percentile band across placebo variants); the SUR delivers
-essentially no efficiency gain (negligible cross-equation residual
-correlation); the structural specifications lose to a random walk with drift
-out of sample at horizons of four and eight quarters; the automated selector,
-the BIC and LIVES theory each point to a different specification; and the
-full-sample permanent-income measure is partly reversed under a causal
-real-time projection. Each negative is diagnostic: it points to why FIML and
+single-equation framework permits: the literal Williams 4-knot spline
+sits at the placebo median, although the *deployed* maximal-GETS
+construction beats 84 per cent of random draws under its own iterated
+reduction protocol; the SUR delivers essentially no efficiency gain
+(negligible cross-equation residual correlation); the structural
+specifications beat a random walk with drift out of sample at one
+quarter but lose at four and eight; the automated selection screen
+prefers a net-worth specification while the BIC and LIVES theory now
+both point to the faithful Spec 11; no specification passes the
+Engle–Granger cointegration screen; and the full-sample
+permanent-income measure is partly reversed under a causal real-time
+projection. Each negative is diagnostic: it points to why FIML and
 back-extension are the routes forward.
 
 ### 1.3 Headline result
 
-The faithful LIVES specification (Spec 11) is the headline. On the
-full sample (1988Q3–2024Q4, n = 146) it delivers a speed of adjustment of
-**lambda = −0.480** (Newey–West t = −3.59), and on the pre-COVID sample
-(1988Q3–2019Q4, n = 126) **lambda = −0.245** (t = −4.80), close to Williams'
-(2010) published −0.286 (his phi_c). We treat the pre-COVID estimate as the
-identified value: the full-sample magnitude is inflated by the COVID
-quarters and fails the upper-bound screen on |lambda| in the selection
-rubric (§6), while the pre-COVID estimate is both correctly signed and
-sharply determined. [Source: australia_all_results.csv;
-australia_lambda_robustness.csv.]
+The faithful LIVES specification (Spec 11) is the headline, and we
+anchor it on the COVID-controlled estimates. The speed of adjustment is
+tightly clustered at **lambda ≈ −0.25** across the three COVID-robust
+variants — −0.266 (t = −4.85) on the pre-COVID sample (1988Q3–2019Q4,
+n = 126), −0.248 (t = −6.66) dropping 2020Q1–2021Q4, and −0.242
+(t = −6.25) with quarterly 2020–21 dummies — within about 13 per cent of
+Williams' (2010) published −0.286 (his phi_c). The full-sample estimate
+(1988Q3–2024Q4, n = 146) is **lambda = −0.448** (Newey–West t = −3.57);
+it is inflated by the COVID quarters — the three pulse dummies the
+full-sample specification carries are not sufficient — and it fails the
+upper-bound screen on |lambda| in the selection rubric (§6), so we
+report it but do not headline it. The full Spec 11 coefficient vector
+under all four sample treatments is committed
+(australia_spec11_variants.csv) so this choice is checkable. [Source:
+australia_spec11_variants.csv; australia_lambda_robustness.csv.]
 
-The wealth structure is right-signed and, for the credit-invariant
-components, significant. On the full sample the net liquid MPC is
-**nla_y = +0.037** (t = 3.40, significant at 1 per cent; implied structural
-MPC gamma_3 = OLS/|lambda| = 0.077) and the illiquid financial MPC is
-**ilfa_y = +0.018** (t = 3.03, significant at 1 per cent; implied structural
-gamma_2 = 0.037). The housing-collateral channel enters with the right sign
-but is not significant: **ha_x_cci = +0.0049** (t = 1.03), implying a
-structural housing-collateral MPC of gamma_1 = 0.010, against Williams'
-peak housing MPC of 0.0488. Permanent income enters strongly:
-**ln_yp_over_y = +0.504** (t = 4.00) on the full sample and +0.279
-(t = 4.75) pre-COVID, consistent with a freely estimated permanent-income
-weight of order 0.50. [Source: australia_all_results.csv.]
+The credit-invariant wealth structure is right-signed and significant,
+and — crucially — its significance survives every COVID treatment. The
+net liquid MPC is **nla_y = +0.027** (t = 3.75) on the full sample,
++0.017 (t = 2.11) with the COVID quarters dropped and +0.014 (t = 3.10)
+under quarterly COVID dummies, implying a structural MPC
+gamma_3 = OLS/|lambda| of about **0.060** with a 95 per cent
+delta-method interval of [0.022, 0.098]. The illiquid financial MPC is
+**ilfa_y = +0.015** (t = 3.09) full-sample and significant at 5 per cent
+in the COVID-controlled variants, implying structural
+gamma_2 ≈ **0.035** [0.012, 0.057] — an interval that spans Williams'
+calibrated 0.022. The housing-collateral channel enters with the right
+sign but is not significant in any variant: **ha_x_cci = +0.0025**
+(t = 0.71 full sample), implying a structural peak housing-collateral
+MPC of gamma_1 ≈ 0.0055 [−0.010, 0.021]. [Source:
+australia_spec11_variants.csv; australia_gamma_inference.csv.]
 
-The honest qualifier on the housing channel is that it is *right-signed but
-insignificant*: gamma_1 = 0.010 (t = 1.03) is consistent with Williams'
-0.0488 only in the weak sense that the latter lies inside a wide confidence
-interval that also contains zero. This is consistency, not confirmation — a
-non-rejection driven by imprecision rather than by point-estimate agreement.
-The accompanying gamma-inference exercise makes the point general: every one
-of Williams' Table 1 values lies inside our 95 per cent interval, but so
-does zero in every case. [Source: australia_gamma_inference.csv.]
+The gamma-inference exercise now cuts both ways, which is a substantive
+upgrade on an earlier draft in which every comparison was vacuous.
+Spec 11's intervals are tight enough to *reject* parts of Williams'
+profile: his net-liquid MPC (0.159) lies outside [0.022, 0.098], and his
+peak housing MPC (0.0488) lies outside [−0.010, 0.021]; his illiquid
+financial MPC (0.022) is comfortably inside ours. The honest reading is
+agreement on the *form* and on the illiquid-financial channel,
+disagreement on magnitudes for the net-liquid channel, and an
+underpowered housing-collateral channel whose interval contains zero.
+[Source: australia_gamma_inference.csv.]
+
+Permanent income enters strongly: **ln_yp_over_y = +0.459** (t = 4.04)
+on the full sample and +0.298 (t = 5.81) pre-COVID. Applying the
+paper's own structural-recovery rule (§4.2), however, the implied
+gearing is OLS/|lambda| ≈ **1.02 full-sample and 1.12–1.13 in the
+COVID-controlled variants — above the theoretical admissibility bound
+psi ≤ 1 − η ≈ 0.95**. We flag this openly rather than re-scale it away:
+the breach is not an artefact of the GFC learning-weight applied to the
+permanent-income series (re-estimating without the ogive gives
+lambda = −0.574 with structural gearing ≈ 1.05;
+australia_spec11_ogive_robustness.csv), and §7.0 discusses the
+candidate explanations, including remaining COVID leverage and the
+non-causal construction of the measure itself. Comparisons with
+Williams' psi_0 = 0.20 must be made on a consistent scale: the correct
+statements are "structural ≈ 1.0–1.1 versus 0.20" or "OLS +0.46 versus
+phi·psi_0 ≈ 0.057", not the OLS-to-structural mix an earlier draft
+used. [Source: australia_spec11_variants.csv;
+australia_spec11_ogive_robustness.csv.]
 
 The contrast with the calibration route is sharp. Imposing Williams'
 Australian calibrations (Spec 12: psi_0 = 0.20, psi_1 = 0.93,
-gamma_IFA = 0.022) collapses the error-correction term to lambda = −0.029
-(t = −0.68) on the full sample and flips its sign on the pre-COVID sample
-(lambda = +0.030, not significant); the independent Williams-prior route
-(Spec 10) reproduces the collapse at lambda = −0.048 (t = −0.76). The LIVES
-*structure* transfers to Australia; Williams' Australian *calibrations* do
-not. Williams' rate, affordability and autonomous-consumption loadings
-cannot even be imposed at their published magnitudes — his raw rate loading
-(alpha_r = −0.871) is roughly thirty times too large on the repository's
-percent real-rate by unit-normalised-CCI scaling, and diverges the long-run
-fixed point. [Source: australia_all_results.csv;
+gamma_IFA = 0.022) collapses the error-correction term to
+lambda = −0.029 (t = −0.68) on the full sample and flips its sign on
+the pre-COVID sample (lambda = +0.029, not significant); the
+independent Williams-prior route (Spec 10) reproduces the collapse at
+lambda = −0.057 (t = −0.87). The LIVES *structure* transfers to
+Australia; Williams' Australian *calibrations* do not. Williams' rate,
+affordability and autonomous-consumption loadings cannot even be
+imposed at their published magnitudes — his raw rate loading
+(alpha_r = −0.871) is roughly thirty times too large on the
+repository's percent real-rate by unit-normalised-CCI scaling, and
+diverges the long-run fixed point. [Source: australia_all_results.csv;
 australia_lambda_robustness.csv.]
 
-By contrast, the conventional constant-MPC disaggregated ECM (Spec 6) — the
-specification an earlier draft, and prior Australian work, treated as the
-LIVES equation — delivers lambda = −0.180 (t = −1.76, full sample, n = 86),
-significant only at the 10 per cent level, with an insignificant standalone
-housing coefficient (ha_y = +0.0088, t = 1.52). We retain Spec 6 as the
-conventional baseline against which the faithful form is the alternative,
-but we no longer read its insignificant standalone ha_y as a failed
-housing-wealth effect: under LIVES theory that coefficient is expected to be
-approximately zero absent the credit interaction. [Source:
-australia_all_results.csv.]
+By contrast, the conventional constant-MPC disaggregated ECM
+(Spec 6) — the specification an earlier draft, and prior Australian
+work, treated as the LIVES equation — delivers lambda = −0.239
+(t = −2.55) on the n = 86 sample to which its credit term binds it,
+with an insignificant standalone housing coefficient (ha_y = +0.0022,
+t = 0.30). We retain Spec 6 as the conventional baseline against which
+the faithful form is the alternative, but we no longer read its
+insignificant standalone ha_y as a failed housing-wealth effect: under
+LIVES theory that coefficient is expected to be approximately zero
+absent the credit interaction. [Source: australia_all_results.csv.]
 
 Finally, the credit-conditions identification limits are reported as
-findings rather than hidden. The deployed CCI spline sits in the
-18th–34th adjusted-R² percentile band across random-knot placebo variants;
-the six CCI interactions are mutually collinear (roughly 0.74–0.97) and so
-cannot be separately identified off one equation; the SUR of consumption and
-house prices shows negligible residual correlation and no efficiency gain;
-and the structural specifications lose to a random walk with drift out of
-sample at the four- and eight-quarter horizons. We do not promote the
-CCI-interactions specification (Spec 8, lambda = −0.445) as a
-credit-conditions success: it re-allocates identification across regressors
-rather than closing the gap with Williams, and its individual interaction
-coefficients are wrong-signed or insignificant. [Source:
-australia_williams_knot_placebo_verdict.csv; australia_oos_rmse.csv;
-australia_all_results.csv.]
+findings rather than hidden, starting with the deployed index itself:
+only four of fifteen candidate knots survive, all post-2007, so the
+CCI is identically zero from 1988 to mid-2007 and negative after 2019
+(§5.1.1 and australia_cci_williams_path.png) — the credit channels are
+identified off roughly seventy quarters, not the nominal n = 146. The
+placebo evidence is split: the literal Williams 4-knot sits at the
+placebo median (45th adjusted-R² percentile), while the deployed
+maximal-GETS construction under its own iterated reduction protocol
+beats 84 per cent of random draws — moderate support, short of strong
+identification. The CCI-scaled regressors are mutually collinear
+(|rho| 0.66–0.97; australia_cci_interaction_corr.csv) and so cannot be
+separately identified off one equation; the SUR of consumption and
+house prices shows negligible residual correlation (ρ̂ = −0.013) and no
+efficiency gain; and the structural specifications beat a random walk
+with drift out of sample at one quarter but lose at four and eight. We
+do not promote the free-interaction specification (Spec 8,
+lambda = −0.458) as a credit-conditions success: it re-allocates
+identification across regressors rather than closing the gap with
+Williams. [Source: australia_williams_knot_placebo_verdict.csv;
+australia_williams_knot_placebo_deployed_verdict.csv;
+australia_oos_rmse.csv; australia_all_results.csv.]
 
 ### 1.4 Roadmap
 
@@ -370,8 +425,8 @@ Section 2 surveys the LIVES literature, the Australian aggregate-wealth-effect
 literature and permanent-income measurement, and frames the LIVES claim that
 there is no classical housing-wealth effect — so that standalone-wealth
 specifications mis-test the theory. Section 3 documents data construction,
-including the disaggregated wealth ratios, the Italy local-projection
-permanent-income forecaster with its look-ahead versus real-time caveat, and
+including the disaggregated wealth ratios, the Italian direct-forecast
+permanent-income measure with its look-ahead versus real-time caveat, and
 the 1976Q3 back-extension sources and proxies. Section 4 presents the
 canonical LIVES equation (Eq (7)) and distinguishes the faithful form
 (Spec 11) from the conventional constant-MPC ECM (Spec 6) as a matter of
@@ -532,8 +587,9 @@ Liberati, Muellbauer and Rondinelli (2020) estimate a single-equation Italian
 adaptation that imposes the cross-equation restriction
 γ_LA + γ_LOANS = 0 (deposits and household debt enter with
 equal-and-opposite coefficients, so that net liquid assets is the
-operative quantity), adopts a Jordà (2005) local-projection
-permanent-income forecaster, applies a Drehmann (2017)
+operative quantity), adopts a direct single-regression forecast of the
+discounted future-income aggregate as its permanent-income measure
+(their Appendix A.2), applies a Drehmann (2017)
 amortising-mortgage adjustment to the real mortgage rate, and
 validates the single-equation OLS estimator against joint SUR.
 Chauvin and Muellbauer (2018), in the Banque de France working-paper
@@ -646,10 +702,8 @@ methodological contribution of the LIVES family — and, as this paper
 argues, a structural necessity rather than a stylistic preference. The
 reason is collinearity. The six CCI-interacted regressors are each
 approximately proportional to CCI, and on the post-1988 Australian
-sample they are 0.74–0.97 mutually correlated (a property of the
-estimation sample; the closest committed evidence is the
-identification-versus-detrending decomposition in §5 and the
-sign-failures and collapse documented in §7). Six near-collinear
+sample they are 0.66–0.97 mutually correlated in absolute value
+(`australia_cci_interaction_corr.csv`; §5.5). Six near-collinear
 interaction regressors cannot be separately freely estimated off a
 single equation; in single-equation OLS the spline can be proxied or
 calibrated, but the individual credit channels cannot be jointly
@@ -700,47 +754,46 @@ enters with a credit-conditions-dependent gearing, ψ(CCI) = ψ_0 +
 ψ_1 = 0.93); §4 and §7 take up whether that calibration transfers to
 Australia.
 
-Two recent methodological developments have improved on the AR(p)
-recipe. Jordà (2005), originally proposed for impulse-response
-identification, estimates the discounted weighted average of income over
-the relevant horizon directly as the dependent variable in a single
-regression, with predictors observable at time *t*. The local-projection
-approach sidesteps the compounding of AR misspecification across forecast
-horizons to which the standard recipe is vulnerable, and admits a
-richer predictor set than is feasible in a parsimonious AR(p).
-Carroll, Slacalek and Tokuoka (2014), in ECB Working Paper 1648,
-document substantial differences between the permanent-income series
-implied by AR(p) forecasting and by direct local-projection
-forecasting in the consumer-expenditure context. The differences are
-concentrated at structural-break episodes, where AR(p) forecasts
-inherit the slow adjustment of the estimated AR coefficients while
-local projections can incorporate predictors capturing the regime
-change.
+An alternative to the AR(p) recipe is to forecast the discounted
+aggregate *directly*: compute, for each quarter whose forecast horizon
+is observable, the discounted weighted average of realised future log
+income, and regress that pre-aggregated target on predictors observable
+at time *t* in a single equation. This *direct forecast* of the
+horizon-aggregate — the method of De Bonis, Liberati, Muellbauer and
+Rondinelli (2020, Appendix A.2), and related in spirit to (though
+distinct from) Jordà's (2005) direct multi-horizon projections, which
+fit one regression per horizon — sidesteps the compounding of AR
+misspecification across forecast horizons to which the standard recipe
+is vulnerable, and admits a richer predictor set than is feasible in a
+parsimonious AR(p). (An earlier draft of this paper labelled the method
+a "Jordà local projection"; we retain the De Bonis et al. attribution
+throughout, since the implementation is a single full-sample regression
+of the pre-aggregated discounted target, not a per-horizon projection.)
 
-De Bonis et al. (2020) explicitly adopt the Jordà local-projection
-approach for their Italian permanent-income series, reporting that the
+De Bonis et al. (2020) adopt this direct-forecast approach for their
+Italian permanent-income series, reporting that the
 choice "captures much of the slow-down of permanent income growth in
 the early 1990s" — a structural feature of Italian growth that the
-AR-based forecaster missed. The Italian local projection includes a
-`log(labour_force / population)` predictor, which slowly trends with
+AR-based forecaster missed. The Italian forecasting regression includes
+a `log(labour_force / population)` predictor, which slowly trends with
 demographic change and is a natural input to long-horizon income
 forecasting. We adopt the same predictor in our Italy-style
 permanent-income helper, with a discounted (η = 0.05, k = 40 quarters)
 weighted average of expected future income (§3, §4), and find a
 quantitatively similar role: the permanent-income series implied by
-local projection in Australia diverges materially from the AR-based
+the direct forecast in Australia diverges materially from the AR-based
 series in the early 1990s and after the 2008 GFC. Substantively, the
-implied long-run coefficient on log(y^p/y) moves from significantly
-negative under the AR forecaster — the "Australian permanent-income
-puzzle" — to positive under the full-sample local-projection *measure*.
+implied long-run coefficient on log(y^p/y) moves from slightly negative
+and economically negligible under the AR forecaster — the "Australian
+permanent-income puzzle" — to positive under the full-sample
+direct-forecast *measure*.
 As §8 documents, this reversal reflects the measure's full-sample
 (non-causal, look-ahead) construction and does not survive a causal
 real-time projection, which sharply shrinks the speed of adjustment
-(real-time AR λ = −0.051, ns; real-time Italy λ = −0.118 against the
-full-sample −0.197; pi_realtime_robustness.csv). The look-ahead versus
-real-time distinction is therefore flagged as a measurement caveat
-throughout: the full-sample permanent-income measure is the headline
-input, with the real-time variant reported as the operational
+(see §7.4 and australia_pi_realtime_robustness.csv). The look-ahead
+versus real-time distinction is therefore flagged as a measurement
+caveat throughout: the full-sample permanent-income measure is the
+headline input, with the real-time variant reported as the operational
 robustness column.
 
 ### 2.6 Where this paper sits
@@ -758,18 +811,20 @@ term), with no standalone housing-wealth level — the
 autonomous-consumption CCI intercept restored (ζ_c·CCI), and illiquid
 financial assets combined (ilfa_y = equities + superannuation), the
 error-correction and core wealth structure come alive. The faithful
-specification (the headline of §7.0) delivers a pre-COVID speed of
-adjustment of λ = −0.245 (t = −4.80), almost exactly Williams' −0.286,
-on a sample of n = 146 (full) / 126 (pre-COVID); correctly signed and
-significant net-liquid and illiquid-financial marginal propensities
-(structural MPCs of 0.077 and 0.037 respectively, full sample,
-relative to |λ| = 0.480); a strong permanent-income coefficient
-(+0.50, t = 4.0); and a housing-collateral coefficient (γ_1) that is
-right-signed but insignificant (implied structural MPC 0.010, t = 1.03,
-against Williams' peak 0.0488). By contrast, the conventional
-constant-MPC disaggregated error-correction model that prior work and
-an earlier draft of this paper treated as the LIVES equation is *not*
-the LIVES equation and delivers an insignificant speed of adjustment.
+specification (the headline of §7.0) delivers a COVID-controlled speed
+of adjustment of λ ≈ −0.25 (pre-COVID −0.266, t = −4.85), within about
+13 per cent of Williams' −0.286, on a sample of n = 146 (full) / 126
+(pre-COVID); correctly signed and significant net-liquid and
+illiquid-financial marginal propensities (structural MPCs of 0.060 and
+0.035 respectively, full sample, relative to |λ| = 0.448); a strong
+permanent-income coefficient (+0.46, t = 4.0); and a housing-collateral
+coefficient (γ_1) that is right-signed but insignificant (implied
+structural MPC 0.0055, t = 0.71, against Williams' peak 0.0488). By
+contrast, the conventional constant-MPC disaggregated error-correction
+model that prior work and an earlier draft of this paper treated as the
+LIVES equation is *not* the LIVES equation and delivers a weaker,
+sample-fragile equilibrium (λ = −0.239, t = −2.55, on its n = 86
+sample, collapsing to −0.087 pre-COVID).
 Reading its insignificant standalone housing coefficient as a failed
 housing wealth effect is the category error described above; much of
 the apparent weakness of Australian single-equation LIVES estimates is
@@ -780,12 +835,13 @@ LIVES *structure* transfers to Australia, but Williams' Australian
 *calibrations* do not. Imposing his permanent-income gearing
 (ψ_0 = 0.20, ψ_1 = 0.93) and illiquid-financial MPC (γ_IFA = 0.022)
 collapses the equilibrium to λ ≈ −0.029 (t = −0.68), independently
-reproduced by a Williams-prior calibrated specification (λ = −0.048),
-because Australia freely estimates ψ at roughly 0.50 — about 2.5 times
-Williams' 0.20 (a framing we hedge, since the headline ln(y^p/y)
-coefficient is +0.50 and the ψ_0/ψ_1 split is not separately
-identified). This reconciles the companion paper's Wald non-rejection
-of the joint calibration (χ² = 2.24): the free estimates are too
+reproduced by a Williams-prior calibrated specification (λ = −0.057),
+because Australia freely estimates a structural permanent-income
+gearing of order one (ψ̂ = OLS/|λ| ≈ 1.0–1.1) — roughly five times
+Williams' 0.20 on the consistent structural scale (equivalently, the
+OLS coefficient +0.46 against his implied φ·ψ_0 ≈ 0.057). This
+reconciles the companion paper's Wald non-rejection of the joint
+calibration (χ²(6) = 7.55, p = 0.27): the free estimates are too
 imprecise to reject Williams' values, but imposing those values wrecks
 the fit — low power is not the same as good fit. Williams' rate and
 affordability loadings cannot even be imposed at published magnitudes:
@@ -794,8 +850,9 @@ percent real-rate × unit-normalised CCI scaling, and diverges the
 fixed point.
 
 **(iii) The interaction-collinearity diagnosis.** The six
-CCI-interacted regressors are 0.74–0.97 mutually correlated on this
-sample because each is approximately proportional to CCI, and so cannot
+CCI-interacted regressors are 0.66–0.97 mutually correlated in absolute
+value on this sample (australia_cci_interaction_corr.csv) because each
+is approximately proportional to CCI, and so cannot
 be separately freely estimated off a single equation. This is the
 structural reason Williams uses FIML, and it explains why single-equation
 calibration is empirically closed and why four-equation FIML plus
@@ -811,10 +868,10 @@ labour-force compilation (1964Q3+). For the 1976Q3–1988Q2 window where
 ABS sectoral household balance-sheet data are unavailable, we construct
 aggregate and disaggregated wealth proxies anchored at 1988Q3 (§3).
 Refitting the disaggregated no-CCI specification on the back-extended
-sample moves the speed of adjustment 37% closer to Williams (λ from
-−0.140 to −0.193; lambda_robustness.csv / spec46_extended_comparison.csv),
+sample moves the speed of adjustment about 12% toward Williams (λ from
+−0.182 to −0.203; lambda_robustness.csv / spec46_extended_comparison.csv),
 but the individual wealth coefficients shrink and the net-liquid-asset
-coefficient collapses (a sign flip, −106%) — which we read as evidence
+coefficient collapses (−95%) — which we read as evidence
 that the binding constraint is the single-equation framing itself, not
 the post-1988 sample window. Sample length is not the binding
 constraint.
@@ -829,16 +886,18 @@ column. The paper is honest throughout about the limitations of
 single-equation LIVES estimation on post-deregulation Australian data,
 and reports the negative results prominently as substantive findings
 that a freely-estimated single-equation framework permits (where imposed
-restrictions would hide them): the deployed credit-conditions index
-sits only in the 18th–34th adjusted-R² percentile band of a knot
-placebo across variants; a two-equation consumption + house-price SUR
-finds negligible cross-equation residual correlation and so no
-efficiency gain (the literal value ≈ −0.004 cited in the companion
-work is a narrative figure; the committed evidence is the OLS-versus-SUR
-coefficient stability in joint_pi_robustness.csv); out-of-sample, the
-random walk with drift beats every structural specification at horizons
-h = 4 and h = 8; the automated specification selector diverges from
-both the BIC-minimising and the theory-preferred specification; and the
+restrictions would hide them): the knot-placebo evidence on the
+credit-conditions index is split — the literal Williams four-knot
+construction sits at the placebo median (45th adjusted-R² percentile)
+and below it on the extended variants (36th–48th), while the deployed
+maximal-GETS protocol beats 84 per cent of random draws; a two-equation
+consumption + house-price SUR finds negligible cross-equation residual
+correlation and so no efficiency gain (SUR ρ̂ = −0.013 against OLS
+−0.011; lives_sur_2eq_resid_corr.csv); out-of-sample, the random walk
+with drift beats every structural specification at horizons h = 4 and
+h = 8 (though Specs 8 and 11 beat it at h = 1); the automated
+specification selector falls back to a non-LIVES net-worth form
+(Spec 3) even though BIC and theory agree on Spec 11; and the
 look-ahead permanent-income reversal does not survive real-time
 construction. Each negative is read diagnostically — it points to why
 FIML and back-extension, rather than further single-equation
@@ -895,7 +954,9 @@ variables in a given specification are observed:
 - **Spec 1–3 (aggregate net worth)** with the back-extension proxy fit
   on n=190 (1977Q3–2024Q4; the binding constraint is `real_rate`, which
   needs a 4-quarter CPI lag for inflation computation). On the official
-  `networth_y` (1988Q3+ ABS) they fit on n=146.
+  `networth_y` (1988Q3+ ABS), Specs 1 and 3 fit on n=146; Spec 2 carries
+  the short-run CCI term and so binds at the 2002Q3 loan-flow constraint
+  (n=86 full / n=66 pre-COVID).
 - **Spec 4 (disaggregated, no CCI) and the faithful LIVES specification
   (Spec 11)** use the official disaggregated series and fit on **n=146**
   (1988Q3–2024Q4), with a **pre-COVID** sub-sample of **n=126**
@@ -975,7 +1036,9 @@ normalised consumption deflator and to per-capita-15+ values by dividing
 by the 15+ population.
 
 Following Williams' Eq (7), wealth enters the long run as
-**asset/annualised-income ratios**, `x_{t-1}/4y`. The
+**asset/annualised-income ratios**. In our implementation the ratio is
+*contemporaneous*: the end-of-quarter (closing) stock divided by four
+times current quarterly income, `x_t/4y`. The
 wealth-to-annualised-income ratios used in the long-run consumption
 equation are constructed as:
 
@@ -987,9 +1050,13 @@ equation are constructed as:
 - `debt_y` = total household debt / (4 × quarterly nominal disposable income)
 - `networth_y` = closing net worth / (4 × quarterly nominal disposable income)
 
-Each ratio is dated `x_{t-1}/4y` (beginning-of-period stock over
-annualised current income), consistent with the timing convention in
-Williams' bracket.
+Williams' bracket dates the stock at `t−1` (`x_{t-1}/4y`), and an
+earlier draft described our ratios that way; the implementation in fact
+uses the current quarter's *closing* stocks throughout, `x_t/4y`.
+Because ABS 5232 stocks are closing values, the contemporaneous ratio
+embeds within-quarter revaluations, which weakens the predeterminedness
+defence of OLS for the wealth terms; §4.6 discloses this timing
+convention and §8.1 reports the corresponding IV robustness check.
 
 #### 3.2.1 Illiquid financial assets are combined in the faithful LIVES specification
 
@@ -1010,12 +1077,12 @@ aggregation. Separating the two financial classes (as the conventional
 Spec 6 baseline does, with plain `eq_y` and `super_y`) repeatedly
 delivers a wrong-signed, insignificant equities coefficient on
 post-deregulation Australian data (e.g. Spec 6 full-sample `eq_y` =
-−0.006, t = −0.13; Spec 9 `eq_y` = −0.013, ns), reflecting the high
+−0.016, t = −0.30; Spec 9 `eq_y` = −0.010, ns), reflecting the high
 collinearity between the two series and the short modern sample rather
 than a negative MPC on equities. Combining them into `ilfa_y` recovers a
 correctly signed and significant illiquid-financial loading in the
-faithful form (Spec 11 full-sample `ilfa_y` = +0.0178, t = 3.03, ***;
-implied structural MPC = 0.037), the same order of magnitude as
+faithful form (Spec 11 full-sample `ilfa_y` = +0.0155, t = 3.09, ***;
+implied structural MPC = 0.035), the same order of magnitude as
 Williams' calibrated 0.022 though somewhat larger. The aggregation is
 therefore both theoretically faithful and empirically necessary.
 
@@ -1035,16 +1102,16 @@ construction, in place of estimating a separate liquid-asset and a
 separate debt MPC. We test this restriction formally in §8: the netting
 restriction is **accepted at the 5 per cent level in every disaggregated
 specification and sample window** (australia\_nla\_restriction\_test.csv;
-e.g. Spec 4 full sum = +0.0800, t = 1.43, p = 0.15; Spec 6 full sum =
-+0.105, t = 1.02, p = 0.31). The honest reading is that the modern
+e.g. Spec 4 full sum = +0.032, t = 0.73, p = 0.46; Spec 6 full sum =
++0.020, t = 0.20, p = 0.84). The honest reading is that the modern
 sample cannot statistically distinguish separate liquid-asset and debt
 MPCs, which is consistent with — but does not by itself confirm — the
 NLA aggregation; netting is a defensible economy of parameters rather
 than a sharply identified result.
 
 In the faithful LIVES specification, NLA carries the largest and most
-robust wealth loading: Spec 11 full-sample `nla_y` = +0.037 (t = 3.40,
-***), an implied structural MPC of 0.077, against Williams' calibrated
+robust wealth loading: Spec 11 full-sample `nla_y` = +0.0269 (t = 3.75,
+***), an implied structural MPC of 0.060, against Williams' calibrated
 0.159.
 
 ### 3.3 Mortgage interest rate
@@ -1076,10 +1143,10 @@ The headline house price index (`hpi`) is constructed by chain-linking
 
 | Layer | Source | Coverage | Splice convention |
 |-------|--------|----------|-------------------|
-| TRYM | Treasury Macroeconomic Model historical database (`house_price_history_long.csv`) | 1959Q3–2018Q2 | growth-rate, anchored at 1986Q2 |
-| Legacy | `houseprice_old.csv` (privately compiled pre-2003 dwelling-price index, monthly→quarterly) | 1986Q2–2003Q3 | growth-rate, anchored at 2003Q4 |
-| Bridge | ABS Cat 6416.0 Residential Property Price Index, 8-capital-cities ("old method") | 2003Q4–2017Q2 | growth-rate, anchored at first overlap |
-| Current | ABS Cat 6432.0 Total Value of Dwellings, mean price | 2003Q3–2024Q4 | (the modern overlay) |
+| TRYM | Treasury Macroeconomic Model historical database (`house_price_history_long.csv`) | 1959Q3–2018Q2 | growth-rate, anchored at 1986Q2 (first overlap with the legacy layer) |
+| Legacy | `houseprice_old.csv` (privately compiled dwelling-price index, quarterly) | 1986Q2–2005Q2 | growth-rate, anchored at 2003Q3 (first overlap with the bridge) |
+| Bridge | ABS Cat 6416.0 Residential Property Price Index, 8-capital-cities ("old method") | 2003Q3–2021Q4 | growth-rate, anchored at 2011Q3 (first overlap with the current layer) |
+| Current | ABS Cat 6432.0 Total Value of Dwellings, mean price | 2011Q3–2024Q4 (sample end; the raw release extends beyond) | (the modern overlay) |
 
 The TRYM source supersedes the BIS Shrapnel / REIA chain used in
 Williams (2010): the TRYM historical compilation already incorporates
@@ -1119,11 +1186,25 @@ mean). Both artefacts were eliminated by the growth-rate convention.
 The relative house-price-to-income ratio used in estimation is
 
 ```
-ln_hp_over_y = log(hpi / (ydi_ann_nom / pop_millions / (cons_deflator_norm / 100)))
+ln_hp_over_y = log(hpi × pop_millions / ydi_ann_nom)
 ```
 
-i.e. the log of the real house-price index divided by real disposable
-income per capita.
+i.e. the log of the nominal house-price index divided by nominal
+annualised disposable income per capita. Because numerator and
+denominator are both nominal, the consumption deflator cancels exactly
+and the ratio is identical to the real house price over real income per
+capita: `(hpi/defl) / (ydi_ann_nom/pop/defl) = hpi·pop_millions/ydi_ann_nom`
+(`australia_data_download.R`).
+
+We disclose a correction here. An earlier draft of this paper divided
+the *nominal* `hpi` by *real* income per capita, leaving the
+economy-wide price level inside the ratio — the contaminated variable
+had a correlation of 0.98 with the consumption deflator and was
+measuring inflation, not relative house-price pressure. Correcting the
+ratio to the consistent nominal/nominal (equivalently real/real) form
+changed the surviving CCI knot set (§3.5, §5.1.1) and, with it, every
+coefficient estimate in the paper; all numbers reported in this draft
+are from the corrected pipeline.
 
 ### 3.5 Credit conditions index
 
@@ -1137,10 +1218,12 @@ four-equation FIML system (consumption, house-price, mortgage-stock and
 home-equity-withdrawal equations) under sign priors, with the
 house-price-equation loading ζ\_h = 1 normalised. The structural reason
 for the joint estimation is identification: CCI enters six channels of
-the consumption equation, and (as §5 develops) the six CCI-interacted
-regressors are between 0.74 and 0.97 mutually correlated on this sample —
-each is approximately proportional to CCI — so they cannot be separately
-identified off the consumption equation alone.
+the consumption equation, and (as §5 develops) the five CCI-carrying
+regressors that implement those channels are between 0.66 and 0.97
+mutually correlated in absolute value on this sample
+(`australia_cci_interaction_corr.csv`) — each is approximately
+proportional to CCI — so they cannot be separately identified off the
+consumption equation alone.
 
 A single equation cannot reproduce the FIML identification, so we proxy
 or calibrate CCI by two routes:
@@ -1161,15 +1244,22 @@ or calibrate CCI by two routes:
   CCI proxy used in the faithful LIVES specification (Spec 11), where it
   also restores the autonomous-consumption loading ζ\_c · CCI
   (`cci_williams`) inside the bracket. On our 1988Q3-onward sample,
-  **only three** of fifteen candidate knots survive the sign-prior
-  reduction (australia\_williams\_cci\_knots.csv): `sdmma_2009_01` (+),
-  `sdmma_2019_01` (−) and `sdmma_2020_04` (+); the 1979 and 1986 knots
-  are aliased/constant within the window and the remaining candidates
-  violate their priors. Only one of Williams' four canonical knots
-  (2007) survives on a post-1988 sample. We report a full placebo
-  battery on the surviving spline in §5: the deployed CCI sits in the
-  18th–34th adjusted-R² percentile band across placebo variants, a
-  result we preserve as an honest negative.
+  **four** of fifteen candidate knots survive the iterated sign-prior
+  reduction (australia\_williams\_cci\_knots.csv): `sdmma_2007_09` (−),
+  `sdmma_2009_01` (+), `sdmma_2019_01` (−) and `sdmma_2020_04` (+); the
+  1979 and 1986 knots are aliased/constant within the window and the
+  remaining nine candidates violate their priors. Only one of Williams'
+  four canonical knots (2007) survives on a post-1988 sample. The
+  fitted series is committed (`australia_cci_williams_series.csv`; path
+  figure `australia_cci_williams_path.png`) and its path is disclosed
+  in §5.1.1: identically zero before 2007Q4, a plateau at its peak of 1
+  over 2010Q4–2018Q4, and strongly negative (trough −2.12, settling at
+  ≈ −1.63) after 2019. We report a full placebo battery on the spline
+  in §5.2: the literal Williams 4-knot construction sits at the 45th
+  adjusted-R² percentile of random knot draws — the detrending critique
+  is vindicated for that construction — while the deployed
+  iterated-reduction protocol reaches the 84th percentile, moderate
+  support that we report with its protocol dependence disclosed.
 
 The first-home-buyer share (`fhb_share = fhb_loans / total_new_loans`)
 is also constructed from ABS Cat 5601.0 from 2002Q3, and enters Spec 7.
@@ -1194,53 +1284,79 @@ payable.
 
 The implied non-property income share of disposable income averages 0.84
 over 2010–2024, consistent with Williams' implicit ~0.85 weighting. We
-use NPY as a robustness column (§8): substituting NPY for gross income
-roughly halves the estimated speed of adjustment (Spec 2 λ = −0.193 →
-−0.094; australia\_williams\_income\_robustness.csv). The income measure is one
-of several channels through which our estimates and Williams' diverge,
-and we treat it as a methodological caveat rather than a resolved choice.
+use NPY as a robustness column (§8): in the current vintage,
+substituting NPY for gross income leaves the estimated speed of
+adjustment essentially unchanged (Spec 3 λ = −0.191 → −0.186;
+australia\_williams\_income\_robustness.csv), with the long-run
+permanent-income loading shifting modestly (+0.196 → +0.164). The income
+measure remains one of the channels through which our estimates and
+Williams' can diverge, and we treat it as a methodological caveat rather
+than a resolved choice.
 
 ### 3.7 Permanent income
 
 Permanent income (`yp`) is the forward-looking object in Williams' ratio
 `log(yp/y)`. We construct it as a **discounted weighted average of
-expected future income** from a forecasting model, following the Italian
-implementation's Jordà (2005) local-projection approach. The baseline
-uses discount η = 0.05 (equivalently a per-quarter weight δ = 0.95) over
-a horizon k = 40 quarters
-(australia\_permanent\_income\_sensitivity.csv, baseline row δ = 0.95,
-k = 40). The estimated speed of adjustment is very stable across
-δ ∈ {0.90, 0.95, 0.97} and
-k ∈ {20, 40, 60}.
+expected future income**, following the Italian implementation's direct
+(single-regression) forecast of the discounted future-income aggregate
+(De Bonis, Liberati, Muellbauer & Rondinelli 2020, Appendix A.2). The
+baseline uses discount η = 0.05 (an annual discount factor δ = 0.95)
+over a horizon k = 40 quarters.
 
-Two important measurement caveats are preserved throughout the paper:
+Three properties of the headline measure, set out in full in §4.4, are
+flagged here because they are measurement issues:
 
-1. **Look-ahead vs real-time.** The headline permanent-income measure is
-   estimated on the full sample and therefore uses information not
-   available in real time. The real-time variant (re-estimating the
-   forecaster recursively) shrinks the speed of adjustment sharply and
-   flips or shrinks the `log(yp/y)` coefficient
-   (australia\_pi\_realtime\_robustness.csv; e.g. AR real-time λ =
-   −0.051, ns; Italy real-time λ = −0.118 vs Italy full-sample −0.197).
-   We flag the full-sample measure as the headline and the real-time
-   column as the operational robustness check; headline results that
-   depend on the look-ahead measure are identified as such in §7.
+1. **Look-ahead and tail extrapolation.** The forecasting regression is
+   estimated once on the full sample, so `yp_t` embeds information dated
+   after `t` and is non-causal. Moreover, the realised 40-quarter-ahead
+   target is computable only up to **2014Q4**, so the training sample
+   ends there and the final forty quarters of `yp` — about 27 per cent
+   of the estimation sample, including the entire COVID period — are
+   out-of-training extrapolations from 2014-vintage coefficients. The
+   real-time variant (re-estimating the forecaster on an expanding
+   window) shrinks the speed of adjustment materially and reverses the
+   `log(yp/y)` coefficient
+   (australia\_pi\_realtime\_robustness.csv; in the Spec 6 frame,
+   λ = −0.239 under the full-sample Italy measure against −0.159
+   real-time Italy and −0.095 real-time AR). We flag the full-sample
+   measure as the headline and the real-time column as the operational
+   robustness check; headline results that depend on the look-ahead
+   measure are identified as such in §7.
 
-2. **Forecaster choice and the Australian permanent-income puzzle.**
+2. **GFC learning ogive.** The headline series is multiplied by an
+   ogive that declines from 1 to 0.5 over 2008Q3–2012Q2, so the
+   regressor is *half* the raw discounted-gap measure over the
+   post-2012 two-thirds of the sample. A no-ogive re-estimate of the
+   headline specification
+   (australia\_spec11\_ogive\_robustness.csv) leaves the structural
+   conclusions unchanged (§4.4).
+
+3. **Forecaster choice and the Australian permanent-income puzzle.**
    Under an AR forecaster the `log(yp/y)` coefficient is *negative*
    (the "Australian permanent-income puzzle"); under the Italy-style
-   local-projection forecaster it is positive and the Italian forecaster
-   fits marginally better (australia\_pi\_method\_meta.csv: AR
-   adj-R² = 0.758, Italy adj-R² = 0.769). The faithful LIVES
-   specification uses the Italy-style measure and recovers a strong,
-   correctly signed permanent-income loading (Spec 11 full-sample
-   `ln_yp_over_y` = +0.504, t = 4.0, ***).
+   direct forecaster it is positive, and the Italy forecaster fits
+   better (australia\_pi\_method\_meta.csv: AR adj-R² = 0.696, Italy
+   adj-R² = 0.731). The faithful LIVES specification uses the
+   Italy-style measure and recovers a strong, correctly signed
+   permanent-income loading (Spec 11 full-sample `ln_yp_over_y` =
+   +0.459, t = 4.04, ***).
+
+On the discount and horizon settings, the δ/k sensitivity grid
+(australia\_permanent\_income\_sensitivity.csv; δ ∈ {0.90, 0.95, 0.97},
+k ∈ {20, 40, 60}, ogive on/off) is run under the **AR constructor** in
+the Spec 2 frame, where λ moves only at the third decimal. The grid
+does **not** cover the headline Italy-style method; the
+headline-method sensitivities are the no-ogive column and the
+real-time variant of point 1 above. The forecaster *method* (Italy vs
+AR, full-sample vs real-time), not the discount calibration, is the
+material choice.
 
 In the canonical LIVES bracket the permanent-income weight is itself
 credit-dependent, ψ(CCI) = ψ₀ + ψ₁·CCI with ψ₀ = 0.20 and ψ₁ = 0.93
 **calibrated** (not freely estimated) by Williams. As §7 and §9 develop,
-this is the calibration that most clearly does not transfer: Australia
-freely estimates ψ on the order of 0.50, and imposing Williams' value
+this is the calibration that most clearly does not transfer: the freely
+estimated Australian gearing is far above Williams' ψ₀ = 0.20 (at or
+above unity in structural terms, §4.4), and imposing Williams' values
 collapses the error-correction term. The data section flags only that
 ψ(CCI) is calibrated in Williams' original — the estimation
 consequences are reported in the results.
@@ -1275,7 +1391,7 @@ Australia-specific narrative dummies enter the default dummy set:
 Together with the standard set (`d2000_gst`, `d2008_gfc`, `d2020_covid`,
 `d2020_rebound`), these constitute the full dummy set; zero-variance
 dummies are silently dropped per specification. The COVID quarters carry
-a very large dummy (`d2020_covid` ≈ −0.157 in Spec 11), and the
+a very large dummy (`d2020_covid` ≈ −0.155 in Spec 11), and the
 COVID-inflated full sample fails the upper-bound λ screen; we therefore
 treat the **pre-COVID** sub-sample (n=126) as the identified window for
 the speed of adjustment (§7).
@@ -1301,8 +1417,23 @@ The M3 monetary aggregate (`m3_aggregate`) is loaded from `d03hist.xlsx`,
 series `DMAM3N` (M3, original/not-seasonally-adjusted, $ billion). M3 is
 total economy-wide currency plus transaction deposits plus all other
 deposits at ADIs, plus certificates of deposit issued by ADIs. Coverage:
-monthly, **1959Q3–2026Q1** (continuous, no series breaks). Aggregated to
-quarterly by mean of the three monthly observations.
+monthly, **1959Q3–2026Q1**, aggregated to quarterly by mean of the three
+monthly observations.
+
+An earlier draft described the series as continuous with no breaks. That
+is **incorrect**: `DMAM3N` carries a definitional series break at
+**August 1976**, when the level jumps by +14.25 log per cent
+month-on-month (computed directly from `d03hist.xlsx`, against a mean
+monthly log change of 0.8 per cent over the full history). The break
+falls inside the opening quarters of the 1976Q3+ spine: it makes the
+1976Q4 quarterly log-difference of M3 (+9.5 log per cent) an outlier of
+roughly 4.8 standard deviations of the series' quarterly growth
+distribution over the spine window, and the outlier propagates into
+every M3-based back-extension proxy (`m3_household_proxy`,
+`fin_deposits_proxy`, `nla_y_proxy`, `networth_y_proxy`) at exactly the
+deepest end of the back-extended sample. Back-extension results that
+lean on the first spine quarters should be read with this break in
+mind.
 
 M3 is the headline liquid-asset proxy for the pre-1988 portion of the
 sample where ABS sectoral household-balance-sheet deposits are not
@@ -1438,12 +1569,19 @@ housing_wealth_proxy[t] = housing_wealth[1988Q3]
 The aggregate proxy is then:
 
 ```
-raw_proxy[t]    = (m3_household_proxy[t] + housing_wealth_proxy[t]) / ydi_ann_nom[t]
-scale           = networth_y[1988Q3] / raw_proxy[1988Q3]    (≈ 1.68 in current vintage)
+raw_proxy[t]    = (m3_household_proxy[t] × 1000 + housing_wealth_proxy[t]) / ydi_ann_nom[t]
+scale           = networth_y[1988Q3] / raw_proxy[1988Q3]
 networth_y_proxy[t]
                 = networth_y[t]              for t >= 1988Q3
                 = raw_proxy[t] × scale       for t < 1988Q3
 ```
+
+The `× 1000` term is a units conversion the code applies before the sum:
+`m3_household_proxy` is carried in $ billion (RBA D03 units, never
+rescaled), whereas `housing_wealth_proxy` and `ydi_ann_nom` are in
+$ million; without the conversion the M3 term would contribute ~0.01 per
+cent of the numerator instead of its intended ~12 per cent and the
+aggregate proxy would collapse to a housing-only back-cast.
 
 Caveats explicitly documented in the data appendix:
 
@@ -1692,8 +1830,10 @@ parameter as
 and report both forms throughout, so that the speed-of-adjustment
 channel (`λ`) and the long-run-coefficient channel are separable. For
 example, the faithful specification's full-sample net-liquid OLS
-coefficient `+0.0370` and `λ = −0.480` imply a structural NLA marginal
-propensity of `0.0370 / 0.480 = 0.077` (§7.0). The structural-recovery
+coefficient `+0.0269` and `λ = −0.448` imply a structural NLA marginal
+propensity of `0.0269 / 0.448 = 0.060` (§7.0). The same rule applies to
+the permanent-income term — a discipline §7.0 enforces when comparing
+the gearing with Williams' calibrated `ψ_0`. The structural-recovery
 identity also makes precise *why* imposing Williams' calibrations can
 collapse the equation: fixing several `γ_i` while iterating to the
 fixed-point implied by the unit income restriction over-determines the
@@ -1705,14 +1845,20 @@ bracket, and the only free margin left — `λ` — adjusts toward zero
 Throughout, `λ` denotes the `ecm_lag` coefficient (the OLS coefficient
 on `ln(c_{t-1}) − ln y_t`), with `λ < 0` indicating stable error
 correction. We report the faithful specification's speed of adjustment
-as `λ = −0.480` (t = −3.59) on the full sample and `λ = −0.245`
-(t = −4.80) on the pre-COVID sample (`australia_all_results.csv`). We treat the pre-COVID value as the
-*identified* speed of adjustment: the full-sample estimate is inflated
-by the extreme COVID quarters and fails the upper-bound `|λ|` screen of
-§6.2, whereas the pre-COVID `−0.245` sits close to Williams' (2010)
-estimated speed of `φ_c = −0.286`. Where a headline number depends on
-the full-sample, non-causal permanent-income measure (§4.4) we say so
-explicitly and point to the real-time robustness column (§8).
+as `λ = −0.448` (t = −3.57) on the full sample and `λ = −0.266`
+(t = −4.85) on the pre-COVID sample (`australia_all_results.csv`). We
+treat the COVID-controlled value of about `−0.25` as the *identified*
+speed of adjustment: it is nearly invariant to the COVID treatment
+(−0.266 pre-COVID, −0.248 excluding 2020Q1–2021Q4, −0.242 under
+quarterly 2020–21 dummies; `australia_spec11_variants.csv`), whereas
+the full-sample estimate is inflated by the COVID quarters — the
+three pulse dummies the full-sample specification carries are
+demonstrably insufficient, since replacing them with quarterly dummies
+halves `|λ|` — and fails the upper-bound `|λ|` screen of §6.2. The
+identified `−0.25` sits close to Williams' (2010) estimated speed of
+`φ_c = −0.286`. Where a headline number depends on the full-sample,
+non-causal permanent-income measure (§4.4) we say so explicitly and
+point to the real-time robustness column (§8).
 
 ### 4.4 Permanent-income forecasting
 
@@ -1725,30 +1871,44 @@ discount factor `δ_q = 0.95^(1/4)` — i.e. an annual discount factor
 >     with w_h = δ_q^(h-1) / Σ_{h=1}^{40} δ_q^(h-1).
 
 We implement two forecasters. The headline measure is the Italy-style
-local projection (Jordà 2005; De Bonis, Liberati, Muellbauer and Rondinelli 2020);
-the rolling AR(8) forecaster is reported as a methodology-robustness
-column (§8).
+direct forecast of the discounted aggregate (De Bonis, Liberati,
+Muellbauer and Rondinelli 2020, Appendix A.2); the rolling AR(8)
+forecaster is reported as a methodology-robustness column (§8).
 
-- **Italy local projection (headline measure).** For each `t` whose
+- **Italy direct forecast (headline measure).** For each `t` whose
   40-quarter-ahead horizon is observable, the discounted weighted
   average of future log income is computed and regressed, in a single
   full-sample equation, on a richer predictor set including
-  `log(lf_share)` (the labour-force-share term that captures slow-moving
-  demographic effects on trend income), a trend, a post-2008 split
-  trend, the four-quarter moving average of log income, the
-  unemployment rate, and four-quarter-difference dynamics. The
-  permanent-income series is the in-sample fitted value of this single
-  regression. It is therefore a two-sided, full-sample *measurement* of
-  permanent income rather than a real-time forecast: because the
-  coefficients are estimated over the whole sample, `y^p_t` embeds
-  information dated after `t` and is non-causal. We carry it as the
-  headline measure but flag this look-ahead property explicitly, and
-  report a causal, expanding-window variant (re-fitting at each `t` only
-  on observations whose full horizon is realised by `t`) as an
-  operational robustness column. The real-time variant shrinks `|λ|`
-  materially (§8): in the Spec 2 net-worth frame the full-sample Italy
-  measure delivers `λ = −0.197` against `λ = −0.118` real-time and
-  `λ ≈ −0.051` under the real-time AR forecaster
+  `log(lf_share)` (the labour-force-participation term that captures
+  slow-moving demographic effects on trend income), a trend, a
+  post-2008 split trend, the four-quarter moving average of log income,
+  the unemployment rate, and four-quarter-difference dynamics. The
+  permanent-income series is the fitted value of this single
+  regression. Three properties of the construction are disclosed
+  explicitly. *(i) Look-ahead:* because the coefficients are estimated
+  over the whole sample, `y^p_t` embeds information dated after `t` and
+  is non-causal — a two-sided *measurement* of permanent income rather
+  than a real-time forecast. *(ii) Tail extrapolation:* the realised
+  40-quarter target is computable only up to 2014Q4, so the training
+  sample ends there and the final forty quarters of `y^p` — about 27
+  per cent of the estimation sample, including the entire COVID
+  period — are out-of-training predictions from 2014-vintage
+  coefficients, driven mainly by the deterministic trend terms.
+  *(iii) GFC learning weight:* the series is multiplied by an ogive
+  that declines from 1 to 0.5 over 2008Q3–2012Q2 (mirroring the
+  treatment in the AR forecaster), so the headline regressor is HALF
+  the raw discounted-gap measure over the post-2012 two-thirds of the
+  sample; a no-ogive re-estimate of the headline specification is
+  reported as a robustness column
+  (`australia_spec11_ogive_robustness.csv`) and leaves the structural
+  conclusions unchanged. We carry the full-sample measure as the
+  headline but report a causal, expanding-window variant (re-fitting at
+  each `t` only on observations whose full horizon is realised by `t`)
+  as the operational robustness column. The real-time variant shrinks
+  `|λ|` materially and reverses the permanent-income coefficient (§7.4):
+  in the Spec 6 frame the full-sample Italy measure delivers
+  `λ = −0.239` against `λ = −0.159` real-time and `λ = −0.095` under
+  the real-time AR forecaster
   (`australia_pi_realtime_robustness.csv`). Any forecasting use of the
   equation — embedding it in MARTIN, in particular — requires the
   real-time variant or the AR forecaster, not the full-sample measure.
@@ -1757,36 +1917,46 @@ column (§8).
   income on eight own lags plus a linear trend, a post-2008Q3 step
   dummy, and a trend-break interaction; forecasts are aggregated over the
   40 horizons using the discount weights, with optional `unemp_rate`,
-  `log_oil`, `log_reer`, `log_stocks` predictors and a 2008Q3 ogive
-  learning weight that attenuates the term to a steady-state weight of
-  0.5 over 15 quarters. Under this forecaster the long-run
+  `log_oil`, `log_reer`, `log_stocks` predictors and the same 2008Q3
+  ogive learning weight. Under this forecaster the long-run
   permanent-income coefficient turns negative — the "Australian
   permanent-income puzzle" of §8 — a sign reversal absent under the
   Italy measure.
 
 The permanent-income discount and horizon settings are not load-bearing
-for the speed of adjustment: across `δ ∈ {0.90, 0.95, 0.97}` and
-`k ∈ {20, 40, 60}`, `λ` in the net-worth frame ranges only over
-`−0.0824` to `−0.0830` (`australia_permanent_income_sensitivity.csv`),
-and the GFC learning weight has no effect on these summaries. The
-forecaster *method* (Italy vs AR, full-sample vs real-time), not the
-discount calibration, is the material choice.
+for the speed of adjustment: across `δ ∈ {0.90, 0.95, 0.97}`,
+`k ∈ {20, 40, 60}` and the ogive on/off toggle, `λ` in the AR/Spec 2
+frame moves only at the third decimal
+(`australia_permanent_income_sensitivity.csv`; the grid is run under
+the AR constructor — the headline-method sensitivities are the ogive
+column above and the real-time column of §7.4). The forecaster *method*
+(Italy vs AR, full-sample vs real-time), not the discount calibration,
+is the material choice.
 
-In the faithful specification the permanent-income channel is strong and
-correctly signed: `ln(y^p/y)` enters with OLS level coefficient `+0.504`
-(t = 4.0) on the full sample and `+0.279` (t = 4.75) pre-COVID
-(`australia_all_results.csv`). This
-level coefficient is of order one half — roughly two to three times
-Williams' calibrated `ψ_0 = 0.20` — although Spec 11 does not separately
-estimate the `ψ_0` / `ψ_1` split, so we read it as the gearing on the
-permanent-income gap rather than as a sharp estimate of `ψ_0` alone. The
-credit-geared component `ψ_1·CCI` is entered through a separate `yp_x_cci`
-interaction; its full-sample coefficient (`−0.590`, t = −1.58) is
-insignificant and wrong-signed relative to Williams' calibrated
-`ψ_1 = +0.93`, so the data identify the level of the permanent-income
-gearing but not its credit slope on a single equation. We return to this
-in §7.0.1: imposing Williams' `ψ_0`, `ψ_1` and `γ_2` calibrations is
-what collapses the equilibrium.
+In the faithful specification the permanent-income channel is strong
+and correctly signed: `ln(y^p/y)` enters with OLS level coefficient
+`+0.459` (t = 4.04) on the full sample and `+0.298` (t = 5.81)
+pre-COVID (`australia_all_results.csv`). Two scale points discipline
+the comparison with Williams. First, by the structural-recovery rule of
+§4.2 the implied gearing is OLS/|λ| ≈ `1.02` (full) to `1.13`
+(COVID-controlled) — **above the theoretical admissibility bound
+`ψ ≤ 1 − η ≈ 0.95`**. We do not hide this: it survives removing the
+ogive (structural ≈ 1.05; `australia_spec11_ogive_robustness.csv`), and
+§7.0 discusses candidate explanations, including the measure's tail
+extrapolation and the unit-income restriction forcing the
+permanent-income gap to absorb low-frequency consumption-to-income
+drift. Second, any comparison with Williams' calibrated `ψ_0 = 0.20`
+must be scale-consistent: structural-to-structural the Australian
+gearing is roughly five times his; OLS-to-OLS-equivalent the comparison
+is +0.46 against `φ·ψ_0 ≈ 0.057`. Spec 11 does not separately estimate
+the `ψ_0`/`ψ_1` split: the credit-geared component enters through a
+separate `yp_x_cci` interaction whose full-sample coefficient
+(`−0.510`, t = −1.51) is insignificant and wrong-signed relative to
+Williams' calibrated `ψ_1 = +0.93` — though it turns right-signed
+(+0.19, t = 1.80) on the pre-COVID sample — so the data identify the
+level of the permanent-income gearing but not its credit slope on a
+single equation. We return to this in §7.0.1: imposing Williams' `ψ_0`,
+`ψ_1` and `γ_2` calibrations is what collapses the equilibrium.
 
 ### 4.5 The conventional constant-MPC ECM as nested baseline (Spec 6)
 
@@ -1813,10 +1983,12 @@ the credit liberalisation that identifies the channels largely predates
 the 1988Q3 start of ABS sectoral balance-sheet data (§3), that
 reduction is precisely what kills the housing-collateral channel.
 
-The implications follow directly. The conventional baseline delivers an
-insignificant speed of adjustment (`λ = −0.180`, t = −1.76, full sample;
-`australia_all_results.csv`) and an insignificant standalone housing
-coefficient (`ha_y = +0.0088`, t = 1.52). Reading that insignificant
+The implications follow directly. The conventional baseline delivers a
+speed of adjustment of `λ = −0.239` (t = −2.55, full sample, n = 86;
+`australia_all_results.csv`) — significant, but estimated on a sample
+less than two-thirds the faithful specification's, to which its
+short-run credit term binds it — and an insignificant standalone
+housing coefficient (`ha_y = +0.0022`, t = 0.30). Reading that insignificant
 `ha_y` as a *failed housing wealth effect* is the category error of §4.1:
 the LIVES form predicts that very coefficient is approximately zero
 absent the `CCI` interaction. The faithful specification, by contrast,
@@ -1829,9 +2001,16 @@ correctly-specified alternative — a matter of theory, not of fit.
 
 ### 4.6 Wealth definitions
 
-Wealth enters as asset-to-annualised-income *ratios*, `x_{t-1} / (4·y_t)`
-— the prior-quarter stock divided by four times current quarterly
-income — consistent with the LIVES treatment. The three components are
+Wealth enters as asset-to-annualised-income *ratios* — the
+end-of-quarter stock divided by four times current quarterly income,
+`x_t / (4·y_t)`. This is *contemporaneous* (closing-balance-sheet)
+timing: Williams' canonical equation dates the stock at `t−1`, and an
+earlier draft of this paper described our ratios that way, but the
+implementation uses the current quarter's closing stocks throughout.
+Because ABS 5232 stocks are closing values, the contemporaneous ratio
+embeds within-quarter revaluations, which weakens the predeterminedness
+defence of OLS for the wealth terms; the IV exercise of §8.1 is the
+corresponding robustness check. The three components are
 
 - **Housing wealth (HA):** the value of the household-sector dwelling
   stock; it enters the faithful specification only through
@@ -1860,28 +2039,40 @@ choice rather than as a tested structural equality.
 
 ### 4.7 The de-meaning convention for the interactions
 
-The credit interactions are entered in *de-meaned* form. The
-housing-collateral regressor is `ha_x_cci`, the de-meaned product
-`(CCI − CCĪ)·(HA/4y)`, and the autonomous-consumption loading
-`cci_williams` is likewise de-meaned; the affordability and rate
-interactions enter as `hp_x_1_minus_cci` and `r_x_cci`. De-meaning
-centres each interaction at the sample-average credit regime, so that
-the un-interacted coefficients (`γ_2`, `γ_3`, the intercept) retain
-their interpretation as marginal propensities evaluated at the average
-`CCI`, and the interaction coefficients measure the *additional* effect
-of moving `CCI` away from its mean. Two consequences matter for
-interpretation. First, under de-meaning a pure re-centring of the credit
-regime is a timing-and-distribution effect, not a level effect, on
-cumulative consumption. (This is distinct from the near-zero CCI
-counterfactual of §10, which is run on the conventional baseline (Spec 6)
+Following Williams' own convention, it is the *interacted economic
+variable*, not the CCI, that is de-meaned. The housing-collateral
+regressor is `ha_x_cci = (HA/4y − mean(HA/4y))·CCI`, with the mean
+taken over the 1980Q1-onwards estimation window on which the CCI is
+observed; the rate and permanent-income interactions are
+`r_x_cci = (r − r̄)·CCI` and `yp_x_cci = (ln(y^p/y) − m̄)·CCI`, and the
+affordability term is
+`hp_x_1_minus_cci = (ln(p^h/y) − m̄)·(1 − 1.2·CCI)`. The CCI level
+`cci_williams` enters Spec 11 *raw* (peak-normalised, not de-meaned) as
+the autonomous-consumption loading. (An earlier draft described the
+convention backwards — de-meaned CCI times the raw variable — which is
+a materially different regression for the housing and rate channels,
+whose levels Spec 11 deliberately excludes; the description here
+matches the code.) Under this convention the interaction coefficients
+are the credit loadings evaluated at the sample-mean value of the
+interacted variable, and — because the deployed CCI is zero before
+2007Q3 (§5.1.1) — the un-interacted coefficients (`γ_2`, `γ_3`, the
+intercept, `ψ̂_0`) are marginal propensities and gearings *at CCI = 0*,
+i.e. in the pre-2007 credit regime. Two consequences matter for
+interpretation. First, a pure re-centring of the credit regime is
+absorbed by the included CCI level, so the housing-collateral
+coefficient is invariant to the de-meaning constant; this is not true
+of specifications that omit the level. (The near-zero CCI
+counterfactual of §10 is run on the conventional baseline (Spec 6),
 where `CCI` enters only the short run and so has no long-run channel to
 integrate — confirming Spec 6 has no operative housing-collateral
-channel.) Second, de-meaning does not break the
-near-collinearity of the interactions — each remains approximately
-proportional to `CCI` and they are 0.74–0.97 mutually correlated on this
-sample (§5) — which is the structural reason the six interactions cannot
-be separately free-estimated off a single equation, and why Williams
-identifies them jointly through FIML.
+channel.) Second, de-meaning does not break the near-collinearity of
+the interactions — each remains approximately proportional to `CCI`
+and their absolute pairwise correlations are 0.66–0.97 on this sample
+(`australia_cci_interaction_corr.csv`; §5) — which is the structural
+reason the credit channels cannot be separately free-estimated off a
+single equation, and why Williams identifies them jointly through
+FIML.
+
 
 ### 4.8 Sign priors
 
@@ -1937,20 +2128,25 @@ developed in §7.0.1 and shown to collapse the equilibrium).
 
 The central new result of this section is an identification diagnosis,
 not a CCI success. We document directly why the credit channels cannot
-be separately recovered from a single equation: the six CCI-interacted
-regressors that carry the credit channels are between roughly 0.74 and
-0.97 mutually correlated on this sample because each is approximately
+be separately recovered from a single equation: the five CCI-carrying
+regressors that implement the credit channels are between 0.66 and 0.97
+mutually correlated in absolute value on this sample
+(`australia_cci_interaction_corr.csv`) because each is approximately
 proportional to `CCI` itself (§5.5). A single equation therefore cannot
-tell them apart, and the spline, when fitted standalone to the
-consumption-equation residual, behaves no better than a flexible
-detrending series — it sits in the placebo distribution rather than
-above it (§5.2). This is the structural reason Williams identifies the
-credit channels through FIML, and it is why we treat four-equation FIML
-and pre-1988 back-extension, not further single-equation search, as the
-routes that could sharpen the credit channels. Throughout, the honest
-negatives — placebo failure, near-zero SUR residual correlation,
-selector divergence — are reported as substantive diagnostic findings,
-not embarrassments.
+tell them apart. The placebo battery (§5.2) returns a split verdict on
+the spline itself: the literal Williams 4-knot construction, and the
+institutional knot choices under single-pass reduction, sit at or below
+the median of random smoothed-step draws — the detrending critique is
+vindicated for those constructions — while the *deployed* construction
+(the iterated reduction over the 15-knot basis) beats roughly four
+fifths of random draws, moderate support that remains
+protocol-dependent. This is the structural reason Williams identifies
+the credit channels through FIML, and it is why we treat four-equation
+FIML and pre-1988 back-extension, not further single-equation search,
+as the routes that could sharpen the credit channels. Throughout, the
+honest negatives — placebo failures for the literal construction,
+near-zero SUR residual correlation, selector divergence — are reported
+as substantive diagnostic findings, not embarrassments.
 
 ### 5.1 The Williams smoothed-step spline approach
 
@@ -1970,16 +2166,17 @@ institutional information available over his 1977-2008 sample: STAMP-
 derived turning points and a deregulation calendar ending shortly after
 the GFC.
 
-**On our 1988Q4-onwards sample, only one of Williams' four canonical
+**On our 1988Q3-onwards sample, only one of Williams' four canonical
 knots survives sign-prior reduction.** A direct replication of the
-Williams 4-knot specification yields:
+Williams 4-knot specification yields
+(`australia_knot_experiment_estimates.csv`):
 
 | Williams knot | Sign prior | Status on 1988+ sample |
 |---|---:|---|
 | 1979Q1 | + | aliased (constant within window) |
 | 1992Q1 | − | sign violator (data signal +ve) |
 | 1998Q1 | + | sign violator (data signal −ve) |
-| 2007Q1 | − | survives, coef ≈ −0.014 |
+| 2007Q1 | − | survives, coef ≈ −0.010 |
 
 The 1979 deregulation knot is mechanically uninformative because the
 smoothed step reaches unity by 1980Q2, three years before our window
@@ -2016,96 +2213,156 @@ macroprudential rounds of '14 and '17, the Hayne Royal Commission of
 '19, the APRA cap removal and buffer reduction of '19Q3, the
 COVID/JobKeeper episode of '20, and the APRA buffer hike of '21.
 
-On the 1988Q4-2024Q4 sample this candidate set reduces to **three
+On the 1988Q3-2024Q4 sample this candidate set reduces to **four
 surviving knots** under the iterated drop-on-violation reduction
 (`australia_williams_cci_knots.csv`):
 
 | Knot | Sign prior | Coef (OLS) | Reading |
 |---|---:|---:|---|
-| 2009Q1 | + | +0.012 | First Home Buyer Boost |
-| 2019Q1 | − | −0.034 | Hayne Royal Commission lending crackdown |
-| 2020Q2 | + | +0.005 | COVID/JobKeeper income support |
+| 2007Q3 | − | −0.0022 | GFC tightening onset |
+| 2009Q1 | + | +0.0123 | First Home Buyer Boost (but see below) |
+| 2019Q1 | − | −0.0338 | Hayne Royal Commission lending crackdown |
+| 2020Q2 | + | +0.0071 | COVID/JobKeeper income support |
 
-(Ten candidate knots — 1990Q3, 1992Q1, 1993Q1, 1998Q3, 2007Q3, 2008Q4,
-2014Q4, 2017Q1, 2019Q3 and 2021Q4 — violate their institutional sign
-priors and are dropped; 1979Q1 and 1986Q1 are aliased, their smoothed
-step being constant within the estimation window.)
+(Nine candidate knots — 1990Q3, 1992Q1, 1993Q1, 1998Q3, 2008Q4, 2014Q4,
+2017Q1, 2019Q3 and 2021Q4 — violate their institutional sign priors and
+are dropped; 1979Q1 and 1986Q1 are aliased, their smoothed step being
+constant within the estimation window.)
 
 The `cci_williams` series used throughout the rest of the paper is
-constructed from these three surviving knots, peak-normalised to unity.
-That only three of fifteen candidate knots survive — all of them
-post-2008 — is itself part of the identification story (§5.3): the
-post-1988 sample carries usable sign-identifying variation only around
-the recent macroprudential and pandemic episodes.
+constructed from these four surviving knots, peak-normalised to unity,
+and is committed in full (`australia_cci_williams_series.csv`; path
+figure `australia_cci_williams_path.png`). Its path should be read
+before any credit interpretation is placed on it: the index is
+**identically zero from 1976 until 2007Q3**, dips slightly negative over
+the GFC ramp (≈ −0.15 by late 2008), rises to its peak of 1 by 2010Q4,
+plateaus at 1 through 2018Q4, then falls steeply after 2019Q1 to a
+trough of −2.12 in 2020Q4 and settles at ≈ −1.63 from 2022 onwards
+(range −2.12 to +1.00). Four implications follow. First, every credit
+channel in Spec 8 and Spec 11 is identified off roughly **70 post-2007
+quarters**: before 2007Q4 each CCI interaction is exactly zero, so the
+pre-GFC half of the sample contributes nothing to the credit
+coefficients. Second, that all four surviving knots are post-2007 is
+itself part of the identification story (§5.3): the post-1988 sample
+carries usable sign-identifying variation only around the GFC,
+macroprudential and pandemic episodes. Third, the institutional reading
+of the surviving 2009Q1 "+" knot is contestable: the First Home Buyer
+Boost was a *fiscal* stimulus rather than a lending-standards easing,
+and the RBA's Financial Stability Reviews record lending standards
+*tightening* through 2009, so the "+" prior records a credit-demand
+event under a credit-supply label. Fourth, the candidate basis embeds a
+documented sign-prior conflict at 1993Q1: the maximal basis codes it −1
+(the tail of the early-1990s bank retrenchment) while the sectional
+basis of §5.2.2 codes the same date +1 (mortgage-originator entry,
+Aussie Home Loans); both institutional readings are defensible for
+different events at the same date, and we disclose rather than silently
+resolve the conflict (`model_helpers.R`).
 
-The maximal-GETS construction is defensible on two grounds: (i) the
+The reduction protocol also requires precise statement. At each pass the
+consumption ECM is re-fitted with the currently surviving candidate set
+and **all** knots whose coefficient violates its sign prior are dropped
+simultaneously; the loop iterates to a fixed point
+(`fit_consumption_with_williams_cci()`). This *differs* from Williams'
+one-at-a-time, strongest-violator-first reduction, and the survivor set
+is protocol-dependent: a single-pass reduction over the same 15-knot
+basis retains a *different* set of five knots — 1992Q1, 2007Q3, 2017Q1,
+2019Q1 and 2020Q2, with 2009Q1 aliased rather than surviving — and a
+different λ (`australia_knot_experiment.csv`, `maximal_gets` row). We deploy the
+iterated protocol and placebo-test exactly that protocol in §5.2.
+
+Finally, the construction is **two-step, with pre-test re-use of the
+dependent variable**. The knots are first selected as plain *additive*
+long-run regressors inside a constant-MPC Spec-4-style consumption
+equation estimated on the same `Δln c` series; the surviving
+combination, peak-normalised, is then re-deployed *multiplicatively*
+(as `ha_x_cci`, `r_x_cci`, `yp_x_cci`, `hp_x_1_minus_cci` and the
+`cci_williams` level) in Spec 8 and Spec 11. Spec 11's fit statistics
+are therefore conditional on a CCI that was pre-fitted, under sign
+priors, to the same dependent variable — a pre-test problem that the
+placebo battery quantifies but does not remove.
+
+The maximal-GETS construction remains defensible on two grounds: (i) the
 candidate set comes from documented Australian institutional history,
 not authorial choice of specific dates; and (ii) the surviving knots are
 those whose data signal aligns with their institutional sign prior, so
 the spline is *empirically* selected rather than imposed. We do **not**,
 however, claim that this delivers a structurally identified
-credit-conditions factor. The placebo battery (§5.2) shows the deployed
-spline does not robustly outperform random smoothed-step constructions,
-and §5.5 documents why: the credit channels it is meant to carry are
-near-collinear and cannot be separated off one equation. Williams'
-canonical 4-knot setup is retained as a robustness benchmark, and a
-sectional sign-prior alternative following Williams' (Aust paper §5.1)
-specification is also implemented and placebo-tested; on the
-back-extended sample it does not outperform the maximal-GETS canonical
-(§5.2.2).
+credit-conditions factor. The placebo battery (§5.2) gives the deployed
+protocol moderate — not strong — support against random smoothed-step
+constructions, and §5.5 documents the underlying obstacle: the credit
+channels the spline is meant to carry are near-collinear and cannot be
+separated off one equation. Williams' canonical 4-knot setup is retained
+as a robustness benchmark, and a sectional sign-prior alternative
+following Williams' (Aust paper §5.1) specification is also implemented
+and placebo-tested (§5.2.2).
 
 ### 5.2 The placebo battery
 
 Whether the spline is identifying genuine credit-conditions turning
 points — rather than acting as flexible detrending of the
-consumption-equation residual — is empirically testable. We construct a
-random-knot placebo: 200 draws of knots in Williams' candidate window.
-For the literal-Williams comparison all four drawn knots are entered
+consumption-equation residual — is empirically testable. We construct
+random-knot placebos: 200 draws of knot dates, compared like-for-like
+with the institutional construction under the *same* protocol. For the
+literal-Williams comparison all four drawn knots are entered
 **unconditionally** — testing pure fit, with no sign-prior reduction —
-so the canonical 4-knot series is compared like-for-like against random
-4-knot series. For the maximal-GETS comparison each draw of 15 candidate
-knots is passed through a single sign-prior reduction pass. (The
-*deployed* `cci_williams` series uses the iterated reduction of §5.1.1,
-which retains three knots; the maximal-GETS placebo applies a single
-reduction pass, so its percentile benchmark is indicative of the
-canonical procedure rather than an exact match to the deployed series.)
-The canonical result's percentile rank in this placebo distribution
-measures whether the specific knot choice identifies something the data
-genuinely flags, versus whatever a flexible smoothed-step series could
-fit by chance.
+so the canonical 4-knot series is compared against random 4-knot
+series. For the maximal-GETS comparison each draw of 15 candidate knots
+is passed through a single sign-prior reduction pass. And — new in this
+draft — a **deployed-protocol placebo** replaces the 15 institutional
+knot dates with random dates carrying the same sign-prior pattern and
+runs exactly the iterated drop-on-violation reduction of §5.1.1, so the
+deployed `cci_williams` construction is placebo-tested as deployed,
+pre-test step and all. The institutional result's percentile rank in
+each placebo distribution measures whether the specific knot choice
+identifies something the data genuinely flags, versus whatever a
+flexible smoothed-step series could fit by chance.
 
-#### 5.2.1 Three placebo runs
+#### 5.2.1 Four placebo runs
 
-| Specification | Sample | adj R² %ile | \|λ\| %ile | Verdict |
-|---|---|---:|---:|---|
-| Literal Williams 4-knot                 | 1988Q4+ (n=146) | 34th | 58th | Below R² median |
-| Literal Williams 4-knot                 | 1976Q3+ (n=190) | **18th** | **10th** | Fails — below median on both |
-| Maximal-GETS canonical (15-knot reduce) | 1976Q3+ (n=190) | **64th** | 37th | Weakly above median |
+| Construction | Protocol | Sample | adj R² %ile | \|λ\| %ile | Verdict |
+|---|---|---|---:|---:|---|
+| Literal Williams 4-knot   | unconditional 4-knot | 1988Q3+ (n=146) | 45th | 56th | Below R² median — detrending critique vindicated |
+| Literal Williams 4-knot   | unconditional 4-knot | 1976Q3+ (n=190) | 36th | 26th | Below median on both — critique persists |
+| Maximal-GETS canonical    | single-pass reduce   | 1976Q3+ (n=190) | 48th | 70th | Below R² median — critique persists |
+| **Deployed `cci_williams`** | **iterated reduce** | 1988Q3+ (n=146) | **84th** | **80th** | **Moderate support** |
 
 Sources: `australia_williams_knot_placebo_verdict.csv` (literal,
-1988Q4+; Williams adj-R² = 0.7209, |λ| = 0.0799; n_placebo = 200);
+1988Q3+; Williams adj-R² = 0.7252, |λ| = 0.1890; 200 draws; committed
+verdict "DETRENDING CRITIQUE VINDICATED — Williams below median");
 `australia_williams_knot_placebo_extended_summary.csv` (literal,
-1976Q3+; Williams adj-R² = 0.6789 versus a placebo median of 0.6816,
-Williams |λ| = 0.1934 versus a placebo median of 0.2022);
+1976Q3+; Williams adj-R² = 0.6801 versus a placebo median of 0.6815,
+|λ| = 0.2023 versus a placebo median of 0.2079);
 `australia_williams_knot_placebo_maximal_extended_summary.csv`
-(maximal-GETS, 1976Q3+; canonical adj-R² = 0.6852 versus a placebo
-median of 0.6832, canonical |λ| = 0.2155 versus a placebo median of
-0.2226, canonical surviving knots 7 versus a placebo median of 8).
+(maximal-GETS, 1976Q3+; canonical adj-R² = 0.6836 versus a placebo
+median of 0.6846, |λ| = 0.2563 versus a placebo median of 0.2329,
+canonical surviving knots 7 versus a placebo median of 8);
+`australia_williams_knot_placebo_deployed_verdict.csv` (deployed
+protocol, 1988Q3+; deployed adj-R² = 0.7540 at the 84th percentile,
+|λ| = 0.2461 at the 80th, 4 surviving knots versus a placebo median of
+5; committed verdict "MODERATE SUPPORT — deployed CCI beats most random
+draws"; full 200-draw table in
+`australia_williams_knot_placebo_deployed.csv`).
 
-The literal Williams 4-knot specification fails the placebo on both
-samples, and the R² failure *deepens* on the extended sample (34th →
-18th percentile). The maximal-GETS reduction partially rescues
-identification — 64th percentile on adjusted R², 37th on |λ| — but does
-not deliver strong support: random combinations of 15 candidate knots
-under the same reduction protocol produce *faster* mean reversion than
-the canonical institutional choice in 63 per cent of draws, and a higher
-adjusted R² in 36 per cent. The committed verdict label is "WEAK
-SUPPORT — institutional choice above median but not far". Read across
-the variants, the deployed/institutional CCI sits in an **18th–34th
-adjusted-R² percentile band**. We report this prominently as an honest
-negative: the spline's standalone fit is consistent with that of a
-flexible detrending series, not with a structurally identified common
-factor.
+The verdict is split, and we report both halves. The **literal Williams
+4-knot construction sits at or below the placebo median on both
+samples** (45th adjusted-R² percentile on the modern sample, 36th/26th
+on the extended sample): Williams' specific published knot dates,
+entered as published, do not outperform random dates, and the
+single-pass maximal-GETS reduction on the extended sample does no
+better (48th R² percentile, with the institutional choice retaining
+*fewer* knots than the random median). For these constructions the
+detrending critique is vindicated, and the committed verdict labels say
+so. The **deployed construction fares better**: under the iterated
+reduction actually used to build `cci_williams`, the institutional
+knot dates beat 84 per cent of random draws on adjusted R² and 80 per
+cent on |λ|, while retaining fewer knots (4) than the placebo median
+(5) — i.e. the deployed CCI achieves more fit with less flexibility
+than typical random constructions. We read this as moderate — not
+strong — support: one in six random draws still matches the deployed
+fit, the percentile is specific to the iterated protocol (§5.1.1), and
+the construction re-uses the dependent variable. The standalone spline
+remains, at best, weakly distinguished from flexible detrending; it is
+not a structurally identified common factor.
 
 #### 5.2.2 Sectional sign priors (Williams Aust paper §5.1) tested
 
@@ -2123,20 +2380,33 @@ We constructed a parallel CCI basis with one knot per period, extending
 Williams' four periods to cover post-2008 events (APRA 2014, APRA 2017,
 COVID 2020, APRA 2021). On the back-extended sample, with a
 random-period placebo (200 draws of 8 random knots and 8 random ±1
-priors), the sectional canonical sits at the **36th adjusted-R²
-percentile and 40th |λ| percentile** — *worse* than the maximal-GETS
-canonical, not better. Williams' specific period dating does not
-outperform random period placements on the post-deregulation-extended
-window.
+priors), the sectional canonical sits at the **37th adjusted-R²
+percentile and 60th |λ| percentile**
+(`sectional_placebo_summary.csv`; committed verdict "DETRENDING
+CRITIQUE PERSISTS — sectional below random median"). Williams' specific
+period dating does not outperform random period placements on the
+post-deregulation-extended window. In the committed side-by-side
+coefficient comparison (`sectional_cci_comparison.csv`) the sectional
+basis retains only two survivors against the maximal basis's four, with
+a weaker fit (adj-R² 0.726 vs 0.754; λ = −0.203 vs −0.246) and a 0.69
+correlation between the two indices — so the period-prior construction
+delivers a related but coarser credit signal than the maximal-GETS
+reduction. (An earlier draft reported the two fits as identical; that
+was a script bug — the sectional comparison had silently re-used the
+maximal basis — fixed in this revision.)
 
-The takeaway across §5.2.1 and §5.2.2 is uniform: neither the literal
-4-knot construction, nor a maximal-GETS reduction, nor sectional sign
-priors delivers strong placebo support on our extended sample. The CCI's
-standalone identification is consistent with a single-equation OLS using
-flexible smoothed-step dummies that the data can fit, and is not
-consistent with a structurally identified common factor. The next two
-subsections set out *why* this is the expected outcome of single-equation
-estimation, and §5.5 supplies the direct mechanical reason.
+The takeaway across §5.2.1 and §5.2.2: neither the literal 4-knot
+construction, nor a single-pass maximal-GETS reduction, nor sectional
+sign priors delivers placebo support on the extended sample — the
+*institutionally dated* knots per se do not beat random dates. The one
+construction that does beat most random draws is the deployed iterated
+protocol on the modern sample, and even that support is moderate and
+conditional on the protocol. The CCI's standalone identification
+therefore remains closer to a single-equation OLS using flexible
+smoothed-step dummies than to a structurally identified common factor.
+The next two subsections set out *why* this is the expected outcome of
+single-equation estimation, and §5.5 supplies the direct mechanical
+reason.
 
 ### 5.3 Why the spline alone cannot identify the CCI as a common factor
 
@@ -2160,49 +2430,53 @@ directory tests this directly.
 #### 5.3.1 Cross-equation joint sign-survival (LIVES phase 3)
 
 We refit the Williams 15-knot maximal candidate set with the consumption
-equation, the house-price equation, and the mortgage-stock equation
-simultaneously, then require each knot to satisfy its institutional sign
-prior in **all three** equations to be retained.
+equation, the house-price equation, the mortgage-stock equation and a
+home-equity-withdrawal proxy equation simultaneously, then require each
+knot to satisfy its institutional sign prior in every equation in which
+it is estimable (`LIVES/outputs/lives_joint_cci_survival.csv`).
 
 | Survival regime | Surviving knots | n |
 |---|---|---:|
-| Consumption equation only (Spec 1 with `ln_networth_y_proxy`, extended sample) | 1979, 1986, 1992, 2007, 2009, 2017, 2020 | 7 |
-| **Joint (C ∩ H ∩ M)**                  | **1986, 2017**                         | **2** |
+| Consumption equation only (Spec 1 with `ln_networth_y_proxy`, extended sample) | 1979, 1986, 1992, 2007Q3, 2017Q1, 2020Q2 | 6 |
+| Joint 3-equation (C ∩ H ∩ M)            | 1986, 2017Q1 | 2 |
+| **Joint 4-equation (C ∩ H ∩ M ∩ HEW)**  | **1986**     | **1** |
 
-Of the 7 knots that survive when fitted to consumption alone (this is the
-single-pass reduction in `joint_cci_identification.R`, using the Spec-1
-aggregate-proxy specification on the back-extended sample — distinct from
-the *iterated* reduction the canonical consumption pipeline applies in
-§5.1.1, which retains only three knots, 2009Q1, 2019Q1 and 2020Q2, on the
-1988+ sample; the two reductions give different but overlapping survivor
-sets), only **1986 (financial deregulation) and 2017 (APRA
-macroprudential round II)** have signs consistent with their institutional
-priors across consumption, house prices and mortgage stock simultaneously.
-The other surviving knots sign-violate in the house-price or
-mortgage-stock equations.
+Of the six knots that pass their sign prior when fitted to consumption
+alone (this is the single-pass reduction in
+`joint_cci_identification.R`, using the Spec-1 aggregate-proxy
+specification on the back-extended sample — distinct from the *iterated*
+reduction the canonical consumption pipeline applies in §5.1.1, which
+retains four knots, 2007Q3, 2009Q1, 2019Q1 and 2020Q2, on the 1988+
+sample; the two reductions give different and only partially overlapping
+survivor sets, and 2009Q1 is aliased in the joint system), only **1986
+(financial deregulation) and 2017Q1 (APRA macroprudential round II)**
+have signs consistent with their institutional priors across
+consumption, house prices and mortgage stock simultaneously, and only
+**1986** also survives the home-equity-withdrawal equation.
 
-The single-pass protocol's identification of 7 knots was therefore
-overstated: 5 of them were consumption-equation-specific and would not
-survive a true cross-equation common-factor restriction. This is the
-empirical content of the placebo failures in §5.2: without imposing
-cross-equation sign consistency, the consumption-equation residual can be
-flexibly fit by smoothed-step dummies whose information content is
+The consumption-only identification is therefore overstated: four of
+the six consumption-passing knots are consumption-equation-specific and
+do not survive a cross-equation common-factor restriction, and only one
+knot survives all four equations. This is the empirical content of the
+placebo results in §5.2: without imposing cross-equation sign
+consistency, the consumption-equation residual can be flexibly fit by
+smoothed-step dummies whose information content is
 consumption-specific.
 
 #### 5.3.2 What joint identification fixes
 
-When we rebuild `cci_williams_joint` using the 2 jointly-surviving knots
-and re-estimate the house-price equation with the new CCI:
+When we rebuild `cci_williams_joint` using the two knots that survive
+the three-equation test and re-estimate the house-price equation with
+the new CCI (`LIVES/outputs/lives_phase3_comparison.csv`):
 
 | HP equation, CCI loading | (a) cons-only CCI | (b) joint OLS | (c) joint SUR |
 |---|---:|---:|---:|
-| Estimate                 |  −0.024 | +0.024 | +0.024 |
+| Estimate                 |  −0.016 | +0.024 | +0.024 |
 | Sign                     |   ✗ violator | ✓ | ✓ |
 
-The house-price equation's CCI loading flips from significantly negative
-(under the consumption-only CCI) to significantly positive (under joint
-identification) — Williams' cross-equation sign restriction working as
-intended. The mortgage-stock equation's CCI loading remains negative
+The house-price equation's CCI loading flips from negative (under the
+consumption-only CCI) to positive (under joint identification) —
+Williams' cross-equation sign restriction working as intended. The mortgage-stock equation's CCI loading remains negative
 under this joint-sign-survival approximation, which weights surviving
 knots by consumption-equation coefficients; full FIML with parameter
 restrictions across all four equations would be needed to flip it. The
@@ -2215,17 +2489,18 @@ A complementary test of the multi-equation framework's value is whether
 SUR or FIML deliver efficiency gains over equation-by-equation OLS. A
 two-equation SUR (consumption + house prices, on the extended 1976Q3+
 sample using Spec 1 with the aggregate net-worth proxy) finds an
-essentially negligible cross-equation residual correlation; with no CCI
-spline and no event dummies it remains small and negative. The narrative
-figure for the headline configuration is ρ̂(ε_C, ε_H) ≈ −0.004 — we flag
-that the exact scalar is a reported summary, not a separately committed
-CSV value, and the load-bearing committed evidence is the coefficient
-comparison in `australia_joint_pi_robustness.csv`. There, moving from
-single-equation OLS to SUR_joint on the Spec-2 consumption equation
-shifts coefficients only within sampling noise: the net-worth loading
-moves from +0.0615 to +0.0695 (+13.1 per cent, both highly significant),
-the speed of adjustment from −0.0829 to −0.1273 (raw-units ecm_lag), and
-the real-rate and permanent-income terms remain near zero under both. No
+essentially negligible cross-equation residual correlation: the
+committed estimates are ρ̂(ε_C, ε_H) = −0.0109 under equation-by-equation
+OLS and −0.0133 under SUR
+(`LIVES/outputs/lives_sur_2eq_resid_corr.csv`, committed verdict
+"NEGLIGIBLE cross-equation linkage — single-equation OLS approximately
+efficient"). The corresponding coefficient comparison is in
+`australia_joint_pi_robustness.csv`: moving from single-equation OLS to
+SUR_joint on the Spec-3 consumption equation shifts coefficients only
+within sampling noise — the net-worth loading moves from +0.0011 to
++0.0024 (well under half a standard error, SE 0.0028; insignificant
+under both), the speed of adjustment from −0.191 to −0.204 (raw-units
+ecm_lag), and the permanent-income loading from +0.196 to +0.187. No
 coefficient changes sign in a way that alters the economic reading, and
 the standard errors are barely tightened.
 
@@ -2255,28 +2530,25 @@ channel (γ_1·CCI·(HA/4y)), the down-payment/affordability composite
 with ψ(CCI) = ψ_0 + ψ_1·CCI), and so the regressors that carry these
 channels are each approximately *proportional to* `CCI` over the sample.
 
-The empirical consequence is that the six CCI-interacted regressors are
-between roughly **0.74 and 0.97 mutually correlated** on this sample. (We
-report this as a property of the estimation sample established in the
-analysis narrative; the specific pairwise correlation range is not itself
-a standalone committed results CSV, and a drafter checking the exact
-figures should compute the interaction correlation matrix from
-`australia_model_dataset.csv`. The closest committed cross-check —
-`australia_cci_method_4way.csv` — concerns correlations *between CCI
-measures*, e.g. Kalman versus PCA ρ = 0.764, not between the six
-interaction regressors, and so should not be substituted for the
-interaction-collinearity figure.) Six near-collinear regressors carrying
-distinct structural meanings cannot be separately free-estimated off a
-single equation: ordinary least squares will allocate a near-singular
-design among them more or less arbitrarily, producing wrong-signed and
-insignificant individual loadings even when the joint contribution of the
-credit block is real.
+The empirical consequence is that the five CCI-carrying regressors —
+`cci_williams`, `ha_x_cci`, `hp_x_1_minus_cci`, `r_x_cci` and
+`yp_x_cci` — have absolute pairwise correlations between **0.66 and
+0.97** on this sample. The full correlation matrix is committed
+(`australia_cci_interaction_corr.csv`); the extremes are
+ρ(`cci_williams`, `yp_x_cci`) = −0.967 and
+ρ(`cci_williams`, `ha_x_cci`) = +0.890, with the weakest pair
+(`cci_williams`, `hp_x_1_minus_cci`) still at −0.681. Five
+near-collinear regressors carrying distinct structural meanings cannot
+be separately free-estimated off a single equation: ordinary least
+squares will allocate a near-singular design among them more or less
+arbitrarily, producing wrong-signed and insignificant individual
+loadings even when the joint contribution of the credit block is real.
 
 The committed, load-bearing evidence for this collinearity is threefold,
 and each piece is itself an honest negative:
 
 1. **Sign failures and insignificance when the interactions are freed
-   (Spec 8, §5.6 and §7).** When the six interactions are estimated
+   (Spec 8, §5.6 and §7).** When the credit interactions are estimated
    freely, the housing-collateral interaction is right-signed but
    insignificant, while three of the remaining interactions fail their
    institutional sign priors (`australia_spec8_sign_prior_verdicts.csv`).
@@ -2285,21 +2557,22 @@ and each piece is itself an honest negative:
 2. **The identification-versus-detrending decomposition
    (`australia_cci_fit_decomposition.csv`).** Adding the Williams
    maximal-GETS CCI to the conventional baseline (Spec 6 → Spec 8) does
-   *not* merely detrend: it shifts the permanent-income loading by +134
-   per cent (from +0.20, t = 0.76, to +0.47, t = 3.44) and the speed of
-   adjustment by −147 per cent (from −0.180 to −0.445), with the
-   equities loading shifting +254 per cent. By the decomposition's own
-   classification these are "IDENTIFICATION" (> 30 per cent) rather than
-   "DETRENDING" (< 5 per cent) shifts. The credit interactions re-allocate
-   identification across the income and speed-of-adjustment channels —
-   which is precisely the symptom of collinearity (one near-singular
-   block redistributing fit), not evidence of clean separate
-   identification of each channel.
+   *not* merely detrend: it shifts the permanent-income loading by +51
+   per cent (from +0.33, t = 1.50, to +0.49, t = 3.42) and the speed of
+   adjustment by −92 per cent (from −0.239 to −0.458), with the
+   net-liquid loading shifting +303 per cent and the superannuation
+   loading +258 per cent. By the decomposition's own classification
+   these are "IDENTIFICATION" (> 30 per cent) rather than "DETRENDING"
+   (< 5 per cent) shifts. The credit interactions re-allocate
+   identification across the income, liquid-wealth and
+   speed-of-adjustment channels — which is precisely the symptom of
+   collinearity (one near-singular block redistributing fit), not
+   evidence of clean separate identification of each channel.
 
 3. **The calibration collapse (Spec 10 and Spec 12, §7.0.1).** When
    Williams' calibrations are imposed instead of freed, the
    error-correction term collapses to λ = −0.029 (t = −0.68) in Spec 12,
-   independently reproduced at λ = −0.048 (t = −0.76) by Spec 10. A block
+   independently reproduced at λ = −0.057 (t = −0.87) by Spec 10. A block
    of regressors that can be jointly identified would not behave this
    way; a near-collinear block, whose joint mapping into the data is
    sharp but whose internal split is not, will.
@@ -2319,8 +2592,9 @@ search cannot.
 ### 5.6 Spec 8: the freely estimated CCI interactions (the collinearity demonstration)
 
 When `cci_williams` is available, we estimate Spec 8, which incorporates
-the Williams interaction structure with the six channels entered as free
-regressors:
+the Williams interaction structure with the credit channels entered as
+free regressors (the autonomous-consumption CCI level is the one channel
+Spec 8 omits; Spec 11 restores it):
 
 > ... + γ_HA · ha_y + γ_HA_cci · ha_y · CCI
 >     + γ_HP · log(p^h/y) · (1 − ϖ · CCI)
@@ -2341,40 +2615,41 @@ priors (`australia_spec8_sign_prior_verdicts.csv`,
 
 | Interaction | Williams reference | Sign prior | OLS (Spec 8, full) | t | Verdict |
 |---|---|---:|---:|---:|---|
-| `ha_x_cci` (housing × CCI; γ_1)        | +0.0488 (peak MPC) | + | +0.0016 | 0.32 | right-signed, ns |
-| `r_x_cci` (real rate × CCI; α_1)       | −0.871 (at CCI=1)  | − | +0.0019 | 1.85 | sign FAIL |
-| `hp_x_1_minus_cci` (down-payment; α_4) | −0.13 (at CCI=0)   | − | +0.0076 | 1.00 | sign FAIL |
-| `yp_x_cci` (PI × CCI; ψ_1)             | +0.93 (calibrated) | + | −0.6113 | −2.12 | sign FAIL |
+| `ha_x_cci` (housing × CCI; γ_1)        | +0.0488 (peak MPC) | + | +0.0043 | 0.87 | right-signed, ns |
+| `r_x_cci` (real rate × CCI; α_1)       | −0.871 (at CCI=1)  | − | +0.0028 | 2.05 | sign FAIL |
+| `hp_x_1_minus_cci` (down-payment; α_4) | −0.13 (at CCI=0)   | − | +0.0299 | 1.38 | sign FAIL |
+| `yp_x_cci` (PI × CCI; ψ_1)             | +0.93 (calibrated) | + | −0.5046 | −2.43 | sign FAIL |
 
 The pattern is diagnostic of the near-singular design, not of structure.
 The housing-collateral interaction is **right-signed** — consistent with
 Williams' prediction that the housing MPC rises with credit ease as
-collateral becomes spendable — but statistically insignificant (t = 0.32,
-p = 0.75). Of the remaining three interactions, all fail their
-institutional sign priors: the rate interaction is wrong-signed (and only
-marginally significant, p = 0.066), the down-payment composite is
+collateral becomes spendable — but statistically insignificant (t = 0.87,
+p = 0.38). Of the remaining three interactions, all fail their
+institutional sign priors: the rate interaction is wrong-signed (and
+significant at 5 per cent, p = 0.042), the down-payment composite is
 wrong-signed and insignificant, and the permanent-income interaction is
-strongly wrong-signed (the free estimate is −0.61, t = −2.12, against
+strongly wrong-signed (the free estimate is −0.50, t = −2.43, against
 Williams' calibrated +0.93). The one term that survives its prior is the
-*non*-interacted permanent-income level (`ln_yp_over_y` = +0.47, t = 3.44,
+*non*-interacted permanent-income level (`ln_yp_over_y` = +0.49, t = 3.42,
 PASS). In other words, when the credit block is freed the equation
 re-allocates almost all of its identification onto the income and
 speed-of-adjustment channels and away from the individual interactions —
 exactly the identification re-allocation §5.5 documents.
 
 It is true that Spec 8 with the interactions included delivers a
-numerically larger speed of adjustment, λ = −0.445 (t = −3.30), exceeding
-Williams' calibrated −0.286 in magnitude, and the lowest BIC among the
-n = 146 specifications (−948.476). We do **not** read this as Spec 8
+numerically larger speed of adjustment, λ = −0.458 (t = −3.52), exceeding
+Williams' calibrated −0.286 in magnitude, and a BIC of −952.8 — second
+only to the faithful Spec 11 (−954.8) among the n = 146 specifications.
+We do **not** read this as Spec 8
 "closing the gap" with Williams or "exceeding" him in any substantive
-sense. The larger |λ| and the lower BIC reflect the re-allocation of fit
+sense. The larger |λ| and the low BIC reflect the re-allocation of fit
 that a near-collinear block produces, not separate identification of the
 credit channels: three of the four interactions are wrong-signed, and the
 one right-signed interaction is insignificant. The honest reading is that
 freeing the block buys fit at the cost of structurally meaningless
 component loadings. The faithful LIVES specification (Spec 11, §7.0), by
 contrast, enters housing *only* through its CCI interaction
-(`ha_x_cci`, de-meaned, +0.0049, t = 1.03 — right-signed, insignificant)
+(`ha_x_cci`, de-meaned, +0.0025, t = 0.71 — right-signed, insignificant)
 and restores the autonomous-consumption CCI loading, and it is the
 narrative-preferred headline on theoretical-form grounds; Spec 8 is
 retained as the collinearity demonstration and is not promoted as a CCI
@@ -2396,22 +2671,23 @@ are low except between the two purely statistical factors:
 
 | Pair | ρ | n |
 |---|---:|---:|
-| Kalman vs Williams maximal-GETS    | 0.050  | 194 |
-| PCA vs Williams maximal-GETS       | −0.190 | 146 |
-| Credit/income gap vs Williams      | 0.332  | 146 |
+| Kalman vs Williams maximal-GETS    | −0.004 | 194 |
+| PCA vs Williams maximal-GETS       | −0.218 | 146 |
+| Credit/income gap vs Williams      | 0.335  | 146 |
 | Credit/income gap vs Kalman        | 0.304  | 146 |
 | Kalman vs PCA                      | **0.764** | 146 |
 | Credit/income gap vs PCA           | 0.238  | 146 |
 
 The institutional spline is essentially uncorrelated with the Kalman
-factor (ρ = 0.05) and weakly negatively correlated with the PCA factor
-(ρ = −0.19); only the two data-driven statistical factors agree strongly
+factor (ρ = −0.004) and weakly negatively correlated with the PCA factor
+(ρ = −0.22); only the two data-driven statistical factors agree strongly
 with one another (Kalman versus PCA, ρ = 0.76). The four candidate
 measures do not converge on a common Australian credit-conditions series.
 When the Kalman factor is used in place of the spline (Spec 9, §7), the
-wealth and speed channels shift by 41–101 per cent relative to the
-no-CCI baseline (`australia_cci_fit_decomposition.csv`), again
-re-allocating identification rather than sharpening it. The measure
+liquid, illiquid-financial and permanent-income channels shift by 32–66
+per cent relative to the no-CCI baseline
+(`australia_cci_fit_decomposition.csv`), again re-allocating
+identification rather than sharpening it. The measure
 choice is therefore not innocuous, and no single-equation CCI proxy
 resolves the underlying weak identification — reinforcing that regime
 classification should rely on the joint system rather than on any one
@@ -2428,20 +2704,25 @@ back-extended 1976Q3+ sample using the disaggregated wealth proxies of §3:
 
 | LR coefficient | Baseline 1988+ (n=146) | Extended 1976+ (n=190) | % change | Williams Table 1 |
 |---|---:|---:|---:|---:|
-| λ (ecm_lag)    | −0.140 | −0.193 | +37.3 | −0.286 |
-| nla_y          | +0.035 | −0.002 | −106  | +0.159 |
-| eq_y           | −0.119 | −0.104 | −13.3 | +0.022‡ |
-| super_y        | +0.040 | +0.024 | −41.7 | (incl.)‡ |
-| ha_y           | +0.068 | +0.040 | −41.6 | +0.0488 |
-| ln_yp_over_y   | +1.07  | +1.12  | +4.33 | +0.20  |
+| λ (ecm_lag)    | −0.182 | −0.203 | +11.5 | −0.286 |
+| nla_y          | +0.0245 | +0.0013 | −94.6 | +0.159 |
+| eq_y           | −0.043 | −0.041 | −6.5 | +0.022‡ |
+| super_y        | +0.0137 | −0.0052 | −138 | (incl.)‡ |
+| ha_y           | +0.0193 | +0.0177 | −8.1 | +0.0488 |
+| ln_yp_over_y   | +1.11  | +1.04  | −6.5 | +0.20  |
 
+Source: `spec46_extended_comparison.csv` (structural long-run
+coefficients, γ = OLS/|λ|, per §4.2; the λ row is the OLS `ecm_lag`).
 ‡ Williams reports a single illiquid-financial-asset MPC (γ_IFA = 0.022), shown here against the combined eq_y + super_y. The Williams structural MPCs used throughout the paper (γ_HA = 0.0488, γ_NLA = 0.159, γ_IFA = 0.022) are the BIS-chapter values recorded in [`australia_williams_comparison.csv`](../outputs/australia_williams_comparison.csv) — the same authoritative source as §7.3 and §11.4.
 
-On Spec 4 the speed of adjustment moves 37 per cent closer to Williams'
-value (−0.140 → −0.193), but the individual OLS wealth coefficients become
-*smaller*, not larger; γ_NLA collapses to roughly zero and γ_EQ retains a
-wrong sign. The long-run permanent-income coefficient remains far above
-Williams' calibrated +0.20 on both samples.
+On Spec 4 the speed of adjustment moves about a fifth of the remaining
+distance towards Williams' value (−0.182 → −0.203, against −0.286), but
+the individual structural wealth coefficients become *smaller*, not
+larger; γ_NLA collapses to roughly zero (+0.0245 → +0.0013), γ_SUPER
+flips sign,
+and γ_EQ retains a wrong sign on both samples. The long-run
+permanent-income coefficient remains far above Williams' calibrated
++0.20 on both samples.
 
 The reading is consistent with the rest of this section. First, the
 back-extension does not push the Spec 4 estimates *closer* to Williams'
@@ -2476,13 +2757,17 @@ specification (Spec 11)** is the narrative lead, the **conventional
 constant-MPC disaggregated ECM (Spec 6)** is retained as the baseline
 against which it is contrasted, and the **Williams-calibration-imposed
 specification (Spec 12)** is the negative control that shows what fails
-to transfer. The automated rubric, applied mechanically, returns a
-third, non-LIVES specification (Spec 2). We treat that divergence not
-as a defect to be smoothed over but as a documented result (§6.3): no
-single screen, BIC, or theory criterion agrees on a single
-specification, which is itself diagnostic of how weakly a single
-equation can pin down the LIVES long run on post-deregulation
-Australian data.
+to transfer. In the current vintage, BIC and LIVES theory *agree*:
+Spec 11 carries the best BIC of all fourteen specifications (−954.8).
+The automated rubric nevertheless returns a third, non-LIVES
+specification (Spec 3, aggregate net worth in levels), because no
+specification clears the cointegration screen and the conservative
+speed-of-adjustment ceiling (|λ| < 0.30) and the 2008Q3 Chow screen
+bind against Spec 11's COVID-inflated full-sample estimate. We treat
+that divergence not as a defect to be smoothed over but as a documented
+result (§6.3): it is diagnostic of how weakly a single equation can pin
+down the LIVES long run on post-deregulation Australian data, and of
+how much the conservative screens are doing.
 
 ### 6.1 The fourteen specifications
 
@@ -2507,11 +2792,11 @@ permanent-income term.
 | 4   | Disaggregated wealth                          | adds `nla_y, eq_y, super_y, ha_y`; drops aggregates |
 | 5   | Spec 4 + full short-run dynamics             | adds Δ²log CCI, ΔΔ₄income, Δ²log unemp, \|ε̂\| |
 | 6   | Conventional constant-MPC disaggregated ECM (baseline) | Spec 5 + post-2008 PI break `ln_yp_over_y_post2008`; plain `ha_y/eq_y/super_y/nla_y`, CCI short-run only |
-| 6b  | Spec 6 with back-extension-compatible SR CCI | replaces Δ²log CCI with Δ²log RBA D02 credit; disaggregated wealth proxies; fits on n = 190 |
+| 6b  | Spec 6 with back-extension-compatible SR CCI | replaces Δ²log CCI with Δ²log RBA D02 credit; disaggregated wealth proxies; fits on n = 180 (1977Q3+ window less short-run lags) |
 | 7   | Spec 6 + cohort terms + synthetic burden     | adds `prime_age_share, fhb_share` |
 | 7b  | Spec 7 with RBA E13 measured burden          | post-2009 sample only |
-| 8   | Williams CCI interactions (six, free)        | Spec 4 + `r×CCI`, `log(HP/y)×(1−1.2·CCI)`, `log(y^p/y)×CCI`, `ha_x_cci` |
-| 9   | Spec 8 with Kalman state-space CCI           | replaces smoothed-step spline with state-space extraction |
+| 8   | Williams CCI interactions (free)             | Spec 4 with the plain `real_rate` and `ln_hp_over_y` levels replaced by `r×CCI` and `log(HP/y)×(1−1.2·CCI)`, plus `ha_x_cci` and `log(y^p/y)×CCI`; plain `ha_y` retained |
+| 9   | Spec 8 with Kalman state-space CCI           | mirrors Spec 8's structure exactly (same de-meaned interaction set incl. `ha_x_cci_k`; plain `ha_y` retained) with `cci_kalman` in place of the spline, isolating the CCI *series* |
 | 10  | Williams-prior calibrated                    | γ_IFA = 0.022, ψ₀ = 0.20, ψ₁ = 0.93, ϖ = 1.2; iterative fixed-point OLS |
 | **11**  | **Faithful LIVES (free, headline)**      | housing via `ha_x_cci` only; ζ_c·CCI intercept `cci_williams` restored; IFA combined (`ilfa_y`); `nla_y`, `hp_x_1_minus_cci`, `r_x_cci`, `ln_yp_over_y`, `yp_x_cci` |
 | 12  | Williams-calibration-imposed LIVES           | Spec 11 form with ψ₀ = 0.20, ψ₁ = 0.93, γ_IFA = 0.022 imposed via iterative fixed-point |
@@ -2551,61 +2836,88 @@ the four-sample λ stability that feeds the stability screen is in
    rejects the no-cointegration null at 5 per cent, evaluated against
    MacKinnon (1991, 2010) critical values keyed to the number of
    regressors in the cointegrating regression, *not* the univariate
-   Dickey–Fuller value. Phillips–Ouliaris and single-equation Johansen
-   results are reported alongside.
+   Dickey–Fuller value. Phillips–Ouliaris results are reported
+   alongside for Specs 1–3. A Johansen trace statistic is also
+   reported, but it should be read for what it is: **one fixed
+   trivariate subsystem per specification** — log consumption, log
+   income, and either `ln_networth_y` (Specs 1–3) or `ha_y` (all other
+   specs) — estimated with K = 2 lags and a restricted constant,
+   testing only the r = 0 null. It is *not* a per-specification test of
+   the specification's own long run, and its uniform rejection of r = 0
+   (`johansen_r1_pass = TRUE` for every estimable form in
+   `australia_cointegration.csv`) says only that the small common
+   subsystem cointegrates.
 3. **Speed-of-adjustment screen** — λ has the correct (negative) sign
    and lies in the interval (0.02, 0.30).
 4. **Stability screen** — Chow at 2008Q3 is not rejected at the 1 per
    cent level, *and* λ is sign-stable across at least 3 of the 4 sample
-   variants (full, pre-COVID, COVID-dropped, COVID rich-dummies).
+   variants (full, pre-COVID, COVID-dropped, COVID rich-dummies). The
+   Chow statistic uses `strucchange::sctest` where computable; when the
+   subsample design is singular (e.g. dummies that are all-zero on one
+   side of the break) the pipeline falls back to a manual
+   common-coefficient Chow F-test, and the method actually used per
+   specification is recorded in the `chow_method` column of
+   `australia_full_diagnostics.csv`. A Chow that is incomputable even
+   after the fallback is treated as *neutral*, not as a failure — an
+   earlier vintage treated incomputability as failure, which spuriously
+   "failed" 12 of the 14 specifications.
 
 Two screens warrant comment for the LIVES interaction specifications
-(Specs 8–12). The cointegration screen is reported as "NA" for these
-forms in `australia_cointegration.csv`: with up to ten regressors
-(`coint_n_vars` of 10, 9, 5, 9 and 3 for Specs 8–12 respectively) the
-static long-run regression that the Engle–Granger test requires is not
-well posed, and the test is not run. And the upper bound of the
-speed-of-adjustment screen (|λ| < 0.30) is binding for the
+(Specs 8–12). The cointegration battery now covers Spec 8 and Spec 11
+directly: both fail, like every other specification (Spec 11: EG ADF
+−3.13 against a MacKinnon 5 per cent critical value of −5.47 for nine
+regressors; Spec 8: −3.40 against −5.70 for ten). Three forms are
+skipped with an explanatory `note` in `australia_cointegration.csv`:
+Spec 9, because its de-meaned Kalman interactions are constructed
+locally inside the estimation step and are not available to the static
+long-run regression, and Specs 10 and 12, because their long run is a
+calibrated offset rather than a freely estimated static regression, so
+an Engle–Granger residual test is not applicable. And the upper bound
+of the speed-of-adjustment screen (|λ| < 0.30) is binding for the
 strongest-adjusting forms: Specs 8 and 11 both adjust faster than the
-0.30 ceiling on the full sample (|λ| = 0.445 and 0.480), and so are
+0.30 ceiling on the full sample (|λ| = 0.458 and 0.448), and so are
 flagged as failing the |λ| screen even though their λ is correctly
 signed, strongly significant, and sign-stable across all four sample
 variants. We return to this in §6.3 and §7: the full-sample λ for the
 faithful LIVES form is inflated by the COVID quarters, and the
-identified value is the pre-COVID estimate, λ = −0.245 (t = −4.80),
-which lies comfortably inside the screen interval and within roughly 15
+identified value is the pre-COVID estimate, λ = −0.266 (t = −4.85),
+which lies comfortably inside the screen interval and within roughly 7
 per cent of Williams' −0.286.
 
 ### 6.3 Selector outcome
 
-Under the canonical `PI_METHOD = 'italy'` setting, the automated
-four-screen selector returns **Spec 2** (aggregate log net worth plus a
-short-run CCI term) as the only specification that passes the sign,
-speed-of-adjustment and stability screens with a finite BIC — and it is
-not the LIVES form. The full screen card, taken directly from
+Under the canonical `PI_METHOD = 'italy'` setting, **no specification
+passes all four screens** — the cointegration screen fails wherever it
+is computable — so the selector falls back to its documented
+most-passes rule (most screens passed, BIC tiebreak). Spec 1 and Spec 3
+each pass three screens (signs, λ, stability), and the BIC tiebreak
+returns **Spec 3** (aggregate net worth in levels, −919.4 against
+Spec 1's −919.3) as the automated pick — a conservative, non-LIVES
+form. The full screen card, taken directly from
 `australia_spec_selection.csv`, is:
 
 | Spec | Signs | Coint | λ | Stability | BIC |
 |---|:-:|:-:|:-:|:-:|---:|
-| 1                            | ✓ | ✗ | ✓ | ✗ | −919.2 |
-| **2** (selector-best)        | **✓** | ✗ | **✓** | **✓** | **−500.8** |
-| 3                            | ✓ | ✗ | ✓ | ✗ | −919.8 |
-| 4                            | ✗ | ✗ | ✓ | ✗ | −906.8 |
-| 5                            | ✗ | ✗ | ✓ | ✓ | −493.0 |
-| 6 (conventional baseline)    | ✗ | ✗ | ✓ | ✗ | −493.8 |
-| 6b                           | ✗ | ✗ | ✓ | ✗ | −1116.3 |
-| 7                            | ✗ | ✗ | ✗ | ✗ | −499.8 |
-| 7b                           | ✗ | ✗ | ✗ | ✗ | −363.0 |
-| 8                            | ✓ | NA | ✗ | ✗ | −948.5 |
-| 9                            | ✗ | NA | ✓ | ✗ | −895.9 |
-| 10                           | ✓ | NA | ✓ | ✗ | −493.7 |
-| **11** (faithful LIVES, headline) | **✓** | NA | ✗ | ✗ | **−945.0** |
-| 12                           | ✗ | NA | ✓ | ✗ | −892.5 |
+| 1                            | ✓ | ✗ | ✓ | ✓ | −919.3 |
+| 2                            | ✗ | ✗ | ✓ | ✓ | −501.7 |
+| **3** (selector-preferred)   | **✓** | ✗ | **✓** | **✓** | **−919.4** |
+| 4                            | ✗ | ✗ | ✓ | ✓ | −905.3 |
+| 5                            | ✗ | ✗ | ✓ | ✓ | −494.6 |
+| 6 (conventional baseline)    | ✗ | ✗ | ✓ | ✓ | −492.5 |
+| 6b                           | ✓ | ✗ | ✓ | ✗ | −1114.0 |
+| 7                            | ✗ | ✗ | ✗ | ✓ | −500.6 |
+| 7b                           | ✗ | ✗ | ✗ | ✓ | −364.5 |
+| 8                            | ✗ | ✗ | ✗ | ✓ | −952.8 |
+| 9                            | ✗ | NA | ✓ | ✗ | −890.6 |
+| 10                           | ✓ | NA | ✓ | ✗ | −493.2 |
+| **11** (faithful LIVES, headline) | **✓** | ✗ | ✗ | ✗ | **−954.8** |
+| 12                           | ✗ | NA | ✓ | ✗ | −892.3 |
 
-Source: `australia_spec_selection.csv`; BIC values are Schwarz from
-`australia_all_diagnostics.csv`. Spec 6b carries the lowest (best) BIC
-only because it is fitted on the longest, n = 190 back-extended sample
-and so is not directly comparable to the n = 146 or n = 86 forms.
+Source: `australia_spec_selection.csv` (the BIC column is the Schwarz
+criterion recorded there and in `australia_full_diagnostics.csv`).
+Spec 6b carries the lowest (best) raw BIC only because it is fitted on
+the longest, n = 190 back-extended sample and so is not directly
+comparable to the n = 146 or n = 86 forms.
 
 Several patterns emerge, and we read them as a coherent statement about
 the limits of single-equation identification rather than as a clean
@@ -2615,94 +2927,104 @@ verdict.
 MacKinnon critical values keyed to the regressor count
 (`coint_adf_5pct_cv` ranging from −4.42 to −6.13 across the estimable
 forms), no single-equation specification rejects the no-cointegration
-null. The disaggregated forms come closest — Specs 4–6 reach
-ADF ≈ −3.2 on the long-run residual (Spec 4/5: −3.23 against −5.23;
-Spec 6: −3.22 against −5.47) and the back-extended Spec 6b reaches
-−3.77 against −5.47 — but none crosses its critical value. The
-aggregated Specs 1–3 fall far short (ADF ≈ −0.56 to −1.13). Phillips–
-Ouliaris likewise fails for Specs 1–3, while single-equation Johansen
-returns r = 1 for every estimable form. A static single-equation long
-run between consumption and its wealth/income determinants is therefore
-not formally established on this sample. This is one of the paper's
+null. The richer forms come closest — Specs 4/5 reach ADF −3.12 against
+−5.23, Spec 6 −3.12 against −5.47, the faithful Spec 11 −3.13 against
+−5.47, Spec 8 −3.40 against −5.70, and the back-extended Spec 6b −3.47
+against −5.47 — but none crosses its critical value. The aggregated
+Specs 1–3 fall far short (ADF −1.75 to −1.95 against −4.42).
+Phillips–Ouliaris likewise fails for Specs 1–3. The Johansen column
+rejects r = 0 for every estimable form, but — as §6.2 cautions — it
+tests one fixed trivariate subsystem (consumption, income, and one
+wealth ratio; K = 2, r = 0 only), not each specification's own long
+run, so it cannot rescue the screen. A static single-equation long run
+between consumption and its wealth/income determinants is therefore not
+formally established on this sample. This is one of the paper's
 recurring themes (§5, §7.3, §9): the long-run identification Williams
 obtains comes from his cross-equation FIML system, not from any single
-equation. Because the screen no longer discriminates, selection falls
-to the remaining three screens with the BIC tiebreak.
+equation. Because the screen never passes, selection falls to the
+remaining three screens with the BIC tiebreak.
 
-**The sign screen passes for both the faithful LIVES form and Spec 8.**
-Spec 11 passes the sign screen — its long-run coefficients with
-unambiguous priors (`nla_y`, `ilfa_y`, `ha_x_cci`, `ln_yp_over_y`) are
-all correctly signed, with `nla_y = +0.037` (t = 3.40), `ilfa_y =
-+0.018` (t = 3.03) and `ln_yp_over_y = +0.504` (t = 4.00) significant
-and right-signed on the full sample, and `ha_x_cci = +0.0049`
-(t = 1.03) right-signed though insignificant. Spec 8, the six-interaction
-free form, also passes the sign screen at the aggregate level. By
-contrast the disaggregated Specs 4–6 *fail* the sign screen under the
-canonical Italy LP forecaster: because |λ| rises markedly relative
-to the AR forecaster, the implied γ on each wealth component shrinks and
-small negative coefficients on individual components — `eq_y` in
-particular (Spec 6 full: `eq_y = −0.0063`, wrong-signed) — tip the
-sign screen. We read this as an identification artefact of the
-constant-MPC disaggregation, not as a substantive reversal of the
+**The sign screen passes for the faithful LIVES form — and now fails
+for Spec 8.** Spec 11 passes the sign screen: its long-run coefficients
+with unambiguous priors are all correctly signed, with
+`nla_y = +0.0269` (t = 3.75), `ilfa_y = +0.0155` (t = 3.09) and
+`ln_yp_over_y = +0.459` (t = 4.04) significant and right-signed on the
+full sample, and `ha_x_cci = +0.0025` (t = 0.71) right-signed though
+insignificant. Spec 8, the free-interaction form, *fails* the sign
+screen in the current vintage because its separately entered equities
+component is wrong-signed (`eq_y = −0.0014`, t = −0.11). The
+disaggregated Specs 4–6 fail for the same reason — small negative
+coefficients on `eq_y` (Spec 6 full: −0.016, t = −0.30) tip the screen.
+We read this as an identification artefact of the constant-MPC
+disaggregation, not as a substantive reversal of the
 illiquid-financial channel, and it is precisely the artefact that the
 faithful LIVES form removes by combining the illiquid components into
 `ilfa_y` (which is then correctly signed and significant).
 
-**The faithful LIVES form fails the |λ| upper-bound screen on the full
-sample.** Spec 11's full-sample λ = −0.480 (t = −3.59) exceeds the 0.30
-ceiling, as does Spec 8's λ = −0.445 (t = −3.30). Both are correctly
-signed, strongly significant and sign-stable across all four sample
-variants. The mechanical screen failure is therefore not a sign or
-significance failure; it reflects the full-sample λ being inflated by
-the COVID quarters. On the pre-COVID sample Spec 11's λ = −0.245
-(t = −4.80) lies inside the screen interval and within roughly 15 per
-cent of Williams' −0.286 — which is why §7 treats the pre-COVID estimate
-as the identified value.
+**The faithful LIVES form fails the |λ| ceiling and the 2008Q3 Chow on
+the full sample.** Spec 11's full-sample λ = −0.448 (t = −3.57) exceeds
+the 0.30 ceiling, as does Spec 8's λ = −0.458 (t = −3.52). Both are
+correctly signed, strongly significant and sign-stable across all four
+sample variants; the |λ| failure is not a sign or significance failure
+but reflects the full-sample λ being inflated by the COVID quarters.
+Spec 11 additionally fails the stability screen through its 2008Q3
+Chow (p = 0.0066 under the manual common-coefficient fallback,
+rejected at the 1 per cent threshold) — an honest flag that the
+faithful form's coefficients shift across the GFC boundary on the full
+COVID-inclusive sample. On the pre-COVID sample Spec 11's λ = −0.266
+(t = −4.85) lies inside the screen interval and within roughly 7 per
+cent of Williams' −0.286 — which is why §7 treats the pre-COVID
+estimate as the identified value.
 
 **The calibration-imposed forms pass the |λ| screen for the wrong
 reason.** Specs 10 and 12 pass the speed-of-adjustment screen on the
 full sample, but only because their λ has *collapsed* toward zero
-(Spec 10: −0.048, t = −0.76; Spec 12: −0.029, t = −0.68), placing it
+(Spec 10: −0.057, t = −0.87; Spec 12: −0.029, t = −0.68), placing it
 just inside the lower edge of the (0.02, 0.30) interval. Both fail the
 stability screen — their λ is not sign-stable across samples
 (`lambda_sign_stable_across_samples = FALSE` in
 `australia_lambda_robustness.csv`; Spec 12's pre-COVID λ flips to
-+0.030, Spec 10's COVID-dropped λ flips to +0.005). A screen that is
++0.029, Spec 10's COVID-dropped λ flips to +0.008). A screen that is
 satisfied by a near-zero, sign-unstable adjustment speed is exactly the
 case the stability screen exists to catch. The economic content of this
 collapse — that imposing Williams' Australian calibrations wrecks the
 equilibrium — is developed in §7.0.1 and §9.
 
-**No single criterion selects the headline.** The automated screen
-returns Spec 2, a non-LIVES aggregate-net-worth form; BIC over the
-comparable n = 146 specifications favours Spec 8 (−948.5, the best
-finite-sample BIC), with the faithful Spec 11 close behind (−945.0);
-and LIVES theory favours Spec 11. These three criteria do not agree.
-We treat this **selector divergence as a documented limitation, not a
-result to be argued away.** It is the single-equation counterpart of
-the identification problem that runs through the paper: the six CCI
-interactions are 0.74–0.97 mutually collinear (§5), the long run does
-not cointegrate in a single equation, and the data are too imprecise
-for any mechanical rule to isolate the structural LIVES form. We do
-*not* promote Spec 8's fast adjustment (λ = −0.445) as a CCI success;
-its interaction coefficients are wrong-signed or insignificant (§7) and
-it re-allocates identification across the interaction block rather than
-sharpening any single channel.
+**BIC and theory now agree on the headline; only the conservative
+screens dissent.** In the current vintage the faithful Spec 11 carries
+the best BIC of all fourteen specifications (−954.8), ahead of Spec 8
+(−952.8), so the fit criterion and the LIVES theoretical form point to
+the *same* specification. What stands between Spec 11 and the automated
+pick is the conservative screen pair: the |λ| < 0.30 ceiling, which the
+COVID-inflated full-sample estimate (−0.448) breaches, and the 2008Q3
+Chow. The selector therefore returns Spec 3 — correctly, by its own
+documented rules — while the narrative leads with Spec 11. This is a
+much narrower divergence than in earlier vintages (where selector, BIC
+and theory pointed to three different specifications), but we still
+treat it **as a documented limitation, not a result to be argued
+away**: the long run does not cointegrate in any single equation, the
+five CCI-carrying regressors are 0.66–0.97 mutually collinear (§5),
+and a mechanical rule built around a 0.30 adjustment ceiling cannot
+endorse a form whose full-sample speed is inflated by the pandemic
+quarters. We do *not* promote Spec 8's fast adjustment (λ = −0.458) as
+a CCI success; its interaction coefficients are wrong-signed or
+insignificant (§7) and it re-allocates identification across the
+interaction block rather than sharpening any single channel.
 
 Accordingly, the body of this paper leads with the **faithful LIVES
 specification (Spec 11)** on theoretical-form grounds — it is the form
 Williams (2010) and the LIVES tradition adopt, it passes the sign
-screen, and (on the identified pre-COVID sample) it recovers Williams'
-error-correction speed. We retain **Spec 6 as the conventional
-constant-MPC baseline** — not the headline or the preferred
-specification — because it is the form prior work treated as LIVES and
-because it permits the γ_LA + γ_LOANS = 0 net-liquid restriction test
-(§8). We carry **Spec 12 (and its independent reproduction Spec 10) as
-the negative control** that shows the structure transfers but the
-calibrations do not, and **Spec 2 as the automated selector-best**
-comparator. The full per-specification coefficient vectors, with
-Newey–West HAC standard errors and now including the Spec 11 and
-Spec 12 columns, are in Appendix B.
+screen, it carries the best BIC, and (on the identified pre-COVID
+sample) it recovers Williams' error-correction speed. We retain
+**Spec 6 as the conventional constant-MPC baseline** — not the headline
+or the preferred specification — because it is the form prior work
+treated as LIVES and because it permits the γ_LA + γ_LOANS = 0
+net-liquid restriction test (§8). We carry **Spec 12 (and its
+independent reproduction Spec 10) as the negative control** that shows
+the structure transfers but the calibrations do not, and **Spec 3 as
+the automated selector-best** comparator. The full per-specification
+coefficient vectors, with Newey–West HAC standard errors and now
+including the Spec 11 and Spec 12 columns, are in Appendix B.
 
 ---
 
@@ -2720,54 +3042,110 @@ Williams housing m.p.c. is zero at CCI = 0; (ii) the autonomous-consumption
 intercept `ζ_c·CCI` is restored; and (iii) illiquid financial assets are
 combined into a single ratio (equities + superannuation) rather than split,
 which removes a collinear, wrong-signed equities coefficient. The CCI
-interactions are de-meaned over the post-1979 sample, following Williams.
+interactions de-mean the interacted variable over the 1980Q1+ window,
+following Williams (§4.7). Spec 11 omits Williams' demographic Δ₄DEMFTB /
+Δ₄WAPOP terms, his DSRISK downside-risk index and the Δ₄ln c habit term
+(none constructible on our data, §3.8), and enters the unemployment
+uncertainty term un-interacted — so it is faithful to Eq (7)'s *credit
+architecture*, not a term-for-term replication.
 
-Full-sample (1988Q4–2024Q4, n = 146, adj-R² = 0.81) long-run coefficients
+Full-sample (1988Q3–2024Q4, n = 146, adj-R² = 0.82) long-run coefficients
 ([`australia_all_results.csv`](../outputs/australia_all_results.csv), Spec 11
-rows; diagnostics from
-[`australia_all_diagnostics.csv`](../outputs/australia_all_diagnostics.csv)):
+rows; the full coefficient vector under all four sample treatments is in
+[`australia_spec11_variants.csv`](../outputs/australia_spec11_variants.csv)):
 
 | Term | OLS coef | t-stat | Implied γ (= OLS/\|λ\|) | Williams |
 |---|---:|---:|---:|---:|
-| `ha_x_cci` (γ₁, housing × CCI) | +0.0049 | +1.03 | 0.010 | 0.049 |
-| `nla_y` (γ_NLA) | +0.0370 | +3.39 | 0.077 | 0.159 |
-| `ilfa_y` (γ_IFA) | +0.0178 | +3.03 | 0.037 | 0.022 |
-| `cci_williams` (ζ_c) | +0.0046 | +0.47 | — | 0.190 |
-| `hp_x_1_minus_cci` (α₄) | +0.0142 | +2.69 | — | −0.130 |
-| `r_x_cci` (α₁) | +0.0027 | +3.57 | — | −0.871 |
-| `ln_yp_over_y` (ψ₀) | +0.504 | +4.00 | — | 0.20 |
-| `yp_x_cci` (ψ₁) | −0.590 | −1.58 | — | 0.93 |
-| **`ecm_lag` (λ)** | **−0.480** | **−3.59** | (= 1) | −0.286 |
+| `ha_x_cci` (γ₁, housing × CCI) | +0.0025 | +0.71 | 0.005 | 0.049 |
+| `nla_y` (γ_NLA) | +0.0269 | +3.75 | 0.060 | 0.159 |
+| `ilfa_y` (γ_IFA) | +0.0155 | +3.09 | 0.035 | 0.022 |
+| `cci_williams` (ζ_c) | +0.0001 | +0.01 | 0.000 | 0.190 |
+| `hp_x_1_minus_cci` (α₄) | +0.0279 | +3.08 | 0.062 | −0.130 |
+| `r_x_cci` (α₁) | +0.0028 | +4.55 | 0.006 | −0.871 |
+| `ln_yp_over_y` (ψ₀) | +0.459 | +4.04 | 1.024 | 0.20 |
+| `yp_x_cci` (ψ₁) | −0.510 | −1.51 | −1.138 | 0.93 |
+| **`ecm_lag` (λ)** | **−0.448** | **−3.57** | (= 1) | −0.286 |
 
-The contrast with Spec 6 (§7.1) is stark. **The error-correction and core
-wealth structure come alive.** The speed of adjustment is λ = −0.480
-(t = −3.59) on the full sample and **λ = −0.245 (t = −4.8) pre-COVID —
-almost exactly Williams' −0.286** — against Spec 6's insignificant −0.180
-(t = −1.76); the full-sample value is inflated by the COVID quarters and
-fails the upper-bound |λ| screen, so we read the pre-COVID estimate as the
-identified one. The net-liquid and illiquid-financial m.p.c.s are now
-individually significant and correctly signed on the full sample (implied γ_NLA = 0.077,
-γ_IFA = 0.037, the latter close to Williams' 0.022; both become individually insignificant on the smaller pre-COVID
-sample, Table 11.1), and the permanent-income response is strong (t = 4.0). Because the CCI-spline
-interactions replace Spec 6's 2002Q3-binding `cci_ratio` short-run term,
-the model estimates on n = 146 rather than n = 86 — a near-doubling of the
-identification window. Reading a standalone, insignificant `ha_y` in Spec 6
-as a failed housing wealth effect was therefore a category error: the
-theory predicts that coefficient to be ≈ 0, and the housing effect lives in
-the credit interaction.
+And the headline speed of adjustment and credit-invariant wealth
+coefficients across the four sample treatments
+([`australia_spec11_variants.csv`](../outputs/australia_spec11_variants.csv)):
 
-The honest qualifier is that **the credit-conditions interactions
-themselves remain weakly identified.** The housing-collateral term
-`ha_x_cci` (γ₁) is correctly signed but insignificant (t = 1.03; implied
-m.p.c. 0.010 against Williams' 0.049), the `ζ_c` intercept is correctly
-signed but insignificant, and the real-rate and affordability interactions
-carry the wrong sign and significance on the full sample but flip to the
-correct sign pre-COVID (e.g. ψ₁ on `yp_x_cci` is −0.59 full-sample but
-+0.13 pre-COVID). This is the signature of two compounding problems
-documented in §5 and below: the six CCI-interacted regressors are 0.74–0.97
-mutually correlated (each ≈ proportional to the latent index), and the
-1980s–1990s financial-liberalisation episode that identifies the credit
-channels largely predates the 1988Q3 household-balance-sheet data.
+| Variant | n | λ (t) | `nla_y` (t) | `ilfa_y` (t) | `ha_x_cci` (t) | `ln_yp_over_y` (t) |
+|---|---:|---:|---:|---:|---:|---:|
+| Full sample | 146 | −0.448 (−3.6) | +0.0269 (3.8) | +0.0155 (3.1) | +0.0025 (0.7) | +0.459 (4.0) |
+| Pre-COVID (to 2019Q4) | 126 | −0.266 (−4.8) | +0.0159 (1.8) | +0.0093 (1.7) | +0.0019 (0.9) | +0.298 (5.8) |
+| COVID quarters dropped | 138 | −0.248 (−6.7) | +0.0170 (2.1) | +0.0098 (2.0) | +0.0023 (1.1) | +0.281 (8.7) |
+| Quarterly COVID dummies | 146 | −0.242 (−6.2) | +0.0141 (3.1) | +0.0084 (3.3) | +0.0016 (0.8) | +0.278 (8.2) |
+
+The contrast with Spec 6 (§7.1) is stark, and — unlike in an earlier
+draft — it does not rest on the COVID quarters. **The error-correction
+and core wealth structure come alive.** The identified speed of
+adjustment is λ ≈ −0.25, nearly invariant across the pre-COVID,
+COVID-dropped and quarterly-dummy treatments (−0.266 / −0.248 / −0.242,
+t-ratios −4.8 to −6.7) and close to Williams' −0.286; the full-sample
+−0.448 is inflated by the COVID quarters (the three pulse dummies are
+demonstrably insufficient — replacing them with quarterly dummies halves
+\|λ\|) and fails the upper-bound \|λ\| screen, so we do not headline it.
+The net-liquid and illiquid-financial m.p.c.s are correctly signed in
+every variant and significant at 5 per cent in the full-sample,
+COVID-dropped and quarterly-dummy treatments (pre-COVID they retain the
+same magnitudes with t ≈ 1.7–1.8); the delta-method intervals on the
+structural values are γ_NLA = 0.060 [0.022, 0.098] and
+γ_IFA = 0.035 [0.012, 0.057]
+([`australia_gamma_inference.csv`](../outputs/australia_gamma_inference.csv)).
+The permanent-income response is strong in every variant (t = 4.0–8.7).
+Because the CCI-spline interactions replace Spec 6's 2002Q3-binding
+`cci_ratio` short-run term, the model estimates on n = 146 rather than
+n = 86 — though the *credit channels* themselves have identifying
+variation only on the ~70 post-2007 quarters where the deployed CCI
+moves (§5.1.1). Reading a standalone, insignificant `ha_y` in Spec 6 as
+a failed housing wealth effect was therefore a category error: the
+theory predicts that coefficient to be ≈ 0, and the housing effect
+lives in the credit interaction.
+
+Three honest qualifiers temper the headline. First, **the
+credit-conditions interactions themselves remain weakly identified.**
+The housing-collateral term `ha_x_cci` (γ₁) is correctly signed but
+insignificant in every variant (full-sample t = 0.71; implied peak
+m.p.c. 0.0055 [−0.010, 0.021] against Williams' 0.049, which the
+interval excludes); the `ζ_c` intercept is essentially zero on the full
+sample though right-signed and significant in the COVID-controlled
+variants (+0.0199, t = 2.77 pre-COVID; +0.0148, t = 4.32
+COVID-dropped); the real-rate interaction is wrong-signed and
+significant in every variant (α₁ should be negative); and the
+affordability interaction is wrong-signed (positive) and significant on
+the full sample. The permanent-income credit slope `yp_x_cci` is
+wrong-signed full-sample (−0.51, t = −1.5) but flips to the correct
+sign in the pre-COVID (+0.19, t = 1.8) and COVID-dropped (+0.10,
+t = 1.7) variants. This is the signature of two compounding problems
+documented in §5: the CCI-scaled regressors are 0.66–0.97 mutually
+correlated in absolute value (each ≈ proportional to the latent index),
+and the deployed CCI has no variation before 2007Q3, so the
+liberalisation episode that identifies the credit channels in Williams'
+1978–2008 sample is absent from ours.
+
+Second, **the structural permanent-income gearing violates the theory
+bound.** By the §4.2 recovery rule, ψ̂ = OLS/\|λ\| is 1.02 on the full
+sample and 1.12–1.13 in the COVID-controlled variants — above the
+admissibility bound ψ ≤ 1 − η ≈ 0.95 implied by the discounting that
+defines y^p. The breach is not the GFC ogive (removing it gives
+λ = −0.574 and ψ̂ ≈ 1.05;
+[`australia_spec11_ogive_robustness.csv`](../outputs/australia_spec11_ogive_robustness.csv)),
+and the delta-method interval [0.86, 1.18] does not exclude 0.95, so
+the violation is not itself statistically decisive. Candidate
+explanations are the unit-income restriction forcing ln(y^p/y) to
+absorb low-frequency consumption-to-income drift, and the measure's
+non-causal, post-2014 tail-extrapolated construction (§4.4); under the
+causal real-time variant the coefficient reverses sign entirely (§7.4),
+so the strong positive gearing is a property of the full-sample
+*measurement*, not an operational forecasting relationship.
+
+Third, the wealth-magnitude comparison with Williams now *rejects* as
+well as accepts: γ_NLA's interval [0.022, 0.098] excludes his 0.159,
+while γ_IFA's interval comfortably includes his 0.022 (§7.3.1). The
+agreement is on form and on the illiquid-financial channel; the
+net-liquid magnitude is genuinely smaller in Australia post-1988 than
+in his 1978–2008 sample.
 
 ### 7.0.1 The calibration route does not transfer (Spec 12, Spec 10)
 
@@ -2779,24 +3157,35 @@ iterative fixed-point offset and frees only the housing-collateral m.p.c.,
 the net-liquid m.p.c. and λ. (His real-rate, affordability and intercept
 loadings cannot be imposed at their published magnitudes: the repo's
 percent-scaled real rate against a unit-normalised CCI makes α₁ = −0.871
-roughly thirty times too large, diverging the fixed point.)
+roughly thirty times too large, diverging the fixed point. The CCI-support
+problem cuts deeper than scale: on the deployed index, which ranges over
+[−2.1, 1] rather than Williams' [0, 0.8], the imposed gearing
+ψ(CCI) = 0.20 + 0.93·CCI is *negative* in the post-2019 regime and
+breaches Williams' own ψ ≤ 0.95 cap at the peak — part of the collapse
+below is therefore the calibration being evaluated on a support it was
+never defined for, a caveat that applies to any structural reading of
+the imposed-calibration specifications.)
 
 The result is decisive and negative: **imposing Williams' permanent-income
 calibration collapses the error-correction to λ ≈ 0** (Spec 12:
-λ = −0.029, t = −0.68; independently reproduced by the pre-existing Spec 10,
-λ = −0.048, which keeps the rate and affordability channels free). The
-mechanism is that the Australian data freely estimates ψ₀ ≈ 0.50 — about
-two-and-a-half times Williams' 0.20 — so forcing his value injects a large,
-mis-signed contribution that destroys the equilibrium. The LIVES *structure*
-transfers; Williams' Australian *calibrations* do not. This sits with, and
-explains, the companion paper's Wald result that the joint calibration is
-*not rejected* (χ² = 2.24, p = 0.90): the freely estimated coefficients are
-too imprecise to reject Williams' values, but imposing them still ruins the
-fit — low power is not the same as good fit. Sharpening the credit channels
-therefore requires either the four-equation FIML system (whose
-cross-equation restrictions supply the identifying variation the single
-equation lacks) or a pre-1988 back-extension that recovers the
-financial-liberalisation episode — not a single-equation calibration.
+λ = −0.029, t = −0.68, flipping sign pre-COVID; independently reproduced
+by the pre-existing Spec 10, λ = −0.057, t = −0.87, which keeps the rate
+and affordability channels free). The mechanism is that the Australian
+data freely estimate a structural permanent-income gearing of order one
+(§7.0) — several times Williams' 0.20 — so forcing his value injects a
+large, mis-signed contribution that destroys the equilibrium. The LIVES
+*structure* transfers; Williams' Australian *calibrations* do not. This
+sits with, and explains, the companion paper's Wald result that the
+joint calibration is *not rejected* (χ²(6) = 7.55, p = 0.27;
+`LIVES/outputs/williams_calibration_wald.csv`): the freely estimated
+Spec 6 coefficients are too imprecise to reject Williams' values
+jointly, but imposing them still ruins the fit — low power is not the
+same as good fit. Sharpening the credit channels therefore requires
+either the four-equation FIML system (whose cross-equation restrictions
+supply the identifying variation the single equation lacks) or a
+pre-1988 back-extension that recovers the financial-liberalisation
+episode — not a single-equation calibration.
+
 
 ### 7.1 Conventional disaggregated specification (Spec 6) — baseline
 
@@ -2810,7 +3199,7 @@ treat as "the LIVES equation": it carries plain `ha_y`, `eq_y`, `super_y` and
 (`d2_logcci_lag2`). It is therefore the right object against which to make the
 form-is-decisive point concrete, not the equation we recommend.
 
-Over the full 1988Q4–2024Q4 sample Spec 6 fits on **n = 86** after lag
+Over the full 1988Q3–2024Q4 sample Spec 6 fits on **n = 86** after lag
 truncation. The binding constraint is `cci_ratio` from ABS Cat 5601.0, which
 begins 2002Q3; this also prevents Spec 6 from being back-extended to the
 1976Q3+ window without either replacing the short-run CCI term with a
@@ -2819,119 +3208,140 @@ it to zero pre-2002. We retain the 2002Q3+ binding constraint here and report
 the back-extension exercise on the simpler Spec 4 in §7.3 and §8.15.
 
 The long-run coefficients of Spec 6 under canonical Italy LP are
-([`australia_all_results.csv`](../outputs/australia_all_results.csv), Spec 6
+([`australia_full_results.csv`](../outputs/australia_full_results.csv), Spec 6
 rows):
 
 | Term | OLS coef | NW SE | t-stat | Implied γ (= OLS/\|λ\|) | Sign OK |
 |---|---:|---:|---:|---:|:-:|
-| `ha_y`                 | +0.0088  | 0.0058 | +1.52 | +0.049 | ✓ |
-| `nla_y`                | +0.0354  | 0.0369 | +0.96 | +0.196 | ✓ |
-| `eq_y`                 | −0.0063  | 0.0471 | −0.13 | −0.035 | ✗ |
-| `super_y`              | +0.0117  | 0.0079 | +1.48 | +0.065 | ✓ |
-| `ln_hp_over_y`         | −0.0170  | 0.0199 | −0.85 | −0.094 | n/a |
-| `real_rate`            | −0.00018 | 0.0011 | −0.17 | −0.0010 | ✓ |
-| `ln_yp_over_y`         | +0.1999  | 0.2633 | +0.76 | +1.110 | n/a |
-| `ln_yp_over_y_post2008`| +0.2360  | 0.2030 | +1.16 | +1.311 | n/a |
-| **`ecm_lag` (λ)**      | **−0.1801** | **0.1025** | **−1.76** | (=1) | ✓ |
+| `ha_y`                 | +0.0022  | 0.0076 | +0.30 | +0.009 | ✓ |
+| `nla_y`                | +0.0083  | 0.0351 | +0.24 | +0.035 | ✓ |
+| `eq_y`                 | −0.0156  | 0.0517 | −0.30 | −0.065 | ✗ |
+| `super_y`              | +0.0060  | 0.0091 | +0.66 | +0.025 | ✓ |
+| `ln_hp_over_y`         | +0.0102  | 0.0444 | +0.23 | +0.043 | n/a |
+| `real_rate`            | −0.00053 | 0.0011 | −0.46 | −0.0022 | ✓ |
+| `ln_yp_over_y`         | +0.3253  | 0.2173 | +1.50 | +1.363 | n/a |
+| `ln_yp_over_y_post2008`| +0.1704  | 0.1965 | +0.87 | +0.714 | n/a |
+| **`ecm_lag` (λ)**      | **−0.2386** | **0.0935** | **−2.55** | (=1) | ✓ |
 
 (Short-run regressors and event dummies omitted from this table; see
 Appendix B for the full coefficient vector.)
 
-The picture is the mirror image of Spec 11. In summary:
+The contrast with Spec 11 is now sharper than a simple
+significant-versus-insignificant split. In summary:
 
-- **Speed of adjustment.** λ = −0.180 (NW SE 0.103), t = −1.76,
-  p = 0.084 — only borderline significant, about 63 per cent of Williams'
-  published −0.286. The error-correction does not come decisively to life in
-  this form.
-- **Housing wealth.** OLS coefficient +0.0088, t = 1.52 — statistically
+- **Speed of adjustment.** λ = −0.239 (NW SE 0.093), t = −2.55,
+  p = 0.013 — significant at the 5 per cent level and about 83 per cent of
+  Williams' published −0.286. But the significance leans on the COVID
+  quarters: the pre-COVID estimate collapses to −0.087 (t = −0.79,
+  [`australia_precovid_results.csv`](../outputs/australia_precovid_results.csv)),
+  where Spec 11's pre-COVID λ is −0.266 with t = −4.85 (§7.0). The
+  error-correction is identified in this form only when the COVID episode
+  supplies the variation.
+- **Housing wealth.** OLS coefficient +0.0022, t = 0.30 — statistically
   indistinguishable from zero as a *standalone* level. This is the
   coefficient the theory predicts to be ≈ 0 absent the CCI interaction;
   reading it as a failed housing wealth effect is the category error §7.0
-  identifies. The implied structural γ_HA = 0.049 is numerically close to
-  Williams' 0.0488, but §7.3.1 shows that closeness is a non-rejection driven
-  by imprecision, not confirmation.
-- **Net liquid assets.** OLS +0.0354 (t = 0.96, insignificant), implied
-  γ_NLA = 0.196 — about 23 per cent above Williams' 0.159, in the same
-  direction and order of magnitude. The γ_LA + γ_LOANS = 0 cross-equation
-  restriction is accepted at the 5 per cent level (§8.5).
-- **Illiquid financial wealth.** Decomposed into equities (γ = −0.035,
-  wrong-signed but t = −0.13, statistically indistinguishable from
-  zero) and superannuation (γ = +0.065, t = 1.48); the combined
-  γ_IFA = 0.030 sits above Williams' calibrated 0.022. The negative
-  point estimate on equities is a small-sample identification
-  artefact of the disaggregated split: combining the two illiquid components
-  into a single `ilfa_y` ratio (as Spec 11 does, §7.0) restores a positive,
-  significant coefficient (+0.018, t = 3.03).
-- **House-price affordability.** OLS −0.0170, implied γ = −0.094;
+  identifies. The implied structural γ_HA = 0.009 is now far below Williams'
+  0.0488 (the numerical coincidence an earlier draft reported did not
+  survive the deflator fix to `ln_hp_over_y` and the pipeline re-run; §7.3).
+- **Net liquid assets.** OLS +0.0083 (t = 0.24, insignificant), implied
+  γ_NLA = 0.035 — about a fifth of Williams' 0.159, though correctly signed.
+  The γ_LA + γ_LOANS = 0 cross-equation restriction is accepted at the
+  5 per cent level (§8.5).
+- **Illiquid financial wealth.** Decomposed into equities (γ = −0.065,
+  wrong-signed but t = −0.30, statistically indistinguishable from
+  zero) and superannuation (γ = +0.025, t = 0.66); the combined
+  γ_IFA = −0.040 is wrong-signed, dragged below zero by the equities
+  component. The negative point estimate on equities is a small-sample
+  identification artefact of the disaggregated split: combining the two
+  illiquid components into a single `ilfa_y` ratio (as Spec 11 does, §7.0)
+  restores a positive, significant coefficient (+0.0155, t = 3.09).
+- **House-price affordability.** OLS +0.0102 (t = 0.23), implied γ = +0.043;
   Spec 6 does not include the affordability × (1 − ϖ·CCI) interaction that
   Williams' framework uses to identify this channel, so the level coefficient
-  is not a like-for-like comparison.
-- **Real mortgage rate.** OLS −0.00018, insignificant in the level; the
+  is not a like-for-like comparison with his −0.13.
+- **Real mortgage rate.** OLS −0.00053, insignificant in the level; the
   credit-conditions-contingent rate effect Williams models enters only
   through the `r × CCI` interaction, which Spec 6 omits.
-- **Permanent income.** Base coefficient +0.200 (SE 0.263, t = 0.76), plus a
-  post-2008 break of +0.236 (SE 0.203, t = 1.16) — neither individually
-  significant. The base coefficient is close to Williams' calibrated +0.20 in
-  sign and broad magnitude.
-- **Diagnostics.** adj-R² = 0.81, Durbin–Watson 2.18, AR(1) p = 0.26,
-  AR(4) p = 0.14 (no serial correlation), RESET p < 0.01
+- **Permanent income.** Base coefficient +0.325 (SE 0.217, t = 1.50), plus a
+  post-2008 break of +0.170 (SE 0.196, t = 0.87) — neither individually
+  significant. The implied structural gearing at CCI = 0 is 1.36, well above
+  Williams' calibrated 0.20 (§7.3.1).
+- **Diagnostics.** adj-R² = 0.80, Durbin–Watson 2.15, AR(1) p = 0.34,
+  AR(4) p = 0.30 (no serial correlation), RESET p = 0.0003
   (functional-form misspecification remains), heteroskedasticity
-  structural (NW HAC SEs throughout). λ is sign-stable across all four
-  sample variants (full −0.180, pre-COVID −0.123).
+  structural (NW HAC SEs throughout;
+  [`australia_full_diagnostics.csv`](../outputs/australia_full_diagnostics.csv)).
+  λ is sign-stable across all four sample variants (full −0.239, pre-COVID
+  −0.087, COVID-dropped −0.162, COVID-rich −0.177;
+  [`australia_lambda_robustness.csv`](../outputs/australia_lambda_robustness.csv)).
 
-The key reading is comparative, not absolute: Spec 6 reproduces a *plausible
-profile of point estimates* but at conventional significance levels its
-error-correction and wealth channels are not individually identified. Spec 11
+The key reading is comparative, not absolute: Spec 6 now delivers a
+significant full-sample error-correction, but its wealth channels are
+individually unidentified (no wealth t-ratio exceeds 0.7), one of the four
+is wrong-signed, and the λ identification evaporates pre-COVID. Spec 11
 recovers the same theory on the same data with significant, correctly signed
-core channels — the difference is the functional form, not the sample, the
-data vintage, or the estimator.
+core wealth channels and a λ that survives every COVID treatment — the
+difference is the functional form, not the sample, the data vintage, or the
+estimator.
 
 ### 7.2 Diagnostics summary
 
 Diagnostic results for all fourteen specifications (full sample) are
 summarised below; full per-spec output is in
-[`australia_all_diagnostics.csv`](../outputs/australia_all_diagnostics.csv).
+[`australia_full_diagnostics.csv`](../outputs/australia_full_diagnostics.csv)
+(pre-COVID counterparts in
+[`australia_precovid_diagnostics.csv`](../outputs/australia_precovid_diagnostics.csv)).
 
-| Spec | n | adj R² | DW | AR(1) | AR(4) | Het | RESET | BIC |
-|---|---:|---:|---:|:-:|:-:|:-:|:-:|---:|
-| 1 (LogNetWorth)        | 146 | 0.731 | 2.34 | rej | rej | struct | rej | −919.2 |
-| 2 (LogNetWorth_CCI)    | 86  | 0.769 | 2.40 | rej | OK  | struct | rej | −500.8 |
-| 3 (LevelNetWorth)      | 146 | 0.732 | 2.35 | rej | rej | struct | rej | −919.8 |
-| 4 (Disagg_NoCCI)       | 146 | 0.729 | 2.39 | rej | rej | struct | rej | −906.8 |
-| 5 (FullDisagg)         | 86  | 0.798 | 2.31 | rej | rej | struct | rej | −493.0 |
-| 6 (Preferred/baseline) | 86  | 0.807 | 2.18 | OK  | OK  | struct | rej | −493.8 |
-| 6b (LongHistSRCCI)     | 180 | 0.707 | 2.11 | OK  | OK  | struct | rej | −1116.3 |
-| 7 (CohortBurden)       | 86  | 0.833 | 2.20 | OK  | rej | struct | rej | −499.8 |
-| 7b (RBABurden)         | 64  | 0.869 | 2.16 | OK  | rej | struct | rej | −363.0 |
-| 8 (CCI_Interactions)   | 146 | 0.821 | 1.87 | OK  | rej | struct | rej | −948.5 |
-| 9 (KalmanCCI)          | 146 | 0.737 | 2.20 | OK  | rej | struct | rej | −895.9 |
-| 10 (WilliamsPrior)     | 86  | 0.778 | 2.17 | OK  | OK  | struct | OK  | −493.7 |
-| **11 (LIVES_Headline)**| 146 | 0.812 | 1.80 | OK  | OK  | struct | rej | −945.0 |
-| 12 (LIVES_Calibrated)  | 146 | 0.686 | 2.09 | OK  | rej | struct | rej | −892.5 |
+| Spec | n | adj R² | DW | AR(1) p | AR(4) p | RESET p | Het p (diagnosis) | BIC |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1 (LogNetWorth)        | 146 | 0.731 | 2.32 | 0.026 | 0.093 | <0.001 | <0.001 (struct) | −919.3 |
+| 2 (LogNetWorth_CCI)    | 86  | 0.772 | 2.44 | 0.020 | 0.165 | 0.003  | <0.001 (struct) | −501.7 |
+| 3 (LevelNetWorth)      | 146 | 0.731 | 2.32 | 0.025 | 0.088 | <0.001 | <0.001 (struct) | −919.4 |
+| 4 (Disagg_NoCCI)       | 146 | 0.726 | 2.32 | 0.018 | 0.067 | <0.001 | <0.001 (struct) | −905.3 |
+| 5 (FullDisagg)         | 86  | 0.802 | 2.25 | 0.107 | 0.087 | <0.001 | <0.001 (struct) | −494.6 |
+| 6 (conventional baseline) | 86 | 0.804 | 2.15 | 0.339 | 0.301 | <0.001 | <0.001 (struct) | −492.5 |
+| 6b (LongHistSRCCI)     | 180 | 0.703 | 2.12 | 0.275 | 0.134 | <0.001 | <0.001 (struct) | −1114.0 |
+| 7 (CohortBurden)       | 86  | 0.834 | 2.21 | 0.203 | 0.050 | 0.018  | 0.002 (struct)  | −500.6 |
+| 7b (RBABurden)         | 64  | 0.872 | 2.16 | 0.327 | 0.004 | 0.109  | 0.003 (struct)  | −364.5 |
+| 8 (CCI_Interactions)   | 146 | 0.827 | 1.92 | 0.494 | 0.057 | 0.001  | <0.001 (struct) | −952.8 |
+| 9 (KalmanCCI)          | 146 | 0.735 | 2.18 | 0.140 | 0.018 | <0.001 | <0.001 (struct) | −890.6 |
+| 10 (WilliamsPrior)     | 86  | 0.778 | 2.10 | 0.510 | 0.230 | 0.085  | <0.001 (struct) | −493.2 |
+| **11 (LIVES_Headline)**| 146 | 0.824 | 1.90 | 0.448 | 0.055 | 0.001  | <0.001 (struct) | **−954.8** |
+| 12 (LIVES_Calibrated)  | 146 | 0.686 | 2.08 | 0.555 | 0.009 | 0.003  | <0.001 (struct) | −892.3 |
 
-(Table regenerated from `australia_all_diagnostics.csv`; "OK"/"rej"
-are the 5 per cent verdicts of the Breusch–Godfrey AR(1)/AR(4) and
-RESET tests, and "Het" is the `het_diagnosis` field. AR(4) is borderline for
-Spec 11, p = 0.055.)
+(Table regenerated from `australia_full_diagnostics.csv`; AR(1)/AR(4) are
+Breusch–Godfrey p-values, "Het p" is the Breusch–Pagan-type LM p-value and
+the parenthetical is the `het_diagnosis` field. The diagnostics file also
+records a `chow_method` column for the 2008Q3 stability statistic: where
+`strucchange::sctest` is singular — because event dummies are all-zero in
+one subsample — the p-value comes from a manual split-sample Chow F-test on
+the coefficients estimable in both subsamples, labelled
+`manual_common_coef`; previously those specifications "failed" the
+stability screen by incomputability rather than by evidence.)
 
 Four diagnostic patterns are worth noting. First, **heteroskedasticity
-is structural in every full-sample specification** — the Breusch–Pagan
-rejection survives dropping the four event quarters in every case — so
+is structural in every full-sample specification** — the LM
+rejection survives dropping the event quarters in every case — so
 the Newey–West HAC standard errors used throughout are necessary rather
 than a precaution. Second, **RESET rejects in every specification bar
-the Williams-prior Spec 10** (p = 0.054), indicating functional-form
-misspecification that the single-equation framing does not fully resolve
+the Williams-prior Spec 10** (p = 0.085) **and the short-sample Spec 7b**
+(p = 0.109), indicating functional-form misspecification that the
+single-equation framing does not fully resolve
 (consistent with §5.3/§7.3/§9); the faithful Spec 11 is not exempt
-(RESET p = 0.006). Third, **low-order serial correlation is concentrated
+(RESET p = 0.001). Third, **low-order serial correlation is concentrated
 in the aggregated and disaggregated-no-CCI forms**: the Breusch–Godfrey
-AR(1) test rejects for Specs 1–5 but not for the baseline Spec 6, the
-faithful Spec 11, or the CCI-augmented Specs 6b–10/12, so the credit-spline
-and disaggregated dynamics absorb the serial dependence the aggregated
-specifications leave in the residual. Fourth, **the headline LIVES form
-(Spec 11) carries the best BIC among the n = 146 specifications bar Spec 8**
-(−945.0 vs −948.5): the form correction is not bought at the cost of fit, but
-neither does it dominate the BIC screen, which favours the over-parameterised
-Spec 8 — one strand of the selector divergence documented in §6.
+AR(1) test rejects for Specs 1–4 but for none of the richer forms, so the
+disaggregated and credit-spline dynamics absorb the serial dependence the
+aggregated specifications leave in the residual; at the fourth order the
+rejections sit instead in the burden, Kalman and calibrated forms (Specs 7,
+7b, 9, 12), with Spec 8 (p = 0.057) and Spec 11 (p = 0.055) borderline.
+Fourth, **the headline LIVES form (Spec 11) now carries the best BIC of any
+n = 146 specification, including the over-parameterised Spec 8** (−954.8 vs
+−952.8): the form correction is not bought at the cost of fit. The automated
+selector nonetheless prefers Spec 3, because Spec 11 fails the λ-bound and
+stability screens (§6.3) — the selector divergence is about admissibility
+screens, not fit.
 
 ### 7.3 Comparison with Williams (2010, 2012): the conventional baseline
 
@@ -2939,9 +3349,7 @@ The faithful comparison with Williams — where the LIVES structure recovers
 his error-correction speed and core wealth m.p.c.s — is in §7.0 and is taken
 up systematically in §9. Here we present the comparison for the
 *conventional baseline* Spec 6, because that comparison is what an earlier
-draft (and much of the literature) would have offered as the headline, and
-because it exhibits a numerical coincidence that the form-is-decisive thesis
-must explain rather than celebrate.
+draft (and much of the literature) would have offered as the headline.
 
 We compare Spec 6 to Williams' published Table 1 estimates from the
 BIS chapter (Muellbauer and Williams 2012). Williams reports
@@ -2953,60 +3361,69 @@ Reporting both forms separates the two channels
 
 | Term | Williams γ | Williams implied OLS | Our OLS | Our γ | OLS gap | γ gap |
 |---|---:|---:|---:|---:|---:|---:|
-| **λ**                       | **−0.2860** | (same)  | **−0.1801** | (same)  | **−37 %** | (same) |
-| Housing wealth `ha_y`       | 0.0488     | 0.0140  | 0.0088     | 0.0491  | −37 %    | +1 %   |
-| Illiquid `eq_y + super_y`   | 0.0220     | 0.0063  | 0.0054     | 0.0300  | −14 %    | +36 %  |
-| Net liquid `nla_y`          | 0.1590     | 0.0455  | 0.0354     | 0.1963  | −22 %    | +23 %  |
-| log(HP/y)                   | −0.1300    | −0.0372 | −0.0170    | −0.0943 | —        | —      |
-| ψ at CCI = 0                | 0.2000     | 0.0572  | 0.1999     | 1.1097  | —        | —      |
+| **λ**                       | **−0.2860** | (same)  | **−0.2386** | (same)  | **−17 %** | (same) |
+| Housing wealth `ha_y`       | 0.0488     | 0.0140  | 0.0022     | 0.0094  | −84 %    | −81 %  |
+| Illiquid `eq_y + super_y`   | 0.0220     | 0.0063  | −0.0096    | −0.0403 | wrong sign | wrong sign |
+| Net liquid `nla_y`          | 0.1590     | 0.0455  | 0.0083     | 0.0350  | −82 %    | −78 %  |
+| log(HP/y)                   | −0.1300    | −0.0372 | +0.0102    | +0.0429 | wrong sign | wrong sign |
+| ψ at CCI = 0                | 0.2000     | 0.0572  | 0.3253     | 1.3632  | —        | —      |
 
-Mechanically, our OLS coefficients on the disaggregated wealth components are
-14–37 per cent below Williams' implied OLS values, while our |λ| is 37 per
-cent below his. Because the OLS gap and the λ gap have the same sign, the two
-deficits **partly cancel under the ECM identity** γ = OLS/|λ|: the implied
-structural γ on housing wealth comes out at 0.049, numerically all but equal
-to Williams' 0.049, and the implied γ on net liquid and illiquid financial
-wealth sit modestly *above* Williams in the same direction.
+(The combined illiquid row sums the `eq_y` and `super_y` OLS coefficients
+and their structural values from `australia_full_results.csv`; the negative
+total is driven entirely by the wrong-signed equities split, §7.1.)
 
-We treat this cancellation as a **property of the conventional baseline, not
-as evidence**, for two reasons. First, the closeness is fragile: it is a
-ratio of two estimates each measured imprecisely on n = 86, and §7.3.1 shows
-the confidence interval around γ_HA spans [−0.05, 0.13] — wide enough to
-contain both Williams' value *and* zero. Second, and more fundamentally,
-Spec 6 is not the LIVES equation: its housing channel is a standalone level
-that the theory predicts to be ≈ 0, so a coincidental match between an
-artefactual γ_HA and Williams' credit-unlocked m.p.c. carries no structural
-content. The faithful Spec 11 makes the same housing channel explicit
-(γ₁ = 0.010, t = 1.03) — right-signed, weakly identified, and *not* matching
+Mechanically, the picture has inverted relative to an earlier draft of this
+paper (which was estimated on a deflator-contaminated `ln_hp_over_y`
+regressor; Appendix D). The speed of adjustment is now the coefficient that
+*agrees* with Williams — our −0.239 sits 17 per cent below his −0.286, well
+inside one standard error — while the disaggregated wealth OLS coefficients
+sit roughly 80 per cent below his implied OLS values. Because the λ gap is
+now small, the ECM identity γ = OLS/|λ| no longer rescales the wealth
+deficits away: γ_HA comes out at 0.0094 against Williams' 0.0488, γ_NLA at
+0.035 against 0.159, and the combined illiquid γ is wrong-signed. There is
+no offsetting-deficits arithmetic to report; the conventional baseline
+matches Williams on speed and misses him on every wealth channel.
+
+Two readings discipline this. First, none of the wealth gaps is sharply
+estimated: §7.3.1 shows the Spec 6 delta-method intervals are wide enough
+to contain Williams' value *and* zero for every wealth coefficient, so the
+80 per cent shortfalls are imprecise, not rejections. Second, and more
+fundamentally, Spec 6 is not the LIVES equation: its housing channel is a
+standalone level that the theory predicts to be ≈ 0, so neither a match nor
+a miss against Williams' credit-unlocked m.p.c. carries structural content.
+The faithful Spec 11 makes the housing channel explicit
+(γ₁ = 0.0055, t = 0.71) — right-signed, weakly identified, and below
 Williams numerically — which is the honest read on what the single-equation
-Australian data support. The §9 comparison is therefore built on Spec 11, not
-on this baseline coincidence.
+Australian data support. The §9 comparison is therefore built on Spec 11,
+not on this baseline.
 
 A natural follow-up question is whether the simpler disaggregated
 no-CCI specification (Spec 4) — closer in form to Williams' Table 1 long-run
 cointegrating regression than Spec 6 is — would align with Williams' Table 1
 on a longer sample. Refitting Spec 4 on the back-extended 1976Q3+ sample
 using the disaggregated wealth proxies (§3.13;
-[`spec46_extended_comparison.csv`](../outputs/spec46_extended_comparison.csv)):
+[`spec46_extended_comparison.csv`](../outputs/spec46_extended_comparison.csv);
+structural long-run coefficients γ = OLS/|λ|):
 
-| LR coefficient | 1988+ baseline (n=146) | 1976+ extended (n=190) | Williams Table 1 |
+| LR coefficient (γ) | 1988+ baseline (n=146) | 1976+ extended (n=190) | Williams Table 1 |
 |---|---:|---:|---:|
-| λ (ecm_lag) | −0.140 | −0.193 | −0.286 |
-| nla_y       | +0.035 | −0.002 | +0.159 |
-| eq_y        | −0.119 | −0.104 | +0.022‡ |
-| super_y     | +0.040 | +0.024 | (incl.)‡ |
-| ha_y        | +0.068 | +0.040 | +0.0488 |
+| λ (ecm_lag) | −0.182 | −0.203 | −0.286 |
+| nla_y       | +0.025 | +0.001 | +0.159 |
+| eq_y        | −0.043 | −0.041 | +0.022‡ |
+| super_y     | +0.014 | −0.005 | (incl.)‡ |
+| ha_y        | +0.019 | +0.018 | +0.0488 |
 
 ‡ Williams reports a single illiquid-financial-asset MPC (γ_IFA = 0.022), shown here against the combined eq_y + super_y. Williams' structural MPCs (γ_HA = 0.0488, γ_NLA = 0.159, γ_IFA = 0.022) are the BIS-chapter values in [`australia_williams_comparison.csv`](../outputs/australia_williams_comparison.csv), the same source used in §7.3's headline comparison and §11.4.
 
-On Spec 4 the speed of adjustment moves 37 per cent closer to
-Williams (−0.140 → −0.193, still 32 per cent short of −0.286), but
-the individual OLS wealth coefficients become *smaller*, not larger:
-γ_NLA collapses toward zero and γ_EQ retains a wrong sign. The
-back-extension therefore does not push the Spec 4 estimates closer
-to Williams' Table 1; the post-1988 sample window is not, in
-itself, what generates the divergence between Spec 4 and Williams'
-values. **Sample length is not the binding constraint.**
+On Spec 4 the speed of adjustment moves 11.5 per cent toward
+Williams (−0.182 → −0.203, still 29 per cent short of −0.286), but
+the individual wealth coefficients become *smaller*, not larger:
+γ_NLA collapses by 95 per cent toward zero, γ_SUPER flips sign, and
+γ_EQ retains a wrong sign. The back-extension therefore does not push
+the Spec 4 estimates closer to Williams' Table 1; the post-1988
+sample window is not, in itself, what generates the divergence
+between Spec 4 and Williams' values. **Sample length is not the
+binding constraint.**
 
 Reading the two exercises together points to the same conclusion as §7.0.1:
 the wedge between any single-equation OLS estimate and Williams' system FIML
@@ -3016,72 +3433,92 @@ result (§5.4) — in which joint estimation delivers a negligible
 cross-equation residual correlation and no efficiency gain — corroborate
 this reading.
 
-We do *not* present Spec 8 (the free six-interaction form, λ = −0.445) as a
+We do *not* present Spec 8 (the free six-interaction form, λ = −0.458) as a
 CCI success here. Adding the full Williams CCI interaction set re-allocates
-the long-run identification across wealth components (γ_HA = 0.022,
-γ_IFA = 0.053, γ_NLA = 0.098) without moving systematically toward Williams'
-Table 1, and three of its six interaction coefficients carry the wrong sign
-against their priors (§5.5, §8.4). The magnitude of its λ reflects the
-collinear interaction set absorbing variation, not a sharpening of the credit
-channel.
+the long-run identification across wealth components (γ_HA = 0.007,
+γ_IFA = 0.044, γ_NLA = 0.073) without moving systematically toward Williams'
+Table 1, and three of its four sign-priced interaction coefficients carry
+the wrong sign against their priors (§5.5, §8.4). The magnitude of its λ
+reflects the collinear interaction set absorbing variation, not a sharpening
+of the credit channel.
 
 ### 7.3.1 How precisely is the structural profile identified?
 
 The implied structural coefficients γ_i = β_i/|λ| are ratios of two
-imprecisely estimated quantities on n = 86, so they inherit wide
-sampling uncertainty that the point-estimate comparison above conceals.
-Computing delta-method standard errors from the Newey–West covariance
-of (β_i, λ) — which carries the correlation between each numerator and
-the speed of adjustment — gives
-([`australia_gamma_inference.csv`](../outputs/australia_gamma_inference.csv)):
+imprecisely estimated quantities, so they inherit sampling uncertainty
+that the point-estimate comparison above conceals. We compute, for both
+the conventional baseline (Spec 6, n = 86) and the faithful LIVES headline
+(Spec 11, n = 146), delta-method standard errors from the Newey–West
+covariance of (β_i, λ) — which carries the correlation between each
+numerator and the speed of adjustment — and, as a cross-check, a seeded
+moving-block residual bootstrap (block length 8, B = 1000). Both blocks
+are committed in
+[`australia_gamma_inference.csv`](../outputs/australia_gamma_inference.csv).
 
-| Term | Implied γ | 95% CI (delta) | Williams Table 1 | Williams in CI? |
+For **Spec 6** the intervals are wide enough to be almost uninformative:
+
+| Term (Spec 6) | Implied γ | 95% CI (delta) | Williams Table 1 | Williams in CI? |
 |---|---:|---:|---:|:-:|
-| Housing `ha_y`           | 0.042  | [−0.050, 0.133] | 0.0488 | ✓ |
-| Net liquid `nla_y`       | 0.150  | [−0.317, 0.617] | 0.159  | ✓ |
-| Equities `eq_y`          | −0.044 | [−0.506, 0.419] | 0.011  | ✓ |
-| Super `super_y`          | 0.047  | [−0.027, 0.121] | 0.011  | ✓ |
-| log(HP/y)                | −0.091 | [−0.447, 0.265] | −0.130 | ✓ |
-| Permanent income         | 1.237  | [−0.337, 2.811] | 0.200  | ✓ |
-| **Wealth aggregate (Σ)** | **0.194** | **[−0.768, 1.157]** | 0.230 | ✓ |
+| Housing `ha_y`           | 0.009  | [−0.056, 0.075] | 0.0488 | ✓ |
+| Net liquid `nla_y`       | 0.035  | [−0.262, 0.332] | 0.159  | ✓ |
+| Equities `eq_y`          | −0.065 | [−0.468, 0.337] | 0.011  | ✓ |
+| Super `super_y`          | 0.025  | [−0.040, 0.091] | 0.011  | ✓ |
+| log(HP/y)                | 0.043  | [−0.308, 0.393] | −0.130 | ✓ |
+| Permanent income         | 1.363  | [0.285, 2.442]  | 0.200  | ✗ |
+| **Wealth aggregate (Σ)** | **0.004** | **[−0.659, 0.668]** | 0.230 | ✓ |
 
-A moving-block residual bootstrap (block length 8, B = 1000) gives a
-near-identical picture, with the bootstrap median γ_HA at 0.038 and a 95 per
-cent interval [−0.45, 0.26] that includes zero (consistent with the standalone
-`ha_y` being statistically indistinguishable from zero in Spec 6).
+Williams' Table 1 value lies inside the 95 per cent interval for every
+Spec 6 coefficient except the permanent-income gearing (whose interval
+[0.29, 2.44] excludes his calibrated 0.20 from above) — but the same
+intervals also contain zero for every wealth channel and values far from
+Williams. The bootstrap agrees (median γ_HA = 0.008, 95 per cent interval
+[−0.049, 0.107]). On the conventional baseline, then, the data cannot
+distinguish Williams' wealth profile from a broad range of alternatives,
+including no wealth effect at all: **non-rejection driven by imprecision,
+not confirmation**.
 
-Two things follow, and they discipline the §7.3 reading. First, **Williams'
-Table 1 value lies inside the 95 per cent confidence interval for every
-coefficient** — so the data are statistically consistent with his
-calibrations, the same conclusion the formal Wald test reaches (§9;
-companion χ² = 2.24, p = 0.90). Second, and equally true, the intervals are
-so wide that they also contain zero (for the aggregate wealth effect, for
-equities, and for housing at the lower bound) and values far from Williams.
-The close numerical agreement of the baseline point estimates is therefore a
-**non-rejection driven by imprecision, not positive evidence** that the
-Australian structural coefficients *equal* Williams': on this sample the
-single-equation estimates cannot distinguish his values from a broad range of
-alternatives, including zero. This is the honest ceiling on the §7.3
-comparison — consistency, not confirmation — and it is exactly why §7.0
-leads with the faithful Spec 11 form (where the *significant* channels are
-NLA and IFA, not the credit-scaled housing m.p.c.) rather than with the
-baseline γ-profile coincidence.
+For **Spec 11** the intervals are several times tighter, and they become
+informative in *both* directions:
+
+| Term (Spec 11) | Implied γ | 95% CI (delta) | Williams Table 1 | Williams in CI? |
+|---|---:|---:|---:|:-:|
+| Housing × CCI `ha_x_cci` (γ₁) | 0.0055 | [−0.010, 0.021] | 0.0488 | ✗ |
+| Net liquid `nla_y`            | 0.060  | [0.022, 0.098]  | 0.159  | ✗ |
+| Illiquid `ilfa_y`             | 0.035  | [0.012, 0.057]  | 0.022  | ✓ |
+| Affordability `hp_x_1_minus_cci` | 0.062 | [0.027, 0.098] | −0.130 | ✗ |
+| Permanent income (ψ₀)         | 1.024  | [0.865, 1.184]  | 0.200  | ✗ |
+| PI × CCI `yp_x_cci` (ψ₁)      | −1.138 | [−2.099, −0.177]| 0.930  | ✗ |
+| **Wealth aggregate (Σ)**      | **0.100** | **[0.036, 0.164]** | 0.230 | ✗ |
+
+The bootstrap intervals are again close to the delta-method ones (e.g.
+γ_NLA [0.013, 0.111], γ_IFA [0.005, 0.065]). The Spec 11 read is therefore
+no longer a blanket non-rejection. The data **accept** Williams' illiquid
+financial m.p.c. (0.022 sits comfortably inside [0.012, 0.057]) but
+**reject** his net-liquid magnitude (0.159 against an upper bound of
+0.098), his credit-unlocked housing m.p.c. (0.0488 against [−0.010,
+0.021]), the sign of his affordability loading, the magnitude of his
+permanent-income gearing, and the sign of his permanent-income credit slope.
+The agreement with Williams is on *form* — the error-correction speed and
+the significance pattern of the wealth channels — not on the credit-channel
+calibrations, which is the same verdict §7.0 and §9 reach from the point
+estimates.
 
 For use in a calibrated model (MARTIN, §10.3), the policy-relevant
-summary is the aggregate long-run wealth elasticity γ_W = 0.19
-(95% CI [−0.77, 1.16]); the point estimate is close to MARTIN's
-calibrated net-wealth elasticity of ≈0.17, but the interval is too wide
-for the free estimate to discipline the calibration — it neither
-confirms nor rejects it. The disaggregated split into four components
-is even less precisely identified and should be treated as indicative.
+summary is Spec 11's aggregate long-run wealth coefficient
+γ_W = 0.100 (95% CI [0.036, 0.164]): positive and bounded away from zero,
+but below both Williams' 0.230 and MARTIN's calibrated net-wealth
+elasticity of ≈ 0.17 (the latter sits just outside the upper bound). The
+Spec 6 aggregate (0.004, CI [−0.66, 0.67]) is too imprecise to discipline
+anything.
 
 (Caveat: both the delta method and the residual bootstrap hold the
 right-hand side fixed, so they propagate sampling uncertainty in the
 ECM coefficients but **not** the first-stage uncertainty in the
-generated permanent-income and CCI regressors; the true intervals are
-therefore at least this wide. The real-time permanent-income
-sensitivity of §7.4 and §8.9 gives a partial read on the first-stage
-component.)
+generated permanent-income and CCI regressors — the permanent-income
+projection and the CCI are held at their full-sample values in both
+methods; the true intervals are therefore at least this wide. The
+real-time permanent-income sensitivity of §7.4 and §8.9 gives a partial
+read on the first-stage component.)
 
 ### 7.4 The Italy / AR comparison and the real-time check
 
@@ -3092,27 +3529,28 @@ Refitting Spec 6 (n = 86) under each measure on a common data flow
 
 | Term | AR (real-time) | Italy full-sample (headline measure) | Italy real-time | Williams |
 |---|---:|---:|---:|---:|
-| `ecm_lag` (λ)   | −0.051 | **−0.197** | **−0.118** | **−0.286** |
-| `ln_yp_over_y`  | −0.222 | **+0.244** | **−0.105** | (calib. 0.20) |
-| implied γ_HA    | 0.019  | 0.0082     | 0.0118     | 0.049 |
+| `ecm_lag` (λ)   | −0.095 (t = −1.68) | **−0.239 (t = −2.55)** | **−0.159 (t = −2.39)** | **−0.286** |
+| `ln_yp_over_y`  | −0.158 (t = −1.68) | **+0.325 (t = 1.50)** | **−0.145 (t = −2.23)** | (calib. 0.20) |
+| `ha_y` (OLS)    | +0.0135 (t = 1.76) | +0.0022 (t = 0.30)    | +0.0024 (t = 0.30)    | (implied 0.014) |
 
-(Common-refit values from `australia_pi_realtime_robustness.csv`; the
-canonical pipeline's Spec 6 λ under the full-sample Italy measure is −0.180,
-marginally different from the −0.197 refit here because the diagnostic
-re-derives the data flow rather than reusing the cached pipeline outputs. The
-`ha_y` row reports the OLS coefficient, which equals the implied γ only after
-dividing by |λ|; we report the OLS coefficient here, consistent with the CSV.)
+(The refit now reproduces the canonical pipeline's Spec 6 estimates exactly
+under the full-sample Italy measure — λ = −0.2386, matching
+`australia_full_results.csv` — since the pipeline-isolation fix described
+in §8.2. The `ha_y` row reports the OLS coefficient, which equals the
+implied γ only after dividing by |λ|, consistent with the CSV.)
 
-Two readings follow. First, the full-sample Italy measure roughly
-quadruples |λ| relative to AR (−0.05 → −0.20) and flips the long-run
-permanent-income coefficient from significantly negative (−0.22, t = −2.23 —
-the "Australian permanent-income puzzle") to positive (+0.24, in sign
-agreement with theory and Williams' calibrated value, though insignificant at
-t = 0.95). Second — the operational caveat — **neither move fully survives a
-causal real-time projection.** The real-time Italy variant keeps about half
-the |λ| gain (−0.118) but the permanent-income coefficient returns to
-modestly negative (−0.105, t = −1.53), and the `ha_y` coefficient sits at
-+0.012 (t = 1.86) rather than at the full-sample +0.008. The positive-PI sign
+Two readings follow. First, the full-sample Italy measure multiplies |λ|
+by roughly two and a half relative to AR (−0.095 → −0.239) and flips the
+long-run permanent-income coefficient from negative (−0.158, t = −1.68 —
+the "Australian permanent-income puzzle") to positive (+0.325, in sign
+agreement with theory and Williams' calibrated value, though insignificant
+at t = 1.50). Second — the operational caveat — **only part of either move
+survives a causal real-time projection.** The real-time Italy variant keeps
+roughly two-thirds of the full-sample |λ| (−0.159 against −0.239) and is
+now itself significant (t = −2.39), so about a third of the headline |λ| is
+attributable to look-ahead rather than to the Italy projection per se. The
+permanent-income coefficient, by contrast, returns to significantly
+negative under the causal measure (−0.145, t = −2.23). The positive-PI sign
 is therefore a property of the full-sample, two-sided measure, not of the
 real-time forecaster a model like MARTIN would use.
 
@@ -3137,125 +3575,189 @@ lower bound.
 ## 8. Robustness
 
 We run the Italian-style robustness suite of De Bonis, Liberati,
-Muellbauer and Rondinelli (2020) on the conventional constant-MPC baseline (Spec 6)
-and, where the committed batteries permit, on the automated-selector
-specification (Spec 2) and the faithful LIVES specification (Spec 11).
-The suite is deliberately weighted toward exposing rather than
-concealing weakness: it spans estimator choice (OLS, IV, SUR), break
-testing, the credit-conditions construction, the permanent-income
-measure, the affordability adjustment, sample length, and
-out-of-sample forecast accuracy. Several of the batteries return
-honest negatives — the out-of-sample loss to a random walk, the
-near-zero cross-equation residual correlation, the placebo failure,
-and the partial reversal under a causal permanent-income measure.
-We report these prominently. They are substantive findings: a
-freely-estimated single-equation framework permits them to surface,
-whereas the imposed restrictions of a four-equation FIML system would
-hide them, and each points to why FIML and pre-1988 back-extension
-are the routes forward (§5, §9).
+Muellbauer and Rondinelli (2020) on the automated-selector
+specification (Spec 3, §6.3), on the conventional constant-MPC baseline
+(Spec 6) where the battery requires the disaggregated wealth split, and —
+in parallel, with a `_spec11` suffix on the committed outputs — on the
+faithful LIVES specification (Spec 11). The suite is deliberately
+weighted toward exposing rather than concealing weakness: it spans
+estimator choice (OLS, IV, SUR), break testing, the credit-conditions
+construction, the permanent-income measure, the affordability
+adjustment, sample length, and out-of-sample forecast accuracy. Several
+of the batteries return honest negatives — the multi-step out-of-sample
+loss to a random walk, the near-zero cross-equation residual
+correlation, the below-median placebo percentiles for the literal
+Williams construction, and the partial reversal under a causal
+permanent-income measure. We report these prominently. They are
+substantive findings: a freely-estimated single-equation framework
+permits them to surface, whereas the imposed restrictions of a
+four-equation FIML system would hide them, and each points to why FIML
+and pre-1988 back-extension are the routes forward (§5, §9).
 
 ### 8.1 OLS vs IV on current income (Hall 1978 endogeneity)
 
-Current income is instrumented by lagged income, lagged unemployment
-and the lagged mortgage rate (six instruments;
-[`australia_iv_robustness.csv`](../outputs/australia_iv_robustness.csv),
-Spec 2, n = 86). The speed of adjustment is essentially unmoved:
-ecm_lag = −0.0829 (OLS) → −0.0852 (IV), a change of −0.0023 (+2.82
-per cent). The net-worth elasticity shifts by −4.81 per cent
-(0.0615 → 0.0585) and the permanent-income coefficient by +85 per
-cent (−0.0031 → −0.0057), but both are economically negligible in
-level terms. Current-income endogeneity is therefore not a material
-source of bias for the speed of adjustment on this sample.
+Because current income enters both the error-correction term
+(ecm_lag = ln c_{t−1} − ln y_t) and the permanent-income gap
+(ln_yp_over_y), the exercise now instruments **both** regressors —
+an upgrade on an earlier draft, which treated ecm_lag as exogenous and
+instrumented only the PI gap. The instrument set is income lagged one,
+two and four quarters, unemployment lagged one and two quarters, and
+the mortgage rate lagged one quarter (six instruments); both the OLS
+and IV columns carry Newey–West HAC standard errors
+([`australia_iv_robustness.csv`](../outputs/australia_iv_robustness.csv),
+Spec 3, n = 146).
+
+Instrumenting moves the speed of adjustment *away* from zero:
+ecm_lag = −0.191 (OLS) → −0.258 (IV, HAC SE 0.110), +35 per cent, and
+the permanent-income coefficient from +0.196 to +0.280 (+43 per cent);
+the small net-worth coefficient flips sign (+0.0011 → −0.0009) but is
+statistically indistinguishable from zero either way. The IV
+diagnostics
+([`australia_iv_diagnostics.csv`](../outputs/australia_iv_diagnostics.csv))
+say the exercise is well-posed but the endogeneity it corrects is
+marginal: the weak-instrument F-statistics are 73.6 (ln_yp_over_y) and
+28.9 (ecm_lag), both far above conventional thresholds; the Wu–Hausman
+test does not reject OLS exogeneity at 5 per cent (p = 0.095); and the
+Sargan over-identification test does not reject instrument validity at
+5 per cent (p = 0.074), though both are close enough to the boundary
+to keep honest.
+
+Run on the faithful LIVES specification
+([`australia_iv_robustness_spec11.csv`](../outputs/australia_iv_robustness_spec11.csv),
+[`australia_iv_diagnostics_spec11.csv`](../outputs/australia_iv_diagnostics_spec11.csv),
+n = 146), the same pattern holds and the headline conclusions are
+intact: λ moves from −0.448 to −0.547 (+22 per cent), the
+permanent-income coefficient from +0.459 to +0.598 (+30 per cent), and
+the wealth m.p.c.s shrink moderately but stay positive — nla_y
+0.0269 → 0.0216 (−20 per cent, HAC t ≈ 2.4) and ilfa_y 0.0155 → 0.0115
+(−26 per cent, t ≈ 1.9). The Spec 11 first stages are equally strong
+(weak-instrument F = 72.2 for ln_yp_over_y and 35.0 for ecm_lag), and
+here the Wu–Hausman test *does* reject exogeneity (p = 0.003) with the
+Sargan test marginal (p = 0.062) — so in the LIVES form the
+Hall-endogeneity correction is statistically warranted and works in
+the direction of a *faster*, not slower, error-correction.
 
 ### 8.2 Joint permanent-income + consumption SUR
 
 Estimating the consumption equation jointly with the permanent-income
 equation by SUR
 ([`australia_joint_pi_robustness.csv`](../outputs/australia_joint_pi_robustness.csv),
-Spec 2, n = 86) leaves every coefficient within sampling noise of the
-single-equation OLS values. The largest level shift is in the speed
-of adjustment (ecm_lag −0.0829 → −0.1273, +53.6 per cent in relative
-but a third of a percentage point in level), and the net-worth
-elasticity moves +13.1 per cent (0.0615 → 0.0695). The
-cross-equation residual correlation is negligible; the SUR-versus-OLS
-coefficient stability is the load-bearing evidence (the literal
-ρ̂ ≈ −0.004 figure cited in the system narrative is not a separately
-committed scalar — we report the coefficient comparison rather than
-the correlation). Single-equation OLS is therefore an acceptable
-estimator for the consumption block, and — consistent with the
-two-equation SUR result in §8.18 — the case for the multi-equation
-framework rests on cross-equation parameter restrictions, not on
-residual covariance or efficiency gain.
+Spec 3, n = 146) leaves every coefficient within sampling noise of the
+single-equation OLS values. The largest level shift among the long-run
+terms is in the speed of adjustment (ecm_lag −0.191 → −0.204, +7.0 per
+cent in relative terms but barely a hundredth in level), with the
+permanent-income coefficient moving −4.5 per cent (0.196 → 0.187). On
+the faithful LIVES specification
+([`australia_joint_pi_robustness_spec11.csv`](../outputs/australia_joint_pi_robustness_spec11.csv),
+n = 146) the stability is even tighter: λ −0.448 → −0.457 (+1.9 per
+cent), nla_y −0.2 per cent, ilfa_y +2.6 per cent, ln_yp_over_y −1.4
+per cent. Single-equation OLS is therefore an acceptable estimator for
+the consumption block, and — consistent with the two-equation SUR
+result in §8.18 — the case for the multi-equation framework rests on
+cross-equation parameter restrictions, not on residual covariance or
+efficiency gain.
+
+Two honest disclosures attach to this battery. First, the second
+equation is a *one-step-ahead* income-growth forecast, not the
+k = 40-quarter discounted projection that defines the permanent-income
+regressor, and the SUR does not propagate the first-stage uncertainty
+of the generated permanent-income series into the consumption-equation
+standard errors — it tests residual covariance, not
+generated-regressor bias (the §7.3.1 caveat applies here too). Second,
+the IV and SUR tables in a previous draft had been produced on data
+contaminated by a pipeline-ordering bug: the diagnostic that builds
+the AR permanent-income series had overwritten the canonical
+Italy-method series in the shared model dataset before the robustness
+batteries ran. The pipeline now isolates each sub-script's data flow,
+and the committed tables here and in §8.1 are estimated on the
+canonical data (which is why the §7.4 refit now matches
+`australia_full_results.csv` exactly).
 
 ### 8.3 Chow battery and multiple-break tests
 
-Chow tests
+Chow tests on the selector specification
 ([`australia_chow_battery.csv`](../outputs/australia_chow_battery.csv),
-Spec 2) at 2008Q3 do not reject parameter stability (Chow stat
-1.248, p = 0.270; n_pre = 21, n_post = 65), while the 2020Q1 break is
-strongly rejected (Chow stat 8.852, p = 9.9 × 10⁻¹⁰; n_pre = 67,
-n_post = 19) — the COVID structural break that the event dummies
-absorb. The 1995Q1 and 2000Q1 break dates fall too close to the
-sample edge to estimate. The Bai–Perron / CUSUM battery
-([`australia_breaks.csv`](../outputs/australia_breaks.csv)) returns a
-single dominant break: supF = 164.20 (p = 0) at 2020Q4, with a CUSUM
-p-value of 0.9963 (recursive residuals stable away from the COVID
-episode). The break structure is therefore concentrated entirely at
-COVID, not at the GFC.
+Spec 3, n = 146) do not reject parameter stability at 1995Q1 (stat
+0.380, p = 0.978; n_pre = 27, n_post = 119), 2000Q1 (0.740, p = 0.730)
+or 2008Q3 (0.529, p = 0.912), while the 2020Q1 break is strongly
+rejected (Chow stat 11.12, p = 8.9 × 10⁻¹⁶; n_pre = 127, n_post = 19)
+— the COVID structural break that the event dummies absorb. On the
+faithful LIVES specification
+([`australia_chow_battery_spec11.csv`](../outputs/australia_chow_battery_spec11.csv))
+1995Q1 (p = 0.844) and 2000Q1 (p = 0.152) are stable, but the 2008Q3
+break is rejected at 5 per cent (stat 1.914, p = 0.017) — consistent
+with the GFC being exactly where Spec 11's credit-interaction
+structure starts to bind (the deployed CCI's first knot is 2007Q3,
+§5.1.1) — and the 2020Q1 statistic is not computable (`sctest`
+singular on the COVID-dummied subsample; the CSV records the failure).
+The Bai–Perron / CUSUM battery
+([`australia_breaks.csv`](../outputs/australia_breaks.csv), Spec 3)
+returns a single dominant break: supF = 169.96 (p = 0) dated 2019Q1 —
+the trimming convention places the date at the segment boundary
+adjacent to the COVID episode — with a CUSUM p-value of 0.971
+(recursive residuals stable away from that episode). For the selector
+specification the break structure is therefore concentrated at COVID,
+not at the GFC; for the LIVES form a 5 per cent GFC break is the
+honest additional finding.
 
 ### 8.4 Williams CCI interactions (Spec 8) — reallocation, not identification
 
-Spec 8 enters all six Williams CCI interactions freely on the 1988Q4+
-sample with the reduced-form `cci_williams`. Following Williams (Aust
-paper §5.1) the variables interacted with CCI are de-meaned over the
-estimation sample before forming the interaction, so that each
-interaction term has a clean conditional interpretation rather than
-absorbing an implicit linear CCI level shift. The sign-prior verdicts
+Spec 8 enters all six Williams CCI interactions freely on the 1988Q3+
+sample with the reduced-form `cci_williams`. Following the §4.7
+convention (Williams' own), it is the interacted economic *variable*
+that is de-meaned — over the 1980Q1-onwards window on which the CCI is
+observed — while the CCI itself enters the interaction raw, so that
+each interaction term has a clean conditional interpretation rather
+than absorbing an implicit linear CCI level shift. The sign-prior
+verdicts
 ([`australia_spec8_sign_prior_verdicts.csv`](../outputs/australia_spec8_sign_prior_verdicts.csv);
 full vector in
-[`australia_all_results.csv`](../outputs/australia_all_results.csv),
+[`australia_full_results.csv`](../outputs/australia_full_results.csv),
 n = 146) are:
 
 | Williams interaction | Sign prior | OLS coef | t | p | Verdict |
 |---|---:|---:|---:|---:|---|
-| `r × CCI`                     | − | +0.00192 | +1.85 | 0.066 | wrong sign, marginal — **FAIL** |
-| `log(HP/y) × (1 − 1.2·CCI)`   | − | +0.00765 | +1.00 | 0.319 | wrong sign on composite, insignificant — **FAIL** |
-| `log(y^p/y) × CCI`            | + | −0.6113  | −2.12 | 0.036 | wrong sign, significant — **FAIL** |
-| `log(y^p/y)`                  | + | +0.4677  | +3.44 | 0.001 | right sign — **PASS** |
-| `HA × CCI` (γ₁)               | + | +0.00159 | +0.32 | 0.748 | right sign, insignificant |
+| `r × CCI`                     | − | +0.00283 | +2.05 | 0.042 | wrong sign, significant — **FAIL** |
+| `log(HP/y) × (1 − 1.2·CCI)`   | − | +0.0299  | +1.38 | 0.171 | wrong sign on composite, insignificant — **FAIL** |
+| `log(y^p/y) × CCI`            | + | −0.5046  | −2.43 | 0.016 | wrong sign, significant — **FAIL** |
+| `log(y^p/y)`                  | + | +0.4921  | +3.42 | 0.001 | right sign — **PASS** |
+| `HA × CCI` (γ₁)               | + | +0.00426 | +0.87 | 0.384 | right sign, insignificant |
 
-Three of the four sign-priced interactions fail. Of the six free
+Three of the four sign-priced interactions fail. Of the free
 interactions only the permanent-income level term (`ln_yp_over_y`,
-+0.4677, t = 3.44) passes its prior cleanly; the housing-collateral
++0.4921, t = 3.42) passes its prior cleanly; the housing-collateral
 interaction `ha_x_cci` carries its theoretically correct positive
-sign but is far from significant (+0.00159, t = 0.32). Against
+sign but is far from significant (+0.00426, t = 0.87). Against
 Williams' Table 1 the raw-coefficient gaps remain structural
 ([`australia_williams_spec8_comparison.csv`](../outputs/australia_williams_spec8_comparison.csv)):
-his α_c1 (r × CCI) = −0.871 against our structural +0.0043; his
-α_c4 (HP/y × (1−1.2·CCI)) = −0.13 against our structural +0.017; his
-calibrated ψ₁ = +0.93 against our freely-estimated structural −1.374.
+his α_c1 (r × CCI) = −0.871 against our structural +0.0062; his
+α_c4 (HP/y × (1−1.2·CCI)) = −0.13 against our structural +0.065; his
+calibrated ψ₁ = +0.93 against our freely-estimated structural −1.101.
 
 The substantive effect of Spec 8 is to *re-allocate* the long-run
-identification, not to recover Williams' channels. Standalone wealth
-strengthens (nla_y +0.0435***, struct +0.098; super_y +0.0139**,
-struct +0.031; ha_y +0.0097**, struct +0.022) and the speed of
-adjustment shifts from −0.180 (Spec 6) to −0.445 (t = −3.30) on the
-full sample — past Williams' value in magnitude. Spec 8 also attains
-the highest adjusted R² among the n = 146 specifications (0.8215) and
-the best BIC overall (−948.5). We do **not** read any of this as a
-credit-conditions success. The pre-COVID estimates are revealing:
-there the wealth coefficients sign-correctly (ha_y +0.0139***) but
-the *de-meaned interaction* `ha_x_cci` turns significantly negative
-(−0.0114**, struct −0.046), the wrong sign for the LIVES collateral
-channel, and `hp_x_1_minus_cci` is significantly negative
-(−0.0194***). Read together with the calibration collapse (§9, Spec
-10/12) and the identification-vs-detrending decomposition (§5), the
-honest reading is that the six CCI-interacted regressors in a single
-equation act as flexible parameter time-variation rather than as the
-structurally identified common-factor channel that Williams'
-four-equation system delivers. Their mutual collinearity (each is
-approximately proportional to CCI) is the structural reason FIML is
-required; we discuss it as a first-class identification result in §5.
+identification, not to recover Williams' channels. Standalone
+non-housing wealth strengthens (nla_y +0.0337***, struct +0.073;
+super_y +0.0215**, struct +0.047; ha_y stays small at +0.0030,
+t = 0.48) and the speed of adjustment shifts from −0.239 (Spec 6) to
+−0.458 (t = −3.52) on the full sample — past Williams' value in
+magnitude. Spec 8 also attains the highest adjusted R² among the
+n = 146 specifications (0.827) and the second-best BIC (−952.8,
+behind Spec 11's −954.8). We do **not** read any of this as a
+credit-conditions success. The pre-COVID estimates are revealing
+([`australia_precovid_results.csv`](../outputs/australia_precovid_results.csv)):
+there the standalone housing level is significant (ha_y +0.0154***,
+t = 2.87) but the *interactions* turn negative — `ha_x_cci` at
+−0.0069 (t = −1.42) and `hp_x_1_minus_cci` at −0.0292 (t = −1.54),
+the former the wrong sign for the LIVES collateral channel — while λ
+halves to −0.219 (t = −3.95). Read together with the calibration
+collapse (§9, Spec 10/12) and the identification-vs-detrending
+decomposition (§5), the honest reading is that the six CCI-interacted
+regressors in a single equation act as flexible parameter
+time-variation rather than as the structurally identified
+common-factor channel that Williams' four-equation system delivers.
+Their mutual collinearity (each is approximately proportional to CCI)
+is the structural reason FIML is required; we discuss it as a
+first-class identification result in §5.
 
 ### 8.5 Net-liquid-assets restriction γ_LA + γ_LOANS = 0
 
@@ -3268,12 +3770,12 @@ Newey–West variance estimator. The restriction is **accepted at the
 
 | Spec | Sample | γ_LA + γ_LOANS | NW SE | t | p | Restriction |
 |---|---|---:|---:|---:|---:|:-:|
-| 4 | full      | +0.0800 | 0.0559 | 1.430 | 0.153 | accepted |
-| 5 | full      | +0.1377 | 0.1134 | 1.214 | 0.225 | accepted |
-| 6 | full      | +0.1045 | 0.1028 | 1.017 | 0.309 | accepted |
-| 4 | pre-COVID | +0.0398 | 0.0269 | 1.480 | 0.139 | accepted |
-| 5 | pre-COVID | −0.0356 | 0.0494 | −0.721 | 0.471 | accepted |
-| 6 | pre-COVID | −0.0201 | 0.0532 | −0.378 | 0.706 | accepted |
+| 4 | full      | +0.0325 | 0.0445 | 0.731 | 0.465 | accepted |
+| 5 | full      | +0.0422 | 0.0999 | 0.422 | 0.673 | accepted |
+| 6 | full      | +0.0202 | 0.0987 | 0.204 | 0.838 | accepted |
+| 4 | pre-COVID | +0.0282 | 0.0285 | 0.989 | 0.322 | accepted |
+| 5 | pre-COVID | −0.0222 | 0.0499 | −0.445 | 0.656 | accepted |
+| 6 | pre-COVID | −0.0026 | 0.0509 | −0.051 | 0.959 | accepted |
 
 The data cannot distinguish separate liquid-asset and debt
 propensities. We read this as non-rejection-by-imprecision rather
@@ -3281,8 +3783,8 @@ than as positive confirmation of exact netting, but it validates the
 Italian convention of netting deposits against debt and supports the
 use of the constructed `nla_y` series — the net-liquid channel that
 carries a significant, correctly-signed marginal propensity in the
-faithful LIVES specification (Spec 11, nla_y +0.037***, struct 0.077;
-§7).
+faithful LIVES specification (Spec 11, nla_y +0.0269***, struct 0.060;
+§7.0).
 
 ### 8.6 Drehmann amortising-mortgage adjusted real rate
 
@@ -3291,15 +3793,19 @@ De Bonis et al. (2020) apply the BIS Drehmann, Juselius and Korinek
 Australia we set N = 25 years (100 quarters), consistent with the
 longer Australian average mortgage maturity
 ([`australia_drehmann_robustness.csv`](../outputs/australia_drehmann_robustness.csv),
-Spec 2, n = 86). The maturity choice materially changes the
-estimated speed of adjustment: ecm_lag −0.1928 (base) → −0.0866
-(Drehmann), with the net-worth elasticity moving 0.0013 → 0.0612 and
-the permanent-income coefficient 0.2404 → −0.0032. Unlike the
-Italian result, the consumption equation is *not* invariant to the
-amortisation adjustment on the Australian sample; we flag the CCI/rate
-maturity convention as a genuine source of sensitivity, consistent
-with the more general finding that the credit-channel calibrations are
-weakly pinned down off a single equation.
+Spec 3, n = 146). The substitution is now essentially inert, matching
+the Italian invariance result: ecm_lag −0.1906 (base) → −0.1902
+(Drehmann), the net-worth coefficient 0.00108 → 0.00129, the
+permanent-income coefficient 0.1963 → 0.1959, and the real-rate
+coefficient itself −0.00020 → −0.00015 (insignificant either way).
+(The large Drehmann sensitivity an earlier draft reported was an
+artefact of the contaminated data flow disclosed in §8.2.) The
+exercise is undefined for the faithful LIVES specification: Spec 11
+carries no plain `real_rate` term — its rate enters only through the
+`r × CCI` interaction — so the Drehmann substitution cannot be
+applied, and
+[`australia_drehmann_robustness_spec11.csv`](../outputs/australia_drehmann_robustness_spec11.csv)
+records the attempt as FAILED for that reason.
 
 ### 8.7 Scaled-income robustness
 
@@ -3307,108 +3813,163 @@ De Bonis et al. (2020) average disposable income with
 labour-plus-transfer income to down-weight property-income
 mismeasurement. Re-running this construction
 ([`australia_scaled_income_robustness.csv`](../outputs/australia_scaled_income_robustness.csv),
-Spec 2, n = 86) shifts the speed of adjustment from −0.1928 to
-−0.1117 (SE 0.0466) and lifts the net-worth elasticity from 0.0013 to
-0.0569. The income-measure choice moves |λ| by roughly 0.08 — not
-negligible — but does not change the substantive ranking of the
-wealth coefficients.
+Spec 3, n = 146) shifts the speed of adjustment modestly from −0.1906
+to −0.2111 and the permanent-income coefficient from 0.196 to 0.163,
+with the net-worth coefficient roughly halving (0.00108 → 0.00061)
+from an already negligible base. On the faithful LIVES specification
+([`australia_scaled_income_robustness_spec11.csv`](../outputs/australia_scaled_income_robustness_spec11.csv))
+the income-measure choice likewise moves λ from −0.448 to −0.525
+while *strengthening* the wealth m.p.c.s (nla_y 0.0269 → 0.0344,
+ilfa_y 0.0155 → 0.0175) and trimming the permanent-income coefficient
+(0.459 → 0.376). The income-measure choice moves |λ| by 0.02–0.08 in
+level — not negligible — but does not change the substantive ranking
+or signs of the wealth coefficients in either frame.
 
 ### 8.8 Williams non-property income (NPY) robustness
 
 Replacing the disposable-income series with `npy_real_pc` constructed
 per Williams (2009) §4.2.1
 ([`australia_williams_income_robustness.csv`](../outputs/australia_williams_income_robustness.csv),
-Spec 2, n = 86) provides the closest methodological match to
+Spec 3, n = 146) provides the closest methodological match to
 Williams' income concept (property income stripped, but not
 symmetrically averaged with labour-plus-transfer income). The
-substitution shifts ecm_lag from −0.1928 to −0.0938 (SE 0.0431) and
-lifts the net-worth elasticity from 0.0013 to 0.0572. This moves |λ|
-by roughly 0.10 under the Williams-NPY measure relative to the
-baseline net-worth specification, in the same direction as — and
-somewhat larger than — the scaled-income result.
+substitution is now close to inert on the speed of adjustment —
+ecm_lag −0.1906 → −0.1857, a 2.6 per cent change — with the
+permanent-income coefficient easing from 0.196 to 0.164 and the
+net-worth coefficient staying negligible (0.00108 → 0.00044). (An
+earlier draft reported the NPY substitution roughly halving |λ|; that
+result did not survive the §8.2 data fix.) On the faithful LIVES
+specification
+([`australia_williams_income_robustness_spec11.csv`](../outputs/australia_williams_income_robustness_spec11.csv))
+the NPY measure trims λ from −0.448 to −0.395 while *raising* the
+wealth m.p.c.s (nla_y 0.0269 → 0.0413, ilfa_y 0.0155 → 0.0203) and
+easing the permanent-income coefficient (0.459 → 0.352). The income
+concept is therefore not what separates our estimates from Williams':
+under his own income measure the conventional λ is essentially
+unchanged and the LIVES wealth channels strengthen.
 
 ### 8.9 Permanent-income method comparison (AR, full-sample Italy, real-time Italy)
 
-§7.4 reports the headline three-way comparison; the committed columns
-([`australia_pi_method_comparison.csv`](../outputs/australia_pi_method_comparison.csv)
-and
-[`australia_pi_realtime_robustness.csv`](../outputs/australia_pi_realtime_robustness.csv),
-n = 86) refit under all three permanent-income measures:
+§7.4 reports the headline three-way comparison in the Spec 6 frame;
+the committed batteries span two specification frames, and we label
+each row accordingly. The method comparison
+([`australia_pi_method_comparison.csv`](../outputs/australia_pi_method_comparison.csv))
+runs on the selector specification (Spec 3, n = 146 — its Italy-column
+estimates match the Spec 3 rows of `australia_full_results.csv`
+exactly), while the real-time battery
+([`australia_pi_realtime_robustness.csv`](../outputs/australia_pi_realtime_robustness.csv))
+runs on the conventional baseline (Spec 6, n = 86):
 
-| PI measure | λ (ecm_lag) | t | log(y^p/y) | t | adj-R² |
-|---|---:|---:|---:|---:|---:|
-| AR forecaster (full)       | −0.0829 | — | −0.0031 (puzzle) | — | 0.7578 |
-| AR (real-time)             | −0.0511 | −0.89 | −0.2224 | −2.23 | — |
-| Italy LP (full-sample)     | −0.1974 | −1.95 | +0.2442 | +0.95 | 0.7690 |
-| Italy LP (real-time)       | −0.1182 | −1.86 | −0.1051 | −1.53 | — |
+| PI measure | Frame | λ (ecm_lag) | t | log(y^p/y) | t | adj-R² |
+|---|---|---:|---:|---:|---:|---:|
+| AR (expanding-window)      | Spec 3, n = 146 | −0.0479 | −1.12 | −0.0036 | −3.96 | 0.696 |
+| Italy LP (full-sample)     | Spec 3, n = 146 | −0.1906 | −2.90 | +0.1963 | +3.41 | 0.731 |
+| AR (expanding-window)      | Spec 6, n = 86  | −0.0948 | −1.68 | −0.1583 | −1.68 | — |
+| Italy LP (full-sample)     | Spec 6, n = 86  | −0.2386 | −2.55 | +0.3253 | +1.50 | — |
+| Italy LP (real-time)       | Spec 6, n = 86  | −0.1594 | −2.39 | −0.1451 | −2.23 | — |
 
-(adjusted R² from
+(Adjusted R² from
 [`australia_pi_method_meta.csv`](../outputs/australia_pi_method_meta.csv);
-the Italy LP forecaster fits marginally better, 0.7690 vs 0.7578.)
+the Italy LP forecaster fits better in the Spec 3 frame, 0.731 vs
+0.696. The AR forecaster is *always* expanding-window — it refits the
+AR(8) on data through each forecast origin — so there is no separate
+"full-sample AR" variant to report.)
 
 The full-sample Italy LP measure is the headline measure (framed as a
-*measurement*, §4.3), and the AR forecaster delivers the
-significantly negative "Australian permanent-income puzzle"
-coefficient (−0.0031 full, −0.2224 under the real-time AR variant).
-The real-time Italy LP variant is the operationally honest benchmark:
-it is causal, re-fitting the projection at each *t* on data whose
-full k-quarter horizon is realised by *t*, so it is usable at
-forecast time. It shows that about half the speed-of-adjustment gain
-from AR to the full-sample Italy measure is genuine (λ falls from
-−0.197 to −0.118 once look-ahead is removed), but that the positive
-permanent-income sign is **not** — it reverses to −0.105 under the
-causal measure. We carry the full-sample measure as the headline and
-disclose explicitly that its positive-PI sign and λ magnitude are
-full-sample, non-causal properties. The same look-ahead caveat
-attaches to the strong permanent-income coefficient in the faithful
-LIVES specification (Spec 11, ln_yp_over_y +0.504, t = 4.0); the
-real-time column is the operational robustness check.
+*measurement*, §4.3), and the AR forecaster delivers the negative
+"Australian permanent-income puzzle" coefficient in both frames
+(significantly so in the Spec 3 frame, t = −3.96). The real-time
+Italy LP variant is the operationally honest benchmark: it is causal,
+re-fitting the projection at each *t* on data whose full k-quarter
+horizon is realised by *t*, so it is usable at forecast time. It
+shows that roughly two-thirds of the full-sample Italy |λ| is genuine
+(−0.159 against −0.239, and now itself significant at t = −2.39) —
+the look-ahead accounts for about a third — but that the positive
+permanent-income sign is **not**: it reverses to −0.145 (t = −2.23)
+under the causal measure. We carry the full-sample measure as the
+headline and disclose explicitly that its positive-PI sign and part
+of its λ magnitude are full-sample, non-causal properties. The same
+look-ahead caveat attaches to the strong permanent-income coefficient
+in the faithful LIVES specification (Spec 11, ln_yp_over_y +0.459,
+t = 4.0); the real-time column is the operational robustness check.
 
 ### 8.10 Permanent-income filter sensitivity
 
-A nine-cell grid over discount factor δ ∈ {0.90, 0.95, 0.97} and
-horizon k ∈ {20, 40, 60} quarters, with the GFC learning-weight on
-and off
+A grid over discount factor δ ∈ {0.90, 0.95, 0.97} and horizon
+k ∈ {20, 40, 60} quarters, with the GFC learning-weight ogive on and
+off
 ([`australia_permanent_income_sensitivity.csv`](../outputs/australia_permanent_income_sensitivity.csv)),
 shows the speed of adjustment to be extremely stable within the AR
-method: λ ranges only from −0.0824 to −0.0830 across the eighteen
-δ × k × GFC combinations (baseline δ = 0.95, k = 40, the eta = 0.05
-mapping of §4.3: λ = −0.0829, structural PI weight −0.037,
-structural main-wealth +0.742). The GFC learning weight has no effect
-on these summaries. Switching to an HP-filter permanent income
-(λ = 1600) moves λ to −0.2006 and flips the structural PI weight to
-+1.397. The within-AR-method PI tuning is therefore not what drives
-the |λ| gap with Williams; the dominant factor is the AR-vs-Italy-LP
-method choice itself (§8.9).
+method on the selector specification (Spec 3 — the grid's λ values
+match the AR column of §8.9's Spec 3 frame): λ ranges only from
+−0.0470 to −0.0482 across the eighteen δ × k × ogive cells (baseline
+δ = 0.95, k = 40, ogive on: λ = −0.0479, structural PI weight −0.076,
+structural net-worth weight +0.122). The GFC ogive toggle is now a
+real switch — an earlier version of the grid carried it as a no-op,
+so its on/off rows were identical; the fixed toggle moves λ by less
+than 0.0003 and the structural PI weight by at most 0.03 within each
+δ × k cell, so the original "no effect" conclusion survives the fix,
+now for a demonstrated rather than vacuous reason. The PI weight is
+more sensitive to the horizon (−0.21 at k = 20 down to −0.04 at
+k = 60) but never changes sign within the AR method. Switching to an
+HP-filter permanent income (λ = 1600) moves λ to −0.0820 and flips
+the structural PI weight to +1.238. The within-AR-method PI tuning is
+therefore not what drives the |λ| gap with Williams; the dominant
+factor is the AR-versus-Italy-direct-forecast method choice itself (§8.9).
+
+For the headline LIVES specification the corresponding sensitivities
+are the GFC-ogive toggle on the Italy measure and the real-time
+variant. Removing the ogive from the headline measure
+([`australia_spec11_ogive_robustness.csv`](../outputs/australia_spec11_ogive_robustness.csv))
+moves Spec 11's λ from −0.448 to −0.574 (t = −4.63) and the
+permanent-income coefficient from +0.459 to +0.604, leaving the
+structural gearing essentially unchanged (ψ̂ ≈ 1.05 against the
+headline 1.02) — so the §7.0 bound violation is not an ogive
+artefact. The real-time variant is §7.4/§8.9.
 
 ### 8.11 COVID-period robustness
 
-Across four sample variants (full, pre-COVID, COVID-dropped,
-COVID-rich) the speed of adjustment is sign-stable for every
-estimable specification except the two Williams-calibration-imposed
-specifications
-([`australia_lambda_robustness.csv`](../outputs/australia_lambda_robustness.csv)).
-For the conventional baseline (Spec 6) λ runs −0.180 (full) /
-−0.123 (pre-COVID) / −0.100 (COVID-dropped) / −0.149 (COVID-rich) —
-all correctly signed. The faithful LIVES specification (Spec 11)
-gives −0.480 (full) / −0.245 (pre-COVID) / −0.256 (COVID-dropped) —
-also sign-stable, with the full-sample value inflated by the COVID
-quarters and the pre-COVID −0.245 treated as the identified value
-(close to Williams' −0.286). Only Spec 10 (Williams-prior calibrated;
-sign-flip to +0.005 COVID-dropped) and Spec 12 (Williams calibrations
-imposed; sign-flip to +0.030 pre-COVID) are not sign-stable across
-samples — an artefact of the calibration collapse documented in §9,
-not of the COVID episode itself.
+All fourteen specifications now carry all **four** sample variants
+(full, pre-COVID, COVID-dropped, COVID-rich) in
+[`australia_lambda_robustness.csv`](../outputs/australia_lambda_robustness.csv)
+— the COVID-rich variant was previously missing for Specs 7–12, so
+this is the first complete battery. The speed of adjustment is
+sign-stable across all four variants for every specification except
+the two Williams-calibration-imposed ones. For the conventional
+baseline (Spec 6) λ runs −0.239 (full) / −0.087 (pre-COVID) / −0.162
+(COVID-dropped) / −0.177 (COVID-rich) — all correctly signed, though
+the pre-COVID estimate is small and insignificant (§7.1). The
+faithful LIVES specification (Spec 11) gives −0.448 (full) / −0.266
+(pre-COVID) / −0.248 (COVID-dropped) / −0.242 (COVID-rich) —
+sign-stable, with the full-sample value inflated by the COVID
+quarters and the tightly clustered −0.24 to −0.27 of the three
+COVID-controlled variants treated as the identified value (close to
+Williams' −0.286; full coefficient vectors for all four variants in
+[`australia_spec11_variants.csv`](../outputs/australia_spec11_variants.csv)).
+Only Spec 10 (Williams-prior calibrated; sign-flips to +0.008
+COVID-dropped and +0.043 COVID-rich) and Spec 12 (Williams
+calibrations imposed; sign-flips to +0.029 pre-COVID and +0.013
+COVID-rich) are not sign-stable across samples — an artefact of the
+calibration collapse documented in §9, not of the COVID episode
+itself.
 
 ### 8.12 Rolling-window estimation
 
-A 60-quarter rolling estimation of the baseline specification shows
-the wealth coefficients trending mildly downward post-2014
-(consistent with the macroprudential era flattening the
-wealth-consumption transmission) and λ becoming slightly less
-negative in the most recent windows. We do not interpret this as
-model instability but as a symptom of the limited identifying
-variation in the post-deregulation portion of the sample (§5): the
+A 60-quarter rolling estimation of the selector specification
+(Spec 3; 87 windows ending 2003Q2–2024Q4,
+[`australia_rolling_coefs.csv`](../outputs/australia_rolling_coefs.csv))
+shows λ holding in a band of roughly −0.13 to −0.27 for the windows
+ending before 2020, the net-worth coefficient trending down from
+about +0.012 in the earliest windows to near zero through the
+macroprudential era (consistent with that era flattening the
+wealth-consumption transmission) and mildly negative in the latest
+windows (−0.011 at 2024Q4, within one standard error of zero). The
+COVID quarters destabilise the short windows: λ briefly flips to
++0.15 in the windows ending around 2021Q3 before settling at −0.44
+(SE 0.19) in the final window, where the COVID quarters dominate a
+60-quarter span. We do not interpret this as model instability but
+as a symptom of the limited identifying variation in the
+post-deregulation portion of the sample (§5): the
 financial-liberalisation episode that would identify the credit
 channels largely predates the 1988Q3 start of ABS sectoral
 balance-sheet data.
@@ -3417,9 +3978,10 @@ balance-sheet data.
 
 We run a rolling out-of-sample validation
 ([`australia_oos_rmse.csv`](../outputs/australia_oos_rmse.csv)) on
-five structural specifications (Spec 4 disagg-no-CCI, Spec 6
+six structural specifications (Spec 4 disagg-no-CCI, Spec 6
 conventional baseline, Spec 7 cohort-burden, Spec 8 Williams-CCI
-interactions, Spec 9 Kalman-CCI) over 36 expanding-window cuts at
+interactions, Spec 9 Kalman-CCI, and now the faithful LIVES Spec 11)
+over 36 expanding-window cuts at
 horizons h ∈ {1, 4, 8} quarters (n = 36 at h = 1, 4; n = 32 at h = 8),
 against random-walk-with-drift and AR(1) benchmarks:
 
@@ -3427,54 +3989,69 @@ against random-walk-with-drift and AR(1) benchmarks:
 |---|---:|---:|---:|
 | Benchmark RW drift           | 0.03094 | 0.03094 | 0.03282 |
 | Benchmark AR(1)              | 0.03703 | 0.03102 | 0.03283 |
-| Spec 4 (disagg, no CCI)      | 0.03191 | 0.03252 | 0.05025 |
-| Spec 6 (conventional baseline)| 0.03218 | 0.03323 | 0.04163 |
-| Spec 7 (cohort-burden)       | 0.03080 | 0.03461 | 0.04428 |
-| Spec 8 (Williams CCI)        | 0.03242 | 0.03151 | 0.03657 |
-| Spec 9 (Kalman CCI)          | 0.03203 | 0.03222 | 0.03854 |
+| Spec 4 (disagg, no CCI)      | 0.03175 | 0.03182 | 0.03896 |
+| Spec 6 (conventional baseline)| 0.03231 | 0.03293 | 0.04180 |
+| Spec 7 (cohort-burden)       | 0.03247 | 0.03164 | 0.03540 |
+| Spec 8 (Williams CCI)        | 0.02901 | 0.03323 | 0.04038 |
+| Spec 9 (Kalman CCI)          | 0.03206 | 0.03299 | 0.03929 |
+| **Spec 11 (LIVES headline)** | 0.02919 | 0.03517 | 0.06402 |
 
-At h = 1 the structural specifications are competitive with the
-random-walk benchmark and Spec 7 narrowly beats RW-drift (0.03080 vs
-0.03094); no other structural spec does. At h = 4 and h = 8 the
-random walk with drift dominates **every** structural specification
-(the best structural performer at h = 8 is Spec 8 at 0.03657 vs
-RW-drift 0.03282). This is the standard macro-forecasting puzzle: the
-LIVES framework's identification advantage is in interpreting
+At h = 1 the two CCI-interaction forms now **beat** the random-walk
+benchmark — Spec 8 (0.0290) and Spec 11 (0.0292) against RW-drift's
+0.0309 — with the remaining structural specifications close behind;
+this is a better one-step showing than an earlier draft reported. At
+h = 4 and h = 8 the random walk with drift still dominates **every**
+structural specification (best structural at h = 4 is Spec 7 at
+0.0316 vs 0.0309; at h = 8, Spec 7 at 0.0354 vs 0.0328), and Spec 11
+is the *worst* performer at h = 8 (0.0640) — plausibly the
+full-sample permanent-income measure's extrapolated tail compounding
+over long horizons. This is the standard macro-forecasting pattern:
+the LIVES framework's identification advantage is in interpreting
 historical co-movement, not in beating naive benchmarks at multi-step
 prediction. We record it honestly rather than overstating forecast
 performance.
 
-Two construction caveats attach to the CCI specifications (Spec 8,
-Spec 9). The credit-conditions series and its de-mean constants are
-full-sample objects, so the Spec 8/9 columns are conditional on a
-full-sample-constructed CCI and are an upper bound on what a fully
-real-time credit-conditions forecaster would deliver; the
-permanent-income input to the validator is the leak-free rolling AR
-forecaster.
+A construction caveat applies to the whole exercise, and we correct
+an earlier draft's claim here. As committed, the validator's
+permanent-income input is the **full-sample Italy-method measure**,
+not a real-time forecaster (the earlier statement that "the AR
+permanent-income input is real-time" was wrong for the committed
+numbers), and the credit-conditions series and its de-mean constants
+are likewise full-sample objects. Both generated regressors therefore
+embed information from beyond each expanding-window cut, so these
+RMSEs measure **fit stability under re-estimation, not genuine
+real-time forecast accuracy** — they are an upper bound on what a
+fully real-time forecaster would deliver, and the h = 1 wins over the
+random walk should be read in that light.
 
 ### 8.14 Back-extension robustness — Spec 1 on the 1976Q3+ sample
 
 Refitting Spec 1 (aggregate net worth) on the back-extended sample
 using `ln_networth_y_proxy`
-([`spec1_extended_comparison.csv`](../outputs/spec1_extended_comparison.csv)):
+([`spec1_extended_comparison.csv`](../outputs/spec1_extended_comparison.csv);
+structural long-run coefficients γ = OLS/|λ|):
 
-| LR coefficient | 1988+ baseline (n = 146) | 1976+ extended (n = 190) | % change |
+| LR coefficient (γ) | 1988+ baseline (n = 146) | 1976+ extended (n = 190) | % change |
 |---|---:|---:|---:|
-| λ (ecm_lag)    | −0.1772  | −0.2021  | +14.0 |
-| ln_networth_y  | +0.1119  | +0.1062  | −5.1  |
-| ln_hp_over_y   | −0.0151  | −0.0033  | −78.1 |
-| real_rate      | −0.00137 | +0.00086 | −163  |
-| ln_yp_over_y   | +0.9612  | +0.9732  | +1.2  |
+| λ (ecm_lag)    | −0.1934  | −0.2090  | +8.1  |
+| ln_networth_y  | +0.0195  | +0.0467  | +140  |
+| ln_hp_over_y   | +0.0443  | +0.0375  | −15.5 |
+| real_rate      | −0.00115 | +0.00005 | sign flip |
+| ln_yp_over_y   | +1.0379  | +0.9913  | −4.5  |
 
-The wealth elasticity is essentially stable across samples
-(0.112 → 0.106, a 5 per cent change) — a positive validation of the
-aggregate-net-worth proxy: doubling the sample length and adding the
-deregulation-era regime does not shift the structural
-wealth-to-consumption coefficient. The permanent-income elasticity is
-also stable, and λ moves slightly more negative on the longer sample.
-The house-price-to-income coefficient collapses to near zero on the
-longer sample — a real signal reflecting lower `hp_over_y` variation
-in the pre-deregulation 1970s — and the real-rate coefficient
+The speed of adjustment and the permanent-income elasticity are
+essentially stable across samples (λ −0.193 → −0.209; γ_yp
+1.04 → 0.99), so doubling the sample length and adding the
+deregulation-era regime does not disturb the equilibrium structure.
+The aggregate wealth elasticity, however, more than doubles
+(0.019 → 0.047) — both values small and imprecisely estimated
+(baseline t = 0.17 on the OLS coefficient,
+`australia_full_results.csv`), so we read this as the
+pre-deregulation regime adding identifying variation to a coefficient
+the modern sample barely pins down, not as parameter instability that
+can be dated. The house-price-to-income coefficient eases toward zero
+on the longer sample — consistent with lower `hp_over_y` variation in
+the pre-deregulation 1970s — and the real-rate coefficient
 sign-flips, though both estimates are economically negligible. The
 aggregate net-worth proxy correctly includes the household M3 liquid
 component (the earlier `$bn`/`$m` unit defect that had made the M3
@@ -3485,17 +4062,17 @@ cold rebuild; see Appendix D).
 
 The disaggregated-wealth proxies of §3 allow Spec 4 to fit on the
 back-extended sample
-([`spec46_extended_comparison.csv`](../outputs/spec46_extended_comparison.csv)):
-λ moves 37 per cent closer to Williams (−0.1404 → −0.1927, still
-about a third short of −0.286), but the individual OLS wealth
-coefficients become *smaller* rather than larger — nla_y collapses
-(+0.035 → −0.002, a sign-flip), ha_y falls 41.6 per cent
-(0.068 → 0.040) and super_y falls 41.7 per cent (0.040 → 0.024). The
-exercise establishes that sample length is **not** the binding
-constraint on whether the disaggregated single-equation form
-reproduces Williams' Table 1: the longer sample sharpens the speed of
-adjustment but blunts, rather than sharpens, the individual wealth
-channels.
+([`spec46_extended_comparison.csv`](../outputs/spec46_extended_comparison.csv);
+structural γ): λ moves 11.5 per cent toward Williams
+(−0.1824 → −0.2034, still 29 per cent short of −0.286), but the
+individual wealth coefficients become *smaller* rather than larger —
+γ_NLA collapses by 95 per cent (+0.0245 → +0.0013), γ_SUPER flips
+sign (+0.014 → −0.005), γ_HA eases (+0.019 → +0.018) and γ_EQ retains
+its wrong sign (−0.043 → −0.041). The exercise establishes that
+sample length is **not** the binding constraint on whether the
+disaggregated single-equation form reproduces Williams' Table 1: the
+longer sample sharpens the speed of adjustment but blunts, rather
+than sharpens, the individual wealth channels.
 
 ### 8.15.1 Spec 6b — conventional baseline on the back-extended sample
 
@@ -3507,120 +4084,171 @@ CCI regressor with the second difference of log RBA D02 total credit
 back-extended proxies. This lets the conventional baseline fit on the
 full back-extended sample (n = 190 in the cointegration screen;
 n = 180 full / 160 pre-COVID in the diagnostics)
-([`australia_all_results.csv`](../outputs/australia_all_results.csv);
-[`australia_all_diagnostics.csv`](../outputs/australia_all_diagnostics.csv)):
+([`australia_full_results.csv`](../outputs/australia_full_results.csv);
+[`australia_full_diagnostics.csv`](../outputs/australia_full_diagnostics.csv);
+structural γ):
 
-| LR coefficient | Spec 6 (n = 86) | Spec 6b (n = 180) | Williams Table 1 |
+| LR coefficient (γ) | Spec 6 (n = 86) | Spec 6b (n = 180) | Williams Table 1 |
 |---|---:|---:|---:|
-| λ (ecm_lag)              | −0.180 (t = −1.76) | **−0.229 (t = −4.18)** | −0.286 |
-| ha_y / ha_y_proxy γ      | 0.049              | 0.038                  | 0.049  |
-| nla_y / nla_y_proxy γ    | 0.196              | 0.013                  | 0.159  |
-| eq_y / eq_y_proxy γ      | −0.035             | −0.081                 | (calibrated 0.011) |
-| super_y / super_y_proxy γ| 0.065              | 0.029                  | (calibrated 0.011) |
-| ln_hp_over_y γ           | −0.094             | −0.036                 | −0.130 |
-| ln_yp_over_y (CCI = 0)   | +0.200             | +1.234                 | +0.20 (calibrated) |
-| BIC                      | −493.8             | −1 116.3               | n/a    |
+| λ (ecm_lag)              | −0.239 (t = −2.55) | **−0.248 (t = −3.96)** | −0.286 |
+| ha_y / ha_y_proxy γ      | 0.009              | 0.012                  | 0.049  |
+| nla_y / nla_y_proxy γ    | 0.035              | 0.015                  | 0.159  |
+| eq_y / eq_y_proxy γ      | −0.065             | −0.008                 | (calibrated 0.011) |
+| super_y / super_y_proxy γ| 0.025              | −0.001                 | (calibrated 0.011) |
+| ln_hp_over_y γ           | +0.043             | +0.024                 | −0.130 |
+| ln_yp_over_y (CCI = 0) γ | +1.363             | +1.113                 | +0.20 (calibrated) |
+| BIC                      | −492.5             | −1 114.0               | n/a    |
 
-Two patterns recur. First, the speed of adjustment moves substantially
-closer to Williams' published value — λ = −0.229 on the back-extended
-sample (80 per cent of Williams' −0.286, vs 63 per cent on Spec 6),
-with the t-statistic improving sharply from −1.76 to −4.18, and the
-pre-COVID estimate similar at −0.240 (t = −4.75). Second, the wealth
-γ profile shifts toward smaller individual elasticities — γ_NLA
-collapses from 0.196 to 0.013 and γ_EQ becomes more negative,
-mirroring the Spec 4 back-extension finding. γ_HA stays positive
-(0.038 vs Williams' 0.049) but sits about 22 per cent below Williams.
-This is consistent with the substantive reading throughout the paper:
-on the back-extended sample the disaggregated wealth proxies do not
-separately identify with Williams-like precision, even when the
-canonical short-run dynamics, the post-2008 permanent-income break,
-and a long-history credit proxy are all available. Sample length
-sharpens |λ| but not the individual wealth γ profile — the residual
-gap is structural to the single-equation framing, not a sample-length
-artefact.
+Two patterns recur. First, the speed of adjustment moves modestly
+closer to Williams' published value — λ = −0.248 on the back-extended
+sample (87 per cent of Williams' −0.286, vs 83 per cent on Spec 6) —
+and is far more sharply estimated, the t-statistic improving from
+−2.55 to −3.96, with the pre-COVID estimate nearly identical at
+−0.240 (t = −4.61,
+[`australia_lambda_robustness.csv`](../outputs/australia_lambda_robustness.csv)):
+unlike Spec 6, whose λ collapses without the COVID quarters, the
+back-extended conventional baseline is identified in every sample
+variant (COVID-dropped −0.240, COVID-rich −0.234). Second, the wealth
+γ profile shifts toward still-smaller individual elasticities — γ_NLA
+falls from 0.035 to 0.015 and γ_SUPER flips sign, mirroring the
+Spec 4 back-extension finding — while γ_HA stays positive but at a
+quarter of Williams' 0.049. This is consistent with the substantive
+reading throughout the paper: on the back-extended sample the
+disaggregated wealth proxies do not separately identify with
+Williams-like precision, even when the canonical short-run dynamics,
+the post-2008 permanent-income break, and a long-history credit proxy
+are all available. Sample length sharpens |λ| but not the individual
+wealth γ profile — the residual gap is structural to the
+single-equation framing, not a sample-length artefact.
+
+(The proxy caveats of §3.14 apply with full force: in particular
+`eq_y_proxy` is held constant at its 1988Q3 value pre-1988, so the
+equities coefficient is identified only off the modern subsample, and
+the near-zero back-extended γ_EQ and γ_SUPER should be read as
+proxy-limited rather than as estimates of a true pre-1988 propensity.)
 
 ### 8.16 Maximal-GETS placebo on the back-extended sample
 
-We place the deployed institutional CCI against 200 random 15-knot,
-15-prior draws under the same sign-survival protocol on the
-back-extended 1976Q3+ sample. The committed verdict files report
-three nested placebo variants
-([`australia_williams_knot_placebo_verdict.csv`](../outputs/australia_williams_knot_placebo_verdict.csv),
-[`australia_williams_knot_placebo_extended_summary.csv`](../outputs/australia_williams_knot_placebo_extended_summary.csv),
+We place the canonical knot constructions against 200 random draws
+under the same sign-survival protocols on the back-extended 1976Q3+
+sample. The committed summary files report two extended-sample
+placebo variants
+([`australia_williams_knot_placebo_extended_summary.csv`](../outputs/australia_williams_knot_placebo_extended_summary.csv),
 [`australia_williams_knot_placebo_maximal_extended_summary.csv`](../outputs/australia_williams_knot_placebo_maximal_extended_summary.csv)):
 
-| Placebo variant | Williams/canonical adj-R² | adj-R² percentile | \|λ\| percentile | Verdict |
+| Placebo variant (1976Q3+) | Canonical adj-R² | adj-R² percentile | \|λ\| percentile | Verdict |
 |---|---:|---:|---:|---|
-| Standard (Williams literal 4-knot)    | 0.7209 | 34th | 58th | "detrending critique vindicated — below median" |
-| Extended (Williams-canonical)         | 0.6789 | 18th | 10th | "detrending critique persists — below median" |
-| Maximal-GETS (deployed institutional) | 0.6852 | 64th | 37th | "weak support — above median but not far" |
+| Extended (Williams literal 4-knot) | 0.6801 | 36th | 26th | "detrending critique persists — below median" |
+| Maximal-GETS (canonical 15-knot reduction) | 0.6836 | 48th | 70th | "detrending critique persists — below median" |
 
-The deployed/institutional CCI sits in the **18th–34th adjusted-R²
-percentile** band across the literal and Williams-canonical variants,
-and the maximal-GETS protocol lifts this to the 64th adjusted-R²
-percentile but only the 37th |λ| percentile (placebo medians:
-adj-R² 0.6832, |λ| 0.2226, surviving knots 8; canonical surviving
-knots 7). Random combinations of 15 candidate knots and priors
-produce faster mean reversion than the canonical institutional choice
-in 64 per cent of draws. The honest reading is that the maximal-GETS
-protocol does some identification work, but most of the lift comes
-from the adaptiveness of the drop-on-violation reduction (15 candidate
-knots is a great deal of flexibility) rather than from Williams'
-specific knot or prior choice. We carry this placebo failure as a
-core negative result, not as an embarrassment: it is the empirical
-expression of why single-equation CCI is weakly identified and why
-the joint system is needed for regime classification (§10).
+On the back-extended sample the literal Williams 4-knot construction
+sits below the placebo median on both metrics (adj-R² 0.6801 versus a
+placebo median of 0.6815; |λ| 0.2023 versus 0.2079). The maximal-GETS
+reduction does better on mean reversion — its |λ| of 0.2563 beats 70
+per cent of random draws against a placebo median of 0.2329 — but
+still sits just below the random median on fit (48th percentile,
+0.6836 versus 0.6846), while retaining *fewer* knots (7) than the
+placebo median (8), i.e. achieving near-median fit with less
+flexibility. Neither extended-sample construction is the deployed
+CCI: the deployed-protocol placebo — random knot dates run through
+exactly the iterated drop-on-violation reduction used to build
+`cci_williams`, on the 1988Q3+ estimation sample — is the §5.2
+result, where the deployed construction reaches the **84th adjusted-R²
+and 80th |λ| percentiles**
+(`australia_williams_knot_placebo_deployed_verdict.csv`). The honest
+reading is unchanged from §5.2: on the back-extended sample, where
+the institutional knot dates predate the data's identifying
+variation, the canonical constructions do not beat random
+flexibility, and most of what lift there is comes from the
+adaptiveness of the reduction protocol rather than from Williams'
+specific knot or prior choice. We carry the below-median
+extended-sample percentiles as a core negative result, not as an
+embarrassment: they are the empirical expression of why
+single-equation CCI is weakly identified and why the joint system is
+needed for regime classification (§10).
 
 ### 8.17 Sectional sign-prior CCI
 
 Williams (Aust paper §5.1) imposes sign priors over periods rather
 than knot by knot. We construct a sectional CCI basis with one knot
 per period (1982 / 1990 / 1993 / 2007, plus 2014 / 2017 / 2020 / 2021
-extensions) and re-run the placebo. The sectional canonical sits at
-the 36th adjusted-R² percentile and 40th |λ| percentile — worse than
-the maximal-GETS canonical (64th/37th). Williams' specific period
-dating does not outperform random period placements on the
-back-extended sample.
+extensions) and re-run the placebo on the back-extended sample
+([`LIVES/outputs/sectional_placebo_summary.csv`](../../LIVES/outputs/sectional_placebo_summary.csv)).
+The sectional canonical (adj-R² 0.6805, |λ| 0.2244) sits at the 37th
+adjusted-R² percentile and 60th |λ| percentile — below the random
+median on fit, like every extended-sample construction in §8.16, and
+between the literal 4-knot and maximal-GETS constructions on mean
+reversion. Williams' specific period dating therefore does not
+outperform random period placements on the back-extended sample. On
+the modern 1988Q3+ sample the sectional reduction retains two
+survivors against the deployed protocol's four, fitting somewhat worse
+(adj-R² 0.726 vs 0.754; λ = −0.203 vs −0.246) with a 0.69 correlation
+between the two indices
+([`LIVES/outputs/sectional_cci_comparison.csv`](../../LIVES/outputs/sectional_cci_comparison.csv)) —
+a related but coarser credit signal, consistent with the period priors
+being a constrained subset of the maximal candidate set.
 
 ### 8.18 Two-equation SUR (consumption + house prices)
 
 Joint SUR estimation of the consumption equation and a Williams-style
 house-price ECM (Aust paper eq. 11) on the back-extended 1976Q3+
-sample yields a residual correlation ρ̂(ε_C, ε_H) ≈ −0.004, with SUR
-coefficients within 0.1 per cent of equation-by-equation OLS for
-nearly every term. The finding is robust across specification variants
-(no CCI: ρ̂ ≈ −0.083; no event dummies: ρ̂ ≈ +0.043; minimal LR + SR:
-ρ̂ ≈ −0.025). Joint estimation gives no efficiency gain at the
-quarterly frequency. The case for the multi-equation framework
-therefore rests on cross-equation parameter restrictions, not on
-residual covariance — the same conclusion as the consumption + PI SUR
-of §8.2.
+sample yields a residual correlation ρ̂(ε_C, ε_H) = −0.0109 under
+equation-by-equation OLS and −0.0133 under SUR
+([`LIVES/outputs/lives_sur_2eq_resid_corr.csv`](../../LIVES/outputs/lives_sur_2eq_resid_corr.csv);
+committed verdict "NEGLIGIBLE cross-equation linkage —
+single-equation OLS approximately efficient"). The SUR coefficients
+move by under 5 per cent of themselves relative to OLS for every
+substantive term (10 per cent on the near-zero intercept) — the
+consumption equation's λ shifts from −0.2101 to −0.2118 (+0.8 per
+cent) and its SUR standard errors are within 0.01 per cent of the OLS
+ones
+([`LIVES/outputs/lives_sur_2eq_compare.csv`](../../LIVES/outputs/lives_sur_2eq_compare.csv)).
+Joint estimation gives no efficiency gain at the quarterly frequency.
+The case for the multi-equation framework therefore rests on
+cross-equation parameter restrictions, not on residual covariance —
+the same conclusion as the consumption + PI SUR of §8.2.
 
 ### 8.19 Three-equation joint cross-equation CCI identification
 
 We extend the maximal-GETS protocol to require sign-prior survival
 across **three** equations simultaneously (consumption + house prices
-+ mortgage stock). Of the seven knots that survive consumption-only
-fitting, only **two** pass the joint test:
++ mortgage stock), and then across **four** (adding the wealth
+equation). Of the fifteen candidate knots, seven pass consumption-only
+fitting; only **two** pass the three-equation joint test and only
+**one** survives all four equations
+([`LIVES/outputs/lives_joint_cci_survival.csv`](../../LIVES/outputs/lives_joint_cci_survival.csv)):
 
 | Survival regime | Surviving knots |
 |---|---|
-| Consumption only  | 1979, 1986, 1992, 2007, 2009, 2017, 2020 |
-| Joint (C ∩ H ∩ M) | **1986, 2017** |
+| Consumption only      | 1979Q1, 1986Q1, 1992Q1, 2007Q3, 2009Q1, 2017Q1, 2020Q2 |
+| Joint 3-eq (C ∩ H ∩ M) | **1986Q1, 2017Q1** |
+| Joint 4-eq (C ∩ H ∩ M ∩ W) | **1986Q1** |
 
-The joint-identified `cci_williams_joint` flips the house-price
-equation's CCI loading from significantly negative (−0.024 under
-consumption-only CCI) to significantly positive (+0.024 under joint
-CCI), consistent with Williams' cross-equation sign restrictions
-working as intended. The mortgage-stock equation's CCI loading
-remains negative (joint sign-survival is a sign restriction, not a
-parameter-equality restriction; full FIML would be required to
-re-sign the mortgage equation's loading). The wealth-coefficient
-profile against Williams' Table 1 is barely affected by joint
-identification, confirming that the residual gap is structural to the
-single-equation framing, not a CCI-construction artefact — and that
-the route to sharpening the credit channels runs through the
-four-equation FIML system, not through further single-equation tuning.
+The joint-identified CCI flips the house-price equation's CCI loading
+from significantly negative (−0.0156 under the consumption-only CCI)
+to positive (+0.0240 under the 3-equation joint CCI; +0.0236 under
+the 4-equation variant;
+[`LIVES/outputs/lives_phase3_comparison.csv`](../../LIVES/outputs/lives_phase3_comparison.csv)),
+consistent with Williams' cross-equation sign restrictions working as
+intended. The mortgage-stock equation's loading moves the other way —
+positive under consumption-only CCI (+0.0026), negative under the
+joint variants (−0.0060 / −0.0069) — a reminder that joint
+sign-survival is a sign restriction, not a parameter-equality
+restriction; full FIML would be required to discipline all loadings
+simultaneously. The consumption equation's error-correction is only
+modestly affected — λ moves from −0.271 (consumption-only) to −0.213
+(3-eq) / −0.227 (4-eq) — while its housing/net-worth long-run
+coefficient sign-corrects under joint identification (−0.031
+consumption-only → +0.037 / +0.017 joint), and the SUR residual
+correlations remain modest (ρ̂(ε_C, ε_H) = −0.119,
+ρ̂(ε_C, ε_M) = +0.102, ρ̂(ε_H, ε_M) = −0.244). Joint sign-survival
+therefore does real, if limited, identification work — it re-signs
+the house-price loading and the consumption wealth term — without
+closing the magnitude gap against Williams' Table 1, confirming that
+the residual gap is structural to the single-equation framing, not a
+CCI-construction artefact, and that the route to sharpening the
+credit channels runs through the four-equation FIML system, not
+through further single-equation tuning.
 
 ---
 
@@ -3650,48 +4278,58 @@ The decisive agreement is on the error-correction speed and the
 *sign and significance* of the core wealth channels, and it appears
 only once the equation is written in the faithful LIVES form.
 
-On the pre-COVID sample the faithful LIVES specification (Spec 11)
-estimates a speed of adjustment of **λ = −0.245 (t = −4.80)** against
-Williams' FIML estimate of **−0.286 (SE 0.083, t = −3.45)** — close to
-his value (about 86 per cent of it), and tightly identified
-(`australia_lambda_robustness.csv`; `australia_all_results.csv`).
-The full-sample estimate is λ = −0.480 (t = −3.59); it is inflated by
+On the COVID-controlled samples the faithful LIVES specification
+(Spec 11) estimates a speed of adjustment tightly clustered at
+**λ ≈ −0.25** — pre-COVID −0.266 (t = −4.85), COVID quarters dropped
+−0.248 (t = −6.66), quarterly COVID dummies −0.242 (t = −6.25) —
+against Williams' FIML estimate of **−0.286 (SE 0.083, t = −3.45)**:
+about 13 per cent below his value, and tightly identified
+(`australia_spec11_variants.csv`; `australia_lambda_robustness.csv`).
+The full-sample estimate is λ = −0.448 (t = −3.57); it is inflated by
 the COVID quarters and fails the |λ| upper-bound screen, so we read
-the pre-COVID figure as the identified one (§7.0). Either way the
-contrast with the conventional baseline is sharp: Spec 6 returns an
-insignificant λ = −0.180 (t = −1.76), 37 per cent below Williams.
+the COVID-controlled cluster as the identified speed (§7.0). Either
+way the contrast with the conventional baseline is sharp: Spec 6
+returns λ = −0.239 (t = −2.55) on its n = 86 sample — about 17 per
+cent below Williams — and collapses to an insignificant −0.087 once
+the COVID quarters are excluded.
 
 Within the faithful form the wealth structure is correctly signed and,
 for two of the three components, individually significant on the full
-sample (`australia_all_results.csv`):
+sample (`australia_all_results.csv`; `australia_gamma_inference.csv`):
 
-- net liquid assets (γ_NLA): OLS +0.037 (t = 3.40, ***), implied
-  structural m.p.c. **0.077**, against Williams' calibrated 0.159 —
-  same sign, same order of magnitude, roughly half his value;
+- net liquid assets (γ_NLA): OLS +0.0269 (t = 3.75, ***), implied
+  structural m.p.c. **0.060** [0.022, 0.098], against Williams'
+  calibrated 0.159 — same sign, but genuinely smaller: the interval
+  *excludes* his value (§9.4);
 - illiquid financial assets (γ_IFA, equities + superannuation
-  combined): OLS +0.018 (t = 3.03, ***), implied structural m.p.c.
-  **0.037**, against Williams' calibrated **0.022** — same sign, within
-  0.015;
-- housing-collateral (γ₁, the `CCI·(HA/4y)` interaction): OLS +0.0049
-  (t = 1.03), implied structural m.p.c. **0.010**, against Williams'
-  peak housing m.p.c. of 0.0488 — correctly signed but insignificant.
+  combined): OLS +0.0155 (t = 3.09, ***), implied structural m.p.c.
+  **0.035** [0.012, 0.057], against Williams' calibrated **0.022** —
+  same sign, and the interval comfortably includes his value;
+- housing-collateral (γ₁, the `CCI·(HA/4y)` interaction): OLS +0.0025
+  (t = 0.71), implied structural m.p.c. **0.0055** [−0.010, 0.021],
+  against Williams' peak housing m.p.c. of 0.0488 — correctly signed
+  but insignificant, with an interval that excludes his peak value
+  while containing zero.
 
 The permanent-income response is strong and correctly signed
-(`ln_yp_over_y` OLS +0.504, t = 4.0). And critically, because the
-CCI-spline interactions replace Spec 6's 2002Q3-binding `cci_ratio`
+(`ln_yp_over_y` OLS +0.459, t = 4.04) — though its structural gearing
+breaches the admissibility bound (§7.0, §9.8). And critically, because
+the CCI-spline interactions replace Spec 6's 2002Q3-binding `cci_ratio`
 short-run term, the faithful form estimates on **n = 146** rather than
-n = 86 — a near-doubling of the identification window relative to the
-baseline against which the previous draft compared Williams.
+n = 86 — a near-doubling of the estimation window relative to the
+baseline against which the previous draft compared Williams (though the
+credit channels themselves are identified only off the ~70 post-2007
+quarters where the deployed CCI moves; §5.1.1).
 
 The single most important interpretive point for the comparison is
 that **the housing channel only appears when the form is faithful.**
 In the LIVES theory there is no classical housing wealth effect: the
 housing m.p.c. is zero at CCI = 0 and is unlocked as credit conditions
-loosen. Reading Spec 6's insignificant standalone `ha_y` (OLS +0.0088,
-t = 1.52) as a *failed* housing wealth effect was therefore a category
+loosen. Reading Spec 6's insignificant standalone `ha_y` (OLS +0.0022,
+t = 0.30) as a *failed* housing wealth effect was therefore a category
 error — the theory predicts that coefficient to be ≈ 0, and the
 housing effect lives in the credit interaction `ha_x_cci`, where it is
-correctly signed.
+correctly signed (if statistically unproven).
 
 ### 9.2 Where the calibrations do not transfer — imposing Williams' gearing collapses the equilibrium
 
@@ -3705,24 +4343,28 @@ Spec 12 imposes Williams' scale-robust calibrations (γ_IFA = 0.022,
 only the housing-collateral m.p.c., the net-liquid m.p.c. and λ. The
 result is a near-total collapse of the error-correction mechanism:
 **λ = −0.029 (t = −0.68)** on the full sample, and it flips to the
-wrong sign (+0.030) pre-COVID, so it is not even sign-stable across
+wrong sign (+0.029) pre-COVID, so it is not even sign-stable across
 samples (`australia_lambda_robustness.csv`). This is independently
 reproduced by the pre-existing Williams-prior specification (Spec 10),
 which keeps the rate and affordability channels free and still returns
-λ = −0.048 (t = −0.76) full-sample and a still-insignificant −0.027
-(t = −0.62) pre-COVID, flipping to the wrong sign once the COVID
-quarters are dropped (`australia_lambda_robustness.csv`). Two separate
-calibration routes therefore reach the same conclusion.
+λ = −0.057 (t = −0.87) full-sample and a still-insignificant −0.019
+(t = −0.44) pre-COVID, flipping to the wrong sign once the COVID
+quarters are dropped or dummied (`australia_lambda_robustness.csv`).
+Two separate calibration routes therefore reach the same conclusion.
 
-The mechanism is straightforward: the Australian data freely estimates
-the permanent-income weight at ψ₀ ≈ 0.50 — roughly two-and-a-half
-times Williams' 0.20 — so forcing his value injects a large,
-mis-signed contribution that destroys the long-run equilibrium. (The
-"≈ 2.5×" framing is a comparison of Spec 11's level coefficient
-`ln_yp_over_y` = +0.504 with Williams' calibrated ψ₀ = 0.20; the exact
-ψ₀/ψ₁ split is not separately estimable on a single equation because
-`yp_x_cci` is insignificant, so we report it as an order-of-magnitude
-contrast rather than a precise ratio.)
+The mechanism is straightforward: the Australian data freely estimate
+a structural permanent-income gearing of order one — by the §4.2
+recovery rule, ψ̂ = OLS/|λ| is 1.02 on the full sample and 1.12–1.13
+in the COVID-controlled variants, roughly five times Williams' 0.20 —
+so forcing his much lower value injects a large, mis-signed
+contribution that destroys the long-run equilibrium. (The comparison
+must be made on a consistent scale: structural ≈ 1.0–1.1 against his
+ψ₀ = 0.20, or OLS +0.459 against his implied φ·ψ₀ ≈ 0.057 — not an
+OLS-to-structural mix. The freely estimated gearing itself breaches
+the ψ ≤ 0.95 admissibility bound, which we flag openly in §7.0; the
+ψ₀/ψ₁ split is in any case not sharply estimable on a single equation,
+so we report the contrast as order-of-magnitude rather than as a
+precise ratio.)
 
 Williams' rate, affordability and autonomous-consumption loadings
 cannot be imposed at all at their published magnitudes. His raw
@@ -3736,9 +4378,13 @@ transplanted mechanically.
 
 ### 9.3 Reconciling the companion paper's Wald non-rejection
 
-The companion paper reports that a joint Wald test does **not reject**
-Williams' calibration (χ² = 2.24, p = 0.90). Read alongside §9.2 this
-looks paradoxical: how can a calibration that *collapses* the
+The companion analysis reports that a joint Wald test on the freely
+estimated Spec 6 coefficients does **not reject** Williams'
+calibration: χ²(6) = 7.55, p = 0.27 for all six coefficients jointly,
+χ²(4) = 1.83, p = 0.77 for the four wealth coefficients, and no
+individual coefficient rejects either
+(`LIVES/outputs/williams_calibration_wald.csv`). Read alongside §9.2
+this looks paradoxical: how can a calibration that *collapses* the
 equilibrium when imposed also be *not rejected* by a test? The
 resolution is power. The freely estimated single-equation coefficients
 are so imprecise that they cannot statistically reject Williams'
@@ -3747,78 +4393,96 @@ zero, or any number of other points. **Low power is not the same as
 good fit.** A calibration can be non-rejected by an underpowered test
 and still wreck the model when imposed; both facts hold here
 simultaneously, and the gamma-inference confidence intervals (§9.4)
-make the imprecision explicit.
+make the imprecision explicit: in the Spec 6 frame every Williams
+*wealth* value lies inside our 95 per cent CI, and every such CI also
+contains zero. The one place the free estimate is strong enough to
+disagree is the permanent-income gearing: the Wald test on the OLS
+scale does not reject (p = 0.20), but the delta-method interval on the
+structural ratio γ = OLS/|λ|, [0.28, 2.44], excludes Williams' 0.20 —
+and that is exactly the channel whose imposition produces the §9.2
+collapse.
 
-(The χ² = 2.24 figure is reported in the companion paper; it is not a
-value in this repository's committed results CSVs. The load-bearing
-committed evidence for the non-rejection-by-imprecision reading is the
-gamma-inference interval table `australia_gamma_inference.csv`, in
-which every Williams value lies inside our 95 per cent CI *and* every
-CI also contains zero.)
-
-### 9.4 The structural-gamma comparison: consistency, not confirmation
+### 9.4 The structural-gamma comparison: the inference now cuts both ways
 
 The earlier draft's headline — that the implied structural γ profile
 "matches Williams almost exactly" — was a property of the conventional
-baseline (Spec 6), and it survives only as a much-weakened, hedged
-statement. Two features demote it from confirmation to consistency.
+baseline (Spec 6), and it does not survive the corrected data. Under
+the ECM identity OLS = λ × γ, Spec 6's |λ| now runs about 17 per cent
+below Williams' while its OLS wealth coefficients run roughly 80 per
+cent below his implied OLS values (e.g. `ha_y` +0.0022 against the
+0.0140 his γ = 0.0488 implies at λ = −0.286; `nla_y` +0.0083 against
+0.0455), so the implied γ profile sits far *below* Williams' rather
+than coincidentally close to it (γ_HA 0.0094 vs 0.0488; γ_NLA 0.035 vs
+0.159). The earlier "offsetting deficits leave γ near Williams"
+reading is therefore retired on the corrected data, not merely hedged.
+What keeps Spec 6 *consistent* with Williams is imprecision: every
+wealth-component interval contains both his value and zero
+(`australia_gamma_inference.csv`, Spec 6 rows):
 
-First, the apparent agreement rests on offsetting deficits. Under the
-ECM identity OLS = λ × γ, Spec 6's OLS wealth coefficients run
-14–37 per cent below Williams' implied OLS values while its |λ| runs
-37 per cent below Williams'; the two deficits roughly cancel, leaving
-the implied γ close to Williams (`australia_williams_comparison.csv`).
-That cancellation is a numerical coincidence of the baseline, not
-evidence that the structure has been identified. We therefore no
-longer present it as a positive result.
-
-Second, and decisively, every component's confidence interval is wide
-enough to contain *both* Williams' value and zero
-(`australia_gamma_inference.csv`):
-
-| Term | OLS | Implied γ | 95% CI | Bootstrap 95% CI | Williams | In CI? |
+| Term (Spec 6, n = 86) | OLS | Implied γ | 95% CI | Bootstrap 95% CI | Williams | In CI? |
 |---|---:|---:|---:|---:|---:|:-:|
-| `ha_y` (housing) | +0.0082 | 0.042 | [−0.050, 0.133] | [−0.451, 0.255] | 0.0488 | ✓ |
-| `nla_y` (net liquid) | +0.0295 | 0.150 | [−0.317, 0.617] | [−0.940, 0.656] | 0.159 | ✓ |
-| `eq_y` (equities) | −0.0086 | −0.044 | [−0.506, 0.419] | [−0.821, 0.578] | 0.011 | ✓ |
-| `super_y` (super) | +0.0092 | 0.047 | [−0.027, 0.121] | [−0.062, 0.210] | 0.011 | ✓ |
-| `ln_hp_over_y` | −0.0179 | −0.091 | [−0.447, 0.265] | [−0.718, 1.220] | −0.130 | ✓ |
-| `ln_yp_over_y` | +0.2442 | 1.237 | [−0.337, 2.811] | [−2.065, 4.813] | 0.20 | ✓ |
-| `WEALTH_AGG` | +0.0384 | 0.194 | [−0.768, 1.157] | — | 0.230 | ✓ |
+| `ha_y` (housing) | +0.0022 | 0.009 | [−0.056, 0.075] | [−0.049, 0.107] | 0.0488 | ✓ |
+| `nla_y` (net liquid) | +0.0083 | 0.035 | [−0.262, 0.332] | [−0.183, 0.361] | 0.159 | ✓ |
+| `eq_y` (equities) | −0.0156 | −0.066 | [−0.468, 0.337] | [−0.303, 0.208] | 0.011 | ✓ |
+| `super_y` (super) | +0.0060 | 0.025 | [−0.040, 0.091] | [−0.064, 0.141] | 0.011 | ✓ |
+| `ln_hp_over_y` | +0.0102 | 0.043 | [−0.308, 0.393] | [−0.400, 0.325] | −0.130 | ✓ |
+| `ln_yp_over_y` | +0.3253 | 1.363 | [0.285, 2.442] | [0.605, 2.192] | 0.20 | ✗ |
+| `WEALTH_AGG` | +0.0010 | 0.004 | [−0.659, 0.668] | — | 0.230 | ✓ |
 
-The honest summary is therefore: **every Williams value lies inside
-our 95 per cent confidence interval — but so does zero.** This is
-non-rejection driven by imprecision, the same low-power phenomenon
-that produces the companion Wald result. The n = 86 baseline sample is
-small and the intervals are correspondingly wide; point-estimate
-proximity to Williams is consistency, not confirmation.
+In the faithful frame the picture sharpens decisively, and in both
+directions (`australia_gamma_inference.csv`, Spec 11 rows):
+
+| Term (Spec 11, n = 146) | OLS | Implied γ | 95% CI | Williams | In CI? |
+|---|---:|---:|---:|---:|:-:|
+| `ha_x_cci` (γ₁, housing × CCI) | +0.0025 | 0.0055 | [−0.010, 0.021] | 0.0488 | ✗ |
+| `nla_y` (γ_NLA) | +0.0269 | 0.060 | [0.022, 0.098] | 0.159 | ✗ |
+| `ilfa_y` (γ_IFA) | +0.0155 | 0.035 | [0.012, 0.057] | 0.022 | ✓ |
+| `hp_x_1_minus_cci` (α₄) | +0.0279 | 0.062 | [0.027, 0.098] | −0.130 | ✗ (wrong sign) |
+| `ln_yp_over_y` (ψ₀) | +0.4591 | 1.024 | [0.865, 1.184] | 0.20 | ✗ |
+| `yp_x_cci` (ψ₁) | −0.5101 | −1.138 | [−2.099, −0.177] | 0.93 | ✗ |
+| `WEALTH_AGG` | +0.0448 | 0.100 | [0.036, 0.164] | 0.230 | ✗ |
+
+The honest summary is therefore no longer "everything is inside a wide
+interval". The gamma inference now **cuts both ways**: Spec 11's
+intervals are tight enough to *reject* parts of Williams' profile —
+his net-liquid m.p.c. (0.159) lies outside [0.022, 0.098], his peak
+housing m.p.c. (0.0488) outside [−0.010, 0.021], and his affordability
+loading has the wrong sign — while his illiquid-financial m.p.c.
+(0.022) is comfortably *inside* [0.012, 0.057]. The Spec 6 frame
+remains consistency-by-imprecision on a small n = 86 sample; the
+Spec 11 frame upgrades the comparison to agreement on form and on the
+illiquid-financial channel, disagreement on the net-liquid magnitude,
+and an underpowered housing-collateral channel whose interval contains
+zero.
 
 ### 9.5 Adding the CCI interactions does not close the gap (Spec 8)
 
-Estimating the six CCI interactions freely (Spec 8) raises the speed
-of adjustment to λ = −0.445 (t = −3.30) full-sample on n = 146, in
-magnitude above Williams' −0.286. We do not present this as a
-credit-channel success. The wealth coefficients shift relative to the
-baseline (γ_NLA → 0.098, γ_IFA → 0.053, housing-collateral → 0.004)
-without moving systematically toward Williams' Table 1, and three of
-the four interaction sign priors fail outright
+Estimating the CCI interactions freely alongside the standalone wealth
+ratios (Spec 8) raises the speed of adjustment to λ = −0.458
+(t = −3.52) full-sample on n = 146, in magnitude above Williams'
+−0.286, with the second-best BIC in the ladder (−952.8, behind
+Spec 11's −954.8). We do not present this as a credit-channel success.
+The wealth coefficients shift relative to the baseline (γ_NLA → 0.073,
+γ_super → 0.047, standalone housing → 0.007) without moving
+systematically toward Williams' Table 1, and three of the four
+interaction sign priors fail outright
 (`australia_spec8_sign_prior_verdicts.csv`):
 
 - `r_x_cci` (Williams α_c1 = −0.871 at CCI = 1): prior negative, OLS
-  +0.0019, p = 0.066 → **FAIL** (wrong sign);
+  +0.0028, p = 0.042 → **FAIL** (wrong sign, significant);
 - `hp_x_1_minus_cci` (Williams α_c4 = −0.13 at CCI = 0): prior
-  negative, OLS +0.0077, p = 0.319 → **FAIL**;
-- `yp_x_cci` (Williams ψ₁ = +0.93): prior positive, OLS −0.611,
-  p = 0.036 → **FAIL** (wrong sign);
+  negative, OLS +0.0299, p = 0.171 → **FAIL**;
+- `yp_x_cci` (Williams ψ₁ = +0.93): prior positive, OLS −0.505,
+  p = 0.016 → **FAIL** (wrong sign, significant);
 - `ln_yp_over_y` (Williams ψ₀ ≈ 0.20): prior small positive, OLS
-  +0.468, p = 0.0008 → **PASS**.
+  +0.492, p = 0.0008 → **PASS**.
 
 The raw-coefficient comparison confirms that the interactions do not
 land where Williams' framework predicts
 (`australia_williams_spec8_comparison.csv`): his α_c1 = −0.871 against
-our structural +0.0043 (t = 1.85), his α_c4 = −0.13 against our
-+0.017 (t = 1.00), his calibrated ψ₁ = +0.93 against our freely
-estimated −1.37 (t = −2.12). Adding the interactions therefore
+our structural +0.0062 (t = 2.05), his α_c4 = −0.13 against our
++0.065 (t = 1.38), his calibrated ψ₁ = +0.93 against our freely
+estimated −1.10 (t = −2.43). Adding the interactions therefore
 **re-allocates** the long-run identification across components — and
 raises λ — but does not close the residual gap with the joint FIML
 estimates. The earlier draft's framing that Spec 8 "exceeds Williams"
@@ -3827,16 +4491,14 @@ is withdrawn.
 ### 9.6 The interactions are collinear: the structural reason Williams uses FIML
 
 The reason single-equation estimation cannot deliver Williams' result
-is, at root, an identification problem. The six CCI-interacted
-regressors are 0.74–0.97 mutually correlated on this sample because
-each is approximately proportional to the latent CCI; they cannot be
-separately identified off one equation. (The 0.74–0.97 range is a
-property of the interaction-regressor matrix reported in §5 and the
-analysis narrative; it is not itself a standalone committed CSV. The
-load-bearing committed evidence is threefold: the wrong-signed,
-insignificant Spec 8 interaction coefficients of §9.5; the
-identification-versus-detrending shifts of §5; and the Spec 10/Spec 12
-collapse of §9.2.)
+is, at root, an identification problem. The CCI-interacted regressors
+are 0.66–0.97 mutually correlated in absolute value on this sample
+(`australia_cci_interaction_corr.csv`; §5.5) because each is
+approximately proportional to the latent CCI; they cannot be
+separately identified off one equation. The committed evidence runs
+in the same direction from three sides: the correlation matrix itself;
+the wrong-signed Spec 8 interaction coefficients of §9.5; and the
+Spec 10/Spec 12 collapse of §9.2.
 
 This is precisely the structural reason Williams (2010) uses a
 four-equation FIML system rather than single-equation OLS. The same
@@ -3846,11 +4508,12 @@ shared across equations; and ζ_h = 1 normalises the house-price
 equation. Those cross-equation restrictions supply the identifying
 variation that lets the credit channels be separated — variation that
 no single-equation specification has. The joint-survival result of §5
-corroborates this from the other direction: when the CCI knots are
-required to satisfy sign priors *jointly* across the consumption,
-house-price and mortgage equations, only two of the seven
-single-equation survivors pass, so the maximal-GETS single-equation
-identification was partly equation-specific. This aligns with both
+corroborates this from the other direction: of the fifteen candidate
+knots, seven pass the consumption-equation sign prior, but only two of
+those survive the three-equation requirement (1986 and 2017Q1) and
+only one survives all four equations (1986)
+(`LIVES/outputs/lives_joint_cci_survival.csv`), so the single-equation
+identification was largely equation-specific. This aligns with both
 Williams' framework (CCI as a common factor under parameter
 restrictions) and the Duca, Muellbauer and Murphy (2013) state-space
 implementation in which the latent factor is identified jointly across
@@ -3866,11 +4529,14 @@ deregulation. The back-extension exercise tests this directly and
 finds it is not the binding constraint.
 
 Refitting the simpler disaggregated no-CCI specification (Spec 4) on
-the back-extended 1976Q3+ sample moves λ 37 per cent closer to
-Williams (−0.140 → −0.193, still 32 per cent short of −0.286) — but
+the back-extended 1976Q3+ sample moves λ about 12 per cent toward
+Williams (−0.182 → −0.203, still 29 per cent short of −0.286;
+`spec46_extended_comparison.csv`) — and the aggregate Spec 1 moves
+similarly (−0.193 → −0.209; `spec1_extended_comparison.csv`) — but
 the individual wealth coefficients *shrink* rather than grow on the
-longer window: γ_NLA collapses toward zero and γ_EQ retains a wrong
-sign (§8). Lengthening the sample sharpens the speed of adjustment but
+longer window: γ_NLA collapses by 95 per cent (+0.025 → +0.001),
+γ_super flips sign, and γ_EQ retains a wrong sign (§8). Lengthening
+the sample slightly sharpens the speed of adjustment but
 not the wealth structure, so the post-1988 window is not, in itself,
 what generates the divergence between any single-equation OLS estimate
 and Williams' jointly identified Table 1. The back-extension is
@@ -3884,46 +4550,57 @@ A final point of comparison concerns the permanent-income channel and
 the measure on which it depends. Under the AR-method forecaster we
 replicate the often-noted "Australian permanent-income puzzle": the
 long-run coefficient on log(yᵖ/y) is negative — near-zero on the
-full-sample (look-ahead) AR variant (−0.003) and significantly negative
-once the AR forecaster is run in real time (−0.22, t = −2.23)
-(`australia_pi_method_comparison.csv`,
-`australia_pi_realtime_robustness.csv`). Under the full-sample Italy
-Jordà local-projection *measure* it is positive (+0.24 on the
-net-worth forecaster regression; +0.504 in the faithful Spec 11). The structural reasons the measures
-diverge are real — the rolling-AR forecaster lacks the
-labour-force-share predictor that captures slow demographic effects,
-compounds short-run AR misspecification across 40 horizons, and
-over-estimates persistence after large income shocks, all of which the
-one-step direct projection avoids. But the positive sign is partly a
-property of the full-sample, non-causal construction of the measure:
-under a causal real-time projection the coefficient returns to
-modestly negative (−0.11, §8). The strong positive permanent-income
-response that the faithful LIVES form recovers therefore rests on the
+full-sample (look-ahead) AR variant (−0.004) and negative though
+insignificant once the AR forecaster is run in real time (−0.158,
+t = −1.68) (`australia_pi_method_comparison.csv`,
+`australia_pi_realtime_robustness.csv`). Under the full-sample Italian
+direct-forecast *measure* (De Bonis et al. 2020, Appendix A.2; §2.5)
+it is strongly positive (+0.196 on the net-worth forecaster
+regression; +0.325 in the Spec 6 frame; +0.459 in the faithful
+Spec 11). The structural reasons the measures diverge are real — the
+rolling-AR forecaster lacks the labour-force-share predictor that
+captures slow demographic effects, compounds short-run AR
+misspecification across 40 horizons, and over-estimates persistence
+after large income shocks, all of which the one-step direct forecast
+avoids. But the positive sign is a property of the full-sample,
+non-causal construction of the measure: under a causal real-time
+direct forecast the coefficient flips to significantly negative
+(−0.145, t = −2.23), even though the error-correction term itself
+survives the real-time treatment (λ = −0.159, t = −2.39, against the
+AR real-time −0.095). The strong positive permanent-income response
+that the faithful LIVES form recovers therefore rests on the
 full-sample (look-ahead) permanent-income measure; we flag this
 explicitly and direct readers to the real-time robustness column
 rather than treating the puzzle as resolved.
 
 ### 9.9 Summary
 
-The comparison with Williams resolves into a clean two-part statement.
-The LIVES *structure* transfers: the faithful single-equation form
-recovers his error-correction speed (pre-COVID λ = −0.245 against
-−0.286) and the correctly signed wealth-m.p.c. structure (net-liquid
-and illiquid-financial m.p.c.s individually significant;
+The comparison with Williams resolves into a clean two-part statement,
+with one honest refinement. The LIVES *structure* transfers: the
+faithful single-equation form recovers his error-correction speed
+(COVID-controlled λ ≈ −0.25 against −0.286, a gap of about 13 per
+cent) and the correctly signed wealth-m.p.c. structure (net-liquid and
+illiquid-financial m.p.c.s individually significant;
 housing-collateral correctly signed). His Australian *calibrations* do
-not transfer: imposing his permanent-income gearing collapses λ to
-≈ 0 (Spec 12, Spec 10), because Australia freely estimates ψ₀ ≈ 0.50,
-roughly 2.5× his 0.20, and his rate loading cannot even be imposed at
-its published scale. The companion Wald non-rejection is reconciled as
-low-power non-rejection — every Williams value sits inside a wide CI
-that also contains zero, so the structural-γ "agreement" is
-consistency, not confirmation. The six CCI interactions are
-0.74–0.97 collinear and so weakly identified off a single equation,
-which is exactly why Williams' identification comes from cross-equation
-FIML restrictions; the back-extension shows sample length is not the
-binding constraint. The path to a tighter reconciliation with Williams'
-published values therefore runs through a full four-equation FIML build,
-not through any single-equation OLS refinement.
+not transfer: imposing his permanent-income gearing collapses λ to ≈ 0
+(Spec 12, Spec 10), because Australia freely estimates a structural
+gearing of order one — roughly five times his 0.20 on the consistent
+structural scale — and his rate loading cannot even be imposed at its
+published scale. The refinement is that the magnitude comparison now
+cuts both ways: the gamma inference rejects his net-liquid m.p.c.
+(0.159 outside [0.022, 0.098]) and his peak housing m.p.c. (0.0488
+outside [−0.010, 0.021]) while matching his illiquid-financial m.p.c.
+(0.022 inside [0.012, 0.057]), so the agreement is on form and on the
+IFA channel, not on every magnitude. The companion Wald non-rejection
+(χ²(6) = 7.55, p = 0.27) is reconciled as low-power non-rejection in
+the imprecise Spec 6 frame. The CCI interactions are 0.66–0.97
+collinear in absolute value and so weakly identified off a single
+equation, which is exactly why Williams' identification comes from
+cross-equation FIML restrictions; the back-extension shows sample
+length is not the binding constraint. The path to a tighter
+reconciliation with Williams' published values therefore runs through
+a full four-equation FIML build, not through any single-equation OLS
+refinement.
 
 ---
 
@@ -3933,70 +4610,77 @@ not through any single-equation OLS refinement.
 This section reads the estimated long run and the policy
 counterfactuals through the lens of the faithful LIVES specification
 (Spec 11) of §7.0, while being explicit about which committed
-decompositions are available on which long-run parameterisation. Two
-caveats frame everything below. First, the long-run contributions
-decomposition committed to the repository
-([`australia_longrun_contributions.csv`](../outputs/australia_longrun_contributions.csv))
-is built on the *net-worth* (Spec 2-style) long run, not the
-disaggregated LIVES bracket of Spec 11; we therefore use it to
-characterise the shape of the fitted equilibrium path rather than to
-attribute consumption to the credit-scaled housing-collateral channel.
-Second, the counterfactuals
+decompositions run on which long-run parameterisation. Two notes frame
+everything below. First, the long-run contributions decomposition is
+now committed in two parameterisations: the Spec 11 LIVES bracket
+([`australia_longrun_contributions_spec11.csv`](../outputs/australia_longrun_contributions_spec11.csv)),
+which is the lead decomposition of §10.1, and the selector-preferred
+net-worth Spec 3
+([`australia_longrun_contributions.csv`](../outputs/australia_longrun_contributions.csv)),
+which we retain as a cross-check. Second, the counterfactuals
 ([`australia_counterfactuals_summary.csv`](../outputs/australia_counterfactuals_summary.csv))
 were generated on the conventional baseline (Spec 6 dummies) and the
 interaction spec (Spec 8); we report them as committed but read the
 CCI counterfactual through the de-meaning convention rather than as a
 structural housing-collateral experiment. The policy reading in
-§10.3, by contrast, is anchored on the Spec 11 channels.
+§10.3 is anchored on the Spec 11 channels.
 
 ### 10.1 Long-run contributions decomposition
 
 The long-run decomposition (an Australian counterpart to Williams
 (2010) Charts 2–8) splits fitted de-meaned log(c/y) into the partial
-contribution of each long-run regressor over the 86 quarters from
-2003Q3 to 2024Q4, the window over which the underlying series
-(including the Italy-LP permanent-income measure) are jointly
-available. Because the committed decomposition rests on the
-net-worth long run, the regressors are aggregate net worth
-(`ln_networth_y`), house-price affordability (`ln_hp_over_y`), the
-real mortgage rate (`real_rate`) and the permanent-income ratio
+contribution of each long-run regressor over the 146 quarters from
+1988Q3 to 2024Q4. The lead decomposition is on the Spec 11 LIVES
+bracket: net liquid assets (`nla_y`), illiquid financial assets
+(`ilfa_y`), the credit-scaled housing-collateral term (`ha_x_cci`),
+the credit-scaled affordability term (`hp_x_1_minus_cci`), the rate
+and permanent-income interactions (`r_x_cci`, `yp_x_cci`), the CCI
+intercept (`cci_williams`) and the permanent-income ratio
 (`ln_yp_over_y`); each term is de-meaned and so sums to approximately
 zero by construction over the window, and the actual de-meaned path
 and the residual are reported alongside
-([`australia_longrun_contributions.csv`](../outputs/australia_longrun_contributions.csv)).
+([`australia_longrun_contributions_spec11.csv`](../outputs/australia_longrun_contributions_spec11.csv)).
 
-At the last observation (2024Q4) the partial contributions are: net
-worth −0.002, house-price affordability −0.041, real rate +0.002,
-and permanent income +0.041, against an actual de-meaned log(c/y) of
-−0.009 and a residual of −0.009. The two large, near-offsetting
-wedges at end-of-sample are the negative affordability term
-(elevated house prices relative to income depressing the equilibrium
-consumption ratio) and the positive permanent-income term, with
-aggregate net worth close to its sample mean. The residual is not
-negligible: it carries a sizeable, slowly-evolving level — around
-+0.10 to +0.18 in the mid-2000s, drifting through zero and turning
-negative later in the sample — with the sharpest excursions around
-the GFC and, especially, early COVID (−0.24 in 2020Q2). By 2024Q4 it
-has returned close to zero (−0.009).
+At the last observation (2024Q4) the dominant negative wedge is the
+credit-scaled affordability term at −0.098 — its largest value in the
+sample, reflecting house prices elevated relative to income with the
+CCI in its post-2022 tight regime — partly offset by the two
+permanent-income terms (+0.057 level, +0.088 interaction), with the
+financial-wealth channels small (`nla_y` +0.004, `ilfa_y` −0.039,
+`ha_x_cci` +0.017) against an actual de-meaned log(c/y) of −0.020 and
+a residual of −0.054. Three features of the path stand out. First,
+because the deployed CCI is identically zero before 2007Q3, the four
+credit-scaled terms contribute essentially nothing over 1988–2007 —
+the pre-GFC swings are carried by the financial-wealth ratios and
+permanent income (e.g. in 2007Q4: `nla_y` +0.023, `ln_yp_over_y`
+−0.040). Second, the post-2022 tightening regime (CCI ≈ −1.6) is
+where the credit terms move most: the rate interaction swings to
+−0.049 in 2022Q3 before reverting, and the affordability wedge widens
+steadily to its end-of-sample extreme. Third, the residual carries a
+sizeable, slowly evolving level — around +0.09 to +0.16 over
+2002–2007, drifting negative from the GFC onwards — with the sharpest
+excursion in the COVID quarters (−0.36 in 2020Q3), where the long-run
+bracket explains little and the dynamic equation's dummies do the
+work; by 2022Q4 it is back near zero.
 
-The honest qualifier is that this is a net-worth decomposition, not
-the disaggregated LIVES bracket. Under the faithful form (Spec 11)
-the housing contribution would enter *only* through the credit-scaled
-collateral channel γ₁·CCI·(HA/4y), whose implied structural MPC is
-0.010 (right-signed but insignificant, t = 1.03; §7.0), so a
-LIVES-consistent decomposition would attribute far less of the
-equilibrium path to housing than a standalone-wealth reading would
-suggest. We do not present a separate Spec 11 path decomposition
-because the credit interaction is weakly identified off a single
-equation (§5, §10.3); attributing the fitted path to a γ₁ that is
-statistically indistinguishable from zero would overstate the
-precision of the channel. The committed net-worth decomposition is
-therefore best read as descriptive of the equilibrium *shape* —
-affordability and permanent income as the dominant moving wedges —
-rather than as a structural attribution to the LIVES collateral
-channel.
+The honest qualifier is that the credit-scaled contributions inherit
+the weak identification of their coefficients (§5, §7.0): γ₁ is
+statistically indistinguishable from zero (t = 0.71), and the
+affordability and rate interactions are wrong-signed against Williams'
+priors, so the Spec 11 attribution should be read as the model's
+fitted arithmetic, not as well-identified structural channels. As a
+cross-check, the selector-preferred net-worth decomposition (Spec 3;
+[`australia_longrun_contributions.csv`](../outputs/australia_longrun_contributions.csv))
+tells a consistent end-of-sample story with coarser channels: net
+worth −0.018, affordability −0.015, real rate ≈ 0.000 and permanent
+income +0.057 at 2024Q4, with a residual of −0.045. Both
+parameterisations agree that affordability-type wedges and permanent
+income are the dominant moving parts of the fitted equilibrium, and
+that aggregate wealth sits near its sample mean at end-2024.
 
 Source:
+[australia_longrun_contributions_spec11.csv](../outputs/australia_longrun_contributions_spec11.csv),
+[australia_longrun_decomposition_spec11.png](../outputs/australia_longrun_decomposition_spec11.png),
 [australia_longrun_contributions.csv](../outputs/australia_longrun_contributions.csv),
 [australia_longrun_decomposition.png](../outputs/australia_longrun_decomposition.png).
 
@@ -4013,32 +4697,35 @@ hedges noted below.
 
 | Scenario | Event date | Basis | h = 4 q gap | h = 8 q gap | End-of-sample gap |
 |---|---|---|---:|---:|---:|
-| No 2014/2017 APRA macroprudential | 2014Q4 | Spec 6 dummies | +0.8 % | +2.3 % | +28.3 % |
-| No COVID income support           | 2020Q1 | Spec 6 dummies | −9.6 % | −9.6 % | −9.6 % |
+| No 2014/2017 APRA macroprudential | 2014Q4 | Spec 6 dummies | −1.0 % | −2.3 % | +2.0 % |
+| No COVID income support           | 2020Q1 | Spec 6 dummies | −8.3 % | −8.3 % | −8.3 % |
 | CCI at peak vs CCI = 0            | 1988Q4 | Spec 8 interactions | n/a | n/a | ≈ 0 |
 
 (Gaps are cumulative deviations in log(c) from the baseline path,
 expressed in per cent; h-quarter values are measured from the
 relevant event date.)
 
-**Counterfactual 1 — no 2014/2017 APRA macroprudential.** Zeroing
-the smoothed-step `d_apra_2014` and `d_apra_2017` dummies implies
-that consumption would have been about 0.8 per cent higher four
-quarters after the 2014 round (+0.0078 in log points) and about 2.3
-per cent higher after eight quarters (+0.0234). The end-of-sample
-gap of +28.3 per cent (+0.2828 by 2024Q4) compounds the persistent
-post-event ogive shift over a decade and must be read as a
-diagnostic upper bound, not a forecast: it assumes nothing else in
-the macroeconomic environment would have adjusted over the same
-window, which is not how the economy operates. The four- and
-eight-quarter figures are the policy-relevant range and are
-consistent with the APRA programme accounting for roughly 1–3 per
-cent of consumption over its first two years.
+**Counterfactual 1 — no 2014/2017 APRA macroprudential.** On the
+re-estimated Spec 6 the two APRA ogive dummies are small and
+statistically weak, and they now disagree in sign (`d_apra_2014`
++0.0050, t = 0.57; `d_apra_2017` −0.0069, t = −1.43;
+`australia_full_results.csv`) — note that the Spec 11 headline
+estimates the opposite sign pattern (§10.3), so the profile is not
+robust across specifications. Zeroing both dummies implies
+consumption about 1.0 per cent *lower* four quarters after the 2014
+round (−0.0103 in log points), 2.3 per cent lower after eight
+quarters (−0.0232), and 2.0 per cent *higher* by end of sample
+(+0.0197), as the negative 2017 dummy's removal eventually dominates.
+The honest reading is that the corrected data do not support a large,
+persistent APRA consumption drag through these event dummies: the
+counterfactual gaps are of the order of 1–2 per cent and not robustly
+signed, and an earlier draft's decade-horizon figure of ≈ +28 per
+cent is withdrawn with the old estimates that produced it.
 
 **Counterfactual 2 — no COVID income support.** Zeroing the
 `d_jobkeeper_2020`, `d2020_covid` and `d2020_rebound` dummies implies
-that consumption would have been about 9.6 per cent *lower* in the
-COVID period (−0.0962 in log points). The cumulative gap is constant
+that consumption would have been about 8.3 per cent *lower* in the
+COVID period (−0.0835 in log points). The cumulative gap is constant
 across horizons because the COVID event dummies are bounded in time
 (zero before and after the 2020–21 window), so unlike the persistent
 APRA ogive the deviation does not continue to compound past the event
@@ -4047,8 +4734,8 @@ window; the scenario is modelled as a one-off.
 **Counterfactual 3 — CCI at peak vs zero.** Evaluating the
 interaction spec with the CCI-interacted regressors at CCI = 1
 (historical peak) versus CCI = 0 (no liberalisation) implies an
-essentially zero cumulative consumption gap across the back-extended
-sample (−4.9 × 10⁻¹⁵, i.e. zero to numerical precision). This is a
+essentially zero cumulative consumption gap across the
+sample (−2.7 × 10⁻¹⁵, i.e. zero to numerical precision). This is a
 mechanical consequence of the de-meaning convention: under de-meaned
 interactions the average contribution of CCI variation to fitted
 Δlog c is zero by construction, so the *cumulative* effect of a
@@ -4077,27 +4764,29 @@ those that remain weakly identified.
 
 **Wealth channel of monetary policy.** Under Spec 11 the two
 plain-MPC wealth channels are significant and correctly signed: the
-net-liquid-asset MPC is γ₃ = 0.077 (OLS coefficient +0.037, t = 3.40)
-and the illiquid-financial-asset MPC is γ₂ = 0.037 (OLS +0.018,
-t = 3.03), both as structural propensities recovered as OLS/|λ| on
-the full sample (|λ| = 0.480). Housing wealth, by contrast, enters
-*only* through the credit-scaled collateral channel: the implied
-structural MPC is γ₁ = 0.010 — right-signed but statistically
-insignificant (OLS +0.0049, t = 1.03), against Williams' calibrated
-peak of 0.0488. The policy reading is therefore asymmetric across
-asset classes: liquid and illiquid financial wealth transmit to
-consumption with well-identified marginal propensities, whereas the
-housing-collateral channel that LIVES theory makes conditional on
-credit conditions is, on Australian single-equation post-deregulation
-data, of the predicted sign but too imprecise to quantify. Movements
-in mortgage rates that change housing values propagate to consumption
-with a speed of adjustment we identify on the pre-COVID sample at
-λ = −0.245 (t = −4.80) — close to Williams' −0.286 — implying about a
-25 per cent cumulative effect at one quarter and most of the
-adjustment completed within five to six years. The full-sample λ of
-−0.480 is inflated by the COVID quarters and fails the |λ|
-upper-bound screen (§6); the pre-COVID value is the policy-relevant
-speed.
+net-liquid-asset MPC is γ₃ = 0.060 [0.022, 0.098] (OLS coefficient
++0.027, t = 3.75) and the illiquid-financial-asset MPC is
+γ₂ = 0.035 [0.012, 0.057] (OLS +0.015, t = 3.09), both as structural
+propensities recovered as OLS/|λ| on the full sample (|λ| = 0.448),
+and both surviving every COVID treatment. Housing wealth, by
+contrast, enters *only* through the credit-scaled collateral channel:
+the implied structural MPC is γ₁ = 0.0055 — right-signed but
+statistically insignificant (OLS +0.0025, t = 0.71), against
+Williams' calibrated peak of 0.0488, which the interval excludes. The
+policy reading is therefore asymmetric across asset classes: liquid
+and illiquid financial wealth transmit to consumption with
+well-identified marginal propensities, whereas the housing-collateral
+channel that LIVES theory makes conditional on credit conditions is,
+on Australian single-equation post-deregulation data, of the
+predicted sign but unproven. Movements in mortgage rates that change
+housing values propagate to consumption with a speed of adjustment we
+identify on the COVID-controlled samples at λ ≈ −0.25 (pre-COVID
+−0.266, t = −4.85) — close to Williams' −0.286 — implying about a
+25 per cent closing of any equilibrium gap in the first quarter and,
+since (1 − 0.25)⁸ ≈ 0.10, roughly 90 per cent of the adjustment
+completed within two years. The full-sample λ of −0.448 is inflated
+by the COVID quarters and fails the |λ| upper-bound screen (§6); the
+COVID-controlled value is the policy-relevant speed.
 
 **Housing wealth is not a free-standing channel.** The central
 form-is-decisive result of the paper carries a direct policy
@@ -4115,29 +4804,33 @@ point estimate of γ₁ is imprecise.
 **Macroprudential effects.** The 2014 and 2017 APRA episodes enter
 as smoothed-step ogive dummies with small Δlog c coefficients. On the
 Spec 11 headline only the 2014 round is materially negative and
-marginally significant (`d_apra_2014` = −0.0143, t = −1.81); the 2017
-dummy is small, positive and insignificant (`d_apra_2017` = +0.0079,
-t = 1.32), so the macroprudential drag is carried by the first round.
-The counterfactual in §10.2 implies they shaved about
-0.8 percentage points off consumption in the year after the 2014
-round and 2.3 points by two years out. The decade-horizon level gap
-is a model-mechanical upper bound, not a forecast of the broader
-macro response.
+marginally significant (`d_apra_2014` = −0.0108, t = −1.92); the 2017
+dummy is positive and insignificant (`d_apra_2017` = +0.0099,
+t = 1.61), so any macroprudential drag is carried by the first round.
+The Spec 6-based counterfactual in §10.2 estimates the opposite sign
+pattern on its shorter sample and implies cumulative gaps of only
+1–2 per cent that are not robustly signed across horizons. The honest
+policy statement is that these event dummies detect, at most, a
+small and specification-dependent consumption effect of the APRA
+rounds — not the large persistent drag an earlier draft reported.
 
 **Permanent-income transmission.** Permanent income is the strongest
 channel in the faithful form: the Spec 11 coefficient on log(yᵖ/y) is
-+0.50 (t = 4.0) on the full sample and +0.28 (t = 4.7) pre-COVID,
-both highly significant and consistent with a structural
-permanent-income weight ψ near 0.50. For fiscal-multiplier work this
-implies Australian households respond meaningfully and durably to
-credible permanent-income shocks. Two caveats apply. The headline
-estimate uses the full-sample (look-ahead) Italy-LP permanent-income
-measure; under the real-time, no-look-ahead variant the speed of
-adjustment shrinks sharply (Italy real-time λ = −0.118 versus
-full-sample −0.197) and the permanent-income coefficient flips or
-weakens (§7.4, §8), so the real-time column is the
-operationally-relevant version for any forward-looking application.
-And the freely-estimated ψ ~ 0.50 is roughly 2.5× Williams' calibrated
++0.46 (t = 4.04) on the full sample and +0.30 (t = 5.81) pre-COVID,
+both highly significant — though the implied structural gearing
+ψ̂ = OLS/|λ| of 1.02–1.13 sits *above* the theoretical admissibility
+bound ψ ≤ 0.95, a breach we disclose as an open puzzle rather than
+re-scale away (§7.0). For fiscal-multiplier work this implies
+Australian households respond meaningfully and durably to credible
+permanent-income shocks. Two caveats apply. The headline estimate
+uses the full-sample (look-ahead) Italian direct-forecast
+permanent-income measure; under the real-time, no-look-ahead variant
+the speed of adjustment shrinks (Italy real-time λ = −0.159, t = −2.39,
+versus full-sample −0.239 in the Spec 6 frame) and the
+permanent-income coefficient flips sign (+0.325 → −0.145; §7.4, §8),
+so the real-time column is the operationally-relevant version for any
+forward-looking application. And the freely-estimated structural
+gearing of order one is roughly five times Williams' calibrated
 ψ₀ = 0.20; imposing his value collapses the equilibrium (§7.0.1,
 §9), so the Australian permanent-income gearing is a domestic
 estimate, not a transferred calibration.
@@ -4145,16 +4838,14 @@ estimate, not a transferred calibration.
 **Credit-conditions identification caveat.** Section 5 documents that
 the CCI's identification in a single-equation OLS is weak, and that
 neither the back-extended sample, the sectional sign priors, nor the
-time-varying housing-wealth interaction changes this. The six
-CCI-interacted regressors are very highly mutually correlated on this
-sample (pairwise correlations of roughly 0.74–0.97, each
-approximately proportional to CCI), so they cannot be separately
-identified off one equation — the structural reason Williams uses
-four-equation FIML. (This near-collinearity is a sample property
-reported in the analysis narrative rather than a standalone committed
-correlation matrix; the load-bearing committed evidence is the
-wrong-signed and insignificant Spec 8 interaction coefficients and
-the Spec 10/12 collapse documented in §7.) Policymakers using a
+time-varying housing-wealth interaction changes this. The deployed
+index itself is degenerate over much of the sample — identically zero
+before 2007Q3, so the credit channels are identified off roughly
+seventy quarters — and the CCI-interacted regressors are very highly
+mutually correlated (pairwise |ρ| of 0.66–0.97, each approximately
+proportional to CCI; `australia_cci_interaction_corr.csv`), so they
+cannot be separately identified off one equation — the structural
+reason Williams uses four-equation FIML. Policymakers using a
 single-equation CCI series for regime classification (tightening
 versus easing diagnoses) should treat the spline coefficients as
 consumption-equation residual identification rather than a
@@ -4197,19 +4888,28 @@ help — the restricted net-wealth elasticity flips to −0.0832
 balanced-growth parameterisation in this simple form. Third, the
 static long run does not cointegrate under Engle–Granger MacKinnon
 critical values (ADF −2.3828 vs 5 per cent CV for four variables
-−4.10), echoing the cointegration-screen result of §6.
+−4.10), echoing the cointegration-screen result of §6 — and this
+caveat bites on the second finding too: the homogeneity Wald test
+sits inside a non-cointegrated static levels regression, where its
+distribution is non-standard, so the rejection is indicative rather
+than decisive.
 
 The reading for MARTIN is that the freely-estimated single-equation
 long run does **not** nest MARTIN's calibrated balanced-growth block:
-homogeneity would have to be imposed rather than tested-and-accepted,
-and the unrestricted wealth elasticity (0.12 here, or 0.19 from the
-disaggregated wealth aggregate of §7.3 with a 95 per cent CI of
-[−0.77, 1.16]) is too imprecise to discipline MARTIN's 0.17
-calibration. The honest position is that this equation is *not yet
-MARTIN-ready as a source of point estimates*: the wealth elasticity
-CI spans MARTIN's value but also spans zero, so it can corroborate
-but not replace the calibration. The MARTIN-operational version of
-the permanent-income measure is the real-time Italy-LP forecaster
+homogeneity would have to be imposed rather than tested-and-accepted
+(with the non-cointegration caveat above), and the comparable
+unrestricted wealth elasticity (0.12) sits below MARTIN's 0.17
+without a committed standard error to adjudicate the gap. The
+disaggregated evidence is now more informative than in an earlier
+draft — Spec 11's aggregate-wealth structural MPC is 0.100 with a
+95 per cent CI of [0.036, 0.164] (`australia_gamma_inference.csv`),
+significantly positive rather than zero-spanning — but an MPC on the
+wealth-to-income ratio is not the same object as MARTIN's log-wealth
+elasticity, so it corroborates a positive wealth channel of the right
+order rather than recalibrating MARTIN's parameter. The honest
+position remains that this equation is *not yet MARTIN-ready as a
+source of point estimates*. The MARTIN-operational version of the
+permanent-income measure is the real-time Italian direct forecaster
 (§7.4), not the full-sample look-ahead measure used for the headline;
 any integration must use the real-time variant, under which the speed
 of adjustment is materially weaker. A productive integration path is
@@ -4238,29 +4938,36 @@ LIVES equation is what identifies it. When housing wealth is entered
 faithfully through its credit-conditions interaction alone, the
 autonomous-consumption CCI intercept is restored, and illiquid
 financial assets are combined, the error-correction mechanism and the
-core wealth structure come alive in a single equation. When housing
-instead enters as a plain, constant-MPC level term — as in the
-conventional disaggregated error-correction model that prior work
-implicitly tested — the equilibrium is far weaker and the standalone
-housing coefficient is insignificant. Reading that insignificant
-standalone coefficient as a failed housing-wealth effect is a
-category error: LIVES theory predicts that coefficient is
-approximately zero absent the credit-conditions interaction, because
-there is no classical housing-wealth channel in the model.
+core wealth structure come alive in a single equation — and they stay
+alive under every COVID treatment. When housing instead enters as a
+plain, constant-MPC level term — as in the conventional disaggregated
+error-correction model that prior work implicitly tested — the
+equilibrium is weaker and sample-fragile and the standalone housing
+coefficient is insignificant. Reading that insignificant standalone
+coefficient as a failed housing-wealth effect is a category error:
+LIVES theory predicts that coefficient is approximately zero absent
+the credit-conditions interaction, because there is no classical
+housing-wealth channel in the model.
 
 A second, equally central finding is that the LIVES *structure*
 transfers to Australia while Williams' Australian *calibrations* do
-not. The faithful specification recovers Williams' speed of
-adjustment and right-signed wealth structure when its parameters are
-freely estimated; imposing his calibrated permanent-income gearing
-collapses the equilibrium. We document why — the six credit-conditions
-interactions are mutually collinear in the post-deregulation sample —
-and we are honest throughout about the limitations of single-equation
-LIVES estimation: a credit-conditions placebo that the deployed index
-fails, no efficiency gain from joint estimation at the quarterly
-frequency, an out-of-sample loss to a random walk, and a look-ahead
-permanent-income measure whose result partially reverses under a
-real-time construction.
+not — and the corrected data now grade the transfer channel by
+channel. The faithful specification recovers Williams' speed of
+adjustment to within about 13 per cent and matches his
+illiquid-financial m.p.c., but its intervals are tight enough to
+reject his net-liquid magnitude; imposing his calibrated
+permanent-income gearing collapses the equilibrium. We document why —
+the credit-conditions interactions are mutually collinear in the
+post-deregulation sample and the deployed index has no variation
+before 2007Q3 — and we are honest throughout about the limitations of
+single-equation LIVES estimation: a split placebo verdict on the
+credit-conditions index (the literal Williams construction sits at
+the placebo median, the deployed protocol earns only moderate
+support), a structural permanent-income gearing above its theoretical
+admissibility bound, no efficiency gain from joint estimation at the
+quarterly frequency, an out-of-sample loss to a random walk beyond
+one quarter, and a look-ahead permanent-income measure whose
+coefficient reverses under a real-time construction.
 
 ### 11.1 Form is decisive: the faithful LIVES specification
 
@@ -4271,35 +4978,43 @@ autonomous-consumption loading ζ_c·CCI (`cci_williams`) is restored,
 and illiquid financial assets are combined into a single ratio
 (`ilfa_y` = equities + superannuation). On this form the
 error-correction and core wealth structure are recovered
-(australia_all_results.csv; australia_lambda_robustness.csv):
+(australia_spec11_variants.csv; australia_lambda_robustness.csv):
 
-| Quantity | Full sample (n = 146) | Pre-COVID (n = 126) | Williams (2010) |
-|---|---:|---:|---:|
-| λ (ecm_lag) | −0.480 (t = −3.59) | −0.245 (t = −4.80) | −0.286 |
-| NLA m.p.c. (`nla_y`) | +0.037 (t = 3.39)*** | +0.008 (ns) | 0.159 |
-| IFA m.p.c. (`ilfa_y`) | +0.018 (t = 3.03)*** | +0.009 (ns) | 0.022 |
-| housing-collateral (`ha_x_cci`, γ₁) | +0.0049 (t = 1.03) | +0.0008 (ns) | 0.0488 |
-| permanent income (`ln_yp_over_y`) | +0.504 (t = 4.00)*** | +0.279 (t = 4.75)*** | 0.20–0.95 |
+| Quantity | Full sample (n = 146) | Pre-COVID (n = 126) | COVID dropped (n = 138) | Williams (2010) |
+|---|---:|---:|---:|---:|
+| λ (ecm_lag) | −0.448 (t = −3.57) | −0.266 (t = −4.85) | −0.248 (t = −6.66) | −0.286 |
+| NLA m.p.c. (`nla_y`) | +0.027 (t = 3.75)*** | +0.016 (t = 1.81)* | +0.017 (t = 2.11)** | 0.159 |
+| IFA m.p.c. (`ilfa_y`) | +0.015 (t = 3.09)*** | +0.009 (t = 1.74)* | +0.010 (t = 2.00)** | 0.022 |
+| housing-collateral (`ha_x_cci`, γ₁) | +0.0025 (t = 0.71) | +0.0019 (t = 0.86) | +0.0023 (t = 1.05) | 0.0488 |
+| permanent income (`ln_yp_over_y`) | +0.459 (t = 4.04)*** | +0.298 (t = 5.81)*** | +0.281 (t = 8.68)*** | 0.20–0.95 |
 
-The pre-COVID speed of adjustment, λ = −0.245 (t = −4.80), is close
-to Williams' (2010) −0.286 and is the value we treat as identified:
-the full-sample λ = −0.480 is inflated by the COVID quarters and
-fails the upper-bound speed screen. The net-liquid and
-illiquid-financial marginal propensities are correctly signed and
-significant on the full sample (`nla_y` +0.037, t = 3.39;
-`ilfa_y` +0.018, t = 3.03), and permanent income enters strongly
-(+0.504, t = 4.00). The housing-collateral term γ₁ is right-signed
-but insignificant (`ha_x_cci` +0.0049, t = 1.03). Scaled by
-|λ| = 0.480, the implied structural marginal propensities are NLA
-0.077, IFA 0.037, and housing-collateral γ₁ 0.010 (right-signed,
-insignificant, versus Williams' 0.0488).
+The COVID-controlled speed of adjustment is tightly clustered at
+λ ≈ −0.25 (−0.266 / −0.248 / −0.242 across the pre-COVID,
+COVID-dropped and quarterly-dummy treatments), about 13 per cent below
+Williams' (2010) −0.286, and is the value we treat as identified: the
+full-sample λ = −0.448 is inflated by the COVID quarters and fails
+the upper-bound speed screen. The net-liquid and illiquid-financial
+marginal propensities are correctly signed in every variant and
+significant at 5 per cent in the full-sample, COVID-dropped and
+quarterly-dummy treatments, and permanent income enters strongly
+everywhere (t = 4.0–8.7). The housing-collateral term γ₁ is
+right-signed but insignificant in every variant (`ha_x_cci` +0.0025,
+t = 0.71 full sample). Scaled by |λ| = 0.448, the implied structural
+marginal propensities are NLA 0.060 [0.022, 0.098], IFA 0.035
+[0.012, 0.057], and housing-collateral γ₁ 0.0055 (right-signed,
+insignificant, versus Williams' 0.0488, which the interval excludes).
+The one theory casualty is the permanent-income gearing: ψ̂ = OLS/|λ|
+is 1.02–1.13, above the admissibility bound ψ ≤ 0.95, a breach that
+survives removal of the GFC ogive and that we disclose as an open
+puzzle (§7.0).
 
 By contrast the conventional constant-MPC disaggregated ECM (Spec 6),
 which carries plain `ha_y`/`eq_y`/`super_y`/`nla_y` with no credit
-scaling and CCI only as a short-run `d2_logcci_lag2` term, delivers a
-weaker speed of adjustment (λ = −0.180, t = −1.76) and an
-insignificant standalone housing coefficient (`ha_y` +0.0088,
-t = 1.52). This is the conventional baseline, not the preferred
+scaling and a 2002Q3-binding short-run credit term, delivers a
+sample-fragile equilibrium on n = 86 (λ = −0.239, t = −2.55,
+collapsing to −0.087 pre-COVID) and an insignificant standalone
+housing coefficient (`ha_y` +0.0022,
+t = 0.30). This is the conventional baseline, not the preferred
 specification. The contrast between Spec 11 and Spec 6 is a matter of
 theory rather than of fit: the two forms test different equations, and
 only Spec 11 is the LIVES equation. Much of the apparent weakness of
@@ -4313,56 +5028,72 @@ It does *not* survive imposition of his Australian calibrations.
 Specification 12 imposes Williams' permanent-income gearing
 (ψ₀ = 0.20, ψ₁ = 0.93) and his illiquid-financial m.p.c.
 (γ_IFA = 0.022) via an iterative fixed point; the error-correction
-mechanism collapses to λ = −0.029 (t = −0.68), with the net-liquid
-coefficient turning wrong-signed (australia_all_results.csv;
+mechanism collapses to λ = −0.029 (t = −0.68) and flips sign
+pre-COVID (+0.029), with the net-liquid coefficient turning
+wrong-signed (australia_all_results.csv;
 australia_lambda_robustness.csv). Specification 10 (Williams-prior
-calibrated) independently reproduces the collapse (λ = −0.048,
-t = −0.76). The mechanism is that Australia freely estimates a
-permanent-income loading of roughly 0.50 — the Spec 11 full-sample
-`ln_yp_over_y` coefficient is +0.504 — well above Williams'
-calibrated ψ₀ = 0.20; forcing his lower value removes the equilibrium.
-Williams' rate, affordability and autonomous-consumption loadings
-cannot even be imposed at their published magnitudes: his raw
-α_r = −0.871 is some thirty times too large on the repository's
+calibrated) independently reproduces the collapse (λ = −0.057,
+t = −0.87). The mechanism is that Australia freely estimates a
+structural permanent-income gearing of order one (ψ̂ = 1.02–1.13) —
+roughly five times Williams' calibrated ψ₀ = 0.20 on the consistent
+structural scale; forcing his much lower value removes the
+equilibrium. Williams' rate, affordability and autonomous-consumption
+loadings cannot even be imposed at their published magnitudes: his
+raw α_r = −0.871 is some thirty times too large on the repository's
 percent real-rate × unit-normalised CCI scaling, and diverges the
 fixed point.
 
-This reconciles the companion paper's Wald non-rejection of the joint
-Williams calibration (χ² = 2.24, p ≈ 0.90). The non-rejection is
-driven by imprecision, not by good fit: every Williams value lies
-inside our wide structural confidence intervals
-(australia_gamma_inference.csv) — but so does zero. The free
-estimates are too imprecise to reject Williams' values, yet imposing
-those values wrecks the fit. Low power is not the same as good fit;
-the honest reading is consistency, not confirmation.
+This reconciles the companion Wald non-rejection of the joint
+Williams calibration (χ²(6) = 7.55, p = 0.27;
+LIVES/outputs/williams_calibration_wald.csv). The non-rejection is
+driven by imprecision, not by good fit: in the Spec 6 frame every
+Williams wealth value lies inside a wide structural confidence
+interval that also contains zero
+(australia_gamma_inference.csv). The free Spec 6 estimates are too
+imprecise to reject Williams' values, yet imposing those values
+wrecks the fit. Low power is not the same as good fit. In the
+faithful Spec 11 frame, by contrast, the inference cuts both ways:
+the intervals reject his net-liquid m.p.c. (0.159 outside
+[0.022, 0.098]) and his peak housing m.p.c. (0.0488 outside
+[−0.010, 0.021]) while matching his illiquid-financial m.p.c. (0.022
+inside [0.012, 0.057]) — agreement on form and on the IFA channel,
+genuine disagreement on the net-liquid magnitude.
 
 ### 11.3 Why the credit channels are weakly identified in one equation
 
 The reason the credit-conditions calibrations cannot be sharpened off
-a single equation is identification, not sample length. The six
-CCI-interacted regressors are each approximately proportional to the
-credit-conditions index and are therefore 0.74–0.97 mutually
-correlated on the post-1988 sample. They cannot be separately
+a single equation is identification, not sample length. The deployed
+CCI is degenerate over much of the sample — only four of fifteen
+candidate knots survive, all post-2007, so the index is identically
+zero from 1988 to mid-2007 and the credit channels are identified off
+roughly seventy quarters — and the CCI-interacted regressors are each
+approximately proportional to the index and therefore 0.66–0.97
+mutually correlated in absolute value
+(australia_cci_interaction_corr.csv). They cannot be separately
 free-estimated from one equation — the structural reason Williams uses
 four-equation FIML. The evidence converges from three directions.
-First, when all six interactions are entered freely (Spec 8), the
+First, when the interactions are entered freely (Spec 8), the
 individual interaction coefficients are wrong-signed or insignificant
-against Williams' priors even though the overall fit is the best in
-the ladder, and the credit channels do not move toward Williams'
-Table 1. Specification 8 reallocates identification; it does not close
-the gap, and we do not present its λ = −0.445 as a credit-conditions
-success. Second, the calibration collapse of Specs 10 and 12 (§11.2)
-shows the channels are not jointly recoverable by imposition either.
-Third, the credit-conditions placebo battery shows the deployed index
-does no better than randomly placed knots: the literal Williams
-four-knot specification sits at the 34th adjusted-R² percentile on
-the 1988+ sample and the 18th on the back-extended sample
+against Williams' priors even though the fit is strong (BIC −952.8,
+second only to Spec 11's −954.8), and the credit channels do not move
+toward Williams' Table 1. Specification 8 reallocates identification;
+it does not close the gap, and we do not present its λ = −0.458 as a
+credit-conditions success. Second, the calibration collapse of
+Specs 10 and 12 (§11.2) shows the channels are not jointly
+recoverable by imposition either. Third, the credit-conditions
+placebo battery returns a split verdict rather than a clean failure:
+the literal Williams four-knot specification sits at the placebo
+median (45th adjusted-R² percentile) and below it on the extended
+samples (36th literal, 48th maximal, 37th sectional), while the
+deployed maximal-GETS construction, evaluated under its own iterated
+reduction protocol, beats 84 per cent of random draws — moderate
+support, short of strong identification
 (australia_williams_knot_placebo_verdict.csv;
-australia_williams_knot_placebo_extended_summary.csv), and the
-maximal-GETS reduction lifts it only weakly (64th/37th). These are
-honest negative results, and they are diagnostic: single-equation
-calibration of the credit channels is empirically closed, and a
-four-equation FIML build is the route to sharpen them.
+australia_williams_knot_placebo_deployed_verdict.csv; extended and
+maximal summaries). These are honest mixed-to-negative results, and
+they are diagnostic: single-equation calibration of the credit
+channels is empirically closed, and a four-equation FIML build is the
+route to sharpen them.
 
 ### 11.4 The back-extension: sample length is not the binding constraint
 
@@ -4380,23 +5111,25 @@ window (spec46_extended_comparison.csv):
 
 | Structural coefficient | 1988+ baseline | 1976+ extended | Williams (2010) |
 |---|---:|---:|---:|
-| λ | −0.140 | −0.193 | −0.286 |
-| NLA (γ_NLA) | +0.035 | −0.002 | +0.159 |
-| IFA equities (γ_EQ) | −0.119 | −0.104 | — |
-| IFA super (γ_super) | +0.040 | +0.024 | — |
-| IFA combined (γ_IFA) | −0.079 | −0.080 | +0.022 |
-| housing (γ_HA) | +0.068 | +0.040 | +0.049 |
+| λ | −0.182 | −0.203 | −0.286 |
+| NLA (γ_NLA) | +0.025 | +0.001 | +0.159 |
+| IFA equities (γ_EQ) | −0.043 | −0.041 | — |
+| IFA super (γ_super) | +0.014 | −0.005 | — |
+| IFA combined (γ_IFA) | −0.030 | −0.046 | +0.022 |
+| housing (γ_HA) | +0.019 | +0.018 | +0.049 |
 
 The Williams (2010) reference values are his housing wealth m.p.c.
 (0.0488 at the CCI peak), net-liquid m.p.c. (0.159) and calibrated
 illiquid-financial m.p.c. (0.022, not split between equities and
 superannuation); the back-extension figures are the Spec 4
-disaggregated structural coefficients (australia_williams_comparison.csv;
-spec46_extended_comparison.csv). The speed of adjustment improves by
-37 per cent (−0.140 → −0.193, still short of −0.286), but the
-individual wealth coefficients shrink rather than converging on
-Williams' values: the net-liquid m.p.c. collapses toward zero, the
-equities coefficient retains a wrong sign, and housing falls. Sample
+disaggregated structural coefficients
+(spec46_extended_comparison.csv). The speed of adjustment improves by
+about 12 per cent (−0.182 → −0.203, still 29 per cent short of
+−0.286; the aggregate Spec 1 moves similarly, −0.193 → −0.209,
+spec1_extended_comparison.csv), but the individual wealth
+coefficients shrink rather than converging on Williams' values: the
+net-liquid m.p.c. collapses by 95 per cent toward zero, the equities
+coefficient retains a wrong sign, and superannuation flips sign. Sample
 length is therefore not, in itself, what generates the divergence; the
 diagnosis remains the single-equation
 framing and the collinearity of the credit channels. The
@@ -4412,52 +5145,72 @@ estimated single-equation framework permits diagnostics that imposed
 restrictions would hide. Each points to why FIML and back-extension
 are the natural next steps rather than further single-equation tuning.
 
-- **Credit-conditions placebo.** The deployed index sits in the
-  18th–34th adjusted-R² percentile band across placebo variants
-  (australia_williams_knot_placebo_verdict.csv; extended and maximal
-  summaries) — no better than random knot placement on the relevant
-  samples.
+- **Credit-conditions placebo: split verdict.** The literal Williams
+  four-knot construction sits at the placebo median (45th adjusted-R²
+  percentile) and below it on the extended variants (36th–48th;
+  sectional 37th), sustaining the detrending critique; the deployed
+  maximal-GETS protocol beats 84 per cent of random draws — moderate
+  support, not strong identification
+  (australia_williams_knot_placebo_verdict.csv;
+  australia_williams_knot_placebo_deployed_verdict.csv).
 - **No system-efficiency gain.** A two-equation SUR of consumption
   and house prices yields negligible cross-equation residual
-  correlation, and the SUR coefficient estimates are within sampling
-  noise of single-equation OLS (australia_joint_pi_robustness.csv):
-  joint estimation buys no efficiency at the quarterly frequency in
-  this sample.
-- **Out-of-sample loss to a random walk.** At horizons h = 4 and
-  h = 8 the random walk with drift beats every structural
-  specification (australia_oos_rmse.csv); only one specification
-  narrowly beats it at h = 1. The framework's value is structural
-  interpretation, not point forecasting.
-- **Selector divergence.** No single criterion selects the same
-  specification: the automated screen returns a net-worth form
-  (Spec 2), BIC favours the free-interaction Spec 8, and LIVES theory
-  favours Spec 11 (australia_spec_selection.csv). We retain Spec 11 as
-  the narrative-preferred headline on theoretical-form grounds and
-  report the divergence as a documented limitation. No single-equation
-  form clears the Engle–Granger cointegration screen at the correct
-  MacKinnon critical values (australia_cointegration.csv).
+  correlation (ρ̂ = −0.0133 against −0.0109 OLS;
+  LIVES/outputs/lives_sur_2eq_resid_corr.csv), and the SUR coefficient
+  estimates are within sampling noise of single-equation OLS
+  (australia_joint_pi_robustness.csv): joint estimation buys no
+  efficiency at the quarterly frequency in this sample.
+- **Out-of-sample: a one-quarter win, multi-step losses.** At h = 1
+  Spec 8 (RMSE 0.0290) and Spec 11 (0.0292) beat the random walk with
+  drift (0.0309), but at h = 4 and h = 8 the random walk beats every
+  structural specification, and Spec 11 is the worst performer at
+  h = 8 (0.0640) (australia_oos_rmse.csv). The exercise uses
+  full-sample permanent-income and CCI inputs, so it measures fit
+  stability under re-estimation, not real-time forecast accuracy
+  (§8.13). The framework's value is structural interpretation, not
+  point forecasting.
+- **Selector divergence, now narrower.** The automated screen falls
+  back to a most-passes rule (no specification clears the
+  Engle–Granger cointegration screen at the correct MacKinnon
+  critical values; australia_cointegration.csv) and returns the
+  net-worth Spec 3, while BIC and LIVES theory now *agree* on Spec 11
+  (BIC −954.8; australia_spec_selection.csv). We headline Spec 11 on
+  joint BIC-and-theory grounds and report the rubric fallback's
+  divergence — and the universal cointegration failure — as documented
+  limitations.
 - **Look-ahead permanent income.** The headline permanent-income
-  result uses the full-sample (non-causal) Italy local-projection
-  forecaster. Under a causal real-time construction the speed of
-  adjustment shrinks sharply and the permanent-income coefficient
-  shrinks or flips (australia_pi_realtime_robustness.csv): the
+  result uses the full-sample (non-causal) Italian direct forecaster.
+  Under a causal real-time construction the speed of adjustment
+  shrinks but survives (λ = −0.159, t = −2.39, against −0.239
+  full-sample) while the permanent-income coefficient flips sign
+  (+0.325 → −0.145; australia_pi_realtime_robustness.csv): the
   positive permanent-income loading is reported as a property of the
   full-sample measure, not a real-time resolution of the Australian
   permanent-income puzzle.
+- **The ψ admissibility bound is breached.** The freely estimated
+  structural gearing ψ̂ = 1.02–1.13 exceeds the theoretical ψ ≤ 0.95
+  bound, and the breach is not an artefact of the GFC ogive
+  (australia_spec11_ogive_robustness.csv). We disclose it as an open
+  puzzle (§7.0) rather than re-scaling it away.
 
 ### 11.6 MARTIN nesting and the wealth elasticity
 
 Nesting the long run against the RBA's MARTIN consumption block, the
 unrestricted net-wealth elasticity is 0.1155, against MARTIN's
 calibrated 0.17 (australia_martin_nesting.csv). Long-run homogeneity
-of the combined income-and-wealth term is rejected (χ² = 16.41,
-p = 0.0001), and the wealth elasticity is not robustly identified:
-imposing homogeneity drives the restricted net-wealth elasticity to
-−0.083, so the estimate is too sensitive to the restriction to
-discipline MARTIN's calibration. The appropriate reading is qualitative: the
-LIVES structure can inform MARTIN's functional form, but the
-single-equation point estimates are not precise enough to recalibrate
-its parameters.
+of the combined income-and-wealth term is rejected (χ²(1) = 16.41,
+p = 0.0001) — though the test sits inside a static levels regression
+that does not cointegrate (EG ADF −2.38 against a −4.10 critical
+value), so the rejection is indicative rather than decisive — and the
+wealth elasticity is not robustly identified: imposing homogeneity
+drives the restricted net-wealth elasticity to −0.083, so the
+estimate is too sensitive to the restriction to discipline MARTIN's
+calibration. The appropriate reading is qualitative: the
+LIVES structure can inform MARTIN's functional form, and Spec 11's
+aggregate-wealth structural MPC of 0.100 [0.036, 0.164] corroborates
+a positive wealth channel of the right order, but the single-equation
+point estimates are not precise enough — nor on the right scale — to
+recalibrate MARTIN's parameters.
 
 ### 11.7 Contributions
 
@@ -4468,26 +5221,35 @@ consumption literature.
    form correction as the lead methodological result.** Entering
    housing only through its credit-conditions interaction, restoring
    the autonomous-consumption CCI intercept, and combining illiquid
-   financial assets recovers a Williams-consistent error-correction
-   speed (pre-COVID λ = −0.245 ≈ Williams' −0.286) and right-signed
-   wealth structure (NLA +0.037***, IFA +0.018***), where the
-   conventional constant-MPC ECM does not. Reading the conventional
-   form's insignificant standalone housing coefficient as a failed
-   wealth effect is shown to be a category error.
+   financial assets recovers a Williams-consistent, COVID-robust
+   error-correction speed (λ ≈ −0.25 across the COVID-controlled
+   treatments, about 13 per cent below Williams' −0.286) and
+   right-signed wealth structure (NLA +0.027***, IFA +0.015***),
+   where the conventional constant-MPC ECM is weaker and
+   sample-fragile. Reading the conventional form's insignificant
+   standalone housing coefficient as a failed wealth effect is shown
+   to be a category error. The structural intervals are tight enough
+   to grade the transfer: the IFA m.p.c. matches Williams' 0.022, the
+   NLA m.p.c. is genuinely smaller than his 0.159, and the housing
+   channel is unproven.
 
 2. **The structure-transfers-but-calibrations-don't finding.**
    Imposing Williams' permanent-income gearing collapses the
-   equilibrium (Spec 12: λ = −0.029; independently reproduced by
-   Spec 10: λ = −0.048), because Australia freely estimates a higher
-   permanent-income loading; this reconciles the companion paper's
-   low-power Wald non-rejection as consistency, not confirmation.
+   equilibrium (Spec 12: λ = −0.029, flipping sign pre-COVID;
+   independently reproduced by Spec 10: λ = −0.057), because
+   Australia freely estimates a structural gearing of order one —
+   roughly five times Williams' 0.20; this reconciles the companion
+   low-power Wald non-rejection (χ²(6) = 7.55, p = 0.27) as
+   imprecision, not good fit.
 
-3. **The interaction-collinearity diagnosis.** The six CCI-interacted
-   regressors are 0.74–0.97 mutually collinear, explaining why the
-   credit channels cannot be separately identified off a single
-   equation and why Williams' identification requires four-equation
-   FIML — corroborated by the Spec 8 reallocation, the calibration
-   collapse, and the placebo battery.
+3. **The interaction-collinearity diagnosis.** The CCI-interacted
+   regressors are 0.66–0.97 mutually collinear in absolute value
+   (australia_cci_interaction_corr.csv), and the deployed index has no
+   variation before 2007Q3, explaining why the credit channels cannot
+   be separately identified off a single equation and why Williams'
+   identification requires four-equation FIML — corroborated by the
+   Spec 8 reallocation, the calibration collapse, and the placebo
+   battery.
 
 4. **A back-extended Australian master dataset to 1976Q3**
    (n = 190–194 quarters) with documented growth-rate splices for
@@ -4496,9 +5258,10 @@ consumption literature.
    showing that sample length is not the binding constraint.
 
 5. **A structured robustness and placebo suite with honest negative
-   results** — the credit-conditions placebo failure, the negligible
-   SUR efficiency gain, the out-of-sample loss to a random walk, the
-   selector divergence, and the look-ahead permanent-income caveat —
+   results** — the split credit-conditions placebo verdict, the
+   negligible SUR efficiency gain, the out-of-sample losses beyond one
+   quarter, the universal cointegration-screen failure, the
+   ψ-bound breach, and the look-ahead permanent-income caveat —
    reported as substantive findings, alongside a multi-equation
    scaffold (data preparation, house-price and mortgage-stock
    equations, joint CCI identification, SURs) on which a companion
@@ -4506,7 +5269,8 @@ consumption literature.
 
 ### 11.8 Outstanding work
 
-Two routes follow directly from the diagnosis above.
+Two structural routes follow directly from the diagnosis above, and
+four narrower investigations sit alongside them.
 
 1. **A multi-equation companion paper.** A full LIVES build with FIML
    and cross-equation parameter restrictions — consumption, house
@@ -4517,24 +5281,40 @@ Two routes follow directly from the diagnosis above.
    channels. Custom likelihood code and a sourced HEW series remain
    the binding obstacles.
 
-2. **Pre-1988 extension of the credit channels.** Because the
-   financial-liberalisation episode that identifies the
-   credit-conditions index largely predates the 1988Q3 start of ABS
-   sectoral balance-sheet data, extending the disaggregated
-   credit-interaction regressors back into the deregulation window —
-   building on the 1976Q3 back-extension — would, in combination with
-   FIML, give the credit channels the variation they need.
+2. **Pre-1988 extension of the credit channels, and richer credit
+   data.** Because the financial-liberalisation episode that
+   identifies the credit-conditions index largely predates the 1988Q3
+   start of ABS sectoral balance-sheet data, extending the
+   disaggregated credit-interaction regressors back into the
+   deregulation window — building on the 1976Q3 back-extension — and
+   bringing in richer direct credit-conditions data (lending
+   standards, securitisation, loan-level series) would, in
+   combination with FIML, give the credit channels the variation they
+   need.
+
+Narrower items: (i) **the ψ-bound breach** — investigating why the
+structural permanent-income gearing estimates at 1.02–1.13 against an
+admissibility bound of 0.95, including the role of the unit-income
+restriction and the measure's non-causal tail; (ii) **a
+lagged-wealth-timing variant**, entering the wealth ratios at t−1 to
+test whether within-quarter timing inflates the wealth and ECM
+loadings; (iii) **a real home-equity-withdrawal series**, which both
+completes the four-equation system and supplies a direct observable
+for the collateral channel; and (iv) **the FIML estimator itself**,
+whose cross-equation restrictions are the identification technology
+everything above points to.
 
 The single-equation framework cannot, on its own, deliver
 identification of the credit channels that Williams (2010) obtains
 from joint estimation under parameter restrictions. What it can do —
 and what this paper establishes — is that the faithful LIVES *form*
 recovers his error-correction and wealth structure where the
-conventional constant-MPC ECM cannot, that his Australian
-*calibrations* do not transfer, and that the credit interactions are
-collinear and weakly identified off a single equation. Reported
-honestly, these results point unambiguously to the multi-equation,
-back-extended programme as the way forward.
+conventional constant-MPC ECM is weak, that the recovery survives
+every COVID treatment, that his Australian *calibrations* do not
+transfer, and that the credit interactions are collinear and weakly
+identified off a single equation. Reported honestly, these results
+point unambiguously to the multi-equation, back-extended programme as
+the way forward.
 
 
 ## References
@@ -4649,10 +5429,10 @@ back-extended programme as the way forward.
 ## Appendix A: Data construction
 
 A full data-construction appendix — series sources, splice conventions,
-deflation, the asset/annualised-income ratio transform ($x_{t-1}/4y$), the
+deflation, the asset/annualised-income ratio transform, the
 disaggregated wealth definitions and the 1976Q3 back-extension — is
 reproduced from the accompanying
-[data documentation](../data.md). It retains the detail of §§3.1–3.13 of
+[data documentation](data.md). It retains the detail of §§3.1–3.13 of
 the main paper, together with the master variable coverage table.
 
 The three load-bearing constructions for the faithful LIVES specification
@@ -4660,8 +5440,11 @@ The three load-bearing constructions for the faithful LIVES specification
 the reader's convenience; the full provenance is in the data appendix.
 
 **A.1 Disaggregated wealth (ratios to annualised income).** All wealth
-terms enter as the prior-quarter stock divided by annualised disposable
-income, $x_{t-1}/4y$:
+terms enter as the current quarter's end-of-quarter (closing) stock
+divided by annualised disposable income, $x_t/4y$ — *contemporaneous*
+timing, not the $x_{t-1}/4y$ dating of Williams' bracket; the
+implications for predeterminedness are disclosed in §3.2 and §4.6, with
+the IV check in §8.1:
 
 - **HA** — housing assets (ABS Balance Sheet 5232035). Enters the faithful
   LIVES form *only* through the credit interaction `ha_x_cci`
@@ -4679,24 +5462,36 @@ income, $x_{t-1}/4y$:
 
 **A.2 Permanent income.** The permanent-income term $\log(y^p/y)$ is a
 discounted ($\eta=0.05$, $k=40$ quarters) weighted average of *expected*
-future income from the Italy-style Jordà (2005) local-projection
-forecaster. The headline measure uses the full-sample (in-sample, hence
-look-ahead) forecaster; the real-time variant is reported as an
-operational robustness column (§7.4; `australia_pi_realtime_robustness.csv`).
-This look-ahead-versus-real-time distinction is flagged wherever a headline
-number depends on the non-causal measure.
+future income from the Italy-style direct (single-regression) forecast
+of the discounted future-income aggregate (De Bonis et al. 2020,
+Appendix A.2). The headline measure uses the full-sample (in-sample,
+hence look-ahead) forecaster, whose training sample necessarily ends at
+2014Q4 (the last quarter with a fully realised 40-quarter horizon), so
+the final forty quarters — about 27 per cent of the estimation sample —
+are out-of-training extrapolations; the series also carries a GFC
+learning ogive that halves it from 2012Q2 onwards (no-ogive robustness:
+`australia_spec11_ogive_robustness.csv`). The real-time variant is
+reported as an operational robustness column (§7.4;
+`australia_pi_realtime_robustness.csv`). This look-ahead-versus-real-time
+distinction is flagged wherever a headline number depends on the
+non-causal measure.
 
 **A.3 The 1976Q3 back-extension.** Sectoral balance-sheet data from the ABS
 begin in 1988Q3, which is why the financial-liberalisation episode that
 identifies the credit channels largely *predates* the estimation sample.
 A back-extended master dataset to 1976Q3 splices in TRYM house prices,
 RBA D03 M3 and RBA D02 credit aggregates, historical labour-force series
-and wealth proxies anchored to 1988Q3 levels. This dataset supports the
-long-history specification (Spec 6b) and the direct sample-length test
-(§8): back-extending Spec 4 moves $\lambda$ about 37 per cent closer to
-Williams' value (from $-0.140$ to $-0.193$) but individual wealth
-coefficients shrink and the NLA term collapses — sample length is not the
-binding constraint on identifying the credit channels.
+and wealth proxies anchored to 1988Q3 levels. One caveat: the RBA D03
+M3 series carries a +14.25 log per cent definitional break at
+August 1976, inside the opening spine quarters, which makes 1976Q4 a
+roughly 4.8σ growth outlier in every M3-based proxy (§3.10.1). The
+back-extended dataset supports the long-history specification (Spec 6b)
+and the direct sample-length test (§8): back-extending Spec 4 moves
+$\lambda$ about a fifth of the way towards Williams' value (from
+$-0.182$ to $-0.203$, against $-0.286$;
+`spec46_extended_comparison.csv`) but individual wealth coefficients
+shrink and the NLA term collapses — sample length is not the binding
+constraint on identifying the credit channels.
 
 ---
 
@@ -4707,173 +5502,210 @@ standard errors, $t$-statistics, $p$-values, the implied error-correction
 speed $\lambda$ (the `ecm_lag` coefficient) and the implied structural
 parameter ($\gamma = \mathrm{OLS}/|\lambda|$), are reproduced in machine
 form from the committed results files. The current draft regenerates these
-tables from a single consolidated source,
-[australia_all_results.csv](../../outputs/australia_all_results.csv) (with
-the matched diagnostics in
-[australia_all_diagnostics.csv](../../outputs/australia_all_diagnostics.csv)),
-which now spans all fourteen specifications — Spec 1 through Spec 12, plus
+tables from the committed per-window results files,
+[australia_full_results.csv](../outputs/australia_full_results.csv) and
+[australia_precovid_results.csv](../outputs/australia_precovid_results.csv)
+(consolidated in
+[australia_all_results.csv](../outputs/australia_all_results.csv), with the
+matched diagnostics in
+[australia_full_diagnostics.csv](../outputs/australia_full_diagnostics.csv)
+and
+[australia_precovid_diagnostics.csv](../outputs/australia_precovid_diagnostics.csv)
+and the four-sample λ vector in
+[australia_lambda_robustness.csv](../outputs/australia_lambda_robustness.csv)),
+which span all fourteen specifications — Spec 1 through Spec 12, plus
 the long-history Spec 6b and the RBA-burden Spec 7b — for both the full
 ($n=146$; 1988Q3–2024Q4) and pre-COVID ($n=126$; 1988Q3–2019Q4) windows.
-In particular it includes the faithful LIVES headline (Spec 11) and the
+In particular they include the faithful LIVES headline (Spec 11) and the
 Williams-calibration-imposed specification (Spec 12), which were absent
-from the earlier draft's tables. The older
-[australia_full_results.csv](../../outputs/australia_full_results.csv) and
-[australia_precovid_results.csv](../../outputs/australia_precovid_results.csv)
-files remain in the repository for the legacy spec set; the consolidated
-file supersedes them for the present draft.
+from the earlier draft's tables.
 
 Rather than retype the full coefficient matrix, Table B.1 reports the two
 specifications that carry the paper's central message — the faithful LIVES
 headline (Spec 11) and the Williams-calibration-imposed specification
 (Spec 12) — across both samples. The remaining specifications are tabulated
-in §6 (the specification ladder) and §7 (results), and in full in Tables B.2–B.3 below and the
+in §6 (the specification ladder) and §7 (results), and in full in Tables B.2–B.4 below and the
 committed CSVs.
 
 **Table B.1 — Faithful LIVES (Spec 11) vs Williams-calibration-imposed
 (Spec 12): selected coefficients (Newey–West HAC).** Source:
-`australia_all_results.csv`, `australia_all_diagnostics.csv`. Convention:
-$\lambda=$ `ecm_lag` (negative = error-correction); structural
+`australia_full_results.csv`, `australia_precovid_results.csv`,
+`australia_full_diagnostics.csv`, `australia_precovid_diagnostics.csv`.
+Convention: $\lambda=$ `ecm_lag` (negative = error-correction); structural
 $\gamma=\mathrm{OLS}/|\lambda|$. *** sig 1%, ** sig 5%, * sig 10%.
 
 | Term | Spec 11 full ($n=146$) | Spec 11 pre-COVID ($n=126$) | Spec 12 full ($n=146$) | Spec 12 pre-COVID ($n=126$) |
 |---|---|---|---|---|
-| $\lambda$ (`ecm_lag`) | −0.480 (t=−3.59)*** | −0.245 (t=−4.80)*** | −0.029 (t=−0.68) | +0.030 (t=1.49, sign flip) |
-| `nla_y` | +0.0370 (t=3.40)*** | +0.0084 (t=0.60) | −0.0014 (t=−0.49, wrong sign) | +0.0024 |
-| `ilfa_y` (=eq+super) | +0.0178 (t=3.03)*** | +0.0090 (t=1.40) | imposed (γ=0.022) | imposed (γ=0.022) |
-| `ha_x_cci` ($\gamma_1$) | +0.0049 (t=1.03) | +0.0008 (t=0.22) | −0.0011 (t=−0.71) | +0.0012 |
-| `hp_x_1_minus_cci` | +0.0142 (t=2.69)*** | −0.0020 (t=−0.29) | — | — |
-| `r_x_cci` | +0.0027 (t=3.57)*** | +0.0020 (t=2.78)*** | — | — |
-| `cci_williams` ($\zeta_c$) | +0.0046 (t=0.47) | +0.0127 (t=1.62) | — | — |
-| `ln_yp_over_y` | +0.5043 (t=4.00)*** | +0.2788 (t=4.75)*** | imposed ($\psi_0$=0.20) | imposed ($\psi_0$=0.20) |
-| `yp_x_cci` | −0.5897 (t=−1.58) | +0.1291 (t=1.17) | imposed ($\psi_1$=0.93) | imposed ($\psi_1$=0.93) |
-| Intercept | −0.0152 (t=−2.32)** | −0.0126 (t=−1.77)* | +0.0101 (t=2.25)** | +0.0027 (t=1.21) |
-| adj-$R^2$ | 0.812 | 0.210 | 0.686 | 0.096 |
-| SE (%) | 0.706 | 0.520 | 0.915 | 0.560 |
-| BIC (Schwarz) | −945.05 | −895.34 | −892.52 | −898.66 |
+| $\lambda$ (`ecm_lag`) | −0.448 (t=−3.57)*** | −0.266 (t=−4.85)*** | −0.029 (t=−0.68) | +0.029 (t=1.47, sign flip) |
+| `nla_y` | +0.0269 (t=3.75)*** | +0.0159 (t=1.81)* | −0.0013 (t=−0.46, wrong sign) | +0.0023 (t=1.04) |
+| `ilfa_y` (=eq+super) | +0.0155 (t=3.09)*** | +0.0093 (t=1.74)* | imposed (γ=0.022) | imposed (γ=0.022) |
+| `ha_x_cci` ($\gamma_1$) | +0.0025 (t=0.71) | +0.0019 (t=0.86) | −0.0010 (t=−0.70) | +0.0012 (t=1.03) |
+| `hp_x_1_minus_cci` | +0.0279 (t=3.08)*** | +0.0137 (t=1.10) | — | — |
+| `r_x_cci` | +0.0028 (t=4.55)*** | +0.0022 (t=3.47)*** | — | — |
+| `cci_williams` ($\zeta_c$) | +0.0001 (t=0.01) | +0.0199 (t=2.77)*** | — | — |
+| `ln_yp_over_y` | +0.4591 (t=4.04)*** | +0.2982 (t=5.81)*** | imposed ($\psi_0$=0.20) | imposed ($\psi_0$=0.20) |
+| `yp_x_cci` | −0.5101 (t=−1.51) | +0.1869 (t=1.80)* | imposed ($\psi_1$=0.93) | imposed ($\psi_1$=0.93) |
+| Intercept | −0.0139 (t=−2.13)** | −0.0099 (t=−1.54) | +0.0101 (t=2.25)** | +0.0028 (t=1.23) |
+| adj-$R^2$ | 0.824 | 0.239 | 0.686 | 0.094 |
+| SE (%) | 0.683 | 0.510 | 0.915 | 0.560 |
+| BIC (Schwarz) | −954.75 | −900.15 | −892.34 | −898.94 |
 
-Implied structural MPCs for Spec 11 (full sample, $/|\lambda|=0.480$):
-NLA 0.077, IFA 0.037, housing-collateral $\gamma_1$ 0.010 (right-signed,
-insignificant, $t=1.03$; cf. Williams' calibrated housing MPC 0.0488). The
-pre-COVID $\lambda=-0.245$ ($t=-4.80$) is treated as the identified speed
-of adjustment — close to Williams' $-0.286$ — because the full-sample
+Implied structural MPCs for Spec 11 (full sample, $/|\lambda|=0.448$):
+NLA 0.060, IFA 0.035, housing-collateral $\gamma_1$ 0.0055 (right-signed,
+insignificant, $t=0.71$; cf. Williams' calibrated housing MPC 0.0488). The
+COVID-controlled cluster $\lambda\approx-0.25$ (pre-COVID $-0.266$,
+$t=-4.85$; Table B.4) is treated as the identified speed of adjustment —
+about 13 per cent below Williams' $-0.286$ — because the full-sample
 value is inflated by the COVID quarters and fails the $|\lambda|$
 upper-bound screen. The headline numbers depend on the full-sample
 (look-ahead) permanent-income measure; see §7.4 and the real-time
 robustness column.
 
-**Table B.2 — Speed of adjustment $\lambda$ (the `ecm_lag` coefficient) across all fourteen specifications, full and pre-COVID samples (Newey–West HAC).** Source: `australia_all_results.csv`. *** sig 1%, ** sig 5%, * sig 10%.
+**Table B.2 — Speed of adjustment $\lambda$ (the `ecm_lag` coefficient) across all fourteen specifications, full and pre-COVID samples (Newey–West HAC).** Source: `australia_full_results.csv`, `australia_precovid_results.csv` (point estimates also in `australia_lambda_robustness.csv`). *** sig 1%, ** sig 5%, * sig 10%.
 
 | Specification | $\lambda$ full ($n=146$) | $\lambda$ pre-COVID ($n=126$) |
 |---|---|---|
-| Spec 1 | −0.177 (t=−2.34)** | −0.100 (t=−1.71)* |
-| Spec 2 | −0.193 (t=−1.93)* | −0.085 (t=−0.84) |
-| Spec 3 | −0.166 (t=−2.23)** | −0.101 (t=−1.70)* |
-| Spec 4 | −0.140 (t=−2.05)** | −0.107 (t=−1.79)* |
-| Spec 5 | −0.177 (t=−1.56) | −0.097 (t=−1.01) |
-| Spec 6 | −0.180 (t=−1.76)* | −0.123 (t=−1.09) |
-| Spec 6b | −0.229 (t=−4.18)*** | −0.240 (t=−4.75)*** |
-| Spec 7 | −0.373 (t=−2.78)*** | −0.052 (t=−0.40) |
-| Spec 7b | −0.375 (t=−2.40)** | −0.061 (t=−0.94) |
-| Spec 8 | −0.445 (t=−3.30)*** | −0.247 (t=−5.03)*** |
-| Spec 9 | −0.199 (t=−3.30)*** | −0.172 (t=−3.32)*** |
-| Spec 10 | −0.048 (t=−0.76) | −0.027 (t=−0.62) |
-| Spec 11 | −0.480 (t=−3.59)*** | −0.245 (t=−4.80)*** |
-| Spec 12 | −0.029 (t=−0.68) | +0.030 (t=+1.49) |
+| Spec 1 | −0.193 (t=−2.88)*** | −0.161 (t=−3.32)*** |
+| Spec 2 | −0.186 (t=−2.07)** | −0.080 (t=−1.15) |
+| Spec 3 | −0.191 (t=−2.90)*** | −0.158 (t=−3.17)*** |
+| Spec 4 | −0.182 (t=−2.45)** | −0.119 (t=−1.95)* |
+| Spec 5 | −0.235 (t=−2.47)** | −0.061 (t=−0.62) |
+| Spec 6 | −0.239 (t=−2.55)** | −0.087 (t=−0.79) |
+| Spec 6b | −0.248 (t=−3.96)*** | −0.240 (t=−4.61)*** |
+| Spec 7 | −0.341 (t=−2.76)*** | −0.054 (t=−0.43) |
+| Spec 7b | −0.381 (t=−2.43)** | −0.061 (t=−0.93) |
+| Spec 8 | −0.458 (t=−3.52)*** | −0.219 (t=−3.95)*** |
+| Spec 9 | −0.209 (t=−3.24)*** | −0.158 (t=−2.86)*** |
+| Spec 10 | −0.057 (t=−0.87) | −0.019 (t=−0.44) |
+| Spec 11 | −0.448 (t=−3.57)*** | −0.266 (t=−4.85)*** |
+| Spec 12 | −0.029 (t=−0.68) | +0.029 (t=+1.47) |
 
-**Table B.3 — Long-run coefficient matrix for the disaggregated specifications (full sample): OLS estimate ($t$-statistic).** Source: `australia_all_results.csv`. "—" = term not in that specification; the implied structural parameter is $\gamma=\mathrm{OLS}/|\lambda|$ (Table B.2). *** sig 1%, ** sig 5%, * sig 10%.
+(Several specifications estimate on different windows from the nominal
+$n=146$/$n=126$: Specs 2, 5, 6, 7 and 10 on $n=86$ because a
+2002Q3-binding credit term shortens their sample, Spec 7b on $n=64$,
+and Spec 6b on the $n=180$ back-extended sample — see §6.1 and
+`australia_full_diagnostics.csv`.)
+
+**Table B.3 — Long-run coefficient matrix for the disaggregated specifications (full sample): OLS estimate ($t$-statistic).** Source: `australia_full_results.csv`. "—" = term not in that specification; the implied structural parameter is $\gamma=\mathrm{OLS}/|\lambda|$ (Table B.2). *** sig 1%, ** sig 5%, * sig 10%.
 
 | Term | Spec 4 | Spec 5 | Spec 6 | Spec 8 | Spec 11 |
 |---|---|---|---|---|---|
-| `nla_y` | +0.0049 (+0.52) | +0.0084 (+0.22) | +0.0354 (+0.96) | +0.0435 (+3.74)*** | +0.0370 (+3.39)*** |
-| `eq_y` | −0.0168 (−1.10) | −0.0268 (−0.51) | −0.0063 (−0.13) | +0.0097 (+0.69) | — |
-| `super_y` | +0.0057 (+0.85) | +0.0045 (+0.48) | +0.0117 (+1.48) | +0.0139 (+2.15)** | — |
-| `ilfa_y` | — | — | — | — | +0.0178 (+3.03)*** |
-| `ha_y` | +0.0095 (+2.46)** | +0.0067 (+1.18) | +0.0088 (+1.52) | +0.0097 (+2.49)** | — |
-| `ha_x_cci` | — | — | — | +0.0016 (+0.32) | +0.0049 (+1.03) |
-| `ln_hp_over_y` | −0.0101 (−1.40) | −0.0024 (−0.11) | −0.0170 (−0.85) | — | — |
-| `hp_x_1_minus_cci` | — | — | — | +0.0076 (+1.00) | +0.0142 (+2.69)*** |
-| `real_rate` | −0.0004 (−0.62) | −0.0009 (−0.67) | −0.0002 (−0.17) | — | — |
-| `r_x_cci` | — | — | — | +0.0019 (+1.85)* | +0.0027 (+3.57)*** |
-| `cci_williams` | — | — | — | — | +0.0046 (+0.47) |
-| `ln_yp_over_y` | +0.1509 (+1.71)* | +0.2484 (+0.80) | +0.1999 (+0.76) | +0.4677 (+3.44)*** | +0.5043 (+4.00)*** |
-| `ln_yp_over_y_post2008` | — | — | +0.2360 (+1.16) | — | — |
-| `yp_x_cci` | — | — | — | −0.6113 (−2.12)** | −0.5897 (−1.58) |
-| `ecm_lag` | −0.1404 (−2.05)** | −0.1770 (−1.56) | −0.1801 (−1.76)* | −0.4449 (−3.30)*** | −0.4801 (−3.59)*** |
+| `nla_y` | +0.0045 (+0.39) | −0.0141 (−0.43) | +0.0083 (+0.24) | +0.0337 (+4.39)*** | +0.0269 (+3.75)*** |
+| `eq_y` | −0.0079 (−0.41) | −0.0295 (−0.57) | −0.0156 (−0.30) | −0.0014 (−0.11) | — |
+| `super_y` | +0.0025 (+0.36) | +0.0040 (+0.37) | +0.0060 (+0.66) | +0.0215 (+2.42)** | — |
+| `ilfa_y` | — | — | — | — | +0.0155 (+3.09)*** |
+| `ha_y` | +0.0035 (+0.53) | −0.0028 (−0.30) | +0.0022 (+0.30) | +0.0030 (+0.48) | — |
+| `ha_x_cci` | — | — | — | +0.0043 (+0.87) | +0.0025 (+0.71) |
+| `ln_hp_over_y` | +0.0038 (+0.13) | +0.0447 (+0.83) | +0.0102 (+0.23) | — | — |
+| `hp_x_1_minus_cci` | — | — | — | +0.0299 (+1.38) | +0.0279 (+3.08)*** |
+| `real_rate` | −0.0002 (−0.33) | −0.0014 (−0.87) | −0.0005 (−0.46) | — | — |
+| `r_x_cci` | — | — | — | +0.0028 (+2.05)** | +0.0028 (+4.55)*** |
+| `cci_williams` | — | — | — | — | +0.0001 (+0.01) |
+| `ln_yp_over_y` | +0.2026 (+1.94)* | +0.3316 (+1.43) | +0.3253 (+1.50) | +0.4921 (+3.42)*** | +0.4591 (+4.04)*** |
+| `ln_yp_over_y_post2008` | — | — | +0.1704 (+0.87) | — | — |
+| `yp_x_cci` | — | — | — | −0.5046 (−2.43)** | −0.5101 (−1.51) |
+| `ecm_lag` | −0.1824 (−2.45)** | −0.2353 (−2.47)** | −0.2386 (−2.55)** | −0.4583 (−3.52)*** | −0.4483 (−3.57)*** |
 
+**Table B.4 — Spec 11 across the four sample treatments: the COVID-controlled headline.** Source: `australia_spec11_variants.csv` (Newey–West HAC $t$-statistics in parentheses).
 
-The contrast between the two columns is the structure-transfers-but-
-calibrations-do-not result: imposing Williams' Australian calibrations
+| Variant | n | $\lambda$ | `nla_y` | `ilfa_y` | `ha_x_cci` | `ln_yp_over_y` |
+|---|---:|---:|---:|---:|---:|---:|
+| Full sample | 146 | −0.448 (−3.57) | +0.0269 (3.75) | +0.0155 (3.09) | +0.0025 (0.71) | +0.459 (4.04) |
+| Pre-COVID (to 2019Q4) | 126 | −0.266 (−4.85) | +0.0159 (1.81) | +0.0093 (1.74) | +0.0019 (0.86) | +0.298 (5.81) |
+| COVID quarters dropped | 138 | −0.248 (−6.66) | +0.0170 (2.11) | +0.0098 (2.00) | +0.0023 (1.05) | +0.281 (8.68) |
+| Quarterly COVID dummies | 146 | −0.242 (−6.25) | +0.0141 (3.10) | +0.0084 (3.28) | +0.0016 (0.83) | +0.278 (8.18) |
+
+The contrast between the Spec 11 and Spec 12 columns of Table B.1 is
+the structure-transfers-but-calibrations-do-not result: imposing
+Williams' Australian calibrations
 ($\psi_0=0.20$, $\psi_1=0.93$, $\gamma_{\mathrm{IFA}}=0.022$) via the
-iterative fixed point collapses the error-correction speed from $-0.480$
+iterative fixed point collapses the error-correction speed from $-0.448$
 to a statistically insignificant $-0.029$, and flips it to the wrong sign
-($+0.030$) pre-COVID. Spec 10 (Williams-prior calibrated;
-`australia_all_results.csv`) independently reproduces the collapse
-($\lambda=-0.048$, $t=-0.76$). This is a low-power-is-not-good-fit reading
-of the structural-parameter inference (`australia_gamma_inference.csv`),
-whose wide confidence intervals contain both Williams' values *and* zero:
-the free estimates are too imprecise to reject Williams' calibrations, but
-imposing them wrecks the fit.
+($+0.029$) pre-COVID. Spec 10 (Williams-prior calibrated;
+`australia_full_results.csv`) independently reproduces the collapse
+($\lambda=-0.057$, $t=-0.87$).
 
 The structural-parameter inference (the implied $\gamma=\mathrm{OLS}/|\lambda|$
-with bootstrap confidence intervals) is in
-[australia_gamma_inference.csv](../../outputs/australia_gamma_inference.csv);
-every Williams value lies inside the (wide) 95 per cent interval, and so
-does zero — consistency, not confirmation.
+with delta-method and bootstrap confidence intervals, for both Spec 6 and
+Spec 11) is in
+[australia_gamma_inference.csv](../outputs/australia_gamma_inference.csv).
+In the Spec 6 frame every Williams wealth value lies inside the (wide)
+95 per cent interval, and so does zero — consistency by imprecision,
+the low-power reading of the companion Wald non-rejection
+($\chi^2(6)=7.55$, $p=0.27$). In the Spec 11 frame the inference cuts
+both ways: the intervals exclude Williams' net-liquid m.p.c. (0.159)
+and peak housing m.p.c. (0.0488) while including his
+illiquid-financial m.p.c. (0.022); see §9.4.
 
 ---
 
 ## Appendix C: Diagnostic battery
 
 The full diagnostic output is reproduced from
-[australia_all_diagnostics.csv](../../outputs/australia_all_diagnostics.csv)
-(consolidated; supersedes the legacy
-[australia_full_diagnostics.csv](../../outputs/australia_full_diagnostics.csv)
+[australia_full_diagnostics.csv](../outputs/australia_full_diagnostics.csv)
 and
-[australia_precovid_diagnostics.csv](../../outputs/australia_precovid_diagnostics.csv)).
-For each specification and sample it reports the number of observations,
+[australia_precovid_diagnostics.csv](../outputs/australia_precovid_diagnostics.csv)
+(consolidated in
+[australia_all_diagnostics.csv](../outputs/australia_all_diagnostics.csv)).
+For each specification and sample these report the number of observations,
 the residual standard error (per cent), adjusted $R^2$, Durbin–Watson,
 Breusch–Godfrey serial-correlation tests at lags 1 and 4, the
-heteroscedasticity test in two forms (full and events-excluded), the RESET
-functional-form test, the Schwarz/BIC and the log-likelihood.
+heteroscedasticity test in two forms (full and events-excluded), the
+Chow break test together with a `chow_method` column recording which
+test variant produced it (`sctest` where the standard implementation is
+estimable, `manual_common_coef` where the sub-sample design matrices are
+rank-deficient and a common-coefficient F-test is substituted, NA where
+neither applies), the RESET functional-form test, the Schwarz/BIC and
+the log-likelihood.
 
 **C.1 Heteroscedasticity is structural, not event-driven.** Every
 full-sample specification flags `het_diagnosis = "structural"`: the
 heteroscedasticity test rejects homoscedasticity even after the COVID, GFC
 and policy-event dummies are excluded (for Spec 11 the full-sample
-heteroscedasticity $p\approx 7.8\times10^{-9}$ and the events-excluded
-$p\approx 9.3\times10^{-10}$). This is why Newey–West HAC standard errors
+heteroscedasticity $p\approx 1.7\times10^{-8}$ and the events-excluded
+$p\approx 2.0\times10^{-9}$). This is why Newey–West HAC standard errors
 are used for every reported $t$-statistic throughout the paper. The
 pre-COVID Spec 11 residuals are, by contrast, well behaved (heteroscedasticity
-$p=0.47$; no serial correlation, $\mathrm{AR}(1)\ p=0.37$,
-$\mathrm{AR}(4)\ p=0.39$; RESET $p=0.54$).
+$p=0.52$; no serial correlation, $\mathrm{AR}(1)\ p=0.32$,
+$\mathrm{AR}(4)\ p=0.47$; RESET $p=0.75$).
 
 **C.2 The multi-break Chow battery** is reported in
-[australia_chow_battery.csv](../../outputs/australia_chow_battery.csv) and
-the structural-break tests in
-[australia_breaks.csv](../../outputs/australia_breaks.csv). The 2008Q3
-break is not rejected (Chow $p=0.27$, stable); the 2020Q1 break is strongly
-rejected (Chow $p\approx 9.9\times10^{-10}$ — the COVID break). The
-Bai–Perron supF statistic (164.20, $p=0$) and the recursive-residual CUSUM
-($p=0.9963$, stable) together locate a single break at the COVID episode
-(2020Q4). This break, and not a deeper instability, is what inflates the
-full-sample $\lambda$ relative to the pre-COVID value.
+[australia_chow_battery.csv](../outputs/australia_chow_battery.csv) and
+[australia_chow_battery_spec11.csv](../outputs/australia_chow_battery_spec11.csv),
+with the structural-break tests in
+[australia_breaks.csv](../outputs/australia_breaks.csv). On the
+selector-preferred Spec 3, the 1995Q1, 2000Q1 and 2008Q3 breaks are not
+rejected (Chow $p=0.98$, $0.73$ and $0.91$) while the 2020Q1 break is
+strongly rejected ($p\approx 8.9\times10^{-16}$ — the COVID break). On
+the faithful Spec 11 the 1995Q1 and 2000Q1 breaks are stable
+($p=0.84$, $0.15$), the 2008Q3 break is rejected at 5 per cent
+($p=0.017$), and the 2020Q1 test is not estimable in its standard form
+(the `sctest failed` note in the CSV). The Bai–Perron supF statistic
+(169.96, $p=0$, breakpoint dated 2019Q1 — the algorithm placing the
+single permitted break just ahead of the COVID collapse) and the
+recursive-residual CUSUM ($p=0.97$, stable) together locate the
+dominant instability at the COVID episode. This break, and not a
+deeper instability, is what inflates the full-sample $\lambda$
+relative to the COVID-controlled value.
 
 **C.3 The net-liquid restriction test**
-([australia_nla_restriction_test.csv](../../outputs/australia_nla_restriction_test.csv))
+([australia_nla_restriction_test.csv](../outputs/australia_nla_restriction_test.csv))
 records `restriction_accepted = TRUE` in all six rows (Specs 4, 5, 6 across
 full and pre-COVID samples): the data cannot distinguish separate liquid-
 asset and debt MPCs, which supports the NLA aggregation used in the
 faithful LIVES form.
 
 **C.4 Cointegration screen**
-([australia_cointegration.csv](../../outputs/australia_cointegration.csv)).
+([australia_cointegration.csv](../outputs/australia_cointegration.csv)).
 The Engle–Granger ADF residual test fails to reject the null of no
 cointegration for *every* estimable specification at the correct MacKinnon
-critical values, while the Johansen rank-1 trace test passes for all. No
-single-equation form clears the Engle–Granger screen; the interaction
-specifications (Spec 8–12) are not run through the cointegration screen
-(`coint` reported NA) because the long-run bracket is a non-linear
-function of CCI.
+critical values (e.g. Spec 11 ADF $-3.13$ against a $-5.47$ critical
+value), while the Johansen rank-1 trace test passes for all estimable
+forms. No single-equation form clears the Engle–Granger screen. Three
+specifications are not run through it (`coint` reported NA): Spec 9,
+whose Kalman-CCI interaction columns are not committed to the static
+regression frame, and Specs 10 and 12, whose calibrated-offset long
+runs make the static EG regression inapplicable.
 
 ---
 
@@ -4907,18 +5739,49 @@ root (`/Users/davidstephan/Documents/consmodelling`):
    Loads `data_raw/master_data.csv`, reconstructs `master`, and runs
    estimation. Useful without internet access, for a frozen
    version-controllable snapshot, or to patch a known data error by hand.
-   (A documented caveat: the CSV and RDS paths can diverge on
-   Chow-borderline selector flags at machine precision; see the data
-   appendix.)
+   The portable CSV has been regenerated alongside the current pipeline
+   run (194 rows × 120 columns, with the earlier vintage's +10 per cent
+   house-price splice step at 2011Q3 eliminated — the boundary now shows
+   a clean −1.78 per cent QoQ log change) and is consistent with the RDS
+   path; an earlier draft's caveat about a stale CSV snapshot no longer
+   applies.
 
 The estimation script writes all fourteen specifications (Spec 1–12, plus
 the long-history Spec 6b and the RBA-burden Spec 7b) to
-[australia_all_results.csv](../../outputs/australia_all_results.csv) and
-[australia_all_diagnostics.csv](../../outputs/australia_all_diagnostics.csv),
-including the faithful LIVES headline (Spec 11) and the
-Williams-calibration-imposed specification (Spec 12); all robustness,
-placebo, counterfactual and comparison outputs cited in the paper are
-written to the matching CSVs in `outputs/`.
+[australia_full_results.csv](../outputs/australia_full_results.csv) /
+[australia_precovid_results.csv](../outputs/australia_precovid_results.csv)
+(consolidated in
+[australia_all_results.csv](../outputs/australia_all_results.csv)) and the
+matching diagnostics files, including the faithful LIVES headline
+(Spec 11) and the Williams-calibration-imposed specification (Spec 12);
+all robustness, placebo, counterfactual and comparison outputs cited in
+the paper are written to the matching CSVs in `outputs/`.
+
+The current pipeline run adds the following committed artefacts, all
+cited in the text: the Spec 11 sample-treatment vector
+(`australia_spec11_variants.csv`) and ogive-robustness run
+(`australia_spec11_ogive_robustness.csv`); the deployed CCI path and
+its interaction-correlation matrix (`australia_cci_williams_series.csv`,
+`australia_cci_interaction_corr.csv`,
+`australia_cci_williams_path.png`); the deployed-protocol knot placebo
+(`australia_williams_knot_placebo_deployed.csv`,
+`australia_williams_knot_placebo_deployed_verdict.csv`); the IV
+diagnostics (`australia_iv_diagnostics.csv`,
+`australia_iv_diagnostics_spec11.csv`) alongside the Spec 11 variants
+of the robustness battery (`australia_iv_robustness_spec11.csv`,
+`australia_chow_battery_spec11.csv`,
+`australia_drehmann_robustness_spec11.csv`,
+`australia_joint_pi_robustness_spec11.csv`,
+`australia_scaled_income_robustness_spec11.csv`,
+`australia_williams_income_robustness_spec11.csv`); the Spec 11
+long-run decomposition (`australia_longrun_contributions_spec11.csv`,
+`australia_longrun_decomposition_spec11.png`); and the two-specification
+structural-gamma inference (`australia_gamma_inference.csv`, Spec 6 and
+Spec 11 rows). The companion LIVES outputs cited here — the joint
+calibration Wald test (`williams_calibration_wald.csv`), the SUR
+residual correlations (`lives_sur_2eq_resid_corr.csv`) and the joint
+knot-survival table (`lives_joint_cci_survival.csv`) — are committed
+under `LIVES/outputs/`.
 
 The environment is pinned with `renv` (R 4.5.3); the dependency manifest is
 in `DESCRIPTION` and the full transitive closure — including the `car` and

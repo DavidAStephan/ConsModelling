@@ -52,32 +52,50 @@ project_root <- normalizePath(file.path(script_dir, ".."), winslash = "/")
 output_dir   <- file.path(project_root, "outputs")
 
 source(file.path(project_root, "R", "model_helpers.R"))
-master <- readRDS(file.path(output_dir, "australia_model_dataset.rds"))
 
-# Build model_data the same way the orchestrator does, then run the
-# pre-Step-1 estimation-script content to get add_model_variables() etc.
-model_data <- master %>%
-  rename(
-    dlcons   = d_ln_cons_pc,
-    lincome  = ln_ydi_real_pc,
-    lcons    = ln_cons_real_pc
-  ) %>%
-  mutate(ecm_lag = lag(lcons, 1L) - lincome)
+# Use pipeline state when sourced from australia_estimation.R MAIN (the
+# orchestrator sources this script into an isolated child environment, so the
+# canonical model_data — including the canonical permanent-income method and
+# the deployed cci_williams — is readable here and assignments stay local).
+# Rebuild from the RDS only when running standalone. A previous version
+# rebuilt unconditionally with the AR permanent-income constructor AND
+# assigned into the caller's environment, clobbering the canonical model_data
+# for every later pipeline step.
+if (exists("model_data") && exists("fit_ecm_spec") &&
+    exists("construct_permanent_income_italy")) {
+  message("[cci_placebo_test] using pipeline model_data (canonical PI method)")
+  model_data <- model_data  # local working copy in this script's environment
+} else {
+  master <- readRDS(file.path(output_dir, "australia_model_dataset.rds"))
 
-src <- readLines(file.path(project_root, "R", "australia_estimation.R"))
-guard_start <- grep("if \\(!exists\\(.model_data.\\)\\)", src)[1L]
-guard_end   <- guard_start + 6L  # block is 7 lines including closing brace
-src_safe <- src[-(guard_start:guard_end)]
-main_start <- grep("\\[Step 1\\]", src_safe)[1L]
-eval(parse(text = paste(src_safe[1:(main_start - 1L)], collapse = "\n")),
-     envir = environment())
+  # Build model_data the same way the orchestrator does, then run the
+  # pre-Step-1 estimation-script content to get add_model_variables() etc.
+  model_data <- master %>%
+    rename(
+      dlcons   = d_ln_cons_pc,
+      lincome  = ln_ydi_real_pc,
+      lcons    = ln_cons_real_pc
+    ) %>%
+    mutate(ecm_lag = lag(lcons, 1L) - lincome)
 
-model_data <- add_model_variables(model_data)
-model_data <- compute_income_volatility(model_data)
-model_data <- construct_permanent_income(model_data)
-model_data <- model_data %>%
-  mutate(ecm_lag = lag(lcons, 1L) - lincome,
-         ln_hp_over_y = log(hpi / exp(lincome) * (cons_deflator_norm / 100)))
+  src <- readLines(file.path(project_root, "R", "australia_estimation.R"))
+  guard_start <- grep("if \\(!exists\\(.model_data.\\)\\)", src)[1L]
+  guard_end   <- guard_start + 6L  # block is 7 lines including closing brace
+  src_safe <- src[-(guard_start:guard_end)]
+  main_start <- grep("\\[Step 1\\]", src_safe)[1L]
+  eval(parse(text = paste(src_safe[1:(main_start - 1L)], collapse = "\n")),
+       envir = environment())
+
+  model_data <- add_model_variables(model_data)
+  model_data <- compute_income_volatility(model_data)
+  model_data <- if (identical(PI_METHOD, "italy")) {
+    construct_permanent_income_italy(model_data)
+  } else {
+    construct_permanent_income(model_data)
+  }
+  model_data <- model_data %>%
+    mutate(ecm_lag = lag(lcons, 1L) - lincome)
+}
 
 # Spec-4-style template (no SR dynamics, base dummies)
 spec_template <- list(
@@ -256,3 +274,149 @@ write.csv(verdict_tbl,
           row.names = FALSE)
 cat(sprintf("Saved: %s\n",
             file.path(output_dir, "australia_williams_knot_placebo_verdict.csv")))
+
+# ==============================================================================
+# DEPLOYED-PROTOCOL placebo (review item: the runs above test the literal
+# Williams 4-knot entered unconditionally — a DIFFERENT object from the
+# deployed cci_williams, which is the 15-knot maximal basis under ITERATED
+# sign-prior reduction inside the Spec-4 long run on the 1988+ sample. This
+# section placebo-tests exactly the deployed construction: each draw replaces
+# the 15 institutional knot dates with random dates (same sign-prior pattern)
+# and runs the same iterated fit_consumption_with_williams_cci() reduction.)
+# ==============================================================================
+
+if (exists("fit_consumption_with_williams_cci")) {
+  cat("\n", strrep("=", 70), "\n", sep = "")
+  cat("DEPLOYED-PROTOCOL PLACEBO (iterated reduction, 15-knot basis)\n")
+  cat(strrep("=", 70), "\n", sep = "")
+
+  set.seed(20260611L)
+
+  deployed_basis  <- build_williams_cci_basis(model_data$date)
+  deployed_priors <- attr(deployed_basis, "sign_priors")
+  n_knots         <- ncol(deployed_basis)
+
+  make_basis_fn <- function(knot_dates, priors) {
+    force(knot_dates); force(priors)
+    function(d) {
+      basis <- vapply(knot_dates, function(k) smoothed_step(d, k),
+                      numeric(length(d)))
+      colnames(basis) <- paste0("sdmma_",
+                                gsub("-", "_", substr(knot_dates, 1, 7)))
+      attr(basis, "sign_priors") <- priors
+      basis
+    }
+  }
+
+  run_deployed_protocol <- function(basis_fn) {
+    md <- model_data
+    md <- md[, !grepl("^sdmma_", names(md))]
+    res <- tryCatch(
+      fit_consumption_with_williams_cci(
+        md,
+        lr_vars    = spec_template$lr_vars,
+        sr_vars    = spec_template$sr_vars,
+        dummy_vars = spec_template$dummy_vars,
+        sample_end = as.Date("2024-10-01"),
+        basis_fn   = basis_fn
+      ),
+      error = function(e) NULL
+    )
+    if (is.null(res)) {
+      return(list(adj_r2 = NA_real_, lambda = NA_real_,
+                  n_obs = NA_integer_, n_survivors = NA_integer_))
+    }
+    cf <- coef(res$spec$fit)
+    list(
+      adj_r2      = summary(res$spec$fit)$adj.r.squared,
+      lambda      = if ("ecm_lag" %in% names(cf)) cf[["ecm_lag"]] else NA_real_,
+      n_obs       = nobs(res$spec$fit),
+      n_survivors = length(res$surviving_knots)
+    )
+  }
+
+  cat("\nFitting deployed (institutional 15-knot, iterated reduction) benchmark...\n")
+  deployed_fit <- run_deployed_protocol(build_williams_cci_basis)
+  cat(sprintf("  Deployed: adj R^2 = %.4f, lambda = %.4f, %d knots survive\n",
+              deployed_fit$adj_r2, deployed_fit$lambda,
+              deployed_fit$n_survivors))
+
+  dp_window_start <- as.numeric(as.Date("1979-01-01"))
+  dp_window_end   <- as.numeric(as.Date("2021-12-01"))
+  cat(sprintf("\nRunning %d deployed-protocol placebo draws...\n", N_DRAWS))
+
+  dp_rows <- list()
+  for (i in seq_len(N_DRAWS)) {
+    if (i %% pb_step == 0L) cat(sprintf("  draw %d / %d\n", i, N_DRAWS))
+    repeat {
+      rd <- sort(as.Date(round(runif(n_knots, dp_window_start, dp_window_end))))
+      nm <- substr(as.character(rd), 1, 7)
+      if (!anyDuplicated(nm)) break  # avoid duplicate sdmma_YYYY_MM columns
+    }
+    res <- run_deployed_protocol(make_basis_fn(as.character(rd),
+                                               deployed_priors))
+    dp_rows[[i]] <- tibble::tibble(
+      draw        = i,
+      knots       = paste(format(rd), collapse = ", "),
+      adj_r2      = res$adj_r2,
+      lambda      = res$lambda,
+      n_obs       = res$n_obs,
+      n_survivors = res$n_survivors
+    )
+  }
+  dp_tbl <- bind_rows(dp_rows)
+  write.csv(dp_tbl,
+            file.path(output_dir, "australia_williams_knot_placebo_deployed.csv"),
+            row.names = FALSE)
+
+  dp_r2 <- dp_tbl$adj_r2[is.finite(dp_tbl$adj_r2)]
+  dp_la <- dp_tbl$lambda[is.finite(dp_tbl$lambda)]
+  dp_r2_pct <- mean(dp_r2 < deployed_fit$adj_r2, na.rm = TRUE)
+  dp_la_pct <- mean(abs(dp_la) < abs(deployed_fit$lambda), na.rm = TRUE)
+
+  dp_verdict <- if (dp_r2_pct > 0.9 && dp_la_pct > 0.9) {
+    "STRONG SUPPORT for institutional knot placement"
+  } else if (dp_r2_pct > 0.75 || dp_la_pct > 0.75) {
+    "MODERATE SUPPORT — deployed CCI beats most random draws"
+  } else if (dp_r2_pct > 0.5) {
+    "WEAK SUPPORT — deployed CCI above median but not far"
+  } else {
+    "DETRENDING CRITIQUE VINDICATED — deployed CCI below median"
+  }
+
+  cat(sprintf("\nDeployed-protocol percentile rank: adj R^2 %.0f%%, |lambda| %.0f%%\n",
+              100 * dp_r2_pct, 100 * dp_la_pct))
+  cat(sprintf("  median survivors in placebo draws: %.0f (deployed: %d)\n",
+              median(dp_tbl$n_survivors, na.rm = TRUE),
+              deployed_fit$n_survivors))
+  cat(sprintf("  VERDICT: %s\n", dp_verdict))
+
+  dp_verdict_tbl <- tibble(
+    metric = c("Deployed adj R^2", "Deployed |lambda|",
+               "Deployed adj R^2 percentile rank",
+               "Deployed |lambda| percentile rank",
+               "Deployed n_survivors",
+               "Placebo median n_survivors",
+               "n_placebo_draws", "verdict"),
+    value = c(
+      sprintf("%.4f", deployed_fit$adj_r2),
+      sprintf("%.4f", abs(deployed_fit$lambda)),
+      sprintf("%.0f%%", 100 * dp_r2_pct),
+      sprintf("%.0f%%", 100 * dp_la_pct),
+      as.character(deployed_fit$n_survivors),
+      sprintf("%.0f", median(dp_tbl$n_survivors, na.rm = TRUE)),
+      as.character(N_DRAWS),
+      dp_verdict
+    )
+  )
+  write.csv(dp_verdict_tbl,
+            file.path(output_dir,
+                      "australia_williams_knot_placebo_deployed_verdict.csv"),
+            row.names = FALSE)
+  cat(sprintf("Saved: %s\n",
+              file.path(output_dir,
+                        "australia_williams_knot_placebo_deployed_verdict.csv")))
+} else {
+  message("[cci_placebo_test] fit_consumption_with_williams_cci not available; ",
+          "skipping deployed-protocol placebo")
+}
