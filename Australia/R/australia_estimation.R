@@ -36,7 +36,7 @@ options(stringsAsFactors = FALSE, scipen = 999)
 # Permanent-income construction method.
 #   "ar"    rolling AR(8) + trend + post-2008 break + GFC-learning ogive
 #           (the original method; default for backwards compatibility)
-#   "italy" Jordà (2005) local projection — directly forecasts the
+#   "italy" De Bonis et al. (2020) direct forecast — directly forecasts the
 #           discounted weighted average of log income in one step.
 #           Adds labour-force-share predictor (Italy.pdf §3.3 highlights
 #           this as the predictor that captures the early-1990s slowdown).
@@ -270,9 +270,11 @@ construct_permanent_income <- function(model_data, k = 40L, delta = 0.95,
 # SECTION A.italy: Italy-style local-projection permanent income
 # ==============================================================================
 #
-# Jordà (2005) local projection of the discounted weighted average of log
-# income k quarters ahead, in ONE regression rather than a rolling AR(p)
-# whose forecasts are aggregated. Predictors are selected to match Italy
+# Direct (single-regression) forecast of the discounted weighted average of
+# log income k quarters ahead — the De Bonis et al. (2020, Appendix A.2)
+# method (related in spirit to, but distinct from, Jorda 2005 per-horizon
+# local projections) — rather than a rolling AR(p) whose forecasts are
+# aggregated. Predictors are selected to match Italy
 # Appendix A.6 / Table A2 as closely as data availability permits:
 #
 #   - time trend, post-2008 split-trend (level shift + slope shift)

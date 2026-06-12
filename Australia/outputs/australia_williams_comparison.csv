@@ -2,7 +2,7 @@
 "lambda",-0.286,0.083,-3.45,-0.286,-0.238632699010184,-0.238632699010184,-2.55227832819728,16.5619933530825,-183.438006646917,"Speed of adjustment, FIML","Spec 6 ecm_lag (OLS == structural for ecm_lag itself)"
 "ha_y",0.0488,0.0095,5.14,0.0139568,0.00224455552334466,0.00940590092076555,0.295909005097078,-83.9178355830516,-80.7256128672837,"Housing wealth MPC at CCI peak; 0.0452 by 2008Q2 (≈0 at CCI=0)","Spec 6 (CCI=0 by construction)"
 "ha_y_at_peak",0.0452,NA,NA,0.0129272,NA,NA,NA,NA,NA,"Housing wealth MPC at CCI peak (paper text p.13)","Not estimated in Spec 6"
-"ifa_y",0.022,NA,NA,0.006292,-0.00960806828723538,0.0402629996940416,NA,-252.702928913468,83.0136349729163,"Illiquid financial MPC; calibrated, not freely estimated (p.18)","Spec 6 eq_y + super_y aggregated"
+"ifa_y",0.022,NA,NA,0.006292,-0.00960806828723538,-0.0402629996940416,NA,-252.702928913468,-283.013634972916,"Illiquid financial MPC; calibrated, not freely estimated (p.18)","Spec 6 eq_y + super_y aggregated"
 "nla_y",0.159,0.041,3.88,0.045474,0.00834664226204236,0.0349769427939386,0.237686559195521,-81.6452428595629,-78.0019227711078,"Net liquid (= LA - total household debt) MPC","Spec 6 NLA fix; restriction accepted"
 "ln_hp_over_y_at_cci0",-0.13,0.027,-4.81,-0.03718,0.0102352241330017,0.0428911216922744,0.230413709051274,127.528843821952,-67.0068294674812,"log(p^h/y) coef at CCI=0; +0.026 at CCI peak (sign reversal)","Spec 6 (no CCI interaction)"
 "real_rate_at_peak",-0.871,0.435,-2,-0.249106,-0.000527150080821,-0.00220904378573243,-0.461969793386055,99.7883832260881,-100.253621559786,"r x CCI coef; effect at CCI=1","Spec 6 (no r x CCI interaction)"

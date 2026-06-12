@@ -46,7 +46,7 @@ after the first parse, so subsequent runs are fast.
     adjusted, quarterly, $m chain volume measures (reference year 2022-23).
   - `cons_nom` — same series but `Current prices`. Used together with
     `cons_real` to derive `cons_deflator = 100 * cons_nom / cons_real`.
-- **Sample:** 1959Q3–2024Q4 (we trim to 1980Q1+).
+- **Sample:** 1959Q3–2024Q4 (we trim to the 1976Q3+ spine).
 - **Series ID convention:** ABS workbook drives series selection by `series_name`
   pattern; the helper [`pick_abs()`](../R/australia_data_download.R#L130) prefers
   `Seasonally Adjusted` then `Trend` then `Original`. We do not pin a series
@@ -64,22 +64,16 @@ after the first parse, so subsequent runs are fast.
   - `mort_int_paid` — property income payable on dwellings (mortgage interest).
     Pattern `property income payable.*interest.*dwelling|mortgage interest`.
     **Currently used only as a fallback for the implicit mortgage rate** when
-    `readrba` is unavailable.
+    neither the local RBA CSV nor `readrba` is available.
 - **Sample:** 1959Q3–2024Q4.
-- **Gap to fix:** This workbook also contains `Compensation of employees` and
-  `Social assistance benefits in cash` — neither is currently extracted. They
-  are needed for the Italy-style **scaled-income** robustness check (Italy
-  averages labour+transfer income with total disposable to down-weight
-  mismeasured property income). The Italy-style robustness block currently
-  skips this column. To fix:
-  - Add `pick_abs(inc_raw, "Compensation of employees.*Total")` →
-    `wages_nom`.
-  - Add `pick_abs(inc_raw, "Social assistance benefits.*current")` →
-    `social_benefits_nom`.
-  - Construct `labour_transfer_nom = wages_nom + social_benefits_nom`,
-    deflate by `cons_deflator`, divide by `pop_millions`, log → call
-    `labour_transfer_income_real_pc` (the name the estimation script
-    already looks for).
+- **Resolved (former gap):** the income components needed for the
+  Italy-style **scaled-income** robustness check (compensation of
+  employees, social assistance benefits, the NPY components) are now
+  supplied via `data_raw/household_income.csv` (10 components, 1976Q3+,
+  194 obs each — see §2.12 of `australia_data_download.R`), from which
+  `labour_transfer_nom`, `scaled_income_real_pc` and the Williams NPY
+  series are constructed. The scaled-income and Williams-NPY robustness
+  blocks run on every pipeline pass.
 
 ### 2.3 ABS 5232035 — Household Balance Sheet
 - **File:** [`data_raw/5232035.xlsx`](../data_raw/5232035.xlsx)
@@ -90,26 +84,33 @@ after the first parse, so subsequent runs are fast.
   - `fin_deposits` — pattern `currency and deposits`
   - `fin_equities` — pattern `shares and other equity`
   - `fin_super` — pattern `superannuation`
-  - `fin_loans` — pattern `liabilities.*loans|loans and placements` (this is
-    **total household debt**, including mortgages + consumer credit)
+  - `fin_loans` — **pinned to series ID `A83722644R`** ("Liabilities -
+    Loans and placements"; regex `^liabilities.*loans` retained as a
+    fallback if the pinned ID disappears). This is **total household
+    debt**, including mortgages + consumer credit.
   - `housing_wealth` — pattern `residential land and dwellings`
-  - `closing_net_worth` — series ID `A83722648X` (one of the few we pin
-    explicitly; falls back to component sum if missing)
-- **Sample binding constraint:** ABS 5232035 starts **1988Q3**. This is the
-  binding sample start for every disaggregated wealth specification (Specs
-  4–8). Earlier observations on consumption/income exist (back to 1959Q3 for
-  HFCE, 1980Q1 for our spine) but `nla_y`, `eq_y`, `super_y`, `ha_y` are NA
-  before 1988Q3.
+  - `closing_net_worth` — series ID `A83722648X` (pinned explicitly;
+    falls back to component sum if missing)
+- **Sample binding constraint:** ABS 5232035 starts **1988Q3**. This is
+  the binding estimation start for every specification using official
+  disaggregated wealth (Specs 4–12; full sample 1988Q3–2024Q4,
+  n = 146). Earlier observations on consumption/income exist (back to
+  1959Q3 for HFCE, 1976Q3 for our spine) but the official `nla_y`,
+  `eq_y`, `super_y`, `ha_y` are NA before 1988Q3; the `*_y_proxy`
+  back-extensions (§3.4a) cover 1976Q3+ and support Spec 6b and the
+  extended placebo battery.
 - **Vintage:** ABS reclassifications happen periodically (notably in the
   ESA→SNA08 transitions). The current vintage is post-SNA08; if a future
   release reclassifies super out of "household financial assets", the
   pattern match will silently miss it.
-- **Gap to fix:** **Sample back-extension to 1980Q1** would require sourcing
-  pre-1988 ABS Financial Accounts annual data and applying Italy-style
-  Bonci-Coletta splicing (see Italy.pdf Appendix A.2). The Williams 4-knot
-  CCI spline explicitly needs the 1979Q1 deregulation knot identifiable,
-  which currently fails because the SDMMA is constant in the post-1988
-  window (see `australia_williams_cci_knots.csv` — 1979 knot is "aliased").
+- **Gap to fix:** **Official-wealth back-extension past 1988Q3** would
+  require sourcing pre-1988 ABS Financial Accounts annual data and
+  applying Italy-style Bonci-Coletta splicing (see Italy.pdf Appendix
+  A.2). The 1979Q1 deregulation knot of the Williams CCI is only
+  identifiable if the SDMMA varies within the estimation window, which
+  currently fails because estimation starts 1988Q3 (see
+  `australia_williams_cci_knots.csv` — the 1979 and 1986 knots are
+  "aliased").
 
 ### 2.4 ABS 6202001 — Labour Force
 - **File:** [`data_raw/6202001.xlsx`](../data_raw/6202001.xlsx)
@@ -117,39 +118,40 @@ after the first parse, so subsequent runs are fast.
 - **What we extract** (monthly source, averaged to quarterly):
   - `unemp_rate` — pattern `^Unemployment rate.*Persons`, SA
   - `labour_force` — pattern `^Labour force.*Persons`, SA, persons (thousands)
-- **Sample:** 1978Q2–2024Q4 (the start date is ABS, not our spine).
-- **Note:** `lf_share = labour_force / pop_millions` is constructed downstream;
-  both numerator and denominator are nominally in thousands of persons (the
-  master column is named `pop_millions` for legacy reasons but actually carries
-  thousands — see Section 6 unit gotcha).
+- **Sample:** 1978Q2–2024Q4 from this workbook; spliced back to 1976Q3
+  (194 obs in `master`) via `labour_force_historic.csv` (§4.4).
+- **Note:** `lf_share = labour_force / pop_millions` is constructed
+  downstream. `labour_force` is in **thousands** of persons while
+  `pop_millions` is in **millions**, so `lf_share` ≈ 1000 × the
+  participation rate (~600–670 over the sample). The 1000× scale is
+  harmless in its only use — `log(lf_share)` as a permanent-income
+  predictor, where it shifts the regression intercept — but do NOT
+  treat `lf_share` as a [0, 1] share. (Mirrors the code comment at
+  `australia_data_download.R` §"Labour-force participation ratio".)
 
-### 2.5 ABS 3101059 — Estimated Resident Population
-- **File:** [`data_raw/3101059.xlsx`](../data_raw/3101059.xlsx)
-- **Cache tag:** `abs_pop`
+### 2.5 Population — ABS A84423091W (15+ civilian) + ABS 3101059 (cohorts)
+- **Files:** [`data_raw/population_workingage.csv`](../data_raw/population_workingage.csv)
+  (primary) and [`data_raw/3101059.xlsx`](../data_raw/3101059.xlsx)
+  (cohort detail; cache tag `abs_pop`).
 - **What we extract:**
-  - `pop_thousands` (renamed `pop_millions` despite being in thousands —
-    see Section 6) — sum of `^Estimated Resident Population ; Persons ; <age> ;`
-    over all single-year cohorts. Annual source, splined to quarterly via
-    [`annual_to_quarterly_spline()`](../R/australia_data_download.R#L114).
-  - `prime_age_share` — sum of single-year cohorts aged 25–54 over total ERP.
-    Uses the `Male` + `Female` split (not `Persons`) because in current ABS
-    vintages the `Persons` series only goes up to age 47 — see "Bug" below.
-- **Bug, partially worked around (acknowledged in code at
-  [`australia_data_download.R:303`](../R/australia_data_download.R#L303)):**
-  the existing `pop_q` total uses the `^Persons` pattern which only matches
-  ages 0–47 in the current vintage, undercounting Australia's population by
-  ~40%. `prime_age_share` sidesteps this by using consistent Male+Female
-  numerator and denominator (so the *ratio* is correct), but `pop_millions`
-  itself is wrong-by-a-large-factor. Per-capita series like `cons_real_pc`
-  divide by this wrong total, but the bias cancels because every per-capita
-  series uses the same denominator and the dependent variable is in *changes*
-  of *logs*. **Gap to fix: rebuild `pop_q` to use `Male + Female` cohorts
-  the same way `prime_age_share` does**, and rename `pop_millions` →
-  `pop_thousands` everywhere (single-line rename across data_download.R and
-  estimation.R).
-- **Vintage caveat:** ABS sometimes restructures cohort series; future
-  vintages may extend `Persons` past age 47, in which case the workaround
-  becomes unnecessary (but the column rename is still needed).
+  - `pop_millions` — Civilian Population aged 15 years and over (ABS
+    series `A84423091W`), monthly in thousands, averaged to quarterly
+    and divided by 1000. **`pop_millions` is now genuinely in
+    millions** (~10.2M at 1976Q3, ~22.4M at 2024Q3); the historical
+    naming bug is resolved. Spliced back to 1976Q3 via
+    `labour_force_historic.csv` (§4.4).
+  - `prime_age_share` — from 3101059: sum of single-year cohorts aged
+    25–54 over total ERP. Uses the `Male` + `Female` split (not
+    `Persons`) because in current ABS vintages the `Persons`-by-age
+    series truncates at age 47.
+- **Legacy fallback:** if `population_workingage.csv` is missing, the
+  pipeline falls back to summing 3101059 single-year `Persons` cohorts
+  — **known biased low** (~65% underestimate, the age-47 truncation).
+  The fallback prints a loud message; don't run production estimates
+  on it.
+- **Vintage caveat:** ABS sometimes restructures cohort series; any
+  change to single-year cohort naming will break `prime_age_share`
+  (loudly — `tryCatch` falls back to NA).
 
 ### 2.6 ABS 643201 — Total Value of Dwellings
 - **File:** [`data_raw/643201.xlsx`](../data_raw/643201.xlsx)
@@ -157,8 +159,12 @@ after the first parse, so subsequent runs are fast.
 - **What we extract:**
   - `hpi_current` — `Mean price of residential dwellings.*Australia`,
     Original (no SA available). Quarterly, $ thousands per dwelling.
-- **Sample:** 2003Q3–2024Q4. This is the **anchor** of the chained
-  house-price series — the contemporaneous portion of `hpi`.
+- **Sample:** **2011Q3+** in the current vintage (the workbook runs to
+  2025Q4; the master spine trims at 2024Q4). This is the **anchor** of
+  the chained house-price series — the contemporaneous portion of
+  `hpi`. The splice boundary at 2011Q3 produces a clean −1.78% QoQ log
+  change in the regenerated master (a +10% step under the old
+  mean-ratio splice convention has been eliminated).
 - **Note:** This is a *level* series (mean dollar price), not an index.
   The splicing chain rescales the bridge and legacy series to its level.
 
@@ -168,9 +174,11 @@ after the first parse, so subsequent runs are fast.
 - **What we extract:**
   - `hpi_bridge` — `Residential Property Price Index.*eight capital cities`,
     Original. Quarterly, index level (2011-12 = 100).
-- **Sample:** 2003Q4–2017Q2 (workbook discontinued by ABS after 2017).
-- **Role:** middle layer of the splice — bridges the legacy 1986–2003 series
-  to the current 643201 series.
+- **Sample:** **2003Q3–2021Q4** in the current vintage (the RPPI was
+  discontinued by ABS after 2021Q4).
+- **Role:** middle layer of the splice — bridges the legacy pre-2003
+  series to the current 643201 series (anchored at the first overlap,
+  2011Q3).
 
 ### 2.8 ABS 560101 — Lending Indicators
 - **File:** [`data_raw/560101.xlsx`](../data_raw/560101.xlsx)
@@ -218,35 +226,33 @@ problem.
 
 ---
 
-## 3. RBA series (live fetch)
-
-The pipeline pulls two RBA series via `readrba::read_rba_seriesid()` on each
-fresh run. **No local cache file exists for RBA data**; if `readrba` is not
-installed, the pipeline falls back to ABS-derived implicit rates with
-substantially different scale.
+## 3. RBA series
 
 ### 3.1 RBA FILRHLBVS — Standard variable owner-occupier mortgage rate
+- **File:** [`data_raw/rba_filrhlbvs.csv`](../data_raw/rba_filrhlbvs.csv)
+  — the RBA F6 historical series is now **cached locally in source
+  control** (the former "gap to fix" is resolved), so the source choice
+  is deterministic. A live `readrba::read_rba_seriesid("FILRHLBVS")`
+  fetch is the first fallback if the CSV is missing.
 - **Used as:** `mortgage_rate`
+- **Coverage in master:** 194 obs, 1976Q3–2024Q4.
 - **Frequency:** monthly, averaged to quarterly
 - **Range:** ~3% to ~17% historically; ~6–8% in recent years
-- **Fallback:** if `readrba` is unavailable, the pipeline computes
+- **Last-resort fallback:** if neither the CSV nor `readrba` is
+  available, the pipeline computes
   `mortgage_rate = 400 * mort_int_paid / lag(fin_loans, 1L)` (annualised
   effective rate from ABS national accounts). The fallback gives
   systematically *lower* rates (~2–8%) because `mort_int_paid` is net of
-  capitalised interest and includes interest-only loans differently. **This
-  has implications for `real_rate`, `mortgage_burden`, and any downstream
-  Drehmann adjustment.** The previous pre-RBA-fallback runs of this
-  pipeline used the implicit rate; the published BIS-Williams paper uses the
-  RBA SVR. **Gap to fix: cache the RBA series locally as `data_raw/rba_filrhlbvs.csv`
-  so the choice between RBA and implicit is deterministic and visible in
-  source control.**
+  capitalised interest and includes interest-only loans differently —
+  with implications for `real_rate`, `mortgage_burden`, and the
+  Drehmann adjustment. The published BIS-Williams paper uses the RBA SVR.
 
 ### 3.2 RBA FIRMMCRTD / FOOIRATCR — Cash rate
 - **Used as:** `cash_rate`
-- **Status:** Loaded but only used inside the legacy spread-backfill CCI
-  branch (which is currently disabled since `USE_INSTITUTIONAL_CCI = FALSE`
-  by default). If `USE_INSTITUTIONAL_CCI` is flipped to `TRUE`, this series
-  becomes load-bearing.
+- **Status:** Loaded (live via `readrba`) but only used inside the
+  legacy spread-backfill CCI overlay branch, which is disabled under
+  the canonical `USE_INSTITUTIONAL_CCI_OVERLAY = FALSE`. If the overlay
+  flag is flipped to `TRUE`, this series becomes load-bearing.
 
 ### 3.3 RBA D03 — Monetary Aggregates (M3)
 - **File:** [`data_raw/d03hist.xlsx`](../data_raw/d03hist.xlsx) (downloaded from
@@ -255,6 +261,13 @@ substantially different scale.
 - **Series ID:** `DMAM3N` — M3, original (not seasonally adjusted), $ billion
 - **Coverage:** 1959Q3+ in current vintage (covers the full TRYM/HPI window)
 - **Frequency:** monthly, averaged to quarterly via `monthly_to_quarterly()`
+- **Series break (disclosure):** DMAM3N has a **+14.25% one-month level
+  jump at August 1976** — a bank-reporting break, the largest in the
+  series. Per the RBA's D3 notes, the *levels* in tables D2/D3 are
+  **not adjusted for series breaks** (only the D1 growth rates are).
+  August 1976 falls inside 1976Q3, the first quarter of our spine, so
+  the break sits at the very edge of the sample; treat any
+  M3-derived growth across the 1976Q3 boundary with caution.
 - **Role:** unlocks pre-1988 liquid-asset proxy. The existing `nla_y` is
   built from ABS B20 deposits (1988Q3+ only); `m3_aggregate` is the longer
   public-data alternative for back-extension exercises.
@@ -362,17 +375,17 @@ substantially different scale.
 ## 4. Project-supplied CSVs
 
 ### 4.1 `data_raw/houseprice_old.csv`
-- **Format:** 77 rows, two columns: `Date` (e.g. `Jun-1986`), `HousePriceOld`
-  (numeric, index level).
+- **Format:** **quarterly**; 77 rows, two columns: `Date` (e.g.
+  `Jun-1986`), `HousePriceOld` (numeric, index level).
 - **Provenance:** **UNDOCUMENTED IN-REPO.** The README mentions "the legacy
   ABS eight-capital-city residential property price index" but the actual
   source workbook isn't preserved. Looking at the values (61.3 in Jun-1986
   rising), it's consistent with a pre-2003 ABS RPPI vintage (Cat 6416
   series, base year unclear — the splicing rescales it to the current
   643201 level so the base is irrelevant downstream).
-- **Sample:** 1986Q2–2003Q3 (overlaps the start of `hpi_bridge`).
-- **Role:** earliest layer of the spliced house-price series; provides
-  pre-2003 coverage.
+- **Sample:** 1986Q2–2005Q2 (overlaps the start of `hpi_bridge`).
+- **Role:** legacy layer of the spliced house-price series; provides
+  pre-2003 coverage between the TRYM history and the ABS bridge.
 - **Gap to fix: document the provenance** — record the original ABS catalogue
   number, vintage date, source URL, and date downloaded. If sourced from a
   third-party (e.g. an RBA chartpack or a private compilation), record that.
@@ -401,9 +414,9 @@ substantially different scale.
   - RBA payment burden mean = 0.081 (interest + principal)
   - cor(synthetic, RBA payment) = **0.93** — synthetic captures the cycle
     well but is biased ~30% high in level
-- **Open follow-up:** decide whether to add a Spec 7b that uses
-  `mortgage_payment_burden_rba` over the post-2009 sample for an explicit
-  measured-vs-synthetic comparison.
+- **Resolved follow-up:** **Spec 7b** in the estimation pipeline uses
+  `mortgage_payment_burden_rba` over the post-2009 sample for the
+  explicit measured-vs-synthetic comparison.
 
 ### 4.3 `data_raw/house_price_history_long.csv`
 - **Format:** 236 rows, two columns: row-name date in `m/d/Y` format
@@ -416,13 +429,11 @@ substantially different scale.
   into a single coherent series.
 - **Sample:** 1959Q3–2018Q2 (236 quarters).
 - **Role:** deepest layer of the spliced house-price series; supersedes
-  `houseprice_old.csv` where they overlap (1986Q2–2003Q3) and extends
-  coverage back to 1959Q3, three years deeper than even Williams'
-  fullest sample. Note that the master is currently restricted to the
-  1980Q1+ date spine; the deeper TRYM history is available in
-  `hpi_spliced` upstream of the master assembly and will be exploited
-  once the rest of NS-020 (deposits, housing credit, demographics)
-  lands.
+  `houseprice_old.csv` where they overlap and extends coverage back to
+  1959Q3, three years deeper than even Williams' fullest sample. The
+  master spine starts 1976Q3, so `hpi` has 194 non-NA obs in `master`;
+  the deeper 1959Q3+ TRYM history remains available in `hpi_spliced`
+  upstream of the master assembly.
 - **Splice method:** pure growth-rate chain-linking from the first
   overlap quarter (1986Q2). TRYM's QoQ growth rates are preserved
   exactly for 1959Q3–1986Q1; the level is pinned to the legacy series
@@ -472,12 +483,12 @@ Implemented via the `splice_hpi()` helper in
 
 ```
 Layer 0 (TRYM):    house_price_history_long.csv  [1959Q3 – 2018Q2]
-       ↓ chain on first 8 quarters of overlap with legacy
-Layer 1 (LEGACY):  houseprice_old.csv     [1986Q2 – 2003Q3]
-       ↓ chain on overlap with bridge
-Layer 2 (BRIDGE):  ABS 641601 RPPI 8CC    [2003Q4 – 2017Q2]
-       ↓ chain on overlap with current
-Layer 3 (CURRENT): ABS 643201 mean price  [2003Q3 – 2024Q4]
+       ↓ chain at first overlap with legacy (1986Q2)
+Layer 1 (LEGACY):  houseprice_old.csv     [1986Q2 – 2005Q2]
+       ↓ chain at first overlap with bridge (2003Q3)
+Layer 2 (BRIDGE):  ABS 641601 RPPI 8CC    [2003Q3 – 2021Q4]
+       ↓ chain at first overlap with current (2011Q3)
+Layer 3 (CURRENT): ABS 643201 mean price  [2011Q3 – 2024Q4 in master]
 ```
 
 The chain mechanism: pure growth-rate chain-linking (standard ABS practice).
@@ -496,24 +507,30 @@ discontinuity at any join. Replaces an earlier `mean(overlay/base)` over
 the full overlap, which produced step jumps at the boundaries when the
 overlap ratio drifted (notably a –17% step at 1986Q2 under the long
 TRYM↔legacy overlap, and a +10% step at 2011Q2→Q3 under the bridge↔current
-overlap). Both are fixed under the growth-rate convention.
+overlap). Both are fixed under the growth-rate convention: the
+regenerated master shows a clean −1.78% QoQ log change in `hpi` at the
+2011Q3 boundary.
 
 ### 5.2 Credit-conditions index (CCI) — multi-source
-The CCI currently has **two operational paths** controlled by the
-`USE_INSTITUTIONAL_CCI` flag in `australia_data_download.R:70`:
+The CCI has **two operational paths**, controlled since June 2026
+(NS-131) by **two independent flags** in `australia_data_download.R`
+(~line 70) — the old single overloaded `USE_INSTITUTIONAL_CCI` flag is
+gone, so the canonical configuration (basis ON, overlay OFF) is
+reproducible from a cold rebuild:
 
-**Path A — Default (flag = FALSE):** flow-based observable CCI from 2002Q3
-only.
+**Path A — flow-based observable CCI** (always built; the optional
+pre-2002 backfill is gated by `USE_INSTITUTIONAL_CCI_OVERLAY`,
+canonical `FALSE`):
 ```
 cci_ratio = log(housing_loan_flow / ydi_ann_8qma)
 ```
-Sample: 90 quarters (2002Q3+). Specs 2 and 5 effectively start 2002Q3 with
-this path. The pre-2002 spread-backfill that previously existed has been
-dropped (was theoretically suspect — spread reflects funding cost, not
-credit availability).
+Sample: 90 quarters (2002Q3+). Specs 2 and 5 effectively start 2002Q3
+under the canonical overlay-off setting. The Muellbauer-style
+regime+indicator backfill is wired in but disabled (overlay `TRUE`
+shifts Spec 6 λ from −0.180 to −0.188 on the old vintage).
 
-**Path B — Optional (flag = TRUE):** Maximal-GETS Australian institutional
-CCI spline + observable-CCI overlay.
+**Path B — Williams SDMMA spline** (`USE_WILLIAMS_SDMMA_BASIS`,
+canonical `TRUE`): Maximal-GETS Australian institutional CCI spline.
 - **15 candidate** smoothed-step dummies at the documented Australian
   financial-policy turning points (Campbell '79, housing dereg '86,
   state-bank distress '90, banking distress '92/'93, Wallis/APRA '98,
@@ -535,21 +552,25 @@ CCI spline + observable-CCI overlay.
   Williams' four knots (2007Q1) survives sign-prior reduction; the others
   alias (1979) or violate priors (1992, 1998). The maximal-GETS approach
   lets the data choose which of 15 candidate institutional events generate
-  identifiable variation, producing 5-6 surviving knots with a richer
-  empirical signal. See
+  identifiable variation. See
   [`knot_experiment_findings.md`](knot_experiment_findings.md) for the
   full analysis.
-- **Current outcome on the 1988Q4+ sample:** 6 knots survive — 1992Q1
-  (banking distress), 2007Q3 (GFC), 2009Q1 (FHB Boost), 2019Q1 (Hayne
-  RC), 2020Q2 (COVID/JobKeeper), 2021Q4 (APRA buffer hike). 1979Q1 and
-  1986Q1 aliased; 1990Q3, 1993Q1, 1998Q3, 2008Q4, 2014Q4, 2017Q1, 2019Q3
-  sign-violators (dropped). See
-  [`outputs/australia_williams_cci_knots.csv`](../outputs/australia_williams_cci_knots.csv).
+- **Current outcome on the 1988Q3+ sample (iterated reduction):**
+  **4 knots survive** — 2007Q3 (GFC), 2009Q1 (FHB Boost), 2019Q1
+  (Hayne RC), 2020Q2 (COVID/JobKeeper). 1979Q1 and 1986Q1 aliased;
+  1990Q3, 1992Q1, 1993Q1, 1998Q3, 2008Q4, 2014Q4, 2017Q1, 2019Q3,
+  2021Q4 sign-violators (dropped). The resulting `cci_williams` is
+  exactly zero before 2007Q3, plateaus at 1 over 2010–18, and sits at
+  ≈ −1.6 after 2022. See
+  [`outputs/australia_williams_cci_knots.csv`](../outputs/australia_williams_cci_knots.csv),
+  [`outputs/australia_cci_williams_series.csv`](../outputs/australia_cci_williams_series.csv)
+  and [`outputs/australia_cci_williams_path.png`](../outputs/australia_cci_williams_path.png).
 
-**Gap to fix (would unlock Path B fully):** sample back-extension to 1980Q1
-via Bonci-Coletta splicing of pre-1988 ABS annual balance-sheet data. The
-1979 deregulation knot is only identifiable if the post-1980 SDMMA isn't
-constant; with current data it transitions before our sample begins.
+**Gap to fix (would unlock Path B fully):** household balance-sheet
+back-extension via Bonci-Coletta splicing of pre-1988 ABS annual data.
+The 1979 deregulation knot is only identifiable if the SDMMA isn't
+constant within the estimation window; the official wealth series still
+bind estimation at 1988Q3 even though the proxy spine reaches 1976Q3.
 
 ---
 
@@ -562,21 +583,23 @@ ABS balance sheets (5232035) are reported in **$ billions**. The
 balance-sheet values to **$ millions** at parse time, so all downstream
 ratios (`*_y` series) are dimensionless. Real series are deflated by
 `cons_deflator_norm` (the chain-volume implicit deflator, normalised so
-2022-23 = 100). Per-capita series divide by `pop_millions`.
+**2015 = 100** — `base_yr <- 2015L` in the derived-variables block).
+Per-capita series divide by `pop_millions`.
 
-### 6.2 The `pop_millions` mis-naming
-**`pop_millions` is in fact in *thousands* of persons.** This is a legacy
-naming bug. Since both numerator and denominator of every per-capita ratio
-share this column, the 1000× scale error cancels in `cons_real_pc` and
-`ydi_real_pc`. It does *not* cancel in:
-- The `lf_share = labour_force / pop_millions` ratio (both numerator and
-  denominator share the same wrong unit, so the ratio is dimensionally
-  correct — but the *interpretation* in messages and assertions assumes a
-  share, which it is, despite the unit confusion).
-- Any downstream code that reads `pop_millions` expecting actual millions
-  and multiplies by something with a "per million" semantic. **There is no
-  such code currently**, but if you add one (e.g. computing GDP per capita
-  for cross-country normalisation), beware.
+### 6.2 `pop_millions` and `lf_share` units (historical bug — resolved)
+**`pop_millions` is now genuinely in millions of persons**
+(`pop_thousands / 1000` from the ABS A84423091W 15+ civilian
+population; ~10.2M at 1976Q3 to ~22.4M at 2024Q3). The historical
+naming bug — the column carrying thousands — is fixed.
+
+One deliberate scale quirk remains: `lf_share = labour_force /
+pop_millions` divides a **thousands** numerator by a **millions**
+denominator, so it is ≈ 1000 × the participation rate (~600–670 over
+the sample), not a [0, 1] share. This is benign in its only use —
+`log(lf_share)` as a permanent-income predictor, where the constant
+1000× factor shifts the regression intercept only — but do not treat
+`lf_share` as a proper share. The code comment next to its
+construction in `australia_data_download.R` says the same.
 
 ### 6.3 Date conventions
 ABS workbooks use the **first day of the *last* month** of each quarter
@@ -591,50 +614,60 @@ match in the `master` left-join chain).
   (`monthly_to_quarterly()`).
 - Annual → quarterly: cubic spline interpolation
   (`annual_to_quarterly_spline()`), with `approx(rule = 2)` fallback. Used
-  for `pop_q` and `prime_age_share`. **Spline is appropriate for slow-moving
-  demographic series; would be wrong for series with intra-annual
-  seasonality**.
+  for `prime_age_share` (and the legacy cohort-sum population fallback).
+  **Spline is appropriate for slow-moving demographic series; would be
+  wrong for series with intra-annual seasonality**.
 
 ### 6.5 Mortgage rate: RBA vs ABS-implicit
-See Section 3.1 — the choice between live RBA fetch and ABS fallback can
-shift `mortgage_rate` by 2–8 percentage points and silently change every
-downstream interest-rate-related coefficient. **The current pipeline does
-not record which source was used in the output dataset metadata.**
+See Section 3.1 — the local `data_raw/rba_filrhlbvs.csv` makes the
+source deterministic on a normal run, but the chain of fallbacks (local
+CSV → live `readrba` → ABS-implicit rate) can shift `mortgage_rate` by
+2–8 percentage points if the CSV is deleted, silently changing every
+downstream interest-rate-related coefficient. **The pipeline does not
+record which source was used in the output dataset metadata** — watch
+the console messages.
 
 ---
 
 ## 7. Coverage table (current vintage)
 
-From the most recent run, `master` has 180 quarterly rows (1980Q1–2024Q4)
-and 50+ columns. Key coverage windows (see
+From the most recent run, `master` has **194 quarterly rows
+(1976Q3–2024Q4) and 120 columns**. Key coverage windows (see
 [`outputs/australia_model_dataset.csv`](../outputs/australia_model_dataset.csv)
-for the full list):
+— the full 116-variable coverage inventory regenerated on every run):
 
 | Variable               | First obs   | Last obs    | n   | Notes                                          |
 | ---------------------- | ----------- | ----------- | --- | ---------------------------------------------- |
-| `cons_real`            | 1980-01-01  | 2024-10-01  | 180 | ABS 5206008 chain volume                       |
-| `ydi_nom`              | 1980-01-01  | 2024-10-01  | 180 | ABS 5206020                                    |
-| `unemp_rate`           | 1980-01-01  | 2024-10-01  | 180 | ABS 6202001                                    |
-| `pop_millions`         | 1980-01-01  | 2024-10-01  | 180 | (in thousands; see §6.2)                       |
-| `prime_age_share`      | 1980-01-01  | 2024-10-01  | 180 | Splined annual ERP                             |
-| `hpi`                  | 1986-04-01  | 2024-10-01  | 155 | Spliced 3-layer                                |
-| `fin_deposits`/`_loans`/`super`/`equities`/`housing_wealth` | 1988-07-01 | 2024-10-01 | 146 | **Binding sample start**                       |
-| `mortgage_rate`        | 1988-10-01  | 2024-10-01  | 145 | RBA SVR (or ABS-implicit fallback)             |
+| `cons_real`            | 1976-07-01  | 2024-10-01  | 194 | ABS 5206008 chain volume                       |
+| `ydi_nom`              | 1976-07-01  | 2024-10-01  | 194 | ABS 5206020                                    |
+| `unemp_rate`           | 1976-07-01  | 2024-10-01  | 194 | ABS 6202001, spliced to historic LF pre-1978   |
+| `pop_millions`         | 1976-07-01  | 2024-10-01  | 194 | 15+ civilian, genuinely millions (§6.2)        |
+| `prime_age_share`      | 1976-07-01  | 2024-10-01  | 194 | Splined annual ERP cohorts                     |
+| `hpi`                  | 1976-07-01  | 2024-10-01  | 194 | Spliced 4-layer (TRYM→legacy→bridge→current)   |
+| `mortgage_rate`        | 1976-07-01  | 2024-10-01  | 194 | RBA F6 SVR from local CSV                      |
+| `m3_aggregate`         | 1976-07-01  | 2024-10-01  | 194 | RBA D03 DMAM3N (Aug-1976 break; §3.3)          |
+| `credit_total_d02`     | 1976-07-01  | 2024-10-01  | 194 | RBA D02 spliced                                |
+| `labour_force`         | 1976-07-01  | 2024-10-01  | 194 | ABS 6202001 + historic splice; PI predictor    |
+| `lf_share`             | 1976-07-01  | 2024-10-01  | 194 | ≈1000× participation rate (§6.2)               |
+| `ln_hp_over_y`         | 1976-07-01  | 2024-10-01  | 194 | `log(hpi·pop_millions/ydi_ann_nom)` (§8)       |
+| `fin_deposits`/`fin_loans`/`fin_super`/`fin_equities`/`housing_wealth` | 1988-07-01 | 2024-10-01 | 146 | ABS 5232035; **binding estimation start 1988Q3** |
+| `ha_y`/`nla_y`/`eq_y`/`super_y`/`ilfa_y`/`networth_y` | 1988-07-01 | 2024-10-01 | 146 | Official wealth ratios                         |
+| `*_y_proxy` (back-extension) | 1976-07-01 | 2024-10-01 | 194 | M3/credit/HPI back-casts (§3.4a)               |
+| `mortgage_burden`      | 1988-07-01  | 2024-10-01  | 146 | Synthetic                                      |
 | `housing_loan_flow`    | 2002-07-01  | 2024-10-01  | 90  | ABS 560101                                     |
 | `fhb_share`            | 2002-07-01  | 2024-10-01  | 90  | (after regex fix; was constant 0.5)            |
 | `cci_ratio`            | 2002-07-01  | 2024-10-01  | 90  | Specs 2, 5 effectively start here              |
-| `mortgage_burden`      | 1988-10-01  | 2024-10-01  | 145 | Synthetic                                      |
-| `labour_force`         | 1980-01-01  | 2024-10-01  | 180 | ABS 6202001; canonical Italy LP predictor      |
-| `lf_share`             | 1980-01-01  | 2024-10-01  | 180 | `labour_force / pop_millions`                  |
-| `cci_kalman`           | 1988-07-01  | 2024-10-01  | 146 | KFAS state-space single-factor CCI (Spec 9)    |
-| `cci_pca`              | 2002-07-01  | 2024-10-01  | 90  | First principal component, 5 indicators        |
-| `cci_creditgap`        | 1988-07-01  | 2024-10-01  | 146 | BIS-style HP-filter credit gap                 |
+| `sdmma_*` (15 knots)   | 1976-07-01  | 2024-10-01  | 194 | Williams candidate basis (flag on)             |
+| `cci_kalman`           | 1976-07-01  | 2024-10-01  | 194 | KFAS state-space single-factor CCI (Spec 9)    |
 | `mortgage_payment_burden_rba` | 2009-01-01 | 2024-10-01 | 64 | RBA E13 measured burden (Spec 7b)             |
 
 The cached
 [`outputs/australia_model_dataset.rds`](../outputs/australia_model_dataset.rds)
 and the portable [`data_raw/master_data.csv`](../data_raw/master_data.csv)
-both currently hold 180 rows × 89 columns and are mutually consistent.
+both currently hold **194 rows × 120 columns** and are mutually
+consistent — the CSV was regenerated in June 2026 after the
+`ln_hp_over_y` fix and carries the clean −1.78% `hpi` log change at
+2011Q3.
 
 ---
 
@@ -645,26 +678,39 @@ directly in estimation. None of them are downloaded.
 
 | Series | Definition | Sample | Used in |
 | --- | --- | --- | --- |
-| `cons_deflator` | `100 * cons_nom / cons_real` | 1980Q1+ | All real series |
-| `cons_deflator_norm` | `cons_deflator / mean(2022 obs) * 100` | 1980Q1+ | Per-capita real series |
-| `ydi_real_pc` | `ydi_nom / cons_deflator_norm * 100 / pop_millions` | 1980Q1+ | All specs (`lincome`) |
-| `cons_real_pc` | `cons_real / pop_millions` | 1980Q1+ | All specs (`lcons`) |
-| `ydi_ann_nom` | `4 * ydi_nom` | 1980Q1+ | Wealth/income ratios denominator |
-| `ydi_ann_8qma` | 8-quarter MA of `ydi_ann_nom` | 1981Q4+ | CCI denominator |
-| `ha_y` | `housing_wealth_r / ydi_ann_r` | 1988Q3+ | Specs 4-7 |
-| `nla_y` | `(fin_deposits - fin_loans) / ydi_ann` | 1988Q3+ | Specs 4-7 |
+| `cons_deflator` | `100 * cons_nom / cons_real` | 1976Q3+ | All real series |
+| `cons_deflator_norm` | `cons_deflator / mean(2015 obs) * 100` (base 2015 = 100) | 1976Q3+ | Per-capita real series |
+| `ydi_real_pc` | `ydi_nom / cons_deflator_norm * 100 / pop_millions` | 1976Q3+ | All specs (`lincome`) |
+| `cons_real_pc` | `cons_real / pop_millions` | 1976Q3+ | All specs (`lcons`) |
+| `ydi_ann_nom` | `4 * ydi_nom` | 1976Q3+ | Wealth/income ratios denominator |
+| `ydi_ann_8qma` | 8-quarter MA of `ydi_ann_nom` | 1978Q2+ | CCI denominator |
+| `ha_y` | `housing_wealth_r / ydi_ann_r` | 1988Q3+ | Specs 4-7 (level); Spec 11 via `ha_x_cci` only |
+| `nla_y` | `(fin_deposits - fin_loans) / ydi_ann` | 1988Q3+ | Specs 4-7, 11, 12 |
 | `nla_y_unrestricted` | `fin_deposits / ydi_ann` | 1988Q3+ | NLA Wald restriction test only |
 | `debt_y` | `fin_loans / ydi_ann` | 1988Q3+ | NLA Wald restriction test only |
-| `eq_y`, `super_y`, `ilfa_y` | corresponding `_r / ydi_ann_r` | 1988Q3+ | Specs 4-7 |
+| `eq_y`, `super_y`, `ilfa_y` | corresponding `_r / ydi_ann_r` (`ilfa_y = eq_y + super_y`) | 1988Q3+ | Specs 4-7 (split); Specs 11/12 (combined) |
 | `networth_y` | `closing_net_worth_r / ydi_ann_r` | 1988Q3+ | Specs 1-3 |
-| `ln_hp_over_y` | `log(hpi / (real per-capita income))` | 1986Q2+ | All specs (mandated) |
-| `hicp_4q_ann` | 4-quarter % change in deflator | 1981Q1+ | Real-rate denominator |
-| `real_rate` | `mortgage_rate - hicp_4q_ann` | 1981Q1+ | All specs |
-| `mortgage_burden` | `(fin_loans * mortgage_rate / 100) / ydi_ann_nom` | 1988Q4+ | Spec 7 (now dropped — see §10) |
+| `ln_hp_over_y` | `log(hpi * pop_millions / ydi_ann_nom)` — both sides nominal, deflator cancels exactly | 1976Q3+ | All specs (mandated) |
+| `hicp_4q_ann` | 4-quarter % change in deflator | 1977Q3+ | Real-rate denominator |
+| `real_rate` | `mortgage_rate - hicp_4q_ann` | 1977Q3+ | All specs |
+| `mortgage_burden` | `(fin_loans * mortgage_rate / 100) / ydi_ann_nom` | 1988Q3+ | Spec 7 |
 | `cci_ratio` | `log(housing_loan_flow / ydi_ann_8qma)` | 2002Q3+ | Specs 2, 5 SR term |
 | `fhb_share` | `fhb_loans / (fhb_loans + non_fhb_loans)` | 2002Q3+ | Spec 7 |
-| Williams basis `sdmma_*` | 5q-MA of 4q-MA of step at 1979/1992/1998/2007 | 1980Q1+ when flag on | Spec 8 (when CCI on) |
-| `cci_williams` | Sum of surviving SDMMAs × OLS coefs, peak-normalised | 1980Q1+ when flag on | Spec 8 |
+| Williams basis `sdmma_*` | 5q-MA of 4q-MA of step at each of the 15 candidate institutional knots | 1976Q3+ when basis flag on | Specs 8-12 |
+| `cci_williams` | Sum of surviving SDMMAs × OLS coefs (iterated reduction; 4 survivors), peak-normalised | 1976Q3+ when basis flag on | Specs 8, 10, 11, 12 |
+
+**`ln_hp_over_y` construction note (fixed June 2026).** A previous
+version computed `log(hpi / ydi_real_pc)` — the *nominal* house price
+divided by *real* per-capita income — which left the consumer price
+level inside the ratio (correlation 0.98 with the deflator). The
+corrected definition uses nominal on both sides, so the deflator
+cancels exactly: real HP / real income pc = `(hpi/defl) /
+(ydi_ann_nom/pop/defl)` = `hpi * pop_millions / ydi_ann_nom`
+(`australia_data_download.R:1441`). The master column is now the
+**single source**: all local re-derivations in `australia_estimation.R`,
+`knot_experiment.R`, `cci_placebo_test.R`, `oos_forecast.R`, the
+`refit_*_extended.R` scripts, the `cci_placebo_*.R` scripts and
+`LIVES/R/lives_data_prep.R` have been removed.
 
 ### Dummies
 | Variable | Definition | Source |
@@ -689,29 +735,26 @@ plausibly be 1.5 or 4.5. Sensitivity not tested.
 
 In rough order of payoff:
 
-1. **Source `compensation_of_employees` and `social_assistance_benefits`
-   from 5206020** to enable Italy-style scaled-income robustness check.
-   Currently the IV-style robustness block skips this column. ~30 mins of
-   work in `australia_data_download.R`. **(§2.2)**
-2. **Cache the RBA mortgage rate locally** as
-   `data_raw/rba_filrhlbvs.csv` and load deterministically; record source
-   + vintage in the cached RDS metadata. Removes the silent RBA-vs-ABS
-   fallback divergence. **(§3.1)**
-3. **Refresh the cached RDS** by running a full
-   `australia_consumption_model.R` so the RDS contains all the new
-   variables (currently `add_model_variables()` reconstructs them on the
-   fly). Just runtime; no code change. **(§7)**
+1. **(DONE)** `compensation_of_employees`, `social_assistance_benefits`
+   and the other NPY components are sourced via
+   `data_raw/household_income.csv`; the scaled-income and Williams-NPY
+   robustness blocks run on every pass. **(§2.2)**
+2. **(DONE)** The RBA mortgage rate is cached locally as
+   `data_raw/rba_filrhlbvs.csv` and loaded deterministically (live
+   `readrba` is now only a fallback). **(§3.1)**
+3. **(DONE)** The cached RDS and portable CSV were regenerated by a
+   full cold rebuild in June 2026 (194 rows × 120 columns, mutually
+   consistent). **(§7)**
 4. **Document the provenance of `houseprice_old.csv`** — original ABS
    catalogue number, vintage, download date. ~15 mins. **(§4.1)**
-5. **Fix the `pop_millions` naming** — rename to `pop_thousands`
-   everywhere, fix `pop_q` to use Male+Female cohorts. Single-line rename
-   plus a one-helper change. **(§2.5, §6.2)**
+5. **(DONE)** `pop_millions` is now genuinely millions, built from the
+   ABS A84423091W 15+ civilian population CSV; the biased cohort sum
+   survives only as a loud fallback. **(§2.5, §6.2)**
 6. **(DONE)** RBA E13 wired in as `mortgage_interest_burden_rba` and
    `mortgage_payment_burden_rba` (2009Q1+, 64 obs). Coexists with the
    synthetic `mortgage_burden` (1988Q3+) so Spec 7's pre-2009 history
-   is preserved. Open question: add a Spec 7b that uses the RBA payment
-   burden over post-2009 sample for an explicit measured-vs-synthetic
-   comparison. **(§4.2)**
+   is preserved. The measured-vs-synthetic comparison now exists as
+   **Spec 7b** in the estimation pipeline. **(§4.2)**
 7. **Source pre-1988 ABS Financial Accounts annual data** for sample back-
    extension via Bonci-Coletta splicing. Required to identify the 1979
    deregulation knot of the Williams CCI. Days of work; needs ABS Time
@@ -747,7 +790,7 @@ NOT invalidate the cache**. To force a re-parse:
    ```
    Rscript Australia/R/australia_consumption_model.R
    ```
-   Reads ABS workbooks (cached), fetches RBA series live, builds `master`,
+   Reads ABS workbooks (cached) and the local RBA CSV, builds `master`,
    saves `australia_model_dataset.rds`, then runs estimation. Required if
    `data_raw/` workbooks change.
 2. **Fast re-estimate from RDS (no data work):**
@@ -773,8 +816,9 @@ Generate the CSV from the current cached RDS:
 ```
 Rscript Australia/R/export_master_csv.R
 ```
-This produces [`data_raw/master_data.csv`](../data_raw/master_data.csv) (180
-rows × 60 columns, ~159 KB) using base R `write.table` with 17 significant
+This produces [`data_raw/master_data.csv`](../data_raw/master_data.csv)
+(**194 rows × 120 columns, ~388 KB**; regenerated June 2026 after the
+`ln_hp_over_y` fix) using base R `write.table` with 17 significant
 digits — full double-precision binary round-trip is preserved at the bit
 level for ~99% of cells, with the rest at machine epsilon (~1e-10 max abs
 diff per column, all of which are billion-scale balance-sheet values where
@@ -800,15 +844,18 @@ essentially identical between RDS and CSV paths. Only edge-case
 CSV is for portability and hand-editing.
 
 If your run produces a different preferred-spec selection than the
-documented Spec 6, check whether you ran the CSV path; the substantive
-analysis is unchanged either way.
+documented Spec 3 (the selector's most-passes fallback — the paper's
+headline is Spec 11 regardless), check whether you ran the CSV path;
+the substantive analysis is unchanged either way.
 
 ### Not in source control (but should be)
 - `Australia/outputs/australia_model_dataset.rds` IS in source control
   (small enough — ~50 KB) so CI can use it.
 - Cache directory `.cache/` is **not** in source control. CI rebuilds from
   the workbooks on first run.
-- RBA fetch results are not cached anywhere — see Gap §3.1.
+- The RBA mortgage rate IS cached in source control
+  (`data_raw/rba_filrhlbvs.csv`, §3.1); the cash rate (only used by the
+  disabled CCI overlay branch) is still a live `readrba` fetch.
 
 ---
 

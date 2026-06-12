@@ -3,8 +3,5 @@ Sectional canonical adj R^2,0.6805
 Sectional canonical |lambda|,-0.2244
 Sectional adj R^2 percentile rank,37th
 Sectional |lambda| percentile rank,60th
-Maximal-GETS adj R^2 percentile (prior result),64th
-Maximal-GETS |lambda| percentile (prior result),36th
-Literal 4-knot adj R^2 percentile (prior result),19th
-Literal 4-knot |lambda| percentile (prior result),10th
+Comparator note,see australia_williams_knot_placebo*_summary.csv
 Verdict,DETRENDING CRITIQUE PERSISTS — sectional below random median

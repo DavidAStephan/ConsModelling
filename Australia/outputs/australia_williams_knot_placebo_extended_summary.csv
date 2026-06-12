@@ -1,9 +1,9 @@
 metric,value
-Williams adj R^2,0.6789
-Williams |lambda|,-0.1934
-Williams adj R^2 percentile rank,18th
-Williams |lambda| percentile rank,10th
+Williams adj R^2,0.6801
+Williams |lambda|,-0.2023
+Williams adj R^2 percentile rank,36th
+Williams |lambda| percentile rank,26th
 Placebo n,200
-Placebo adj R^2 median,0.6816
-Placebo |lambda| median,0.2022
+Placebo adj R^2 median,0.6815
+Placebo |lambda| median,0.2079
 Verdict,DETRENDING CRITIQUE PERSISTS — Williams below median

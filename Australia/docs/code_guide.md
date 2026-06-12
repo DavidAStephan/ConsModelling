@@ -54,23 +54,27 @@ Williams' Table 1 calibrations.
                                                        ▼
                                           ┌─────────────────────────┐
                                           │ australia_estimation.R  │
-                                          │ 11 pipeline steps:      │
+                                          │ pipeline steps:         │
                                           │  1-3   build model_data │
-                                          │  4     iterated Williams│
+                                          │  4a    iterated Williams│
                                           │        CCI knot survival│
-                                          │  4     estimate 11 specs│
+                                          │  4     estimate 14 specs│
                                           │        × 4 sample variants│
                                           │  5-7   results+coint+λ  │
+                                          │  7b    Spec 11 variants │
                                           │  8     spec selection   │
-                                          │  9-9c  Italy-style robust│
+                                          │  9/9b  Italy-style robust│
+                                          │        (preferred+Spec11)│
                                           │ 10     long-run decomp  │
                                           │ 11     §10.2 counterfacts│
+                                          │ 16-22  source_isolated  │
+                                          │        sub-scripts      │
                                           └────────────┬────────────┘
                                                        │
                                                        ▼
                             ┌────────────────────────────────────┐
                             │  outputs/                          │
-                            │  ~50 CSVs + ~15 PNGs + summary.md  │
+                            │  ~70 CSVs + ~29 PNGs + summary.md  │
                             └────────────────────────────────────┘
                                             │
                                             ▼   (uses cached RDS)
@@ -93,7 +97,7 @@ Williams' Table 1 calibrations.
                             │ williams_calibration_test.R         │
                             │  → χ² Wald test of Williams Table 1│
                             │                                    │
-                            │ outputs: 8 CSVs                    │
+                            │ outputs: ~14 CSVs + model-data RDS │
                             └────────────────────────────────────┘
 ```
 
@@ -111,14 +115,27 @@ Auxiliaries:
   side-by-side comparison against Williams (2010, 2012) for WP §9.
   Sourced by `australia_estimation.R` at the end of the main block.
 
-Total R code in the project: **27 scripts, ~12,600 lines** across
-`Australia/R/` (18 files) and `LIVES/R/` (9 files).
+Total R code in the project: **30 scripts, ~13,900 lines** across
+`Australia/R/` (21 files) and `LIVES/R/` (9 files).
+
+**Isolation architecture (June 2026 fix).** The post-estimation
+sub-scripts (williams_comparison, knot_experiment, the CCI comparisons
+and placebos, cci_fit_decomposition, oos_forecast) are sourced via
+`source_isolated()` (defined near the end of `australia_estimation.R`),
+which evaluates each script in a fresh child environment
+(`new.env(parent = globalenv())`). The sub-scripts can *read* pipeline
+state (`model_data`, `specs_full`, …) but their own assignments stay
+local. A previous version sourced them at top level, so
+`knot_experiment.R` / `cci_placebo_test.R` silently REASSIGNED the
+global `model_data` (rebuilt with the AR permanent-income constructor),
+contaminating every later step — the old committed IV/SUR tables had
+been estimated on AR-PI data. Do not revert to top-level sourcing.
 
 ---
 
 ## 2. `Australia/R/` — the headline pipeline
 
-The 18 scripts that build the master dataset, fit the eleven
+The 21 scripts that build the master dataset, fit the fourteen
 single-equation specifications, run the robustness suite, and write
 all `Australia/outputs/` CSVs and PNGs.
 
@@ -145,7 +162,7 @@ rename, or chaining additional pre-estimation transforms.
 
 **Don't modify when:** doing routine analysis; this script is glue.
 
-#### 2.1.2 `australia_data_download.R` (1,780 lines) — data construction
+#### 2.1.2 `australia_data_download.R` (1,815 lines) — data construction
 
 **Role.** Part 1 of the pipeline. Builds the `master` tibble from raw
 inputs (ABS workbooks, user-supplied CSVs, RBA D-tables, TRYM HPI,
@@ -170,9 +187,11 @@ or an interactive session.
 | 9 | Coverage report and assertions |
 | 10 | Save outputs (RDS + coverage CSV) |
 
-**Key configuration variable**:
+**Key configuration variables** (decoupled June 2026, NS-131 — the old
+single `USE_INSTITUTIONAL_CCI` flag is gone):
 ```r
-USE_INSTITUTIONAL_CCI <- TRUE   # attaches Williams 15-knot SDMMA basis
+USE_WILLIAMS_SDMMA_BASIS    <- TRUE   # attach the 15-knot Williams SDMMA basis (canonical)
+USE_INSTITUTIONAL_CCI_OVERLAY <- FALSE # pre-2002 cci_ratio backfill (canonical OFF)
 ```
 
 **Key inputs (`data_raw/`):**
@@ -201,13 +220,15 @@ For full provenance see [`data.md`](data.md).
 changes and the regex in `pick_abs()` no longer matches, or you want
 to change a splice point.
 
-#### 2.1.3 `australia_estimation.R` (3,981 lines) — the analytical core
+#### 2.1.3 `australia_estimation.R` (4,470 lines) — the analytical core
 
 **Role.** Part 2 of the pipeline. Reads `model_data` from its
-environment (produced upstream), fits the **eleven specifications**
-(Spec 1–10 plus Spec 6b and Spec 7b) across multiple sample windows,
-runs the full robustness suite, runs the §10.2 policy counterfactuals,
-and writes the headline outputs.
+environment (produced upstream), fits the **fourteen specifications**
+(Spec 1–12 plus Spec 6b and Spec 7b) across the four sample variants
+(full, pre-COVID, COVID-dropped, COVID-rich — `covid_rich` now covers
+all fourteen), runs the full robustness suite (on the
+selector-preferred spec AND on the Spec 11 headline), runs the §10.2
+policy counterfactuals, and writes the headline outputs.
 
 **Run directly?** No. Sourced by all three execution modes.
 
@@ -216,10 +237,10 @@ and writes the headline outputs.
 | Section | Contents |
 |---|---|
 | Top of file | Library loads, output_dir resolution, `PI_METHOD` flag |
-| A | `add_model_variables()`, `compute_income_volatility()`, both PI forecasters, `run_pi_sensitivity()` |
-| C | `model_diagnostics()` — DW, BP, AR(1)/(4), Chow, RESET, BIC |
+| A | `add_model_variables()`, `compute_income_volatility()`, both PI forecasters (AR with a `gfc_ogive` toggle; De Bonis direct forecast), `run_pi_sensitivity()` |
+| C | `model_diagnostics()` — DW, BP, AR(1)/(4), Chow, RESET, BIC. The Chow test uses `strucchange::sctest`, with a manual common-coefficient F-test fallback when sctest is incomputable; the method used is recorded in the `chow_method` column of the diagnostics CSVs (`sctest` / `manual_common_coef`) |
 | E | `fit_ecm_spec()` — single-spec OLS+NW HAC fit |
-| F | `run_all_specifications()` — Specs 1–10 plus 6b and 7b |
+| F | `run_all_specifications()` — Specs 1–12 plus 6b and 7b (Spec 11 = faithful LIVES headline; Spec 12 = calibrated LIVES via `fit_lives_calibrated_spec()`) |
 | F1 | `run_specifications_covid_robust()` — 4-sample variant |
 | F2 | `fit_consumption_with_williams_cci()` — **iterated** spline knot survival |
 | F3 | `build_lambda_robustness_table()` |
@@ -243,33 +264,47 @@ and writes the headline outputs.
 |---|---|---|
 | 1 | Build short-run + dummy variables | (in-memory) |
 | 2 | AR(8) income volatility | `abs_income_resid` |
-| 3 | Construct permanent income (AR or Italy LP) | `ln_yp_over_y` |
-| 4a | Iterated Williams CCI fit (multi-pass sign-survival, max 10 iters) | `cci_williams` attached to model_data |
-| 4 | Estimate 11 specs × 4 sample variants | spec objects |
-| 5 | Build coefficient + diagnostics tables | `australia_*_results.csv`, `*_diagnostics.csv` |
+| 3 | Construct permanent income (AR or De Bonis direct forecast) | `ln_yp_over_y` |
+| 4a | Iterated Williams CCI fit (multi-pass sign-survival, max 10 iters; 4 knots survive: 2007Q3, 2009Q1, 2019Q1, 2020Q2) | `cci_williams` attached to model_data; `australia_cci_williams_series.csv`, `australia_cci_williams_path.png`, `australia_cci_interaction_corr.csv` |
+| 4 | Estimate 14 specs × 4 sample variants | spec objects |
+| 5 | Build coefficient + diagnostics tables | `australia_*_results.csv`, `*_diagnostics.csv` (with `chow_method`) |
 | 5b | Wald test of NLA cross-equation restriction | `australia_nla_restriction_test.csv` |
-| 6 | Cointegration battery | `australia_cointegration.csv` |
+| 6 | Cointegration battery | `australia_cointegration.csv` (with a `note` column) |
 | 7 | λ across 4 sample variants | `australia_lambda_robustness.csv` |
+| 7b | Spec 11 full coefficient vector × 4 variants | `australia_spec11_variants.csv` |
 | 8 | Select preferred spec | `australia_spec_selection.csv` |
-| 9 | Italy-style robustness (IV, SUR, Chow, Drehmann, scaled, NPY) | 6 CSVs |
-| 10 | Long-run decomposition plot | `australia_longrun_decomposition.png` + `.csv` |
+| 9 | Italy-style robustness on the selector-preferred spec (IV, SUR, Chow, Drehmann, scaled, NPY) | 6+ CSVs |
+| 9b | Same suite re-run on the Spec 11 headline | `*_spec11.csv` variants incl. `australia_iv_diagnostics_spec11.csv` |
+| 10 | Long-run decomposition plots (preferred + Spec 11) | `australia_longrun_decomposition*.png` + `.csv` |
 | 11 | Policy counterfactuals (no-APRA, no-COVID, CCI=peak vs zero) | `australia_counterfactuals*.csv` + `.png` |
+| 16–22 | Sub-scripts via `source_isolated()`: williams_comparison, knot_experiment, cci_method_comparison, cci_alternatives, cci_placebo_test, cci_fit_decomposition, oos_forecast | see §2.2, §2.4 |
 
-Other auxiliary steps run inline: PI sensitivity grid, AR vs Italy
-LP method comparison, rolling-window estimation, OOS forecast
-validation, CCI method 4-way comparison, narrative model summary,
-preferred-spec + Spec 1 plots, Williams comparison via
-`williams_comparison.R`.
+Other auxiliary steps run inline: PI sensitivity grid, AR vs direct
+forecast method comparison, rolling-window estimation, narrative model
+summary, preferred-spec + Spec 1 plots.
+
+The IV block instruments the two regressors containing current income —
+`ecm_lag` and `ln_yp_over_y` — with six instruments (income lags 1/2/4,
+unemployment lags 1/2, mortgage-rate lag 1), reports Newey-West HAC SEs,
+and writes first-stage / Wu-Hausman / Sargan diagnostics to
+`australia_iv_diagnostics*.csv` (first-stage F ≈ 29–74). A previous
+version treated `ecm_lag` as exogenous.
 
 **Key configuration variables** (top of file):
 
 ```r
-PI_METHOD <- "italy"   # canonical: Jordà LP. "ar" for rolling AR(8) robustness.
+PI_METHOD <- "italy"   # canonical: De Bonis et al. (2020) direct forecast.
+                       # "ar" for rolling AR(8) robustness (gfc_ogive toggleable).
 ```
 
-The canonical method is Italy LP (resolved 2026-05-07). The AR vs
-Italy LP comparison output is produced regardless of which method is
-canonical.
+The canonical method is the Italy-style direct forecast (resolved
+2026-05-07): a single full-sample regression of the pre-aggregated
+discounted future-income target on time-t predictors, per De Bonis,
+Liberati, Muellbauer & Rondinelli (2020, Appendix A.2). An earlier
+draft mislabelled this a "Jordà (2005) local projection"; the
+implementation is one regression of the pre-aggregated target, not
+per-horizon projections. The AR vs direct-forecast comparison output is
+produced regardless of which method is canonical.
 
 **Modify when:**
 - Adding a new specification → edit `run_all_specifications()`.
@@ -279,7 +314,7 @@ canonical.
 - Adding a new pipeline step → insert in the MAIN block; preserve
   the `[Step N]` console-output convention.
 
-#### 2.1.4 `model_helpers.R` (1,207 lines) — shared utilities
+#### 2.1.4 `model_helpers.R` (1,264 lines) — shared utilities
 
 **Role.** Library of utility functions sourced by Part 1 and Part 2.
 
@@ -347,7 +382,7 @@ Chow-stability flags can flip** because `strucchange::sctest` is
 bit-sensitive near a critical value. Prints a warning at startup.
 For bit-identical reproduction, prefer Mode 2 (RDS).
 
-#### 2.1.8 `williams_comparison.R` (396 lines) — comparison vs Williams (2010, 2012)
+#### 2.1.8 `williams_comparison.R` (402 lines) — comparison vs Williams (2010, 2012)
 
 **Role.** Post-estimation analysis. Builds the side-by-side comparison
 against Williams' published Table 1 and writes a near-publishable
@@ -361,13 +396,20 @@ markdown commentary that is the basis for WP §9.
   comparison.
 - `australia_williams_comparison.md` — ~80-line markdown commentary.
 
-**Methodology framing.** Under canonical `PI_METHOD = "italy"`, our
-Spec 6 λ is 63 % of Williams' published value (−0.180 vs −0.286),
-and the implied structural γ profile is broadly consistent with
-Williams' Table 1: γ_HA = 0.049 vs 0.049, γ_IFA = 0.030 vs 0.022,
-γ_NLA = 0.196 vs 0.159. Under `PI_METHOD = "ar"` the |λ| collapses to
-~0.05 with the historical "Australian PI puzzle" (wrong-signed PI
-coefficient) — treated as a methodology artefact in the WP.
+**Methodology framing.** Under canonical `PI_METHOD = "italy"`, the
+conventional baseline Spec 6 λ is −0.239 (t = −2.55, n = 86) — about
+83 % of Williams' published −0.286. Spec 6's implied structural γ on
+the individual wealth terms is small and individually insignificant
+(γ_HA = 0.009, γ_NLA = 0.035 vs Williams' 0.0488 / 0.159), but with
+wide n = 86 bands Williams' values are not rejected
+(`australia_gamma_inference.csv`). The WP reads the Spec 6 null on
+`ha_y` as a *theory-predicted* null — Williams' housing MPC is zero at
+CCI = 0 — and the headline comparison is now against Spec 11, where
+γ_NLA = 0.060 [0.022, 0.098] excludes Williams' 0.159 and
+γ_IFA = 0.035 [0.012, 0.057] includes his 0.022. Under
+`PI_METHOD = "ar"` the |λ| collapses to ~0.05–0.09 with the historical
+"Australian PI puzzle" (wrong-signed PI coefficient) — treated as a
+methodology artefact in the WP.
 
 ### 2.2 CCI exploration scripts (standalone)
 
@@ -394,7 +436,7 @@ mean |%-shift| on the disaggregated wealth coefficients.
 
 **Outputs:** `australia_cci_fit_decomposition.csv` and `.md`.
 
-#### 2.2.3 `cci_method_comparison.R` (220 lines)
+#### 2.2.3 `cci_method_comparison.R` (216 lines)
 
 **Role.** Produces the **4-way CCI method comparison** chart and
 CSV — Williams 4-knot, Williams maximal-GETS, Kalman, sectional —
@@ -405,34 +447,47 @@ each fit to the consumption equation under common settings.
 `australia_cci_4way_comparison.png`,
 `australia_cci_series_comparison.png`.
 
-#### 2.2.4 `cci_placebo_test.R` (258 lines)
+#### 2.2.4 `cci_placebo_test.R` (422 lines)
 
-**Role.** Random-knot **placebo battery** for the *literal Williams
-4-knot* specification on the 1988Q4+ baseline sample. 200 draws of
-4 random knot dates in the 1979–2007 window, each fit via the same
-sign-survival reduction.
+**Role.** Two random-knot **placebo batteries** on the 1988Q3+
+baseline sample, sourced into an isolated child environment so it
+reuses the canonical pipeline `model_data` (Italy-PI) rather than
+rebuilding it:
 
-**Output:** `australia_williams_knot_placebo.csv`,
-`australia_williams_knot_placebo.png`,
-`australia_williams_knot_placebo_verdict.csv`.
+1. *Literal Williams 4-knot*: 200 draws of 4 random knot dates, each
+   fit via the same sign-survival reduction as the canonical 4-knot.
+2. *Deployed protocol* (new): 200 draws that replace the 15
+   institutional knots with random dates and random sign priors, then
+   run the same **iterated** maximal-GETS reduction as the deployed
+   `cci_williams` — a placebo of exactly the construction the headline
+   uses.
 
-**Headline result on current vintage:** Williams 4-knot R² at the
-34th percentile, |λ| at the 58th — below median on R², above on |λ|.
+**Output:** `australia_williams_knot_placebo.csv` + `.png` +
+`_verdict.csv` (literal), and
+`australia_williams_knot_placebo_deployed.csv` +
+`_deployed_verdict.csv` (deployed protocol).
 
-#### 2.2.5 `cci_placebo_extended.R` (231 lines)
+**Headline result on current vintage:** the literal Williams 4-knot is
+at the placebo median — R² at the 45th percentile, |λ| at the 56th
+(verdict: "detrending critique vindicated"). The deployed 15-knot
+iterated protocol does materially better — R² at the 84th percentile,
+|λ| at the 80th, 4 surviving knots vs a placebo median of 5 (verdict:
+"moderate support").
 
-**Role.** Same protocol on the **back-extended 1976Q3+ sample**
-(n = 190). Tests whether the longer pre-deregulation window
+#### 2.2.5 `cci_placebo_extended.R` (230 lines)
+
+**Role.** Literal 4-knot protocol on the **back-extended 1976Q3+
+sample**. Tests whether the longer pre-deregulation window
 strengthens or weakens the canonical Williams 4-knot identification.
 
 **Output:** `australia_williams_knot_placebo_extended.csv` plus
 two PNG charts (`_lambda.png`, `_r2.png`) and a summary CSV.
 
-**Headline result:** R² at the 19th percentile, |λ| at the 10th —
-the canonical 4-knot specification *deteriorates* on the extended
-sample.
+**Headline result (current vintage):** R² at the 36th percentile, |λ|
+at the 26th — the canonical 4-knot specification remains below the
+random-knot median on the extended sample.
 
-#### 2.2.6 `cci_placebo_maximal_gets_extended.R` (317 lines)
+#### 2.2.6 `cci_placebo_maximal_gets_extended.R` (316 lines)
 
 **Role.** Random-knot placebo on the **maximal-GETS canonical**
 (15-knot candidate set with sign-prior reduction) on the
@@ -442,16 +497,19 @@ sign priors.
 **Output:** `australia_williams_knot_placebo_maximal_extended.csv`
 plus two PNG charts and a summary CSV.
 
-**Headline result:** maximal-GETS canonical at the 64th R²
-percentile, 36th |λ| percentile — "weak support" above the
-random-knot median.
+**Headline result (current vintage):** maximal-GETS canonical at the
+48th R² percentile, 70th |λ| percentile — at the random-knot median on
+fit, above it on adjustment speed.
 
-#### 2.2.7 `knot_experiment.R` (459 lines)
+#### 2.2.7 `knot_experiment.R` (475 lines)
 
-**Role.** Iterative **knot experiment** that adds candidate knots
-one at a time, re-fits, and records survival under the
-Hendry-Krolzig sign-prior reduction. The script that motivated the
-maximal-GETS → 15-knot canonical choice in May 2026.
+**Role.** **Knot experiment** comparing 7 CCI spline variants (the
+published 3- and 4-knot specs, extended macroprudential sets, an
+"Australia within-sample" set, and the maximal-candidate set pruned by
+Hendry-Krolzig sign-prior reduction). The script that motivated the
+maximal-GETS → 15-knot canonical choice in May 2026. Now sourced into
+an isolated child environment and reuses the canonical pipeline
+`model_data` (Italy PI), rebuilding only the standalone variants.
 
 **Output:** `australia_knot_experiment.csv`,
 `australia_knot_experiment_estimates.csv`,
@@ -459,7 +517,7 @@ maximal-GETS → 15-knot canonical choice in May 2026.
 
 ### 2.3 Back-extension scripts
 
-#### 2.3.1 `refit_spec1_extended.R` (157 lines)
+#### 2.3.1 `refit_spec1_extended.R` (156 lines)
 
 **Role.** Refits **Spec 1 (aggregate net worth)** on the
 back-extended 1976Q3+ sample using `ln_networth_y_proxy`, and
@@ -472,7 +530,7 @@ length.
 **Headline result:** wealth elasticity stable (+0.112 → +0.107,
 −4 %); λ slightly more negative on longer sample.
 
-#### 2.3.2 `refit_spec46_extended.R` (186 lines)
+#### 2.3.2 `refit_spec46_extended.R` (185 lines)
 
 **Role.** Refits **Spec 4** (disaggregated no-CCI) and **Spec 6**
 (preferred) on the back-extended sample. Spec 4 uses the
@@ -486,10 +544,11 @@ defined in `run_all_specifications()` proper.
 
 ### 2.4 Out-of-sample forecasting
 
-#### 2.4.1 `oos_forecast.R` (481 lines)
+#### 2.4.1 `oos_forecast.R` (541 lines)
 
-**Role.** Rolling **out-of-sample forecast validation** on five
-specs (Spec 6, Spec 4, Spec 7, Spec 8, Spec 9) over 36
+**Role.** Rolling **out-of-sample forecast validation** on six specs
+(Spec 4, Spec 6, Spec 7, Spec 8, Spec 9, and now Spec 11 — a previous
+version skipped the headline as "missing regressors") over 36
 expanding-window cuts from 2015Q1 to 2023Q4 at horizons
 h ∈ {1, 4, 8}, with random-walk-with-drift and AR(1) benchmark
 forecasters.
@@ -499,10 +558,43 @@ forecasters.
 `australia_oos_forecast_paths.png`,
 `australia_oos_rolling_rmse.png`.
 
-**Headline finding:** at h = 1 the structural specs are competitive
-with the RW-drift benchmark; at h = 4 and h = 8 the random walk
-dominates by 5–15 % in RMSE. Standard "macro forecasting puzzle"
-recorded honestly in WP §8.13.
+**Headline finding:** at h = 1 Spec 8 and Spec 11 edge out the
+RW-drift benchmark on RMSE (0.0290 / 0.0292 vs 0.0309); at h = 4 and
+h = 8 the random walk dominates. Standard "macro forecasting puzzle"
+recorded honestly in the WP.
+
+### 2.5 Standalone inference and nesting scripts
+
+#### 2.5.1 `gamma_inference.R` (222 lines)
+
+**Role.** NS-126/NS-134 — attaches uncertainty to the implied
+structural γ_i = β_i/|λ| ratios, for **both Spec 6 (conventional
+baseline) and Spec 11 (LIVES headline)**: (1) delta-method SEs/CIs
+from the Newey-West vcov of (β, λ); (2) an aggregate wealth γ_W with
+delta-method CI; (3) a seeded moving-block residual bootstrap
+(block length 8, B = 1000, random block starts — a previous version
+generated starts from a deterministic cycle and was not a bootstrap);
+(4) Williams-in-CI flags. For Spec 11 the housing reference is
+Williams' *peak* MPC (0.0488) because the deployed CCI is
+peak-normalised.
+
+**Run:** `Rscript Australia/R/gamma_inference.R` (standalone).
+**Output:** `australia_gamma_inference.csv`.
+
+#### 2.5.2 `martin_nesting.R` (96 lines)
+
+**Role.** NS-135 — tests whether MARTIN's consumption block (income/
+net-wealth homogeneity with net-wealth elasticity ≈ 0.17) is accepted
+on the contemporary data via H0: coef(lincome) = 1 in
+`lcons ~ lincome + log(networth_y) + real_rate`.
+
+**Output:** `australia_martin_nesting.csv`.
+
+#### 2.5.3 `pi_realtime_diagnostic.R` (96 lines)
+
+**Role.** Diagnostic for the real-time (expanding-window) variant of
+the De Bonis direct-forecast permanent income; feeds the look-ahead
+caveat and `australia_pi_realtime_robustness.csv`.
 
 ---
 
@@ -518,7 +610,7 @@ findings logged in
 
 ### 3.1 Data preparation
 
-#### 3.1.1 `lives_data_prep.R` (225 lines)
+#### 3.1.1 `lives_data_prep.R` (227 lines)
 
 **Role.** Loads the master dataset built by
 `australia_data_download.R`, sources the Australia estimation
@@ -580,9 +672,10 @@ constraint.
 **Output:** `LIVES/outputs/sectional_cci_comparison.csv`,
 `LIVES/outputs/sectional_placebo_summary.csv`.
 
-**Headline result:** sectional canonical at the 36th R² percentile,
-40th |λ| percentile — *worse* than the maximal-GETS canonical
-(64/36), against the pre-implementation hypothesis.
+**Headline result (current vintage):** sectional canonical at the
+37th R² percentile, 60th |λ| percentile — still below the random-knot
+median on fit, against the pre-implementation hypothesis that
+sectional priors would strengthen identification.
 
 ### 3.3 Standalone equation diagnostics
 
@@ -615,8 +708,9 @@ on the back-extended sample.
 `lives_sur_2eq_compare.csv` (OLS vs SUR side-by-side),
 `lives_sur_2eq_resid_corr.csv`.
 
-**Headline result:** ρ̂(ε_C, ε_H) ≈ −0.0037. Joint estimation gives
-no efficiency gain at the quarterly frequency. The case for
+**Headline result (current vintage):** ρ̂(ε_C, ε_H) ≈ −0.013 under
+SUR (−0.011 under OLS) — negligible. Joint estimation gives no
+efficiency gain at the quarterly frequency. The case for
 multi-equation LIVES therefore rests on cross-equation parameter
 restrictions, not on residual covariance.
 
@@ -656,7 +750,7 @@ further multi-equation work.
 
 ### 3.5 Phase B — Williams calibration test
 
-#### 3.5.1 `williams_calibration_test.R` (179 lines)
+#### 3.5.1 `williams_calibration_test.R` (186 lines)
 
 **Role.** Phase B item B2. Refits Spec 6 on the canonical Italy-LP
 master and tests **Williams' six Table 1 calibrations** (γ_HA,
@@ -666,52 +760,66 @@ restrictions on the OLS coefficient vector using
 
 **Output:** `LIVES/outputs/williams_calibration_wald.csv`.
 
-**Headline result:** Williams' Table 1 calibrations are **not
-rejected** as a system of restrictions: joint Wald χ²(6) = 2.24,
-p = 0.90 across all six; χ²(4) = 1.07, p = 0.90 for the four wealth
-restrictions alone; no individual restriction rejects (γ_HA:
-χ²(1) = 0.05, p = 0.83). This agrees with our *implied* γ_HA from
-Spec 6 (0.049 vs Williams' 0.0488). The implied-OLS target for each
+**Headline result (current vintage):** Williams' Table 1 calibrations
+are **not rejected** as a system of restrictions: joint Wald
+χ²(6) = 7.55, p = 0.27 across all six; χ²(4) = 1.83, p = 0.77 for the
+four wealth restrictions alone; no individual restriction rejects
+(γ_HA: χ²(1) = 1.54, p = 0.22). The implied-OLS target for each
 restriction is γ × |λ̂| (the structural convention γ = OLS/|λ|); an
 earlier version compared against γ × λ̂ (signed), which flipped the
 target sign and spuriously produced χ²(6) = 29.1 — fixed 2026-06
 ([NS-125](next_steps_plan_2026.md)). The non-rejection is partly a
-low-power result (n = 86, wide NW bands). Discussion in
+low-power result (n = 86, wide NW bands) — note the tension with
+Spec 12, where *imposing* the same calibrations collapses λ to −0.029.
+Discussion in
 [`companion_paper_draft.md §7`](../../LIVES/docs/companion_paper_draft.md).
 
 ---
 
 ## 4. Configuration flags
 
-Two runtime flags materially change pipeline behaviour. Both are at
+Three runtime flags materially change pipeline behaviour. All are at
 the top of their respective files.
 
 ### `PI_METHOD` (in `australia_estimation.R`, ~line 45)
 
 ```r
-PI_METHOD <- "italy"  # canonical (resolved 2026-05-07): Jordà (2005) LP
+PI_METHOD <- "italy"  # canonical (resolved 2026-05-07): De Bonis et al.
+                      # (2020) direct single-regression forecast
 PI_METHOD <- "ar"     # robustness column: rolling AR(8) + trend + ogive
+                      # (the GFC ogive is now a real gfc_ogive toggle)
 ```
 
-Italy LP (a) uses the labour-force-share predictor, (b) flips the
-long-run permanent-income coefficient to positive (resolving the
-Australian PI puzzle under AR), (c) gives Spec 6 |λ| ≈ 0.18 — 63 % of
-Williams' published value. The AR vs Italy LP comparison is produced
-regardless of which method is canonical.
+The direct forecast (a) uses the labour-force-share predictor,
+(b) flips the long-run permanent-income coefficient to positive
+(resolving the Australian PI puzzle under AR), (c) gives Spec 6
+|λ| ≈ 0.24 and Spec 11 |λ| ≈ 0.45. The AR vs direct-forecast
+comparison is produced regardless of which method is canonical. (Do
+not call this method a "Jordà local projection" — it is one full-sample
+regression of the pre-aggregated discounted target.)
 
-### `USE_INSTITUTIONAL_CCI` (in `australia_data_download.R`, ~line 70)
+### `USE_WILLIAMS_SDMMA_BASIS` / `USE_INSTITUTIONAL_CCI_OVERLAY`
+(in `australia_data_download.R`, ~line 70)
+
+The single overloaded `USE_INSTITUTIONAL_CCI` flag was decoupled in
+June 2026 (NS-131) into two independent switches, so the canonical
+configuration (basis ON, overlay OFF) is reproducible from a cold
+rebuild:
 
 ```r
-USE_INSTITUTIONAL_CCI <- TRUE   # canonical: enable Williams SDMMA basis
-USE_INSTITUTIONAL_CCI <- FALSE  # disable Spec 8 / Spec 9 / iterated Williams fit
+USE_WILLIAMS_SDMMA_BASIS      <- TRUE   # canonical: attach the 15-knot SDMMA basis
+USE_INSTITUTIONAL_CCI_OVERLAY <- FALSE  # canonical: NO pre-2002 cci_ratio backfill
 ```
 
-When `TRUE`, the 15-knot Williams candidate SDMMA basis is attached
-and `fit_consumption_with_williams_cci()` runs the **iterated**
-sign-survival reduction (up to 10 iterations; on the current vintage
-3 knots survive after 2 iterations: sdmma_2009_01, sdmma_2019_01,
-sdmma_2020_04). When `FALSE`, Spec 8 / Spec 9 return `NULL` and are
-filtered out of downstream pipeline steps.
+When `USE_WILLIAMS_SDMMA_BASIS = TRUE`, the 15-knot Williams candidate
+SDMMA basis is attached and `fit_consumption_with_williams_cci()` runs
+the **iterated** sign-survival reduction (up to 10 iterations; on the
+current vintage **4 knots survive**: sdmma_2007_09 (GFC), sdmma_2009_01
+(FHB Boost), sdmma_2019_01 (Hayne RC), sdmma_2020_04 (COVID)). When
+`FALSE`, Specs 8/9/10/11/12 return `NULL` and are filtered out of
+downstream pipeline steps. `USE_INSTITUTIONAL_CCI_OVERLAY = TRUE`
+backfills `cci_ratio` pre-2002 with the Muellbauer-style
+regime+indicator blend (shifts the Spec 2/5/6 short-run CCI term).
 
 ---
 
@@ -807,7 +915,7 @@ cd Australia/docs/ && make pdf
 - `test-permanent_income.R` — `compute_log_yp_over_y` and
   `adaptive_permanent_income_log`.
 
-22 `test_that` blocks; all should pass with no skips.
+24 `test_that` blocks; all should pass with no skips.
 
 ### Run
 ```
@@ -843,9 +951,10 @@ off.
 | `compute_income_volatility()` | australia_estimation.R | AR(8) residual proxy |
 | `compute_log_yp_over_y()` | model_helpers.R | log(y^p/y) with discount weights |
 | `construct_institutional_cci()` | model_helpers.R | Muellbauer regime + indicator blend (legacy) |
-| `construct_permanent_income()` | australia_estimation.R | Rolling AR(8) PI forecaster |
-| `construct_permanent_income_italy()` | australia_estimation.R | Jordà (2005) LP PI forecaster |
+| `construct_permanent_income()` | australia_estimation.R | Rolling AR(8) PI forecaster (`gfc_ogive` toggle) |
+| `construct_permanent_income_italy()` | australia_estimation.R | De Bonis et al. (2020) direct-forecast PI (`real_time` option) |
 | `fit_consumption_with_williams_cci()` | australia_estimation.R | **Iterated** Williams CCI knot-survival fit (max 10 iter) |
+| `fit_lives_calibrated_spec()` | australia_estimation.R | Spec 12 — calibrated LIVES headline (Williams Table 1 imposed) |
 | `fit_dols_spec()` | model_helpers.R | Dynamic OLS cointegrating regression |
 | `fit_ecm_spec()` | australia_estimation.R | Single-spec OLS + NW HAC fit |
 | `fit_long_run_spec()` | model_helpers.R | Static cointegrating regression |
@@ -860,10 +969,11 @@ off.
 | `read_abs_ts_workbook()` | model_helpers.R | Parse ABS time-series workbook |
 | `rescale_to_millions()` | model_helpers.R | Convert balance-sheet `$ Billions` to `$ Millions` |
 | `run_adf_drift()` | model_helpers.R | ADF test with drift |
-| `run_all_specifications()` | australia_estimation.R | Estimate all 11 specs |
-| `run_cointegration_battery()` | australia_estimation.R | ADF + Phillips-Ouliaris + Johansen per spec |
+| `run_all_specifications()` | australia_estimation.R | Estimate all 14 specs |
+| `run_cointegration_battery()` | australia_estimation.R | ADF + Phillips-Ouliaris + Johansen per spec (writes a `note` column) |
 | `run_counterfactuals()` | australia_estimation.R | §10.2 NS-012 policy counterfactuals |
-| `run_italy_style_robustness()` | australia_estimation.R | Six robustness blocks (IV, SUR, Chow, Drehmann, scaled, NPY) |
+| `run_italy_style_robustness()` | australia_estimation.R | Six robustness blocks (IV, SUR, Chow, Drehmann, scaled, NPY); `file_suffix = "_spec11"` re-runs it on the headline |
+| `source_isolated()` | australia_estimation.R | Source a sub-script into a fresh child environment (pipeline-state read-only) |
 | `run_pi_sensitivity()` | australia_estimation.R | 18-variant PI grid |
 | `run_specifications_covid_robust()` | australia_estimation.R | 4 sample variants for λ stability |
 | `select_preferred_spec()` | australia_estimation.R | 4-screen rubric + BIC tiebreak |
@@ -890,17 +1000,23 @@ off.
 
 ### Coefficient tables (Australia)
 
-- `australia_full_results.csv` — Specs 1–10 + 6b + 7b coefficients on
-  the full sample. Columns include `ols_estimate`, `nw_se`, `t_stat`,
-  `p_value`, `lambda`, `structural_param` (= ols/|λ|),
+- `australia_full_results.csv` — Specs 1–12 plus 6b + 7b coefficients
+  on the full sample. Columns include `ols_estimate`, `nw_se`,
+  `t_stat`, `p_value`, `lambda`, `structural_param` (= ols/|λ|),
   `expected_sign`, `sign_ok`.
 - `australia_precovid_results.csv` — same on the pre-COVID sub-sample.
 - `australia_all_results.csv` — combined long-format.
+- `australia_spec11_variants.csv` — the Spec 11 full coefficient
+  vector across all four sample variants (full / precovid /
+  covid_dropped / covid_rich).
+- `australia_spec11_ogive_robustness.csv` — Spec 11 with the AR-PI
+  GFC ogive on (headline) vs off (λ = −0.574).
 
 ### Diagnostics
 
 - `australia_full_diagnostics.csv` — n_obs, se_pct, adj_r2, dw,
   lm_het_pval, het_diagnosis, ar1_pval, ar4_pval, chow_pval,
+  `chow_method` (`sctest` or `manual_common_coef` fallback),
   reset_pval, schwarz, loglik per spec.
 - `australia_precovid_diagnostics.csv` — same on pre-COVID.
 - `australia_all_diagnostics.csv` — combined.
@@ -908,7 +1024,11 @@ off.
 ### Spec-selection and stability
 
 - `australia_spec_selection.csv` — pass/fail per the 4 screens, BIC,
-  `is_preferred` flag.
+  `is_preferred` flag. No spec passes the EG cointegration screen, so
+  the selector falls back to most-passes and currently picks
+  Spec3_LevelNetWorth; the BIC-best spec is Spec 11 (−954.8). The
+  paper's headline is Spec 11 on substantive grounds, not the
+  selector.
 - `australia_lambda_robustness.csv` — λ for each (spec × sample
   variant).
 - `australia_breaks.csv` — supF, breakpoints, CUSUM for the preferred
@@ -923,12 +1043,25 @@ off.
 - `australia_nla_restriction_test.csv` — Wald test of γ_LA + γ_LOANS=0
   for Specs 4/5/6 × 2 samples.
 - `australia_williams_cci_knots.csv` — Williams CCI knot survival
-  under the iterated maximal-GETS reduction.
+  under the iterated maximal-GETS reduction (4 survivors: 2007Q3,
+  2009Q1, 2019Q1, 2020Q2).
+- `australia_cci_williams_series.csv` — the deployed CCI path and its
+  five interaction regressors; charted in
+  `australia_cci_williams_path.png` (zero pre-2007Q3, plateau at 1
+  over 2010–18, ≈ −1.6 post-2022).
+- `australia_cci_interaction_corr.csv` — correlation matrix of the
+  CCI interaction block (|ρ| 0.66–0.97 — the collinearity that
+  motivates Spec 12).
 - `australia_spec8_sign_prior_verdicts.csv` — Spec 8 interaction-term
   sign verdicts vs Williams.
-- `australia_cointegration.csv` — ADF + PO + Johansen per spec.
-- `australia_chow_battery.csv` — Chow tests at 1995Q1, 2000Q1, 2008Q3,
-  2020Q1 on the preferred spec.
+- `australia_cointegration.csv` — ADF + PO + Johansen per spec, with a
+  `note` column.
+- `australia_gamma_inference.csv` — delta-method + seeded
+  block-bootstrap CIs on the structural γ, Spec 6 and Spec 11.
+- `australia_martin_nesting.csv` — MARTIN consumption-block nesting
+  test.
+- `australia_chow_battery.csv` / `_spec11.csv` — Chow tests at 1995Q1,
+  2000Q1, 2008Q3, 2020Q1.
 
 ### CCI exploration outputs
 
@@ -946,22 +1079,40 @@ off.
 ### Placebo battery
 
 - `australia_williams_knot_placebo.csv` + `.png` +
-  `_verdict.csv` — literal Williams 4-knot on 1988+.
+  `_verdict.csv` — literal Williams 4-knot on 1988+ (45th R²
+  percentile — the detrending-critique benchmark).
+- `australia_williams_knot_placebo_deployed.csv` +
+  `_deployed_verdict.csv` — deployed-protocol placebo (iterated
+  15-knot reduction, random knots + random priors; 84th R²
+  percentile, moderate support).
 - `australia_williams_knot_placebo_extended*.csv` + `*.png` —
-  literal Williams 4-knot on 1976Q3+.
+  literal Williams 4-knot on 1976Q3+ (36th R² / 26th |λ|).
 - `australia_williams_knot_placebo_maximal_extended*.csv` + `*.png` —
-  maximal-GETS canonical on 1976Q3+.
+  maximal-GETS canonical on 1976Q3+ (48th R² / 70th |λ|).
 
 ### Italy-style robustness suite
 
-- `australia_iv_robustness.csv` — OLS vs IV on current income.
-- `australia_joint_pi_robustness.csv` — single-eq vs joint PI+cons SUR.
+Each of the following also exists in a `*_spec11.csv` variant — the
+suite runs on both the selector-preferred spec and the Spec 11
+headline (Step 9b):
+
+- `australia_iv_robustness.csv` — OLS vs IV (instruments `ecm_lag` +
+  `ln_yp_over_y` with lagged income/unemployment/mortgage-rate
+  instruments).
+- `australia_iv_diagnostics.csv` — first-stage F, Wu-Hausman, Sargan.
+- `australia_joint_pi_robustness.csv` — single-eq vs joint PI+cons SUR
+  (now estimated on the canonical pipeline `model_data`; the old
+  committed tables had been contaminated by AR-PI data from
+  non-isolated sub-script sourcing).
 - `australia_drehmann_robustness.csv` — flat real rate vs amortising.
 - `australia_scaled_income_robustness.csv` — disposable vs 50/50 scaled.
 - `australia_williams_income_robustness.csv` — disposable vs Williams NPY.
 - `australia_wls_robustness.csv` — OLS-NW vs WLS on preferred spec.
 - `australia_permanent_income_sensitivity.csv` — 18-cell PI grid.
-- `australia_pi_method_comparison.csv` + `_meta.csv` — AR vs Italy LP.
+- `australia_pi_method_comparison.csv` + `_meta.csv` — AR vs De Bonis
+  direct forecast.
+- `australia_pi_realtime_robustness.csv` — full-sample vs real-time
+  expanding-window PI (look-ahead caveat).
 
 ### Out-of-sample validation
 
@@ -1025,7 +1176,9 @@ off.
 | Question | Answer |
 |---|---|
 | "Where is the canonical entry point?" | `australia_consumption_model.R` (Mode 1) |
-| "How is permanent income computed?" | `construct_permanent_income()` (AR) and `construct_permanent_income_italy()` (LP) in `australia_estimation.R` |
+| "How is permanent income computed?" | `construct_permanent_income()` (AR) and `construct_permanent_income_italy()` (De Bonis direct forecast) in `australia_estimation.R` |
+| "Where is Spec 11 (LIVES headline) defined?" | `run_all_specifications()` in `australia_estimation.R`, after Spec 8 (search `Spec11_LIVES_Headline`) |
+| "Where is Spec 12 (calibrated LIVES) defined?" | `fit_lives_calibrated_spec()` in `australia_estimation.R` |
 | "How is the Williams spline implemented?" | `build_williams_cci_basis()` and friends in `model_helpers.R`; iterated knot-survival in `fit_consumption_with_williams_cci()` in `australia_estimation.R` |
 | "Where is the spec selector?" | `select_preferred_spec()` in `australia_estimation.R` |
 | "Where is the §10.2 counterfactual code?" | `run_counterfactuals()` in `australia_estimation.R`, Step 11 of MAIN |
@@ -1043,7 +1196,10 @@ off.
 ---
 
 **Generated alongside the May 2026 repo cleanup; refreshed for
-Phase A / B / Spec 6b / Quarto in May 2026 (2026-05-21).
+Phase A / B / Spec 6b / Quarto in May 2026 (2026-05-21); refreshed
+again in June 2026 for the ln_hp_over_y fix, Spec 11/12, the
+deployed-protocol placebo, pipeline isolation (`source_isolated`),
+and the full output re-run (2026-06-12).
 Cross-linked with `data.md`, `wp_draft.md`,
 `next_steps.md` (historical backlog),
 `next_steps_plan_2026.md` (forward-looking tier plan),
