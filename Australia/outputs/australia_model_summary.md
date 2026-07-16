@@ -33,9 +33,9 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec7b_RBABurden | 0.872 | 2.16 | Y | N | N | — | Y | -364.5 | N | N | N | Y |
 | Spec8_CCI_Interactions | 0.827 | 1.92 | Y | Y | N | Y | N | -952.8 | N | N | N | Y |
 | Spec9_KalmanCCI | 0.735 | 2.18 | Y | N | N | N | N | -890.6 | N | — | Y | N |
-| Spec10_WilliamsPrior | 0.778 | 2.10 | Y | Y | N | Y | Y | -493.2 | Y | — | Y | N |
+| Spec10_WilliamsPrior | 0.773 | 2.22 | Y | Y | N | Y | N | -493.3 | Y | — | Y | N |
 | Spec11_LIVES_Headline | 0.824 | 1.90 | Y | Y | N | N | N | -954.8 | Y | N | N | N |
-| Spec12_LIVES_Calibrated | 0.686 | 2.08 | Y | N | N | N | N | -892.3 | N | — | Y | N |
+| Spec12_LIVES_Calibrated | 0.687 | 2.14 | Y | N | N | N | N | -893.8 | Y | — | Y | N |
 
 ## Lambda comparison (full vs pre-COVID)
 
@@ -52,9 +52,9 @@ Long-run structural coefficients (preferred spec, full sample):
 | Spec7b_RBABurden | -0.3805 | -0.0610 | yes |
 | Spec8_CCI_Interactions | -0.4583 | -0.2186 | yes |
 | Spec9_KalmanCCI | -0.2088 | -0.1577 | yes |
-| Spec10_WilliamsPrior | -0.0569 | -0.0187 | yes |
+| Spec10_WilliamsPrior | -0.0481 | -0.0253 | yes |
 | Spec11_LIVES_Headline | -0.4483 | -0.2656 | yes |
-| Spec12_LIVES_Calibrated | -0.0292 | 0.0291 | no |
+| Spec12_LIVES_Calibrated | -0.0301 | 0.0405 | no |
 
 ## Italy vs Australia (preferred specs)
 
@@ -74,7 +74,7 @@ _Italy comparison not available._
 - Spec9_KalmanCCI fails: sign, stability
 - Spec10_WilliamsPrior fails: stability
 - Spec11_LIVES_Headline fails: cointegration, λ range/sign, stability
-- Spec12_LIVES_Calibrated fails: sign, stability
+- Spec12_LIVES_Calibrated fails: stability
 - Heteroskedasticity rejected at 5% in some specs — see `lm_het_pval`, `lm_het_pval_no_events`, `het_diagnosis` columns of diagnostics CSV.
 - COVID handling: see `australia_lambda_robustness.csv` for sample sensitivity.
 - `model_helpers.R::compute_log_yp_over_y` ignores its `discount`, `horizon`, `weights`, `denom` arguments and returns a raw level gap. Flagged for human review.
@@ -84,5 +84,5 @@ _Italy comparison not available._
 - Run: `Rscript Australia/R/australia_consumption_model.R`
 - Fast re-estimation: `Rscript Australia/R/run_estimation_from_rds.R`
 - Random seed: not used (OLS is deterministic).
-- Date generated: 2026-06-12
+- Date generated: 2026-07-16
 

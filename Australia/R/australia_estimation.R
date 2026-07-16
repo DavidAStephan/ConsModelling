@@ -1395,7 +1395,13 @@ fit_williams_prior_spec <- function(model_data,
 
   fit_at_lambda <- function(lambda_guess) {
     d_local <- d
-    d_local$dlcons_adj <- d_local$dlcons - lambda_guess * offset_calib
+    # Convention (header :12-19, build_results_table :2325): the structural
+    # ECM is dlcons = lambda*(ecm_lag - offset_calib) + free terms + e, i.e.
+    # dlcons = lambda*ecm_lag - lambda*offset_calib + free terms + e. Moving
+    # the calibrated part to the LHS to isolate lambda*ecm_lag on the RHS
+    # gives dlcons_adj = dlcons + lambda*offset_calib = lambda*ecm_lag + ...,
+    # so the offset must be ADDED back, not subtracted.
+    d_local$dlcons_adj <- d_local$dlcons + lambda_guess * offset_calib
     fit_ecm_spec(d_local, "Spec10_WilliamsPrior",
                  lr_vars    = free_lr,
                  sr_vars    = free_sr,
@@ -1538,7 +1544,11 @@ fit_lives_calibrated_spec <- function(model_data,
 
   fit_at_lambda <- function(lambda_guess) {
     d_local <- d
-    d_local$dlcons_adj <- d_local$dlcons - lambda_guess * offset_calib
+    # Same sign convention as Spec 10 (see comment there): dlcons_adj must
+    # ADD lambda*offset_calib, not subtract it, so that the fixed-point
+    # regression of dlcons_adj on ecm_lag recovers lambda under
+    # beta_OLS = -lambda*gamma (lambda < 0).
+    d_local$dlcons_adj <- d_local$dlcons + lambda_guess * offset_calib
     fit_ecm_spec(d_local, "Spec12_LIVES_Calibrated",
                  lr_vars    = free_lr,
                  sr_vars    = free_sr,
@@ -3090,7 +3100,23 @@ run_italy_style_robustness <- function(preferred_spec, model_data, output_dir,
     # (= lag(lcons,1) - lincome_t), and ln_yp_over_y (= y^p_hat - lincome_t).
     # A previous version omitted ecm_lag, so the Hall-endogeneity term itself
     # was treated as exogenous and only the PI gap was instrumented.
-    endog <- intersect(c("ln_y_over_c", "ecm_lag", "ln_yp_over_y"), rhs_terms)
+    #
+    # The SAME rule also catches three Spec 8/11 CCI interaction terms that a
+    # previous version left in the exogenous/instrument block:
+    #   - yp_x_cci  = (ln_yp_over_y - mean)*cci_williams: mechanically
+    #     contains ln_yp_over_y, hence current lincome.
+    #   - ha_x_cci  = (ha_y - mean)*cci_williams: ha_y = housing_wealth /
+    #     ydi_ann_nom (CURRENT-period income denominator).
+    #   - hp_x_1_minus_cci = (ln_hp_over_y - mean)*(1 - 1.2*cci_williams):
+    #     ln_hp_over_y = log(hpi*pop/ydi_ann_nom), same current-income ratio.
+    # r_x_cci = (real_rate - mean)*cci_williams is NOT added: real_rate has no
+    # income term, so it does not meet the stated rule. cci_williams itself
+    # (bare CCI level, no ratio) likewise stays exogenous. nla_y/ilfa_y are
+    # also current-income ratios by construction but are left as-is here:
+    # they are not CCI interactions and were out of scope for this fix.
+    endog <- intersect(c("ln_y_over_c", "ecm_lag", "ln_yp_over_y",
+                        "yp_x_cci", "ha_x_cci", "hp_x_1_minus_cci"),
+                       rhs_terms)
     if (length(endog) == 0L) endog <- intersect("ln_y_over_c", rhs_terms)
     exog  <- setdiff(rhs_terms, endog)
 
@@ -3775,7 +3801,8 @@ run_counterfactuals <- function(specs_full, output_dir) {
   invisible(scen_long)
 }
 
-plot_longrun_decomposition <- function(preferred_spec, output_dir) {
+plot_longrun_decomposition <- function(preferred_spec, output_dir,
+                                       file_suffix = "") {
 
   spec_name <- preferred_spec$spec_name
   est_data  <- preferred_spec$est_data
@@ -3793,7 +3820,8 @@ plot_longrun_decomposition <- function(preferred_spec, output_dir) {
     stop("[plot_longrun_decomposition] lambda near zero — cannot rescale")
 
   # Long-run regressors EXCLUDING the ECM term (ln_y_over_c itself); contributions
-  # are de-meaned and scaled by structural coef = OLS / lambda.
+  # are de-meaned and scaled by structural coef = -OLS / lambda (canonical
+  # negative-lambda convention: build_results_table :2325, gamma_inference.R).
   decomp_vars <- setdiff(lr_vars, c("ln_y_over_c", "ecm_lag"))
   decomp_vars <- intersect(decomp_vars, names(est_data))
   decomp_vars <- decomp_vars[!vapply(est_data[, decomp_vars, drop = FALSE],
@@ -3804,7 +3832,7 @@ plot_longrun_decomposition <- function(preferred_spec, output_dir) {
   # Compute contributions
   contrib_mat <- vapply(decomp_vars, function(v) {
     x        <- est_data[[v]]
-    beta_str <- unname(cf[v]) / unname(lambda)
+    beta_str <- -unname(cf[v]) / unname(lambda)
     beta_str * (x - mean(x, na.rm = TRUE))
   }, numeric(nrow(est_data)))
 
@@ -3839,7 +3867,9 @@ plot_longrun_decomposition <- function(preferred_spec, output_dir) {
                    contribution = residual)
   )
 
-  csv_path <- file.path(output_dir, "australia_longrun_contributions.csv")
+  csv_path <- file.path(output_dir,
+                        sprintf("australia_longrun_contributions%s.csv",
+                                file_suffix))
   write.csv(long_df, csv_path, row.names = FALSE)
   message(sprintf("[plot_longrun_decomposition] CSV saved: %s (%d rows)",
                   csv_path, nrow(long_df)))
@@ -3907,7 +3937,9 @@ plot_longrun_decomposition <- function(preferred_spec, output_dir) {
           plot.subtitle = element_text(colour = "grey30"),
           plot.caption  = element_text(colour = "grey40"))
 
-  png_path <- file.path(output_dir, "australia_longrun_decomposition.png")
+  png_path <- file.path(output_dir,
+                        sprintf("australia_longrun_decomposition%s.png",
+                                file_suffix))
   ggsave(png_path, p, width = 16, height = 9, dpi = 200)
   message(sprintf("[plot_longrun_decomposition] PNG saved: %s", png_path))
 
@@ -4457,6 +4489,22 @@ tryCatch(
   plot_longrun_decomposition(preferred_spec, output_dir),
   error = function(e)
     message(sprintf("  [Step 10] aborted: %s", conditionMessage(e)))
+)
+
+cat("[Step 10b] Long-run decomposition plot for the LIVES headline (Spec 11)...\n")
+# Mirrors Step 9b: the §10.1 decomposition narrative is about the LIVES
+# headline mechanism, so it must be regenerated on Spec 11, not just on the
+# selector-preferred spec (previously Spec 3/6). Skipped gracefully if Spec 11
+# is absent from this run (e.g. USE_WILLIAMS_SDMMA_BASIS = FALSE).
+tryCatch({
+  if (!is.null(specs_full$spec11)) {
+    plot_longrun_decomposition(specs_full$spec11, output_dir,
+                               file_suffix = "_spec11")
+  } else {
+    message("  [Step 10b] skipped: Spec 11 not available")
+  }
+}, error = function(e)
+    message(sprintf("  [Step 10b] aborted: %s", conditionMessage(e)))
 )
 
 cat("[Step 11] Policy counterfactuals (NS-012)...\n")

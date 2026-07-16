@@ -48,8 +48,9 @@ across the pre-COVID, COVID-excluded and COVID-rich-dummy variants
 australia_spec11_variants.csv), within about 13 per cent of Williams'
 published −0.286; the full-sample λ = −0.448 (t = −3.6) is inflated by
 the COVID quarters and we do not headline it. The credit-invariant
-wealth structure is right-signed and significant, and remains so under
-every COVID treatment: the structural net-liquid MPC is 0.060 (95 per
+wealth structure is right-signed and significant at 5 per cent in the
+full-sample and COVID-dummy variants, weakening to 10 per cent in the
+pre-COVID subsample: the structural net-liquid MPC is 0.060 (95 per
 cent CI [0.022, 0.098]) and the illiquid financial MPC 0.035
 ([0.012, 0.057]), the latter spanning Williams' calibrated 0.022. The
 estimates are now precise enough to *reject* parts of Williams'
@@ -73,9 +74,9 @@ coefficient reversing sign — are discussed in §7.4.)
 The LIVES *structure* transfers to Australia, but Williams' Australian
 *calibrations* do not. Imposing his calibrated permanent-income
 gearing (ψ₀ = 0.20, ψ₁ = 0.93) collapses the error-correction to
-λ = −0.029 (t = −0.7; the Williams-calibration-imposed specification,
+λ = −0.030 (t = −0.7; the Williams-calibration-imposed specification,
 Spec 12, which flips sign pre-COVID), independently reproduced by
-Spec 10 (λ = −0.057): the Australian data freely estimate a
+Spec 10 (λ = −0.048): the Australian data freely estimate a
 permanent-income gearing several times Williams', and forcing his
 smaller value destroys the equilibrium. This reconciles a puzzle in
 our companion work, where a Wald test fails to reject Williams' joint
@@ -241,10 +242,10 @@ Williams' Australian calibrations do not.** Imposing Williams' Australian
 permanent-income gearing (psi_0 = 0.20, psi_1 = 0.93) and his illiquid
 financial MPC (gamma_IFA = 0.022) — the Williams-calibration-imposed
 specification, Spec 12 — *collapses* the equilibrium: the speed of
-adjustment falls to lambda = −0.029 (t = −0.68, full sample), statistically
+adjustment falls to lambda = −0.030 (t = −0.74, full sample), statistically
 indistinguishable from zero, and flips sign pre-COVID. An independent
 calibration route (Spec 10, Williams-prior) reproduces the collapse
-(lambda = −0.057, t = −0.87). The reason is that Australia freely
+(lambda = −0.048, t = −0.78). The reason is that Australia freely
 estimates a structural permanent-income gearing of order one — several
 times Williams' 0.20 — so forcing his value breaks the long-run fixed
 point. This reconciles the companion paper's Wald non-rejection of
@@ -325,15 +326,17 @@ under all four sample treatments is committed
 (australia_spec11_variants.csv) so this choice is checkable. [Source:
 australia_spec11_variants.csv; australia_lambda_robustness.csv.]
 
-The credit-invariant wealth structure is right-signed and significant,
-and — crucially — its significance survives every COVID treatment. The
+The credit-invariant wealth structure is right-signed and significant
+at 5 per cent in the full-sample and COVID-dummy variants, weakening to
+10 per cent in the pre-COVID subsample. The
 net liquid MPC is **nla_y = +0.027** (t = 3.75) on the full sample,
 +0.017 (t = 2.11) with the COVID quarters dropped and +0.014 (t = 3.10)
 under quarterly COVID dummies, implying a structural MPC
 gamma_3 = OLS/|lambda| of about **0.060** with a 95 per cent
 delta-method interval of [0.022, 0.098]. The illiquid financial MPC is
 **ilfa_y = +0.015** (t = 3.09) full-sample and significant at 5 per cent
-in the COVID-controlled variants, implying structural
+under the COVID-dummy variants, weakening to 10 per cent on the
+pre-COVID subsample (t = 1.74), implying structural
 gamma_2 ≈ **0.035** [0.012, 0.057] — an interval that spans Williams'
 calibrated 0.022. The housing-collateral channel enters with the right
 sign but is not significant in any variant: **ha_x_cci = +0.0025**
@@ -373,10 +376,10 @@ australia_spec11_ogive_robustness.csv.]
 The contrast with the calibration route is sharp. Imposing Williams'
 Australian calibrations (Spec 12: psi_0 = 0.20, psi_1 = 0.93,
 gamma_IFA = 0.022) collapses the error-correction term to
-lambda = −0.029 (t = −0.68) on the full sample and flips its sign on
-the pre-COVID sample (lambda = +0.029, not significant); the
+lambda = −0.030 (t = −0.74) on the full sample and flips its sign on
+the pre-COVID sample (lambda = +0.041, t = 2.03, significant at 5 per cent); the
 independent Williams-prior route (Spec 10) reproduces the collapse at
-lambda = −0.057 (t = −0.87). The LIVES *structure* transfers to
+lambda = −0.048 (t = −0.78). The LIVES *structure* transfers to
 Australia; Williams' Australian *calibrations* do not. Williams' rate,
 affordability and autonomous-consumption loadings cannot even be
 imposed at their published magnitudes — his raw rate loading
@@ -834,8 +837,8 @@ a specification artefact.
 LIVES *structure* transfers to Australia, but Williams' Australian
 *calibrations* do not. Imposing his permanent-income gearing
 (ψ_0 = 0.20, ψ_1 = 0.93) and illiquid-financial MPC (γ_IFA = 0.022)
-collapses the equilibrium to λ ≈ −0.029 (t = −0.68), independently
-reproduced by a Williams-prior calibrated specification (λ = −0.057),
+collapses the equilibrium to λ ≈ −0.030 (t = −0.74), independently
+reproduced by a Williams-prior calibrated specification (λ = −0.048),
 because Australia freely estimates a structural permanent-income
 gearing of order one (ψ̂ = OLS/|λ| ≈ 1.0–1.1) — roughly five times
 Williams' 0.20 on the consistent structural scale (equivalently, the
@@ -2571,8 +2574,8 @@ and each piece is itself an honest negative:
 
 3. **The calibration collapse (Spec 10 and Spec 12, §7.0.1).** When
    Williams' calibrations are imposed instead of freed, the
-   error-correction term collapses to λ = −0.029 (t = −0.68) in Spec 12,
-   independently reproduced at λ = −0.057 (t = −0.87) by Spec 10. A block
+   error-correction term collapses to λ = −0.030 (t = −0.74) in Spec 12,
+   independently reproduced at λ = −0.048 (t = −0.78) by Spec 10. A block
    of regressors that can be jointly identified would not behave this
    way; a near-collinear block, whose joint mapping into the data is
    sharp but whose internal split is not, will.
@@ -2911,7 +2914,7 @@ form. The full screen card, taken directly from
 | 9                            | ✗ | NA | ✓ | ✗ | −890.6 |
 | 10                           | ✓ | NA | ✓ | ✗ | −493.2 |
 | **11** (faithful LIVES, headline) | **✓** | ✗ | ✗ | ✗ | **−954.8** |
-| 12                           | ✗ | NA | ✓ | ✗ | −892.3 |
+| 12                           | ✓ | NA | ✓ | ✗ | −893.8 |
 
 Source: `australia_spec_selection.csv` (the BIC column is the Schwarz
 criterion recorded there and in `australia_full_diagnostics.csv`).
@@ -2979,12 +2982,12 @@ estimate as the identified value.
 **The calibration-imposed forms pass the |λ| screen for the wrong
 reason.** Specs 10 and 12 pass the speed-of-adjustment screen on the
 full sample, but only because their λ has *collapsed* toward zero
-(Spec 10: −0.057, t = −0.87; Spec 12: −0.029, t = −0.68), placing it
+(Spec 10: −0.048, t = −0.78; Spec 12: −0.030, t = −0.74), placing it
 just inside the lower edge of the (0.02, 0.30) interval. Both fail the
 stability screen — their λ is not sign-stable across samples
 (`lambda_sign_stable_across_samples = FALSE` in
 `australia_lambda_robustness.csv`; Spec 12's pre-COVID λ flips to
-+0.029, Spec 10's COVID-dropped λ flips to +0.008). A screen that is
++0.041, Spec 10's COVID-dropped λ flips to +0.009). A screen that is
 satisfied by a near-zero, sign-unstable adjustment speed is exactly the
 case the stability screen exists to catch. The economic content of this
 collapse — that imposing Williams' Australian calibrations wrecks the
@@ -3168,8 +3171,8 @@ the imposed-calibration specifications.)
 
 The result is decisive and negative: **imposing Williams' permanent-income
 calibration collapses the error-correction to λ ≈ 0** (Spec 12:
-λ = −0.029, t = −0.68, flipping sign pre-COVID; independently reproduced
-by the pre-existing Spec 10, λ = −0.057, t = −0.87, which keeps the rate
+λ = −0.030, t = −0.74, flipping sign pre-COVID; independently reproduced
+by the pre-existing Spec 10, λ = −0.048, t = −0.78, which keeps the rate
 and affordability channels free). The mechanism is that the Australian
 data freely estimate a structural permanent-income gearing of order one
 (§7.0) — several times Williams' 0.20 — so forcing his value injects a
@@ -3625,17 +3628,30 @@ to keep honest.
 Run on the faithful LIVES specification
 ([`australia_iv_robustness_spec11.csv`](../outputs/australia_iv_robustness_spec11.csv),
 [`australia_iv_diagnostics_spec11.csv`](../outputs/australia_iv_diagnostics_spec11.csv),
-n = 146), the same pattern holds and the headline conclusions are
-intact: λ moves from −0.448 to −0.547 (+22 per cent), the
-permanent-income coefficient from +0.459 to +0.598 (+30 per cent), and
-the wealth m.p.c.s shrink moderately but stay positive — nla_y
-0.0269 → 0.0216 (−20 per cent, HAC t ≈ 2.4) and ilfa_y 0.0155 → 0.0115
-(−26 per cent, t ≈ 1.9). The Spec 11 first stages are equally strong
-(weak-instrument F = 72.2 for ln_yp_over_y and 35.0 for ecm_lag), and
-here the Wu–Hausman test *does* reject exogeneity (p = 0.003) with the
-Sargan test marginal (p = 0.062) — so in the LIVES form the
-Hall-endogeneity correction is statistically warranted and works in
-the direction of a *faster*, not slower, error-correction.
+n = 146), the exercise is more demanding and correspondingly less
+conclusive, and we read it diagnostically rather than confirmatorily.
+Correcting an error in an earlier run — which had let three of the CCI
+interactions instrument themselves — the endogenous set is now the five
+income- and wealth-carrying terms (ecm_lag, ln_yp_over_y, yp_x_cci,
+ha_x_cci and hp_x_1_minus_cci) against the same six instruments, which
+leaves only a single overidentifying restriction. The Wu–Hausman test
+still rejects exogeneity (p = 0.002), so current-income endogeneity is a
+live concern in the LIVES form; but the first stages are uneven — the
+weak-instrument F-statistics are 126.0 (ln_yp_over_y), 55.5 (ha_x_cci),
+32.5 (ecm_lag) and 15.2 (hp_x_1_minus_cci), yet only 6.5 for yp_x_cci,
+below the conventional weak-instrument threshold. λ does move away from
+zero (−0.448 → −0.503, +12 per cent), in the direction of a *faster*
+error-correction; but the wealth-channel point estimates cannot bear
+weight. nla_y attenuates to statistical insignificance
+(0.0269 → 0.0040, HAC t ≈ 0.3), and the two housing interactions flip
+sign relative to OLS (ha_x_cci +0.0025 → −0.013;
+hp_x_1_minus_cci +0.028 → −0.015). With only one overidentifying
+restriction (Sargan p = 0.251, a near-vacuous test at df = 1) and a weak
+first stage on yp_x_cci, these movements are not reliable evidence for
+or against the wealth channel in either direction — the IV design is
+underpowered for Spec 11. What the exercise establishes is narrower than
+the earlier draft claimed: that endogeneity matters here (Wu–Hausman),
+not that the LIVES wealth m.p.c.s survive instrumentation.
 
 ### 8.2 Joint permanent-income + consumption SUR
 
@@ -3946,9 +3962,9 @@ quarters and the tightly clustered −0.24 to −0.27 of the three
 COVID-controlled variants treated as the identified value (close to
 Williams' −0.286; full coefficient vectors for all four variants in
 [`australia_spec11_variants.csv`](../outputs/australia_spec11_variants.csv)).
-Only Spec 10 (Williams-prior calibrated; sign-flips to +0.008
-COVID-dropped and +0.043 COVID-rich) and Spec 12 (Williams
-calibrations imposed; sign-flips to +0.029 pre-COVID and +0.013
+Only Spec 10 (Williams-prior calibrated; sign-flips to +0.009
+COVID-dropped and +0.051 COVID-rich) and Spec 12 (Williams
+calibrations imposed; sign-flips to +0.041 pre-COVID and +0.015
 COVID-rich) are not sign-stable across samples — an artefact of the
 calibration collapse documented in §9, not of the COVID episode
 itself.
@@ -4342,13 +4358,13 @@ Spec 12 imposes Williams' scale-robust calibrations (γ_IFA = 0.022,
 ψ₀ = 0.20, ψ₁ = 0.93) via an iterative fixed-point offset and frees
 only the housing-collateral m.p.c., the net-liquid m.p.c. and λ. The
 result is a near-total collapse of the error-correction mechanism:
-**λ = −0.029 (t = −0.68)** on the full sample, and it flips to the
-wrong sign (+0.029) pre-COVID, so it is not even sign-stable across
+**λ = −0.030 (t = −0.74)** on the full sample, and it flips to the
+wrong sign (+0.041, t = 2.03, significant at 5 per cent) pre-COVID, so it is not even sign-stable across
 samples (`australia_lambda_robustness.csv`). This is independently
 reproduced by the pre-existing Williams-prior specification (Spec 10),
 which keeps the rate and affordability channels free and still returns
-λ = −0.057 (t = −0.87) full-sample and a still-insignificant −0.019
-(t = −0.44) pre-COVID, flipping to the wrong sign once the COVID
+λ = −0.048 (t = −0.78) full-sample and a still-insignificant −0.025
+(t = −0.57) pre-COVID, flipping to the wrong sign once the COVID
 quarters are dropped or dummied (`australia_lambda_robustness.csv`).
 Two separate calibration routes therefore reach the same conclusion.
 
@@ -4641,27 +4657,50 @@ zero by construction over the window, and the actual de-meaned path
 and the residual are reported alongside
 ([`australia_longrun_contributions_spec11.csv`](../outputs/australia_longrun_contributions_spec11.csv)).
 
-At the last observation (2024Q4) the dominant negative wedge is the
-credit-scaled affordability term at −0.098 — its largest value in the
+At the last observation (2024Q4) the dominant wedge is now the
+credit-scaled affordability term at +0.098 — its largest value in the
 sample, reflecting house prices elevated relative to income with the
-CCI in its post-2022 tight regime — partly offset by the two
-permanent-income terms (+0.057 level, +0.088 interaction), with the
-financial-wealth channels small (`nla_y` +0.004, `ilfa_y` −0.039,
-`ha_x_cci` +0.017) against an actual de-meaned log(c/y) of −0.020 and
-a residual of −0.054. Three features of the path stand out. First,
-because the deployed CCI is identically zero before 2007Q3, the four
-credit-scaled terms contribute essentially nothing over 1988–2007 —
-the pre-GFC swings are carried by the financial-wealth ratios and
-permanent income (e.g. in 2007Q4: `nla_y` +0.023, `ln_yp_over_y`
-−0.040). Second, the post-2022 tightening regime (CCI ≈ −1.6) is
-where the credit terms move most: the rate interaction swings to
-−0.049 in 2022Q3 before reverting, and the affordability wedge widens
-steadily to its end-of-sample extreme. Third, the residual carries a
-sizeable, slowly evolving level — around +0.09 to +0.16 over
-2002–2007, drifting negative from the GFC onwards — with the sharpest
-excursion in the COVID quarters (−0.36 in 2020Q3), where the long-run
-bracket explains little and the dynamic equation's dummies do the
-work; by 2022Q4 it is back near zero.
+CCI in its post-2022 tight regime (CCI ≈ −1.6, so the affordability
+multiplier 1 − 1.2·CCI is large and positive) — offset by the two
+permanent-income terms (−0.057 level, −0.088 interaction), with the
+financial-wealth channels smaller (`ilfa_y` +0.039, `ha_x_cci` −0.017,
+`nla_y` −0.004) against an actual de-meaned log(c/y) of −0.020 and a
+residual of only +0.013. The headline of the corrected decomposition
+is that the fitted long-run sum now tracks the actual path closely:
+the correlation between fitted and actual de-meaned log(c/y) is +0.945
+and the residual carries only 11 per cent of the variance of the
+actual path, so the estimated drivers — not an unexplained residual —
+account for most of the movement in the consumption-to-income ratio.
+
+Three features of the path stand out. First, because the deployed CCI
+is identically zero before 2007Q3, the rate, permanent-income and
+housing-collateral interactions (`r_x_cci`, `yp_x_cci`, `ha_x_cci`)
+are held flat over 1988–2007 and only the affordability term moves
+(and only with house prices, since 1 − 1.2·CCI = 1 there); the pre-GFC
+swings are therefore carried by permanent income and the
+financial-wealth ratios. The early-2000s credit boom is a
+permanent-income episode in this arithmetic — at 2003Q4 an actual
+de-meaned log(c/y) of +0.062 is almost entirely the +0.063
+contribution of `ln_yp_over_y` — and the 2009Q1 GFC dip (actual
+−0.027) is carried by net liquid assets (−0.016) with permanent income
+turning below trend (−0.009). Second, once the CCI is live the credit
+terms do most of their work in the tightening episodes: through the
+2010s the permanent-income level term runs persistently negative (PI
+below realised income, e.g. −0.046 at 2015Q4) largely offset by rising
+illiquid financial wealth (+0.020) and the permanent-income
+interaction (+0.046); and in the post-2022 tightening regime the rate
+interaction swings to +0.049 in 2022Q3 while the affordability wedge
+widens steadily to its end-of-sample extreme of +0.098. Third — the
+substantive reversal from the pre-fix decomposition — the residual is
+now small and no longer carries the story. Across 2002–2007 it sits
+within ±0.02 (against the +0.09 to +0.16 level the sign-inverted
+decomposition had reported), and even the COVID collapse is largely
+captured by the long-run bracket rather than left to the dynamic
+dummies: at the trough (2020Q2, actual −0.213) the drivers still leave
+a −0.107 residual, but by 2020Q3 the permanent-income interaction
+(−0.158) and its level term (−0.077) absorb nearly all of the −0.170
+dip, leaving a residual of only +0.017. The COVID quarters are where
+the drivers explain the most, not the least.
 
 The honest qualifier is that the credit-scaled contributions inherit
 the weak identification of their coefficients (§5, §7.0): γ₁ is
@@ -4672,11 +4711,19 @@ fitted arithmetic, not as well-identified structural channels. As a
 cross-check, the selector-preferred net-worth decomposition (Spec 3;
 [`australia_longrun_contributions.csv`](../outputs/australia_longrun_contributions.csv))
 tells a consistent end-of-sample story with coarser channels: net
-worth −0.018, affordability −0.015, real rate ≈ 0.000 and permanent
-income +0.057 at 2024Q4, with a residual of −0.045. Both
-parameterisations agree that affordability-type wedges and permanent
-income are the dominant moving parts of the fitted equilibrium, and
-that aggregate wealth sits near its sample mean at end-2024.
+worth +0.018, house-price affordability +0.015, real rate ≈ 0.000 and
+permanent income −0.057 at 2024Q4, with a residual of +0.004. Spec 3
+tracks the actual path less tightly than Spec 11 (fitted–actual
+correlation +0.81, residual variance 36 per cent of the actual) —
+lacking the CCI interactions it cannot capture the COVID dip, leaving
+a −0.103 residual at 2020Q3 — but both parameterisations agree that
+permanent income is the single largest source of variation in the
+fitted equilibrium, with the affordability/house-price wedge the
+next-largest moving part. On the wealth side the two decompositions
+also agree in the corrected sign: net worth (Spec 3, +0.018) and
+illiquid financial assets (Spec 11, +0.039) both sit modestly above
+their sample means at end-2024, a small positive support to the ratio
+rather than the drag the sign-inverted decomposition had shown.
 
 Source:
 [australia_longrun_contributions_spec11.csv](../outputs/australia_longrun_contributions_spec11.csv),
@@ -4768,7 +4815,8 @@ net-liquid-asset MPC is γ₃ = 0.060 [0.022, 0.098] (OLS coefficient
 +0.027, t = 3.75) and the illiquid-financial-asset MPC is
 γ₂ = 0.035 [0.012, 0.057] (OLS +0.015, t = 3.09), both as structural
 propensities recovered as OLS/|λ| on the full sample (|λ| = 0.448),
-and both surviving every COVID treatment. Housing wealth, by
+both significant at 5 per cent in the full-sample and COVID-dummy
+variants, weakening to 10 per cent in the pre-COVID subsample. Housing wealth, by
 contrast, enters *only* through the credit-scaled collateral channel:
 the implied structural MPC is γ₁ = 0.0055 — right-signed but
 statistically insignificant (OLS +0.0025, t = 0.71), against
@@ -5028,12 +5076,12 @@ It does *not* survive imposition of his Australian calibrations.
 Specification 12 imposes Williams' permanent-income gearing
 (ψ₀ = 0.20, ψ₁ = 0.93) and his illiquid-financial m.p.c.
 (γ_IFA = 0.022) via an iterative fixed point; the error-correction
-mechanism collapses to λ = −0.029 (t = −0.68) and flips sign
-pre-COVID (+0.029), with the net-liquid coefficient turning
+mechanism collapses to λ = −0.030 (t = −0.74) and flips sign
+pre-COVID (+0.041, t = 2.03), with the net-liquid coefficient turning
 wrong-signed (australia_all_results.csv;
 australia_lambda_robustness.csv). Specification 10 (Williams-prior
-calibrated) independently reproduces the collapse (λ = −0.057,
-t = −0.87). The mechanism is that Australia freely estimates a
+calibrated) independently reproduces the collapse (λ = −0.048,
+t = −0.78). The mechanism is that Australia freely estimates a
 structural permanent-income gearing of order one (ψ̂ = 1.02–1.13) —
 roughly five times Williams' calibrated ψ₀ = 0.20 on the consistent
 structural scale; forcing his much lower value removes the
@@ -5235,8 +5283,8 @@ consumption literature.
 
 2. **The structure-transfers-but-calibrations-don't finding.**
    Imposing Williams' permanent-income gearing collapses the
-   equilibrium (Spec 12: λ = −0.029, flipping sign pre-COVID;
-   independently reproduced by Spec 10: λ = −0.057), because
+   equilibrium (Spec 12: λ = −0.030, flipping sign pre-COVID;
+   independently reproduced by Spec 10: λ = −0.048), because
    Australia freely estimates a structural gearing of order one —
    roughly five times Williams' 0.20; this reconciles the companion
    low-power Wald non-rejection (χ²(6) = 7.55, p = 0.27) as
@@ -5536,19 +5584,19 @@ $\gamma=\mathrm{OLS}/|\lambda|$. *** sig 1%, ** sig 5%, * sig 10%.
 
 | Term | Spec 11 full ($n=146$) | Spec 11 pre-COVID ($n=126$) | Spec 12 full ($n=146$) | Spec 12 pre-COVID ($n=126$) |
 |---|---|---|---|---|
-| $\lambda$ (`ecm_lag`) | −0.448 (t=−3.57)*** | −0.266 (t=−4.85)*** | −0.029 (t=−0.68) | +0.029 (t=1.47, sign flip) |
-| `nla_y` | +0.0269 (t=3.75)*** | +0.0159 (t=1.81)* | −0.0013 (t=−0.46, wrong sign) | +0.0023 (t=1.04) |
+| $\lambda$ (`ecm_lag`) | −0.448 (t=−3.57)*** | −0.266 (t=−4.85)*** | −0.030 (t=−0.74) | +0.041 (t=2.03)**, sign flip |
+| `nla_y` | +0.0269 (t=3.75)*** | +0.0159 (t=1.81)* | +0.0011 (t=0.39) | −0.0002 (t=−0.09, wrong sign) |
 | `ilfa_y` (=eq+super) | +0.0155 (t=3.09)*** | +0.0093 (t=1.74)* | imposed (γ=0.022) | imposed (γ=0.022) |
-| `ha_x_cci` ($\gamma_1$) | +0.0025 (t=0.71) | +0.0019 (t=0.86) | −0.0010 (t=−0.70) | +0.0012 (t=1.03) |
+| `ha_x_cci` ($\gamma_1$) | +0.0025 (t=0.71) | +0.0019 (t=0.86) | −0.0012 (t=−0.88) | +0.0018 (t=1.52) |
 | `hp_x_1_minus_cci` | +0.0279 (t=3.08)*** | +0.0137 (t=1.10) | — | — |
 | `r_x_cci` | +0.0028 (t=4.55)*** | +0.0022 (t=3.47)*** | — | — |
 | `cci_williams` ($\zeta_c$) | +0.0001 (t=0.01) | +0.0199 (t=2.77)*** | — | — |
 | `ln_yp_over_y` | +0.4591 (t=4.04)*** | +0.2982 (t=5.81)*** | imposed ($\psi_0$=0.20) | imposed ($\psi_0$=0.20) |
 | `yp_x_cci` | −0.5101 (t=−1.51) | +0.1869 (t=1.80)* | imposed ($\psi_1$=0.93) | imposed ($\psi_1$=0.93) |
-| Intercept | −0.0139 (t=−2.13)** | −0.0099 (t=−1.54) | +0.0101 (t=2.25)** | +0.0028 (t=1.23) |
-| adj-$R^2$ | 0.824 | 0.239 | 0.686 | 0.094 |
-| SE (%) | 0.683 | 0.510 | 0.915 | 0.560 |
-| BIC (Schwarz) | −954.75 | −900.15 | −892.34 | −898.94 |
+| Intercept | −0.0139 (t=−2.13)** | −0.0099 (t=−1.54) | +0.0078 (t=1.81)* | +0.0048 (t=2.13)** |
+| adj-$R^2$ | 0.824 | 0.239 | 0.687 | 0.073 |
+| SE (%) | 0.683 | 0.510 | 0.911 | 0.565 |
+| BIC (Schwarz) | −954.75 | −900.15 | −893.79 | −896.61 |
 
 Implied structural MPCs for Spec 11 (full sample, $/|\lambda|=0.448$):
 NLA 0.060, IFA 0.035, housing-collateral $\gamma_1$ 0.0055 (right-signed,
@@ -5576,9 +5624,9 @@ robustness column.
 | Spec 7b | −0.381 (t=−2.43)** | −0.061 (t=−0.93) |
 | Spec 8 | −0.458 (t=−3.52)*** | −0.219 (t=−3.95)*** |
 | Spec 9 | −0.209 (t=−3.24)*** | −0.158 (t=−2.86)*** |
-| Spec 10 | −0.057 (t=−0.87) | −0.019 (t=−0.44) |
+| Spec 10 | −0.048 (t=−0.78) | −0.025 (t=−0.57) |
 | Spec 11 | −0.448 (t=−3.57)*** | −0.266 (t=−4.85)*** |
-| Spec 12 | −0.029 (t=−0.68) | +0.029 (t=+1.47) |
+| Spec 12 | −0.030 (t=−0.74) | +0.041 (t=+2.03)** |
 
 (Several specifications estimate on different windows from the nominal
 $n=146$/$n=126$: Specs 2, 5, 6, 7 and 10 on $n=86$ because a
@@ -5620,10 +5668,10 @@ the structure-transfers-but-calibrations-do-not result: imposing
 Williams' Australian calibrations
 ($\psi_0=0.20$, $\psi_1=0.93$, $\gamma_{\mathrm{IFA}}=0.022$) via the
 iterative fixed point collapses the error-correction speed from $-0.448$
-to a statistically insignificant $-0.029$, and flips it to the wrong sign
-($+0.029$) pre-COVID. Spec 10 (Williams-prior calibrated;
+to a statistically insignificant $-0.030$, and flips it to the wrong sign
+and statistically significant $+0.041$ ($t=2.03$) pre-COVID. Spec 10 (Williams-prior calibrated;
 `australia_full_results.csv`) independently reproduces the collapse
-($\lambda=-0.057$, $t=-0.87$).
+($\lambda=-0.048$, $t=-0.78$).
 
 The structural-parameter inference (the implied $\gamma=\mathrm{OLS}/|\lambda|$
 with delta-method and bootstrap confidence intervals, for both Spec 6 and
