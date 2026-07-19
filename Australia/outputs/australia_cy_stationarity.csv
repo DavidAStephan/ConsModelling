@@ -1,0 +1,5 @@
+window,sample_from,sample_to,n_obs,adf_stat,adf_5pct_cv,adf_verdict,kpss_stat,kpss_5pct_cv,kpss_verdict,note
+full,1976-10-01,2024-10-01,193,-2.3274771761769775,-2.88,nonstationary,0.9970868440737046,0.463,nonstationary,
+Spec6_Preferred,2003-07-01,2024-10-01,86,-2.4279684338684917,-2.89,nonstationary,0.8494082864264192,0.463,nonstationary,
+Spec11_LIVES_Headline,1988-07-01,2024-10-01,146,-2.500470013629073,-2.88,nonstationary,0.78273487379696,0.463,nonstationary,
+Spec12_LIVES_Calibrated,1988-07-01,2024-10-01,146,-2.500470013629073,-2.88,nonstationary,0.78273487379696,0.463,nonstationary,

@@ -173,8 +173,8 @@ households operate have evolved markedly since financial deregulation in the
 1980s?
 
 The Muellbauer–Williams "LIVES" framework — Latent Interactive Variable
-Equation System, in the flow-of-funds tradition of Tobin and of Duca,
-Muellbauer and Murphy (2013) — was developed to answer exactly these
+Equation System, in the flow-of-funds tradition of Tobin and of Duca
+and Muellbauer (2013) — was developed to answer exactly these
 questions. It augments the standard credit-augmented life-cycle consumption
 function (Friedman 1957; Ando and Modigliani 1963; Tobin and Dolde 1971)
 with three features. First, wealth is disaggregated into net liquid assets
@@ -544,8 +544,9 @@ the affordability multiplier ϖ = 1.2). Critically, housing wealth
 enters *only* through γ_1·CCI·(HA/4y) — there is no standalone housing
 wealth level in the long-run relationship. The housing marginal
 propensity is therefore zero at CCI = 0 and rises as credit conditions
-ease, reaching Williams' implied peak housing MPC of 0.0488 (Williams'
-Table 1; williams_comparison.csv). The illiquid financial asset term
+ease, reaching Williams' implied peak housing MPC of 0.0488 — his
+derived long-run figure, not the raw Table 1 coefficient (γ₁ = 0.0606);
+see williams_comparison.csv. The illiquid financial asset term
 (IFA = equities + superannuation) and the net liquid asset term
 (NLA = liquid assets − total household debt) enter as plain marginal
 propensities (Williams' calibrated γ_IFA = 0.022 and estimated
@@ -578,9 +579,9 @@ Muellbauer and Murphy (2010) apply the framework to the global financial
 crisis, demonstrating that the abrupt tightening in CCI from 2007
 quantitatively rationalises the sharp consumption pullback observed in
 heavy-MEW economies. Duca and Muellbauer (2013), in
-*European Economy* Discussion Paper 14, formalise what they label the
-"LIVES" approach — the *L*atent *I*nteractive *V*ariable
-*E*quation *S*ystem — emphasising the joint determination of
+European Central Bank Working Paper 1581 ("Tobin LIVES"), formalise
+what they label the "LIVES" approach — the *L*atent *I*nteractive
+*V*ariable *E*quation *S*ystem — emphasising the joint determination of
 consumption, house prices, mortgage debt and home equity withdrawal in
 a four-equation system identified by common factors and cross-equation
 sign restrictions.
@@ -679,10 +680,11 @@ the present analysis rather than substitutes for it.
 
 The credit-conditions index is the most contested ingredient in the
 LIVES framework, and the heart of the identification problem this paper
-documents. Williams (2010) constructs CCI as a latent variable
-identified by a spline of smoothed-step dummies (`SDMMA` series —
-five-quarter moving averages of four-quarter moving averages of step
-dummies), Σ a_s·SDMMA_s, at four institutional turning points: 1979
+documents. Muellbauer and Williams (2012) construct CCI as a latent
+variable identified by a spline of smoothed-step dummies (`SDMMA`
+series — five-quarter moving averages of four-quarter moving averages
+of step dummies), Σ a_s·SDMMA_s, at four institutional turning points:
+1979
 (Campbell Committee, removal of interest-rate ceilings on bank
 deposits), 1992 (banking distress and the entry of the first mortgage
 originator, Aussie Home Loans), 1998 (the rise of non-bank financial
@@ -692,7 +694,15 @@ deregulation underpinning these choices is documented in Battellino and
 McMillan (1989) and Edey and Gray (1996); Bayoumi (1993) provides a
 cross-country analysis of the consumption response to financial
 liberalisation, including Australia, that quantitatively validates a
-structural CCI shift in the early 1980s.
+structural CCI shift in the early 1980s. Williams' earlier
+single-author papers used a simpler precursor: Williams (2009)
+identifies the same institutional turning points via STAMP
+unobserved-components analysis (Koopman et al. 2000) but represents
+credit conditions as smoothed *linear split trends* rather than
+smoothed step dummies, and Williams (2010) carries this simpler
+measure (denoted `CCIH`) into the single-equation consumption model;
+the step-dummy `SDMMA` spline used throughout this paper is the
+refinement introduced in the joint four-equation system.
 
 The decisive feature of Williams' identification is that it is *joint*.
 In the system-estimation context of Muellbauer and Williams (2012),
@@ -1716,8 +1726,8 @@ financial ratio `ilfa_y` first becomes available at 1988Q3, alongside its
 ### 4.1 The canonical LIVES consumption equation
 
 The decisive contribution of this paper is that the *functional form* of
-the Muellbauer-Williams LIVES (life-cycle / inter-temporal / credit-
-conditions) equation is what identifies it. We therefore present the
+the Muellbauer-Williams LIVES ("Latent Interactive Variable Equation
+System") equation is what identifies it. We therefore present the
 faithful form of Williams' (2010) eq. (7) as the model, and present the
 generic constant-MPC error-correction model that an earlier draft and
 much of the Australian literature treat as "the LIVES equation" as a
@@ -1811,7 +1821,10 @@ The permanent-income gearing is itself credit-dependent:
 
 so that the weight on the permanent-to-current income gap rises with
 credit availability. Williams *calibrates* `ψ_0 = 0.20` and `ψ_1 = 0.93`
-(the cap `ψ(CCI) ≤ 0.95` binds at the credit-loose extreme); these are
+(the theoretical ceiling `ψ(CCI) ≤ 0.95` motivates these values — freely
+estimated, ψ would exceed it — though his own CCI series empirically
+peaks below its theoretical maximum, so the ceiling is not actually
+reached within his estimation sample); these are
 not free parameters in his system. The affordability multiplier is
 `ϖ = 1.2`, also fixed. We treat the distinction between *structure*
 (the interactions and the unit income restriction) and *calibration*
@@ -2151,15 +2164,18 @@ honest negatives — placebo failures for the literal construction,
 near-zero SUR residual correlation, selector divergence — are reported
 as substantive diagnostic findings, not embarrassments.
 
-### 5.1 The Williams smoothed-step spline approach
+### 5.1 The Muellbauer-Williams smoothed-step spline approach
 
-Williams (2010) constructs `CCI` as a spline of `SDMMA` smoothed-step
-dummies — a 5-quarter moving average of a 4-quarter moving average of
-a 0/1 step — at institutional turning points in the Australian
-financial-policy chronology. Each knot's coefficient is constrained
-by a sign prior derived from institutional history (deregulation
-episodes positive; retrenchment episodes negative), enforced by
-Hendry-Krolzig (2005) drop-on-violation general-to-specific reduction.
+Muellbauer and Williams (2012) construct `CCI` as a spline of `SDMMA`
+smoothed-step dummies — a 5-quarter moving average of a 4-quarter
+moving average of a 0/1 step — at institutional turning points in the
+Australian financial-policy chronology (§2.4 above; the earlier,
+single-author Williams 2009/2010 papers use a simpler smoothed
+linear-split-trend measure, `CCIH`). Each knot's coefficient is
+constrained by a sign prior derived from institutional history
+(deregulation episodes positive; retrenchment episodes negative),
+enforced by Hendry-Krolzig (2005) drop-on-violation
+general-to-specific reduction.
 
 Williams' canonical paper uses four knots: 1979Q1 (Campbell Committee,
 removal of interest-rate ceilings), 1992Q1 (NBFI distress after the
@@ -2414,11 +2430,12 @@ reason.
 ### 5.3 Why the spline alone cannot identify the CCI as a common factor
 
 The placebo evidence is consistent with the structural diagnosis in the
-LIVES literature itself. Williams (2010) and Duca, Muellbauer and Murphy
+LIVES literature itself. Williams (2010) and Duca and Muellbauer
 (2013, ECB WP 1581) estimate the CCI inside a **multi-equation system**
 (consumption, house prices, mortgage stock, home equity withdrawal —
-Williams; consumption + refinancing rate — Duca, Muellbauer and Murphy)
-where the *same* CCI series enters all equations simultaneously. Williams
+Williams; consumption + mortgage-refinancing rate, via a Kalman-filter
+state-space model — Duca and Muellbauer) where the *same* latent credit
+variable enters all equations simultaneously. Williams
 imposes a normalisation (ζ_h = 1 in the house-price equation) and
 estimates ζ_c, ζ_m, ζ_w as relative scalings; this cross-equation
 parameter restriction is what identifies the CCI as a common factor
@@ -2716,7 +2733,7 @@ back-extended 1976Q3+ sample using the disaggregated wealth proxies of §3:
 
 Source: `spec46_extended_comparison.csv` (structural long-run
 coefficients, γ = OLS/|λ|, per §4.2; the λ row is the OLS `ecm_lag`).
-‡ Williams reports a single illiquid-financial-asset MPC (γ_IFA = 0.022), shown here against the combined eq_y + super_y. The Williams structural MPCs used throughout the paper (γ_HA = 0.0488, γ_NLA = 0.159, γ_IFA = 0.022) are the BIS-chapter values recorded in [`australia_williams_comparison.csv`](../outputs/australia_williams_comparison.csv) — the same authoritative source as §7.3 and §11.4.
+‡ Williams reports a single illiquid-financial-asset MPC (γ_IFA = 0.022), shown here against the combined eq_y + super_y. The Williams structural MPCs used throughout the paper (γ_HA = 0.0488, γ_NLA = 0.159, γ_IFA = 0.022) are as reported in Muellbauer and Williams (2012): γ_NLA and γ_IFA are Table 1's raw coefficients γ₃ and γ₂ (0.1588 and 0.0219 respectively); γ_HA = 0.0488 is the paper's derived long-run peak housing MPC reported in the text, not the raw Table 1 coefficient (Table 1's γ₁ = 0.0606). All values are recorded in [`australia_williams_comparison.csv`](../outputs/australia_williams_comparison.csv) — the same authoritative source as §7.3 and §11.4.
 
 On Spec 4 the speed of adjustment moves about a fifth of the remaining
 distance towards Williams' value (−0.182 → −0.203, against −0.286), but
@@ -3355,7 +3372,10 @@ up systematically in §9. Here we present the comparison for the
 draft (and much of the literature) would have offered as the headline.
 
 We compare Spec 6 to Williams' published Table 1 estimates from the
-BIS chapter (Muellbauer and Williams 2012). Williams reports
+full working-paper version of Muellbauer and Williams (2012) (CEPR
+Discussion Paper 8386, revised 12 April 2012; the 7-page *BIS Papers*
+No. 64 chapter is a condensed version that does not itself contain
+Table 1). Williams reports
 **structural** long-run coefficients γ; our OLS coefficients relate
 to those γ by the ECM identity OLS_coef = λ × γ, so a difference in
 the implied γ can come from either the OLS coefficient or λ.
@@ -3416,7 +3436,7 @@ structural long-run coefficients γ = OLS/|λ|):
 | super_y     | +0.014 | −0.005 | (incl.)‡ |
 | ha_y        | +0.019 | +0.018 | +0.0488 |
 
-‡ Williams reports a single illiquid-financial-asset MPC (γ_IFA = 0.022), shown here against the combined eq_y + super_y. Williams' structural MPCs (γ_HA = 0.0488, γ_NLA = 0.159, γ_IFA = 0.022) are the BIS-chapter values in [`australia_williams_comparison.csv`](../outputs/australia_williams_comparison.csv), the same source used in §7.3's headline comparison and §11.4.
+‡ Williams reports a single illiquid-financial-asset MPC (γ_IFA = 0.022), shown here against the combined eq_y + super_y. Williams' structural MPCs (γ_HA = 0.0488, γ_NLA = 0.159, γ_IFA = 0.022) are as reported in Muellbauer and Williams (2012): γ_NLA and γ_IFA are Table 1's raw coefficients; γ_HA = 0.0488 is the paper's derived peak housing MPC, not the raw Table 1 coefficient (γ₁ = 0.0606). Values recorded in [`australia_williams_comparison.csv`](../outputs/australia_williams_comparison.csv), the same source used in §7.3's headline comparison and §11.4.
 
 On Spec 4 the speed of adjustment moves 11.5 per cent toward
 Williams (−0.182 → −0.203, still 29 per cent short of −0.286), but
@@ -4531,7 +4551,7 @@ only one survives all four equations (1986)
 (`LIVES/outputs/lives_joint_cci_survival.csv`), so the single-equation
 identification was largely equation-specific. This aligns with both
 Williams' framework (CCI as a common factor under parameter
-restrictions) and the Duca, Muellbauer and Murphy (2013) state-space
+restrictions) and the Duca and Muellbauer (2013) state-space
 implementation in which the latent factor is identified jointly across
 equations.
 
@@ -5367,6 +5387,9 @@ the way forward.
 
 ## References
 
+- Ando, A., & Modigliani, F. (1963). The "life cycle" hypothesis of
+  saving: aggregate implications and tests. *American Economic Review*,
+  53(1), 55–84.
 - Aron, J., Duca, J. V., Muellbauer, J., Murata, K., & Murphy, A. (2012).
   Credit, housing collateral and consumption: evidence from Japan, the
   U.K. and the U.S. *Review of Income and Wealth*, 58(3), 397–423.
@@ -5430,9 +5453,6 @@ the way forward.
 - Duca, J. V., Muellbauer, J., & Murphy, A. (2010). Housing markets and
   the financial crisis of 2007–2009: lessons for the future. *Journal
   of Financial Stability*, 6(4), 203–217.
-- Duca, J. V., Muellbauer, J., & Murphy, A. (2013). Tobin LIVES:
-  integrating evolving credit market architecture into flow-of-funds
-  based macro models. *European Economy Discussion Paper* 14.
 - Dvornak, N., & Kohler, M. (2003). Housing wealth, stock market wealth
   and consumption: a panel analysis for Australia. *RBA Research
   Discussion Paper* 2003-07.

@@ -1,0 +1,14 @@
+"spec","term","quantity","point","conventional_method","conventional_ci_lo","conventional_ci_hi","conventional_width","nested_median","nested_ci_lo","nested_ci_hi","nested_width","width_ratio_nested_over_conventional","williams","n_draws","conventional_excludes_zero","nested_excludes_zero","williams_in_nested_ci","n_draws_planned","n_draws_run","n_draws_usable","runtime_guard_tripped"
+"Spec11","lambda","coefficient",-0.4483,"wald(NW)",-0.6946,-0.2019,0.4927,-0.1686,-0.2728,-0.0774,0.1954,0.3967,NA,199,TRUE,TRUE,FALSE,199,199,199,FALSE
+"Spec11","nla_y","coefficient (OLS beta)",0.0269,"delta/NW (not applicable to raw beta; NW SE shown)",NA,NA,NA,0.0066,-0.0315,0.0406,0.072,NA,NA,199,FALSE,FALSE,FALSE,199,199,199,FALSE
+"Spec11","nla_y","structural gamma (-beta/lambda)",0.06,"delta-method (Newey-West)",0.0224,0.0975,0.0751,0.0381,-0.1739,0.3168,0.4906,6.533,0.159,199,TRUE,FALSE,TRUE,199,199,199,FALSE
+"Spec11","ilfa_y","coefficient (OLS beta)",0.0155,"delta/NW (not applicable to raw beta; NW SE shown)",NA,NA,NA,0.0019,-0.0119,0.0193,0.0312,NA,NA,199,FALSE,FALSE,FALSE,199,199,199,FALSE
+"Spec11","ilfa_y","structural gamma (-beta/lambda)",0.0345,"delta-method (Newey-West)",0.012,0.057,0.045,0.0122,-0.0857,0.1643,0.2501,5.5568,0.022,199,TRUE,FALSE,TRUE,199,199,199,FALSE
+"Spec11","ln_yp_over_y","coefficient (OLS beta)",0.4591,"delta/NW (not applicable to raw beta; NW SE shown)",NA,NA,NA,0.112,-0.01,0.3151,0.3251,NA,NA,199,FALSE,FALSE,FALSE,199,199,199,FALSE
+"Spec11","ln_yp_over_y","structural gamma (-beta/lambda)",1.0242,"delta-method (Newey-West)",0.8648,1.1837,0.3189,0.696,-0.1238,1.6014,1.7251,5.4096,0.2,199,TRUE,FALSE,TRUE,199,199,199,FALSE
+"Spec11","yp_x_cci","coefficient (OLS beta)",-0.5101,"delta/NW (not applicable to raw beta; NW SE shown)",NA,NA,NA,-4.2432,-17.4998,2.119,19.6189,NA,NA,199,FALSE,FALSE,FALSE,199,199,199,FALSE
+"Spec11","yp_x_cci","structural gamma (-beta/lambda)",-1.1379,"delta-method (Newey-West)",-2.0987,-0.1771,1.9216,-25.5968,-103.3064,24.4562,127.7626,66.4876,0.93,199,TRUE,FALSE,TRUE,199,199,199,FALSE
+"Spec11","ha_x_cci","coefficient (OLS beta)",0.0025,"delta/NW (not applicable to raw beta; NW SE shown)",NA,NA,NA,-0.0331,-0.5334,0.301,0.8343,NA,NA,199,FALSE,FALSE,FALSE,199,199,199,FALSE
+"Spec11","ha_x_cci","structural gamma (-beta/lambda)",0.0055,"delta-method (Newey-West)",-0.0104,0.0214,0.0318,-0.2847,-3.662,2.357,6.019,189.277,0.0488,199,FALSE,FALSE,TRUE,199,199,199,FALSE
+"Spec11","hp_x_1_minus_cci","coefficient (OLS beta)",0.0279,"delta/NW (not applicable to raw beta; NW SE shown)",NA,NA,NA,0.0122,-0.0129,0.0606,0.0736,NA,NA,199,FALSE,FALSE,FALSE,199,199,199,FALSE
+"Spec11","hp_x_1_minus_cci","structural gamma (-beta/lambda)",0.0623,"delta-method (Newey-West)",0.0269,0.0976,0.0707,0.0728,-0.0737,0.3755,0.4492,6.3543,-0.13,199,TRUE,FALSE,FALSE,199,199,199,FALSE
