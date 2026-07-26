@@ -54,7 +54,7 @@ fit_under <- function(label, pidat) {
     he$fit_ecm_spec(data = pidat, spec_name = paste0("Spec6_", label),
                     lr_vars = lr_vars, sr_vars = sr_vars,
                     dummy_vars = base_dummies,
-                    sample_end = as.Date("2024-10-01")),
+                    sample_end = as.Date("2026-01-01")),
     error = function(e) { message("fit failed for ", label, ": ", e$message); NULL })
   if (is.null(sp)) return(NULL)
   cf <- coef(sp$fit); se <- sqrt(diag(sp$nw_vcov)); se <- se[match(names(cf), names(se))]

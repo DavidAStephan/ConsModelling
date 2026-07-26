@@ -2,7 +2,7 @@
 
 Tests 7 variants of the Williams-style smoothed-step CCI spline against
 the same disaggregated consumption equation (Spec 4 long-run + base
-dummies) on the 1988Q4-2024Q4 sample. Each variant proposes a different
+dummies) on the 1988Q4-2026Q1 sample. Each variant proposes a different
 candidate knot set; the Hendry-Krolzig drop-on-violation reduction prunes
 knots that violate their institutional sign prior or are collinear/aliased.
 
@@ -14,25 +14,25 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 
 | Variant | Cand. | Aliased | Violators | Surviving | λ | adj R² |
 |---|---:|---:|---:|---:|---:|---:|
-| williams_2009 | 3 | 1 | 2 | 0 | -0.1824 | 0.726 |
-| williams_2010 | 4 | 1 | 2 | 1 | -0.1866 | 0.727 |
-| six_with_macropru | 6 | 1 | 3 | 2 | -0.2018 | 0.728 |
-| eight_full_australia | 8 | 2 | 5 | 1 | -0.1866 | 0.727 |
-| australia_within_sample | 5 | 0 | 3 | 2 | -0.2018 | 0.728 |
-| australia_within_sample_plus | 7 | 0 | 5 | 2 | -0.1867 | 0.725 |
-| maximal_gets | 15 | 3 | 7 | 5 | -0.2516 | 0.753 |
+| williams_2009 | 3 | 1 | 2 | 0 | -0.1807 | 0.727 |
+| williams_2010 | 4 | 1 | 1 | 2 | -0.1850 | 0.726 |
+| six_with_macropru | 6 | 1 | 3 | 2 | -0.1962 | 0.729 |
+| eight_full_australia | 8 | 2 | 5 | 1 | -0.1841 | 0.728 |
+| australia_within_sample | 5 | 0 | 3 | 2 | -0.1962 | 0.729 |
+| australia_within_sample_plus | 7 | 0 | 5 | 2 | -0.1838 | 0.726 |
+| maximal_gets | 15 | 3 | 7 | 5 | -0.2413 | 0.751 |
 
 ## Robustness — which knots survive across multiple variants
 
 | Knot | Variants where it survives | Mean OLS coefficient |
 |---|---:|---:|
-| 2007_01 | 5 | -0.008080 |
-| 2017_03 | 3 | -0.012805 |
-| 1990_09 | 1 | -0.001499 |
-| 1992_01 | 1 | -0.015392 |
-| 2007_09 | 1 | -0.007153 |
-| 2019_01 | 1 | -0.002934 |
-| 2020_04 | 1 | 0.102928 |
+| 2007_01 | 5 | -0.008071 |
+| 2017_03 | 3 | -0.011120 |
+| 1992_01 | 2 | -0.006659 |
+| 1990_09 | 1 | -0.001625 |
+| 2007_09 | 1 | -0.006578 |
+| 2019_01 | 1 | -0.001006 |
+| 2020_04 | 1 | 0.106472 |
 
 ## Per-variant knot detail
 
@@ -43,18 +43,18 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01
 - **Sign-violators (dropped):** 1992_01, 1998_01
 - **Surviving:** **none — variant fails**
-- **λ (consumption equation):** -0.1824
-- **Adjusted R²:** 0.726
+- **λ (consumption equation):** -0.1807
+- **Adjusted R²:** 0.727
 
 
 ### williams_2010
 **Description:** Aust system paper Table 5; published 4-knot spec
 - **Candidate knots:** 4 (1979-Q, 1992-Q, 1998-Q, 2007-Q)
 - **Aliased (constant within window):** 1979_01
-- **Sign-violators (dropped):** 1992_01, 1998_01
-- **Surviving:** 2007_01
-- **λ (consumption equation):** -0.1866
-- **Adjusted R²:** 0.727
+- **Sign-violators (dropped):** 1998_01
+- **Surviving:** 1992_01, 2007_01
+- **λ (consumption equation):** -0.1850
+- **Adjusted R²:** 0.726
 
 
 ### six_with_macropru
@@ -63,8 +63,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12
 - **Surviving:** 2007_01, 2017_03
-- **λ (consumption equation):** -0.2018
-- **Adjusted R²:** 0.728
+- **λ (consumption equation):** -0.1962
+- **Adjusted R²:** 0.729
 
 
 ### eight_full_australia
@@ -73,8 +73,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01, 1986_01
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12, 2017_03, 2019_09
 - **Surviving:** 2007_01
-- **λ (consumption equation):** -0.1866
-- **Adjusted R²:** 0.727
+- **λ (consumption equation):** -0.1841
+- **Adjusted R²:** 0.728
 
 
 ### australia_within_sample
@@ -83,8 +83,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** none
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12
 - **Surviving:** 2007_01, 2017_03
-- **λ (consumption equation):** -0.2018
-- **Adjusted R²:** 0.728
+- **λ (consumption equation):** -0.1962
+- **Adjusted R²:** 0.729
 
 
 ### australia_within_sample_plus
@@ -93,8 +93,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** none
 - **Sign-violators (dropped):** 1992_01, 1998_01, 2014_12, 2017_03, 2019_09
 - **Surviving:** 1990_09, 2007_01
-- **λ (consumption equation):** -0.1867
-- **Adjusted R²:** 0.725
+- **λ (consumption equation):** -0.1838
+- **Adjusted R²:** 0.726
 
 
 ### maximal_gets
@@ -103,8 +103,8 @@ surviving, the resulting consumption-equation lambda, adjusted R^2.
 - **Aliased (constant within window):** 1979_01, 1986_01, 2009_01
 - **Sign-violators (dropped):** 1990_09, 1993_01, 1998_09, 2008_12, 2014_12, 2019_09, 2021_12
 - **Surviving:** 1992_01, 2007_09, 2017_03, 2019_01, 2020_04
-- **λ (consumption equation):** -0.2516
-- **Adjusted R²:** 0.753
+- **λ (consumption equation):** -0.2413
+- **Adjusted R²:** 0.751
 
 
 ## Interpretation

@@ -121,7 +121,7 @@ if (!exists("fit_consumption_with_williams_cci")) {
        "definitions).")
 }
 
-SAMPLE_END <- as.Date("2024-10-01")
+SAMPLE_END <- as.Date("2026-01-01")
 
 # Spec-4-style template used for the additive knot-survival reduction stage
 # (identical to cci_placebo_test.R's spec_template / deployed protocol).

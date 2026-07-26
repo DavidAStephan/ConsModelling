@@ -1,5 +1,5 @@
 "method","description","source_file","n_obs"
-"Williams maximal-GETS spline","15-knot smoothed-step spline at Australian institutional turning points; sign-prior reduction selects surviving knots","model_helpers.R::build_williams_cci_basis",194
-"Kalman state-space factor","Single common factor by ML Kalman filter on 5 credit indicators with anchor loading on housing-loan-flow","model_helpers.R::fit_kalman_cci",194
-"PCA first principal component","First principal component across the same 5 standardised credit indicators","cci_alternatives.R (this script)",146
-"Credit-to-income HP gap","BIS-style HP filter (lambda=400000) on log household debt-to-income; positive gap = looser credit","cci_alternatives.R (this script)",146
+"Williams maximal-GETS spline","15-knot smoothed-step spline at Australian institutional turning points; sign-prior reduction selects surviving knots","model_helpers.R::build_williams_cci_basis",199
+"Kalman state-space factor","Single common factor by ML Kalman filter on 5 credit indicators with anchor loading on housing-loan-flow","model_helpers.R::fit_kalman_cci",199
+"PCA first principal component","First principal component across the same 5 standardised credit indicators","cci_alternatives.R (this script)",151
+"Credit-to-income HP gap","BIS-style HP filter (lambda=400000) on log household debt-to-income; positive gap = looser credit","cci_alternatives.R (this script)",151

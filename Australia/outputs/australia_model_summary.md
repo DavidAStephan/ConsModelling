@@ -1,7 +1,7 @@
 # Australia Household Consumption Model — Summary
 
 ## Sample and data
-- Full sample: 1988Q3–2024Q4, n=146
+- Full sample: 1988Q3–2026Q1, n=151
 - Pre-COVID sample: 1988Q3–2019Q4, n=126
 - Data sources: ABS HFCE 5206008, ABS Household Income 5206020, ABS Balance Sheet 5232035, RBA f06hist mortgage rate, ABS lending 560101.
 
@@ -12,49 +12,49 @@ Long-run structural coefficients (preferred spec, full sample):
 
 | Term | Coef | t-stat | p | Expected sign | Sign OK |
 |------|------|--------|---|---------------|---------|
-| networth_y | 0.0011 | 0.38 | 0.708 | + | yes |
-| ln_hp_over_y | 0.0057 | 0.32 | 0.750 | +/- | — |
-| real_rate | -0.0002 | -0.52 | 0.604 | - | yes |
-| ln_yp_over_y | 0.1963 | 3.41 | 0.001 | +/- | — |
-| ecm_lag | -0.1906 | -2.90 | 0.004 | - | yes |
+| networth_y | 0.0012 | 0.43 | 0.671 | + | yes |
+| ln_hp_over_y | 0.0047 | 0.28 | 0.780 | +/- | — |
+| real_rate | -0.0002 | -0.59 | 0.558 | - | yes |
+| ln_yp_over_y | 0.1945 | 3.59 | 0.000 | +/- | — |
+| ecm_lag | -0.1894 | -2.99 | 0.003 | - | yes |
 
 ## All specifications — diagnostics traffic light
 
 | Spec | adj R² | DW | AR(1) | AR(4) | Het | Chow | RESET | BIC | Sign | Coint | λ | Stability |
 |------|--------|----|-------|-------|-----|------|-------|-----|------|-------|---|-----------|
-| Spec1_LogNetWorth | 0.731 | 2.32 | N | Y | N | Y | N | -919.3 | Y | N | Y | Y |
-| Spec2_LogNetWorth_CCI | 0.772 | 2.44 | N | Y | N | Y | N | -501.7 | N | N | Y | Y |
-| Spec3_LevelNetWorth | 0.731 | 2.32 | N | Y | N | Y | N | -919.4 | Y | N | Y | Y |
-| Spec4_Disagg_NoCCI | 0.726 | 2.32 | N | Y | N | Y | N | -905.3 | N | N | Y | Y |
-| Spec5_FullDisagg | 0.802 | 2.25 | Y | Y | N | N | N | -494.6 | N | N | Y | Y |
-| Spec6_Preferred | 0.804 | 2.15 | Y | Y | N | Y | N | -492.5 | N | N | Y | Y |
-| Spec6b_LongHistSRCCI | 0.703 | 2.12 | Y | Y | N | N | N | -1114.0 | Y | N | Y | N |
-| Spec7_CohortBurden | 0.834 | 2.21 | Y | N | N | Y | N | -500.6 | N | N | N | Y |
-| Spec7b_RBABurden | 0.872 | 2.16 | Y | N | N | — | Y | -364.5 | N | N | N | Y |
-| Spec8_CCI_Interactions | 0.827 | 1.92 | Y | Y | N | Y | N | -952.8 | N | N | N | Y |
-| Spec9_KalmanCCI | 0.735 | 2.18 | Y | N | N | N | N | -890.6 | N | — | Y | N |
-| Spec10_WilliamsPrior | 0.773 | 2.22 | Y | Y | N | Y | N | -493.3 | Y | — | Y | N |
-| Spec11_LIVES_Headline | 0.824 | 1.90 | Y | Y | N | N | N | -954.8 | Y | N | N | N |
-| Spec12_LIVES_Calibrated | 0.687 | 2.14 | Y | N | N | N | N | -893.8 | Y | — | Y | N |
+| Spec1_LogNetWorth | 0.732 | 2.32 | N | Y | N | Y | N | -957.7 | Y | N | Y | Y |
+| Spec2_LogNetWorth_CCI | 0.773 | 2.44 | N | Y | N | Y | N | -538.7 | N | N | Y | Y |
+| Spec3_LevelNetWorth | 0.732 | 2.32 | N | Y | N | Y | N | -957.9 | Y | N | Y | Y |
+| Spec4_Disagg_NoCCI | 0.727 | 2.32 | N | Y | N | Y | N | -943.5 | N | N | Y | Y |
+| Spec5_FullDisagg | 0.803 | 2.28 | Y | N | N | N | N | -531.9 | N | N | Y | Y |
+| Spec6_Preferred | 0.807 | 2.17 | Y | Y | N | Y | N | -530.1 | N | N | Y | Y |
+| Spec6b_LongHistSRCCI | 0.704 | 2.13 | Y | Y | N | N | N | -1152.3 | Y | N | Y | N |
+| Spec7_CohortBurden | 0.834 | 2.23 | Y | N | N | Y | N | -537.8 | N | N | N | Y |
+| Spec7b_RBABurden | 0.875 | 2.18 | Y | N | N | — | Y | -387.9 | N | N | N | Y |
+| Spec8_CCI_Interactions | 0.817 | 1.97 | Y | N | N | N | N | -984.4 | N | N | N | Y |
+| Spec9_KalmanCCI | 0.735 | 2.18 | Y | N | N | Y | N | -928.5 | N | — | Y | Y |
+| Spec10_WilliamsPrior | 0.773 | 2.22 | Y | Y | N | Y | Y | -529.5 | Y | — | Y | N |
+| Spec11_LIVES_Headline | 0.816 | 1.94 | Y | N | N | N | N | -987.3 | Y | N | N | Y |
+| Spec12_LIVES_Calibrated | 0.687 | 2.14 | Y | N | N | N | N | -931.0 | Y | — | Y | N |
 
 ## Lambda comparison (full vs pre-COVID)
 
 | Spec | Full sample λ | Pre-COVID λ | Sign-stable? |
 |------|---------------|-------------|--------------|
-| Spec1_LogNetWorth | -0.1934 | -0.1607 | yes |
-| Spec2_LogNetWorth_CCI | -0.1860 | -0.0799 | yes |
-| Spec3_LevelNetWorth | -0.1906 | -0.1578 | yes |
-| Spec4_Disagg_NoCCI | -0.1824 | -0.1190 | yes |
-| Spec5_FullDisagg | -0.2353 | -0.0607 | yes |
-| Spec6_Preferred | -0.2386 | -0.0866 | yes |
-| Spec6b_LongHistSRCCI | -0.2475 | -0.2397 | yes |
-| Spec7_CohortBurden | -0.3414 | -0.0544 | yes |
-| Spec7b_RBABurden | -0.3805 | -0.0610 | yes |
-| Spec8_CCI_Interactions | -0.4583 | -0.2186 | yes |
-| Spec9_KalmanCCI | -0.2088 | -0.1577 | yes |
-| Spec10_WilliamsPrior | -0.0481 | -0.0253 | yes |
-| Spec11_LIVES_Headline | -0.4483 | -0.2656 | yes |
-| Spec12_LIVES_Calibrated | -0.0301 | 0.0405 | no |
+| Spec1_LogNetWorth | -0.1923 | -0.1608 | yes |
+| Spec2_LogNetWorth_CCI | -0.1809 | -0.0799 | yes |
+| Spec3_LevelNetWorth | -0.1894 | -0.1578 | yes |
+| Spec4_Disagg_NoCCI | -0.1807 | -0.1188 | yes |
+| Spec5_FullDisagg | -0.2251 | -0.0613 | yes |
+| Spec6_Preferred | -0.2325 | -0.0859 | yes |
+| Spec6b_LongHistSRCCI | -0.2462 | -0.2389 | yes |
+| Spec7_CohortBurden | -0.3300 | -0.0548 | yes |
+| Spec7b_RBABurden | -0.3768 | -0.0606 | yes |
+| Spec8_CCI_Interactions | -0.4265 | -0.2182 | yes |
+| Spec9_KalmanCCI | -0.2099 | -0.1572 | yes |
+| Spec10_WilliamsPrior | -0.0432 | -0.0262 | yes |
+| Spec11_LIVES_Headline | -0.4231 | -0.2651 | yes |
+| Spec12_LIVES_Calibrated | -0.0311 | 0.0407 | no |
 
 ## Italy vs Australia (preferred specs)
 
@@ -71,9 +71,9 @@ _Italy comparison not available._
 - Spec7_CohortBurden fails: sign, cointegration, λ range/sign
 - Spec7b_RBABurden fails: sign, cointegration, λ range/sign
 - Spec8_CCI_Interactions fails: sign, cointegration, λ range/sign
-- Spec9_KalmanCCI fails: sign, stability
+- Spec9_KalmanCCI fails: sign
 - Spec10_WilliamsPrior fails: stability
-- Spec11_LIVES_Headline fails: cointegration, λ range/sign, stability
+- Spec11_LIVES_Headline fails: cointegration, λ range/sign
 - Spec12_LIVES_Calibrated fails: stability
 - Heteroskedasticity rejected at 5% in some specs — see `lm_het_pval`, `lm_het_pval_no_events`, `het_diagnosis` columns of diagnostics CSV.
 - COVID handling: see `australia_lambda_robustness.csv` for sample sensitivity.
@@ -84,5 +84,5 @@ _Italy comparison not available._
 - Run: `Rscript Australia/R/australia_consumption_model.R`
 - Fast re-estimation: `Rscript Australia/R/run_estimation_from_rds.R`
 - Random seed: not used (OLS is deterministic).
-- Date generated: 2026-07-16
+- Date generated: 2026-07-26
 

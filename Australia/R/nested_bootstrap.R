@@ -29,7 +29,7 @@
 #           appearing as a block interior point.
 #     (ii)  Rebuild bootstrap consumption growth
 #           dlcons_b = fitted(Spec 11) + resampled residuals, over the Spec
-#           11 estimation window (1988Q3-2024Q4, n=146, contiguous quarters).
+#           11 estimation window (1988Q3-2026Q1, n=146, contiguous quarters).
 #           Integrate dlcons_b into a bootstrap consumption LEVEL path
 #           lcons_b by cumulative summation from the ACTUAL log-consumption
 #           level in the quarter immediately preceding the estimation
@@ -145,7 +145,7 @@ master <- master %>% mutate(ecm_lag = lag(lcons, 1L) - lincome)
 base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
                   "d_neg_gearing_8587", "d_recession_1991",
                   "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
-sample_end <- as.Date("2024-10-01")
+sample_end <- as.Date("2026-01-01")
 
 cci_lr_vars <- c("nla_y", "eq_y", "super_y", "ha_y", "ln_hp_over_y",
                  "real_rate", "ln_yp_over_y", "ecm_lag")

@@ -71,7 +71,7 @@ if (have_cci) {
     mutate(ilfa_y = eq_y + super_y)
   mask <- !is.na(master$cci_williams) &
           master$date >= as.Date("1980-01-01") &
-          master$date <= as.Date("2024-10-01")
+          master$date <= as.Date("2026-01-01")
   ha_m <- mean(master$ha_y[mask],         na.rm = TRUE)
   hp_m <- mean(master$ln_hp_over_y[mask], na.rm = TRUE)
   r_m  <- mean(master$real_rate[mask],    na.rm = TRUE)
@@ -132,7 +132,7 @@ for (sd_name in names(spec_defs)) {
     he$fit_ecm_spec(data = master, spec_name = sd$label,
                     lr_vars = sd$lr_vars, sr_vars = sd$sr_vars,
                     dummy_vars = base_dummies,
-                    sample_end = as.Date("2024-10-01")),
+                    sample_end = as.Date("2026-01-01")),
     error = function(e) { message("[", sd_name, "] fit failed: ",
                                   conditionMessage(e)); NULL })
   if (is.null(sp)) next

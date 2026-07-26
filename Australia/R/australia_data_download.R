@@ -89,9 +89,17 @@ USE_INSTITUTIONAL_CCI_OVERLAY <- FALSE
 # ==============================================================================
 
 # Cache helper — identical interface to italy_data_download.R
-get_cached <- function(tag) {
+get_cached <- function(tag, src = NULL) {
   path <- file.path(cache_dir, paste0(tag, ".rds"))
   if (file.exists(path)) {
+    # Invalidate on source mtime. The cache is keyed only on `tag`, so without
+    # this check a refreshed workbook in data_raw/ is silently ignored and the
+    # whole build quietly reuses the previous vintage — the failure mode is a
+    # dataset that looks fine but stops at the old sample end.
+    if (!is.null(src) && file.exists(src) && file.mtime(src) > file.mtime(path)) {
+      message("  [cache stale] ", tag, " — source is newer than cache, re-reading")
+      return(NULL)
+    }
     message("  [cached] ", tag)
     return(readRDS(path))
   }
@@ -199,7 +207,7 @@ report_series <- function(v, name, dates) {
 }
 
 # ==============================================================================
-# SECTION 1: Date spine  (1976Q3 – 2024Q4)
+# SECTION 1: Date spine  (1976Q3 – 2026Q1)
 # ==============================================================================
 # Spine extended back to 1976Q3 (NS-020 phase 1 target). Variables sourced
 # from public data that cover the full window:
@@ -217,9 +225,9 @@ report_series <- function(v, name, dates) {
 # Spec 1-3 (aggregate net-worth) are the natural beneficiaries once an
 # aggregate net-worth proxy is built from M3 + housing wealth.
 
-message("\nDate spine: quarterly 1976Q3 to 2024Q4")
+message("\nDate spine: quarterly 1976Q3 to 2026Q1")
 spine_start <- as.Date("1976-07-01")
-spine_end   <- as.Date("2024-10-01")
+spine_end   <- as.Date("2026-01-01")
 spine_dates <- seq(spine_start, spine_end, by = "quarter")
 n_spine     <- length(spine_dates)
 message("  ", n_spine, " quarters")
@@ -234,7 +242,7 @@ message("\n--- Section 2: Loading ABS data ---")
 
 # Helper: read workbook with caching
 read_abs_cached <- function(path, tag) {
-  cached <- get_cached(tag)
+  cached <- get_cached(tag, src = path)
   if (!is.null(cached)) return(cached)
   message("  Reading ", basename(path))
   obj <- read_abs_ts_workbook(path)
@@ -1692,7 +1700,7 @@ message("\n--- Section 4: No back-extrapolation — actual data only from 1988Q3
 
 # Sanity-check: print wealth ratio ranges to confirm unit scaling is correct.
 # ha_y should be ~3-8 (housing wealth ~3-8x annual income) for Australia.
-message("\n--- Wealth ratio sanity check (2024 Q4 values) ---")
+message("\n--- Wealth ratio sanity check (2026 Q1 values) ---")
 last_row <- master %>% filter(!is.na(ha_y)) %>% tail(1)
 message(sprintf("  housing_wealth (raw, last obs): %.1f", tail(master$housing_wealth[!is.na(master$housing_wealth)], 1)))
 message(sprintf("  ydi_ann_nom    (raw, last obs): %.1f", tail(master$ydi_ann_nom[!is.na(master$ydi_ann_nom)], 1)))
@@ -1710,8 +1718,8 @@ if (!is.null(master$mortgage_rate)) {
 # vintage, or series structure and downstream estimation results would be
 # silently wrong. Better to halt here than to publish spurious coefficients.
 stopifnot(
-  "master has wrong row count (expected 194 quarters 1976Q3-2024Q4)" =
-    nrow(master) == 194,
+  "master has wrong row count (expected 199 quarters 1976Q3-2026Q1)" =
+    nrow(master) == 199,
   "ha_y out of plausible range (expected ~1-10)" =
     min(master$ha_y, na.rm = TRUE) > 1 &&
     max(master$ha_y, na.rm = TRUE) < 10,

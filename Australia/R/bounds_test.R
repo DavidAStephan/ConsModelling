@@ -135,7 +135,7 @@ master <- master %>%
 
 mask <- !is.na(master$cci_williams) &
         master$date >= as.Date("1980-01-01") &
-        master$date <= as.Date("2024-10-01")
+        master$date <= as.Date("2026-01-01")
 ha_m <- mean(master$ha_y[mask],         na.rm = TRUE)
 hp_m <- mean(master$ln_hp_over_y[mask], na.rm = TRUE)
 r_m  <- mean(master$real_rate[mask],    na.rm = TRUE)
@@ -177,7 +177,7 @@ PSS_T_I1_5PCT <- c(`1` = -3.22, `2` = -3.53, `3` = -3.78, `4` = -3.99, `5` = -4.
 
 build_uecm_data <- function(data, other_level_vars, sr_vars, dummy_vars,
                             sample_start = as.Date("1980-01-01"),
-                            sample_end   = as.Date("2024-10-01")) {
+                            sample_end   = as.Date("2026-01-01")) {
   d <- data %>% arrange(date) %>%
     mutate(lcons_lag1 = lag(lcons, 1L), lincome_lag1 = lag(lincome, 1L),
            dlcons_lag1 = lag(dlcons, 1L))
@@ -194,7 +194,7 @@ build_uecm_data <- function(data, other_level_vars, sr_vars, dummy_vars,
 # Estimate the UECM and run the PSS F- and t-bounds tests for one spec.
 run_bounds_test <- function(spec_label, data, other_level_vars, sr_vars, dummy_vars,
                             sample_start = as.Date("1980-01-01"),
-                            sample_end   = as.Date("2024-10-01"),
+                            sample_end   = as.Date("2026-01-01"),
                             note_prefix  = "") {
   other_ok <- other_level_vars[vapply(other_level_vars, function(v)
     v %in% names(data) && !all(is.na(data[[v]])), logical(1))]

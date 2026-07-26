@@ -109,7 +109,7 @@ fit_maximal_gets <- function(knot_dates, sign_priors) {
     fit_ecm_spec(md, "MaximalGETS_Pl", full_lr,
                  spec_template$sr_vars, spec_template$dummy_vars,
                  sample_start = as.Date("1976-07-01"),
-                 sample_end   = as.Date("2024-10-01")),
+                 sample_end   = as.Date("2026-01-01")),
     error = function(e) NULL
   )
   if (is.null(spec1)) return(list(adj_r2 = NA_real_, lambda = NA_real_,
@@ -136,7 +136,7 @@ fit_maximal_gets <- function(knot_dates, sign_priors) {
         fit_ecm_spec(md, "MaximalGETS_Pl", full_lr2,
                      spec_template$sr_vars, spec_template$dummy_vars,
                      sample_start = as.Date("1976-07-01"),
-                     sample_end   = as.Date("2024-10-01")),
+                     sample_end   = as.Date("2026-01-01")),
         error = function(e) spec1
       )
     } else {

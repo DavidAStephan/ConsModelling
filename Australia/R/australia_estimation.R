@@ -1089,7 +1089,7 @@ fit_ecm_spec <- function(data, spec_name, lr_vars, sr_vars = character(0),
                                         "d_jobkeeper_2020"),
                          response     = "dlcons",
                          sample_start = as.Date("1980-01-01"),
-                         sample_end   = as.Date("2024-10-01")) {
+                         sample_end   = as.Date("2026-01-01")) {
 
   # Drop sr_vars that are entirely NA in the data
   sr_vars_ok <- sr_vars[vapply(sr_vars, function(v) {
@@ -1162,7 +1162,7 @@ fit_ecm_spec <- function(data, spec_name, lr_vars, sr_vars = character(0),
 # ==============================================================================
 
 run_cointegration_battery <- function(model_data, specs, output_dir,
-                                       sample_end = as.Date("2024-10-01")) {
+                                       sample_end = as.Date("2026-01-01")) {
   has_urca <- requireNamespace("urca", quietly = TRUE)
   if (!has_urca) {
     message("[run_cointegration_battery] urca not available — ADF only.")
@@ -1350,7 +1350,7 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
 #
 # Inputs:
 #   model_data  the master tibble with cci_williams already attached
-#   sample_end  as.Date("2024-10-01") by default
+#   sample_end  as.Date("2026-01-01") by default
 #   gamma_ifa, psi_0, psi_1, varpi  Williams' calibrated values
 #   cci_col     "cci_williams" (default; the maximal-GETS canonical) or
 #               other available CCI column
@@ -1361,7 +1361,7 @@ run_cointegration_battery <- function(model_data, specs, output_dir,
 #   converged lambda, and iteration count.
 
 fit_williams_prior_spec <- function(model_data,
-                                     sample_end = as.Date("2024-10-01"),
+                                     sample_end = as.Date("2026-01-01"),
                                      gamma_ifa = 0.022,
                                      psi_0     = 0.20,
                                      psi_1     = 0.93,
@@ -1505,7 +1505,7 @@ fit_williams_prior_spec <- function(model_data,
 # lambda * (calibrated long-run sum) from the dependent variable and re-read lambda
 # from ecm_lag until convergence.
 fit_lives_calibrated_spec <- function(model_data,
-                                      sample_end = as.Date("2024-10-01"),
+                                      sample_end = as.Date("2026-01-01"),
                                       gamma_ifa = 0.022,
                                       psi_0     = 0.20,
                                       psi_1     = 0.93,
@@ -1594,7 +1594,7 @@ fit_lives_calibrated_spec <- function(model_data,
 }
 
 
-run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"),
+run_all_specifications <- function(model_data, sample_end = as.Date("2026-01-01"),
                                    dummy_vars = NULL) {
 
   # dummy_vars override lets the COVID-rich variant run ALL fourteen specs
@@ -1695,7 +1695,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
   # Spec 6b: Spec 6 with the back-extension-compatible short-run CCI.
   # Replaces d2_logcci_lag2 (bounded at 2002Q3+ by ABS 5601.0 housing loan
   # flow) with d2_log_creditd02_lag2 (Δ²log of RBA D02 total credit, back
-  # to 1976Q3). Lets Spec 6 fit on n = 190 (1976Q3–2024Q4) instead of
+  # to 1976Q3). Lets Spec 6 fit on n = 190 (1976Q3–2026Q1) instead of
   # n = 86 (2002Q3+). Comparison with Spec 6 is the back-extension
   # robustness column for the preferred specification.
   # ------------------------------------------------------------------
@@ -1990,7 +1990,7 @@ run_all_specifications <- function(model_data, sample_end = as.Date("2024-10-01"
 # ==============================================================================
 
 run_specifications_covid_robust <- function(model_data,
-                                            sample_end = as.Date("2024-10-01")) {
+                                            sample_end = as.Date("2026-01-01")) {
   drop_dat <- model_data %>%
     filter(!(date >= as.Date("2020-01-01") & date <= as.Date("2021-10-01")))
   specs_dropped <- run_all_specifications(drop_dat, sample_end = sample_end)
@@ -2027,7 +2027,7 @@ run_specifications_covid_robust <- function(model_data,
 
 fit_consumption_with_williams_cci <- function(model_data, lr_vars, sr_vars,
                                                dummy_vars,
-                                               sample_end = as.Date("2024-10-01"),
+                                               sample_end = as.Date("2026-01-01"),
                                                basis_fn   = build_williams_cci_basis,
                                                max_iter   = 10L) {
   # Iterated knot-survival per Williams (Aust paper §5.1). At each
@@ -2538,7 +2538,7 @@ select_preferred_spec <- function(coef_combined, diag_combined, coint_results,
 
 test_nla_restriction <- function(model_data,
                                  sample_label = "full",
-                                 sample_end   = as.Date("2024-10-01")) {
+                                 sample_end   = as.Date("2026-01-01")) {
 
   base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
                     "d_neg_gearing_8587", "d_recession_1991",
@@ -4002,7 +4002,7 @@ if (any(grepl("^sdmma_", names(model_data)))) {
                      "real_rate", "ln_yp_over_y", "ecm_lag"),
       sr_vars    = character(0),
       dummy_vars = base_dummies,
-      sample_end = as.Date("2024-10-01")
+      sample_end = as.Date("2026-01-01")
     ),
     error = function(e) {
       message("[Williams CCI] fit failed: ", conditionMessage(e))
@@ -4060,7 +4060,7 @@ if (any(grepl("^sdmma_", names(model_data)))) {
       # visible to every downstream consumer — the cointegration battery
       # (which previously skipped Spec 11 as "missing regressors"), the OOS
       # validator, gamma inference, and the counterfactual engine.
-      cci_attach_end  <- as.Date("2024-10-01")
+      cci_attach_end  <- as.Date("2026-01-01")
       cci_attach_mask <- !is.na(model_data$cci_williams) &
                          model_data$date >= as.Date("1980-01-01") &
                          model_data$date <= cci_attach_end
@@ -4108,13 +4108,13 @@ if (any(grepl("^sdmma_", names(model_data)))) {
   WILLIAMS_FALLBACK <- TRUE
 }
 
-cat("  [4a] Full sample (1988Q4–2024Q4)\n")
-specs_full     <- run_all_specifications(model_data, sample_end = as.Date("2024-10-01"))
+cat("  [4a] Full sample (1988Q4–2026Q1)\n")
+specs_full     <- run_all_specifications(model_data, sample_end = as.Date("2026-01-01"))
 cat("  [4b] Pre-COVID sample (1988Q4–2019Q4)\n")
 specs_precovid <- run_all_specifications(model_data, sample_end = as.Date("2019-10-01"))
 cat("  [4c] COVID-dropped + COVID-rich-dummies variants\n")
 covid_specs <- run_specifications_covid_robust(model_data,
-                                               sample_end = as.Date("2024-10-01"))
+                                               sample_end = as.Date("2026-01-01"))
 
 cat("[Step 5] Building results tables...\n")
 results_full     <- build_results_table(specs_full,     output_dir, period_label = "full")
@@ -4123,7 +4123,7 @@ results_precovid <- build_results_table(specs_precovid, output_dir, period_label
 cat("[Step 5b] Wald test of NLA cross-equation restriction (gamma_LA + gamma_LOANS = 0)...\n")
 nla_test_full     <- test_nla_restriction(model_data,
                        sample_label = "full",
-                       sample_end   = as.Date("2024-10-01"))
+                       sample_end   = as.Date("2026-01-01"))
 nla_test_precovid <- test_nla_restriction(model_data,
                        sample_label = "precovid",
                        sample_end   = as.Date("2019-10-01"))
@@ -4185,7 +4185,7 @@ write.csv(combined_diag, file.path(output_dir, "australia_all_diagnostics.csv"),
 cat("[Step 6] Running cointegration battery (ADF + PO + Johansen)...\n")
 coint_results <- tryCatch(
   run_cointegration_battery(model_data, specs_full, output_dir,
-                            sample_end = as.Date("2024-10-01")),
+                            sample_end = as.Date("2026-01-01")),
   error = function(e) {
     message("[run_cointegration_battery] Error: ", e$message); NULL
   }
@@ -4255,7 +4255,7 @@ tryCatch({
     noog <- noog %>% mutate(ecm_lag = lag(lcons, 1L) - lincome)
     mask_no <- !is.na(noog$cci_williams) &
                noog$date >= as.Date("1980-01-01") &
-               noog$date <= as.Date("2024-10-01")
+               noog$date <= as.Date("2026-01-01")
     yp_mean_no <- mean(noog$ln_yp_over_y[mask_no], na.rm = TRUE)
     noog <- noog %>%
       mutate(yp_x_cci = (ln_yp_over_y - yp_mean_no) * cci_williams)
@@ -4265,7 +4265,7 @@ tryCatch({
       lr_vars    = specs_full$spec11$lr_vars,
       sr_vars    = specs_full$spec11$sr_vars,
       dummy_vars = specs_full$spec11$dummy_vars,
-      sample_end = as.Date("2024-10-01")
+      sample_end = as.Date("2026-01-01")
     )
     grab <- function(sp, label) {
       cf <- coef(sp$fit); vc <- sp$nw_vcov

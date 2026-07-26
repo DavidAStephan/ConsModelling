@@ -124,7 +124,7 @@ fit_with_knot_set <- function(knot_dates) {
   spec <- tryCatch(
     fit_ecm_spec(md, "Placebo", full_lr,
                  spec_template$sr_vars, spec_template$dummy_vars,
-                 sample_end = as.Date("2024-10-01")),
+                 sample_end = as.Date("2026-01-01")),
     error = function(e) NULL
   )
   if (is.null(spec)) return(list(adj_r2 = NA_real_, lambda = NA_real_,
@@ -317,7 +317,7 @@ if (exists("fit_consumption_with_williams_cci")) {
         lr_vars    = spec_template$lr_vars,
         sr_vars    = spec_template$sr_vars,
         dummy_vars = spec_template$dummy_vars,
-        sample_end = as.Date("2024-10-01"),
+        sample_end = as.Date("2026-01-01"),
         basis_fn   = basis_fn
       ),
       error = function(e) NULL

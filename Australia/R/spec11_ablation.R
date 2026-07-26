@@ -3,21 +3,21 @@
 #
 # Plan item C1 (journal_review_2026-07.md, Referee 2 finding 1): the paper's
 # "form is decisive" claim compares Spec 11 (n=146, cci_williams,
-# 1988Q3-2024Q4) against Spec 6 (n=86, cci_ratio-bound, 2002Q3-2024Q4). These
+# 1988Q3-2026Q1) against Spec 6 (n=86, cci_ratio-bound, 2002Q3-2026Q1). These
 # two specs differ in BOTH functional form (generic wealth-ECM vs the LIVES
 # Eq-7 credit-interaction core) AND estimation sample/CCI series. This script
 # isolates the two by fitting two additional cells:
 #
 #   Cell A: Spec 11's regressor set, estimated on Spec 6's exact window
-#           (2002Q3-2024Q4, n=86) -- "form only" test.
+#           (2002Q3-2026Q1, n=86) -- "form only" test.
 #   Cell B: Spec 6's regressor set, estimated on Spec 11's window
-#           (1988Q3-2024Q4, n=146) with the cci_ratio-based short-run credit
+#           (1988Q3-2026Q1, n=146) with the cci_ratio-based short-run credit
 #           term replaced by an analogous cci_williams-based term --
 #           "sample/CCI-series only" test.
 #
 # Reproduction check (must pass before any new cell is estimated): replicate
-# the committed baseline Spec 6 (lambda = -0.2386, Australia/outputs/
-# australia_full_results.csv line 88) and Spec 11 (lambda = -0.4483, same
+# the committed baseline Spec 6 (lambda = -0.2325, Australia/outputs/
+# australia_full_results.csv) and Spec 11 (lambda = -0.4231, same
 # file line 234) using the exact pipeline conventions from
 # australia_estimation.R (fit_ecm_spec(), Newey-West HAC, the Williams CCI
 # spline fit, the Spec 8/11 de-meaned interaction construction).
@@ -85,7 +85,7 @@ cat(sprintf("model_data: %d rows, %d complete for core vars\n", nrow(model_data)
 base_dummies <- c("d2000_gst", "d2008_gfc", "d2020_covid", "d2020_rebound",
                   "d_neg_gearing_8587", "d_recession_1991",
                   "d_apra_2014", "d_apra_2017", "d_jobkeeper_2020")
-sample_end <- as.Date("2024-10-01")
+sample_end <- as.Date("2026-01-01")
 
 # ------------------------------------------------------------------------
 # Step 4a-i: fit the Williams CCI spline exactly as MAIN EXECUTION does,
@@ -167,14 +167,14 @@ lambda11 <- unname(coef(base_spec11$fit)["ecm_lag"])
 n6  <- nrow(base_spec6$est_data)
 n11 <- nrow(base_spec11$est_data)
 
-cat(sprintf("Reproduced Spec 6:  lambda = %.4f (target -0.2386), n = %d (target 86)\n",
+cat(sprintf("Reproduced Spec 6:  lambda = %.4f (target -0.2325), n = %d (target 91)\n",
             lambda6, n6))
-cat(sprintf("Reproduced Spec 11: lambda = %.4f (target -0.4483), n = %d (target 146)\n",
+cat(sprintf("Reproduced Spec 11: lambda = %.4f (target -0.4231), n = %d (target 151)\n",
             lambda11, n11))
 
 TOL <- 5e-4
-ok6  <- !is.na(lambda6)  && abs(lambda6  - (-0.238632699010184)) < TOL && n6  == 86L
-ok11 <- !is.na(lambda11) && abs(lambda11 - (-0.44826755184568))  < TOL && n11 == 146L
+ok6  <- !is.na(lambda6)  && abs(lambda6  - (-0.232524897848698)) < TOL && n6  == 91L
+ok11 <- !is.na(lambda11) && abs(lambda11 - (-0.42311645591257))  < TOL && n11 == 151L
 
 if (!ok6 || !ok11) {
   stop(sprintf(
@@ -331,13 +331,13 @@ extract_row <- function(fit_obj, spec_form, sample_label, key_lr_name) {
 }
 
 out <- bind_rows(
-  extract_row(base_spec6,  "Spec6_form (baseline)",  "Spec6_sample (2002Q3-2024Q4, n=86)",  "ha_y")     %>%
-    mutate(note = sprintf("baseline reproduction; committed lambda=-0.2386, n=86 -- MATCH")),
-  extract_row(base_spec11, "Spec11_form (baseline)", "Spec11_sample (1988Q3-2024Q4, n=146)", "ha_x_cci") %>%
-    mutate(note = sprintf("baseline reproduction; committed lambda=-0.4483, n=146 -- MATCH")),
-  extract_row(cellA, "Spec11_form", "Spec6_sample (2002Q3-2024Q4, n=86)", "ha_x_cci") %>%
+  extract_row(base_spec6,  "Spec6_form (baseline)",  "Spec6_sample (2002Q3-2026Q1, n=86)",  "ha_y")     %>%
+    mutate(note = sprintf("baseline reproduction; committed lambda=-0.2325, n=91 -- MATCH")),
+  extract_row(base_spec11, "Spec11_form (baseline)", "Spec11_sample (1988Q3-2026Q1, n=146)", "ha_x_cci") %>%
+    mutate(note = sprintf("baseline reproduction; committed lambda=-0.4231, n=151 -- MATCH")),
+  extract_row(cellA, "Spec11_form", "Spec6_sample (2002Q3-2026Q1, n=86)", "ha_x_cci") %>%
     mutate(note = "Cell A: Spec 11 regressors on Spec 6's exact estimation window (form-only test)"),
-  extract_row(cellB, "Spec6_form", "Spec11_sample (1988Q3-2024Q4, n=146)", "ha_y") %>%
+  extract_row(cellB, "Spec6_form", "Spec11_sample (1988Q3-2026Q1, n=146)", "ha_y") %>%
     mutate(note = cellB_note)
 )
 

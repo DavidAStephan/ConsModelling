@@ -11,7 +11,7 @@
 #   outputs/australia_williams_comparison.md      markdown commentary for WP
 #
 # Caveats baked into the comparison:
-#   - Sample window: ours 1988Q4-2024Q4 (n=86 for Spec 6); Williams 1978Q1-2008Q2
+#   - Sample window: ours 1988Q4-2026Q1 (n=86 for Spec 6); Williams 1978Q1-2008Q2
 #   - Income measure: ours uses ydi_real_pc by default; Williams uses NPY
 #     (we have npy_real_pc available as a robustness column — see
 #      australia_williams_income_robustness.csv).
@@ -243,7 +243,7 @@ md_lines <- c(
   "",
   "Side-by-side comparison of our preferred specification (Spec 6) against",
   "Muellbauer-Williams (2012) Table 1 / BIS chapter Figs 1-2. Williams' sample",
-  "is **1978Q1-2008Q2 (n=122)**; ours is **1988Q3-2024Q4 (n=86 for Spec 6)**. Williams",
+  "is **1978Q1-2008Q2 (n=122)**; ours is **1988Q3-2026Q1 (n=86 for Spec 6)**. Williams",
   "estimates by **FIML in a 4-equation system** with imposed sign priors;",
   "we use **OLS with Newey-West HAC SEs** in a single equation.",
   "",
@@ -267,7 +267,7 @@ md_lines <- c(
   "structural profile as consistency evidence, not confirmation — see the",
   "confidence intervals in the headline paper Section 7.3.1.",
   "",
-  "## Headline comparison (Spec 6, full sample 1988Q3-2024Q4)",
+  "## Headline comparison (Spec 6, full sample 1988Q3-2026Q1)",
   "",
   sprintf("Williams' lambda = -0.286, ours = %s.", fmt(spec6_lambda$est)),
   "Showing both forms below to disentangle the channels:",

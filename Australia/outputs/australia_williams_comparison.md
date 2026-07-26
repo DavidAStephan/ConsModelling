@@ -2,7 +2,7 @@
 
 Side-by-side comparison of our preferred specification (Spec 6) against
 Muellbauer-Williams (2012) Table 1 / BIS chapter Figs 1-2. Williams' sample
-is **1978Q1-2008Q2 (n=122)**; ours is **1988Q3-2024Q4 (n=86 for Spec 6)**. Williams
+is **1978Q1-2008Q2 (n=122)**; ours is **1988Q3-2026Q1 (n=86 for Spec 6)**. Williams
 estimates by **FIML in a 4-equation system** with imposed sign priors;
 we use **OLS with Newey-West HAC SEs** in a single equation.
 
@@ -26,19 +26,19 @@ Spec 6 coefficients are individually imprecise (n = 86), so treat the
 structural profile as consistency evidence, not confirmation — see the
 confidence intervals in the headline paper Section 7.3.1.
 
-## Headline comparison (Spec 6, full sample 1988Q3-2024Q4)
+## Headline comparison (Spec 6, full sample 1988Q3-2026Q1)
 
-Williams' lambda = -0.286, ours = -0.2386.
+Williams' lambda = -0.286, ours = -0.2325.
 Showing both forms below to disentangle the channels:
 
 | Term | Williams γ | Williams implied OLS (γ × \|λ\|) | Our OLS | Our γ (= OLS / \|λ\|) | OLS gap | γ gap |
 |------|-----------:|----------------------------------:|--------:|---------------------:|--------:|------:|
-| **λ** | -0.2860 | (same) | -0.2386 | (same) | -17% | (same) |
-| Housing `ha_y` | 0.0488 | 0.0140 | 0.0022 | 0.0094 | -84% | -81% |
-| Illiquid `eq_y + super_y` | 0.0220 (calibrated) | 0.0063 | -0.0096 | -0.0403 | -253% | +83% |
-| Net liquid `nla_y` | 0.1590 | 0.0455 | 0.0083 | 0.0350 | -82% | -78% |
-| log(HP/y) | -0.1300 | -0.0372 | 0.0102 | 0.0429 | — | — |
-| ψ (PI weight) at CCI=0 | 0.2000 (calibrated) | 0.0572 | 0.3253 | 1.3632 | — | — |
+| **λ** | -0.2860 | (same) | -0.2325 | (same) | -19% | (same) |
+| Housing `ha_y` | 0.0488 | 0.0140 | 0.0039 | 0.0167 | -72% | -66% |
+| Illiquid `eq_y + super_y` | 0.0220 (calibrated) | 0.0063 | -0.0134 | -0.0575 | -312% | +161% |
+| Net liquid `nla_y` | 0.1590 | 0.0455 | 0.0079 | 0.0341 | -83% | -79% |
+| log(HP/y) | -0.1300 | -0.0372 | 0.0030 | 0.0130 | — | — |
+| ψ (PI weight) at CCI=0 | 0.2000 (calibrated) | 0.0572 | 0.3261 | 1.4025 | — | — |
 
 ## Spec 8 (CCI-interaction) match
 
@@ -48,9 +48,9 @@ with our reduced-form `cci_williams` (surviving knots per
 
 | Williams term | Williams γ | Spec 8 OLS coef | Spec 8 implied γ | Note |
 |---|---:|---:|---:|---|
-| α_c1 (r × CCI) | -0.8710 | 0.0028 | 0.0062 | Sign FAIL on our sample (small +ve) |
-| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | 0.0299 | 0.0652 | Sign agrees; magnitude smaller |
-| ψ_1 (log(y^p/y) × CCI) | 0.9300 | -0.5046 | -1.1010 | Williams calibrates; we estimate freely (sign FAIL) |
+| α_c1 (r × CCI) | -0.8710 | 0.0031 | 0.0072 | Sign FAIL on our sample (small +ve) |
+| α_c4 (log(HP/y) × (1-1.2·CCI)) | -0.1300 | 0.0280 | 0.0656 | Sign agrees; magnitude smaller |
+| ψ_1 (log(y^p/y) × CCI) | 0.9300 | -0.5089 | -1.1934 | Williams calibrates; we estimate freely (sign FAIL) |
 
 ## Where we agree, where we differ
 
@@ -65,7 +65,7 @@ screen comprehensively.
 
 **Read the structural gamma profile from the table above (live values).**
 
-1. **Our lambda is -0.2386 against Williams' -0.286** (live value).
+1. **Our lambda is -0.2325 against Williams' -0.286** (live value).
    Any gap between the implied structural gammas and Williams' Table 1 is
    plausibly due to (i) missing CCI interactions in Spec 6, which Williams
    partitions across r×CCI, log(HP/y)×(1-1.2·CCI), and ψ_1·CCI; (ii) FIML

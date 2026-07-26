@@ -1,5 +1,5 @@
 window,sample_from,sample_to,n_obs,adf_stat,adf_5pct_cv,adf_verdict,kpss_stat,kpss_5pct_cv,kpss_verdict,note
-full,1976-10-01,2024-10-01,193,-2.3274771761769775,-2.88,nonstationary,0.9970868440737046,0.463,nonstationary,
-Spec6_Preferred,2003-07-01,2024-10-01,86,-2.4279684338684917,-2.89,nonstationary,0.8494082864264192,0.463,nonstationary,
-Spec11_LIVES_Headline,1988-07-01,2024-10-01,146,-2.500470013629073,-2.88,nonstationary,0.78273487379696,0.463,nonstationary,
-Spec12_LIVES_Calibrated,1988-07-01,2024-10-01,146,-2.500470013629073,-2.88,nonstationary,0.78273487379696,0.463,nonstationary,
+full,1976-10-01,2026-01-01,198,-2.3722303564102547,-2.88,nonstationary,0.964729366468094,0.463,nonstationary,
+Spec6_Preferred,2003-07-01,2026-01-01,91,-2.517236692235807,-2.89,nonstationary,0.8643126716781439,0.463,nonstationary,
+Spec11_LIVES_Headline,1988-07-01,2026-01-01,151,-2.5284327829340496,-2.88,nonstationary,0.8432831560672348,0.463,nonstationary,
+Spec12_LIVES_Calibrated,1988-07-01,2026-01-01,151,-2.5284327829340496,-2.88,nonstationary,0.8432831560672348,0.463,nonstationary,

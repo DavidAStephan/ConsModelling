@@ -193,7 +193,7 @@ run_variant <- function(variant_name, variant) {
       lr_vars    = spec_template$lr_vars,
       sr_vars    = spec_template$sr_vars,
       dummy_vars = spec_template$dummy_vars,
-      sample_end = as.Date("2024-10-01")
+      sample_end = as.Date("2026-01-01")
     ),
     error = function(e) {
       message(sprintf("  ERROR: %s", conditionMessage(e)))
@@ -211,7 +211,7 @@ run_variant <- function(variant_name, variant) {
 
 fit_with_knots <- function(model_data, knots, signs,
                            lr_vars, sr_vars, dummy_vars,
-                           sample_end = as.Date("2024-10-01")) {
+                           sample_end = as.Date("2026-01-01")) {
 
   # Drop any leftover sdmma_ columns from previous runs
   if (any(grepl("^sdmma_", names(model_data)))) {
@@ -402,7 +402,7 @@ md_lines <- c(
   "",
   "Tests 7 variants of the Williams-style smoothed-step CCI spline against",
   "the same disaggregated consumption equation (Spec 4 long-run + base",
-  "dummies) on the 1988Q4-2024Q4 sample. Each variant proposes a different",
+  "dummies) on the 1988Q4-2026Q1 sample. Each variant proposes a different",
   "candidate knot set; the Hendry-Krolzig drop-on-violation reduction prunes",
   "knots that violate their institutional sign prior or are collinear/aliased.",
   "",

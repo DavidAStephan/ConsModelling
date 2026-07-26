@@ -13,7 +13,7 @@ Two methodologically distinct CCI extractors are now implemented:
    loan-flow; idiosyncratic noise variances and other loadings
    estimated via fitSSM. Smoothed state extracted via KFS.
 
-**Pearson correlation between the two series: -0.004**
+**Pearson correlation between the two series: -0.019**
 
 ## Spec-8 (Williams) vs Spec-9 (Kalman) coefficient comparison
 
@@ -24,32 +24,32 @@ difference is which CCI series enters the interactions.
 
 | Term | Spec 8 (Williams) | Spec 9 (Kalman) | Diff |
 |------|------------------:|----------------:|-----:|
-| (Intercept) | -0.02013 | 0.00080 | 0.02094 |
-| abs_income_resid | -0.18365 | -0.21557 | -0.03192 |
-| d2000_gst | 0.01010 | 0.01079 | 0.00069 |
-| d2008_gfc | -0.00603 | -0.01366 | -0.00763 |
-| d2020_covid | -0.15518 | -0.15702 | -0.00184 |
-| d2020_rebound | 0.01787 | 0.02764 | 0.00977 |
-| d2_log_unemp | 0.00349 | 0.01044 | 0.00695 |
-| d_apra_2014 | -0.01569 | 0.00480 | 0.02049 |
-| d_apra_2017 | 0.00998 | -0.00801 | -0.01799 |
-| d_jobkeeper_2020 | 0.03174 | 0.01423 | -0.01751 |
-| d_recession_1991 | -0.00457 | -0.00453 | 0.00004 |
-| dd4_income | 0.02770 | -0.00432 | -0.03202 |
-| ecm_lag | -0.45832 | -0.20878 | 0.24954 |
-| eq_y | -0.00136 | -0.00950 | -0.00814 |
-| ha_x_cci | 0.00426 | 0.00323 | -0.00103 |
-| ha_y | 0.00299 | 0.00219 | -0.00080 |
-| hp_x_1_minus_cci | 0.02987 | 0.01041 | -0.01946 |
-| ln_yp_over_y | 0.49212 | 0.22224 | -0.26988 |
-| nla_y | 0.03366 | 0.00282 | -0.03084 |
-| r_x_cci | 0.00283 | 0.00073 | -0.00209 |
-| super_y | 0.02152 | 0.00266 | -0.01886 |
-| yp_x_cci | -0.50462 | 0.04285 | 0.54747 |
+| (Intercept) | -0.01795 | 0.00015 | 0.01810 |
+| abs_income_resid | -0.18457 | -0.20825 | -0.02369 |
+| d2000_gst | 0.00996 | 0.01044 | 0.00047 |
+| d2008_gfc | -0.00630 | -0.01385 | -0.00755 |
+| d2020_covid | -0.15591 | -0.15743 | -0.00152 |
+| d2020_rebound | 0.02004 | 0.02733 | 0.00729 |
+| d2_log_unemp | 0.00449 | 0.00919 | 0.00470 |
+| d_apra_2014 | -0.01489 | 0.00558 | 0.02047 |
+| d_apra_2017 | 0.00970 | -0.00778 | -0.01748 |
+| d_jobkeeper_2020 | 0.03129 | 0.01453 | -0.01676 |
+| d_recession_1991 | -0.00467 | -0.00478 | -0.00011 |
+| dd4_income | 0.02886 | -0.00017 | -0.02904 |
+| ecm_lag | -0.42646 | -0.20988 | 0.21659 |
+| eq_y | -0.00001 | -0.01290 | -0.01289 |
+| ha_x_cci | 0.00452 | 0.00283 | -0.00168 |
+| ha_y | 0.00271 | 0.00245 | -0.00026 |
+| hp_x_1_minus_cci | 0.02796 | 0.00734 | -0.02061 |
+| ln_yp_over_y | 0.46500 | 0.23242 | -0.23258 |
+| nla_y | 0.03072 | -0.00028 | -0.03100 |
+| r_x_cci | 0.00306 | 0.00048 | -0.00258 |
+| super_y | 0.01887 | 0.00204 | -0.01683 |
+| yp_x_cci | -0.50892 | 0.05278 | 0.56170 |
 
 ## Headline observations
 
-- **Speed of adjustment**: Spec 8 lambda = -0.4583, Spec 9 lambda = -0.2088.
+- **Speed of adjustment**: Spec 8 lambda = -0.4265, Spec 9 lambda = -0.2099.
 - Wealth and interaction coefficients are method-dependent; read the
   table above (regenerated from the live fits each run) rather than any
   hand-written narrative for the current values.

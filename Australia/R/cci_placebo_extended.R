@@ -90,7 +90,7 @@ fit_with_knot_set <- function(knot_dates) {
     fit_ecm_spec(md, "Placebo_Ext", full_lr,
                  spec_template$sr_vars, spec_template$dummy_vars,
                  sample_start = as.Date("1976-07-01"),
-                 sample_end   = as.Date("2024-10-01")),
+                 sample_end   = as.Date("2026-01-01")),
     error = function(e) NULL
   )
   if (is.null(spec)) return(list(adj_r2 = NA_real_, lambda = NA_real_,
