@@ -2,6 +2,8 @@
 
 **David Stephan**
 
+**July 2026**
+
 **JEL classification:** E21, E32, E51, D14
 **Keywords:** household consumption, wealth effects, credit conditions, error-correction models, permanent income
 

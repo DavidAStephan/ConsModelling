@@ -58,12 +58,10 @@ format:
     citecolor: NavyBlue
     urlcolor: NavyBlue
     number-sections: false
-    toc: true
-    toc-depth: 3
+    toc: false
     colorlinks: true
   docx:
-    toc: true
-    toc-depth: 3
+    toc: false
     number-sections: false
   html:
     toc: true

@@ -42,10 +42,8 @@ DOCX_OUT     = wp_draft.docx
 HTML_OUT     = wp_draft.html
 DOCX_PANDOC  = wp_draft_pandoc.docx
 
-# Typst PDF metadata
-TITLE        = Australian Household Consumption, Wealth and Credit Conditions: A Single-Equation LIVES Estimate
-AUTHOR       = David Stephan
-DATE         = July 2026
+# Title, author and date live in the markdown header, which is the single
+# source of truth. Passing them again as Typst metadata renders them twice.
 
 .PHONY: pdf pdf-quarto docx html docx-pandoc clean help body
 
@@ -77,11 +75,6 @@ $(PDF_OUT): $(SRC_MD)
 	$(PANDOC) $(SRC_MD) -o $(PDF_OUT) \
 	    --from gfm+raw_attribute \
 	    --pdf-engine typst \
-	    --toc \
-	    --toc-depth 3 \
-	    -V title="$(TITLE)" \
-	    -V author="$(AUTHOR)" \
-	    -V date="$(DATE)" \
 	    -V papersize=a4 \
 	    -V margin-left=2cm \
 	    -V margin-right=2cm \
@@ -115,8 +108,7 @@ html: $(HTML_OUT)
 $(DOCX_PANDOC): $(SRC_MD)
 	$(PANDOC) $(SRC_MD) -o $(DOCX_PANDOC) \
 	    --from gfm+raw_attribute \
-	    --to docx \
-	    --toc
+	    --to docx
 
 docx-pandoc: $(DOCX_PANDOC)
 
