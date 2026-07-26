@@ -1,9 +1,9 @@
 # Rendering the working paper
 
-The headline paper is authored in markdown (`wp_draft.md`) and rendered
-to PDF / docx / html via pandoc + Typst (default) or Quarto + LaTeX
-(alternative). The companion paper in
-[`../../LIVES/docs/`](../../LIVES/docs/) uses the same setup.
+The headline paper is authored in markdown and rendered to PDF / docx /
+html via pandoc + Typst (default) or Quarto + LaTeX (alternative). The
+companion paper in [`../../LIVES/docs/`](../../LIVES/docs/) uses the same
+setup.
 
 ## Quick start
 
@@ -139,11 +139,11 @@ figures, citations, and bibliography do not need to change.
 - **`make docx-pandoc` fails on table syntax** — pandoc's default
   table parser is strict. If a table chokes, run `make docx`
   instead; Quarto's pipeline is more forgiving.
-- **`{{< include _wp_body.md >}}` not resolved** — that's a Quarto
+- **`{{< include ... >}}` not resolved** — that's a Quarto
   shortcode, not raw markdown. Run via `quarto render`, not
-  `pandoc` directly, when using `wp_draft.qmd`.
+  `pandoc` directly, when using a `.qmd` wrapper.
 - **Bibliography not appearing** — make sure `wp_references.bib`
-  is in the same directory as `wp_draft.qmd`, and that the
+  is in the same directory as the `.qmd` wrapper, and that the
   citations in the body have been migrated to `[@key]` form (a
   pure-prose draft renders cleanly but without an automatic
   bibliography section).

@@ -5,8 +5,8 @@
 #   (title, author, abstract, bibliography, format options) and
 #   `{{< include _wp_body.md >}}` for the body.
 # - _wp_body.md is an auto-generated build artefact: it is
-#   wp_draft.md with the leading title / draft-tag / author /
-#   JEL / keywords preamble stripped (those live in the YAML).
+#   wp_draft.md from "## 1. Introduction" onward, the leading title /
+#   author / JEL / keywords / abstract preamble living in the YAML.
 # - Final RBA RDP styling (template substitution, RBA cover page,
 #   typography) is a submission-time task; this Makefile produces
 #   a generic academic-style PDF / docx in the meantime.
@@ -22,7 +22,7 @@
 #                       pipeline)
 #   make docx          Render wp_draft.qmd to wp_draft.docx (Quarto)
 #   make html          Render wp_draft.qmd to wp_draft.html (Quarto)
-#   make docx-pandoc   Stopgap: produce wp_draft.docx via plain pandoc
+#   make docx-pandoc   Stopgap: produce wp_draft_pandoc.docx via plain pandoc
 #                       (no Quarto needed)
 #   make clean         Remove generated artefacts
 #
@@ -43,9 +43,9 @@ HTML_OUT     = wp_draft.html
 DOCX_PANDOC  = wp_draft_pandoc.docx
 
 # Typst PDF metadata
-TITLE        = Australian Household Consumption, Wealth and Credit Conditions: An Updated Single-Equation LIVES Estimate
+TITLE        = Australian Household Consumption, Wealth and Credit Conditions: A Single-Equation LIVES Estimate
 AUTHOR       = David Stephan
-DATE         = June 2026
+DATE         = July 2026
 
 .PHONY: pdf pdf-quarto docx html docx-pandoc clean help body
 
@@ -61,9 +61,8 @@ help:
 	@echo "See RENDER.md for setup."
 
 # ----------------------------------------------------------------------------
-# Body partial: wp_draft.md minus the leading preamble (title + draft tag
-# + author + JEL + keywords + first ---), which moves into Quarto YAML.
-# Stops stripping at the first line starting "## Abstract".
+# Body partial: wp_draft.md from the introduction onward. The leading
+# title / author / JEL / keywords / abstract preamble moves into Quarto YAML.
 # ----------------------------------------------------------------------------
 $(BODY_MD): $(SRC_MD)
 	@echo "[make] Building $(BODY_MD) from $(SRC_MD)"
