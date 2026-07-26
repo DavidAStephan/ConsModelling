@@ -1,7 +1,7 @@
 metric,value
-Sectional canonical adj R^2,0.6805
-Sectional canonical |lambda|,-0.2244
-Sectional adj R^2 percentile rank,37th
+Sectional canonical adj R^2,0.6807
+Sectional canonical |lambda|,-0.2239
+Sectional adj R^2 percentile rank,39th
 Sectional |lambda| percentile rank,60th
 Comparator note,see australia_williams_knot_placebo*_summary.csv
 Verdict,DETRENDING CRITIQUE PERSISTS — sectional below random median
