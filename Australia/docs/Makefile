@@ -75,11 +75,10 @@ body: $(BODY_MD)
 # ----------------------------------------------------------------------------
 $(PDF_OUT): $(SRC_MD)
 	$(PANDOC) $(SRC_MD) -o $(PDF_OUT) \
-	    --from gfm \
+	    --from gfm+raw_attribute \
 	    --pdf-engine typst \
 	    --toc \
 	    --toc-depth 3 \
-	    --number-sections \
 	    -V title="$(TITLE)" \
 	    -V author="$(AUTHOR)" \
 	    -V date="$(DATE)" \
@@ -115,10 +114,9 @@ html: $(HTML_OUT)
 # ----------------------------------------------------------------------------
 $(DOCX_PANDOC): $(SRC_MD)
 	$(PANDOC) $(SRC_MD) -o $(DOCX_PANDOC) \
-	    --from gfm \
+	    --from gfm+raw_attribute \
 	    --to docx \
-	    --toc \
-	    --number-sections
+	    --toc
 
 docx-pandoc: $(DOCX_PANDOC)
 

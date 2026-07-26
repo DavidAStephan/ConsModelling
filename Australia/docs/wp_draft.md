@@ -974,6 +974,10 @@ Four features of the screen card bear comment. *No specification clears the coin
 
 Specifications 2, 5, 6, 7 and 10 estimate on 86 observations because a 2002Q3-binding credit term shortens their sample; 7b on 64; 6b on the 180-observation back-extended sample.
 
+```{=typst}
+#pagebreak()
+```
+
 **Table C.3: Long-run coefficient matrix, disaggregated specifications, full sample**
 
 | Term | 4 | 5 | 6 | 8 | 11 |

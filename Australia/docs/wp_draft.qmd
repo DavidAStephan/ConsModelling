@@ -57,19 +57,19 @@ format:
     linkcolor: NavyBlue
     citecolor: NavyBlue
     urlcolor: NavyBlue
-    number-sections: true
+    number-sections: false
     toc: true
     toc-depth: 3
     colorlinks: true
   docx:
     toc: true
     toc-depth: 3
-    number-sections: true
+    number-sections: false
   html:
     toc: true
     toc-depth: 3
     theme: cosmo
-    number-sections: true
+    number-sections: false
 
 bibliography: wp_references.bib
 
