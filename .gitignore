@@ -41,3 +41,9 @@ LIVES/docs/companion_paper_draft.html
 LIVES/docs/companion_paper_draft_pandoc.docx
 LIVES/docs/companion_paper_draft_files/
 LIVES/docs/.quarto/
+
+# Workbook parse cache. Build artefact, never a deliverable: entries are
+# fingerprinted against their source workbook and rebuilt on demand. Keeping it
+# out of git also removes the checkout-mtime hazard that a tracked cache creates.
+Australia/.cache/
+LIVES/.cache/

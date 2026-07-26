@@ -88,25 +88,57 @@ USE_INSTITUTIONAL_CCI_OVERLAY <- FALSE
 # HELPERS
 # ==============================================================================
 
-# Cache helper — identical interface to italy_data_download.R
+# Cache helpers.
+#
+# The parse cache is keyed on `tag` alone. Historically it had no link back to
+# the workbook it was parsed from, so refreshing a file in data_raw/ and
+# re-running silently reused the previous vintage: the build succeeded, every
+# assertion passed, and the dataset simply stopped at the old sample end. That
+# is a near-invisible failure, so the cache now records a fingerprint of its
+# source and invalidates whenever the source no longer matches.
+#
+# The fingerprint is an MD5 of the source file rather than its mtime. mtime is
+# unreliable here: a fresh `git clone` or `git checkout` stamps every file with
+# the checkout time in arbitrary order, so a cache entry can legitimately end up
+# newer than the workbook it came from. A content hash cannot drift that way.
+.src_fingerprint <- function(src) {
+  if (is.null(src) || !file.exists(src)) return(NA_character_)
+  unname(tools::md5sum(src))
+}
+
 get_cached <- function(tag, src = NULL) {
   path <- file.path(cache_dir, paste0(tag, ".rds"))
-  if (file.exists(path)) {
-    # Invalidate on source mtime. The cache is keyed only on `tag`, so without
-    # this check a refreshed workbook in data_raw/ is silently ignored and the
-    # whole build quietly reuses the previous vintage — the failure mode is a
-    # dataset that looks fine but stops at the old sample end.
-    if (!is.null(src) && file.exists(src) && file.mtime(src) > file.mtime(path)) {
-      message("  [cache stale] ", tag, " — source is newer than cache, re-reading")
+  if (!file.exists(path)) return(NULL)
+  entry <- tryCatch(readRDS(path), error = function(e) NULL)
+
+  # Entries written before fingerprinting carry no provenance, so they cannot
+  # be verified and are treated as stale.
+  is_wrapped <- is.list(entry) && !is.data.frame(entry) &&
+    all(c("obj", "src_md5") %in% names(entry))
+  if (!is_wrapped) {
+    message("  [cache stale] ", tag, " — unfingerprinted entry, re-reading")
+    return(NULL)
+  }
+
+  if (!is.null(src)) {
+    now <- .src_fingerprint(src)
+    if (is.na(now) || !identical(now, entry$src_md5)) {
+      message("  [cache stale] ", tag, " — source changed, re-reading")
       return(NULL)
     }
-    message("  [cached] ", tag)
-    return(readRDS(path))
   }
-  NULL
+  message("  [cached] ", tag)
+  entry$obj
 }
-save_cached <- function(obj, tag) {
-  saveRDS(obj, file.path(cache_dir, paste0(tag, ".rds")))
+
+save_cached <- function(obj, tag, src = NULL) {
+  saveRDS(
+    list(obj       = obj,
+         src_md5   = .src_fingerprint(src),
+         src_name  = if (is.null(src)) NA_character_ else basename(src),
+         cached_at = Sys.time()),
+    file.path(cache_dir, paste0(tag, ".rds"))
+  )
   invisible(obj)
 }
 
@@ -246,7 +278,7 @@ read_abs_cached <- function(path, tag) {
   if (!is.null(cached)) return(cached)
   message("  Reading ", basename(path))
   obj <- read_abs_ts_workbook(path)
-  save_cached(obj, tag)
+  save_cached(obj, tag, src = path)
   obj
 }
 
